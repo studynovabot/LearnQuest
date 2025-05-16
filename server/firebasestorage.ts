@@ -9,8 +9,7 @@ import {
   type ChatMessage, type InsertChatMessage,
   type StoreItem, type InsertStoreItem,
   type UserItem, type InsertUserItem
-} from "@shared/schema";
-import { calculateLevel } from '../client/src/lib/utils';
+} from "./types/schema";
 import { IStorage } from './storage';
 import bcrypt from 'bcryptjs';
 
@@ -566,11 +565,9 @@ export class FirebaseStorage implements IStorage {
       if (!user) throw new Error('User not found');
       
       const newXp = user.xp + amount;
-      const newLevel = calculateLevel(newXp);
       
       const updatedUser = await this.updateUser(userId, {
-        xp: newXp,
-        level: newLevel
+        xp: newXp
       });
       
       if (!updatedUser) throw new Error('Failed to update user');

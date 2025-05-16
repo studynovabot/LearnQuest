@@ -1,5 +1,5 @@
 import TogetherAI from 'together-ai';
-import { QuestionRating } from '../../shared/schema';
+import { QuestionRating } from '../types/schema';
 
 type XPEvaluatorOptions = {
   apiKey: string;

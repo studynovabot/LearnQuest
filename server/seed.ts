@@ -1,5 +1,5 @@
 import { storage } from './index';
-import { type User, type Subject, type Task, type AITutor, type ChatMessage } from '@shared/schema';
+import { type User, type Subject, type Task, type AITutor, type ChatMessage } from './types/schema';
 
 // Create the initial dataset for the Study Nova app
 export async function seedDatabase() {

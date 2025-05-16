@@ -1,4 +1,4 @@
-import { AITutor } from '../../shared/schema';
+import { AITutor } from '../types/schema';
 import { GroqService } from './groq';
 import { TogetherAIService } from './together';
 

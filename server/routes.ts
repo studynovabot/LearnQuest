@@ -6,7 +6,7 @@ import {
   insertUserSchema, 
   insertTaskSchema, 
   insertChatMessageSchema
-} from "@shared/schema";
+} from "./types/schema";
 import { seedDatabase } from "./seed"; // Import seedDatabase from the appropriate module
 import { getAIServiceForAgent } from './ai';
 import multer from 'multer';
@@ -85,7 +85,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: String(req.body.password ?? ''),
         displayName: String(req.body.displayName ?? ''),
         isPro: Boolean(req.body.isPro) // Ensure isPro is always a boolean
-      });
+      }) as Record<string, any>;
       // Check if user already exists
       const existingUser = await storage.getUserByUsername(userData.username);
       if (existingUser) {
@@ -240,7 +240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description: String(req.body.description ?? ''),
         xpReward: Number(req.body.xpReward ?? 0),
         priority: String(req.body.priority ?? 'medium')
-      });
+      }) as Record<string, any>;
       const task = await storage.createTask({ ...taskData, priority: taskData.priority || 'medium' });
       res.status(201).json(task);
     } catch (error) {
