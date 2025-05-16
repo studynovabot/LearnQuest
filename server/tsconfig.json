@@ -1,6 +1,6 @@
 {
   "include": ["./**/*"],
-  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
+  "exclude": ["node_modules", "build", "dist", "../client", "../shared", "**/*.test.ts"],
   "compilerOptions": {
     "incremental": true,
     "noEmit": false,
