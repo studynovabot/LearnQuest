@@ -6,23 +6,21 @@ type TogetherAIOptions = {
   model: string;
 };
 
-interface TogetherAIClient {
-  complete: (params: {
-    model: string;
-    prompt: string;
-    max_tokens: number;
-    temperature: number;
-    top_p: number;
-    stop: string[];
-  }) => Promise<{
-    output?: {
-      text: string;
-    };
-  }>;
-}
-
 export class TogetherAIService implements AIService {
-  private client: TogetherAIClient;
+  private client: {
+    complete: (params: {
+      model: string;
+      prompt: string;
+      max_tokens: number;
+      temperature: number;
+      top_p: number;
+      stop: string[];
+    }) => Promise<{
+      output?: {
+        text: string;
+      };
+    }>;
+  };
   private model: string;
   
   constructor(options: TogetherAIOptions) {
@@ -40,7 +38,6 @@ export class TogetherAIService implements AIService {
       complete: async (params) => {
         try {
           console.log(`Making TogetherAI API request for model: ${params.model}`);
-          
           const response = await fetch(togetherApiUrl, {
             method: 'POST',
             headers: {
@@ -49,14 +46,12 @@ export class TogetherAIService implements AIService {
             },
             body: JSON.stringify(params)
           });
-          
           if (!response.ok) {
             const errorText = await response.text().catch(() => response.statusText);
             console.error(`TogetherAI API error (${response.status}): ${errorText}`);
             throw new Error(`TogetherAI API error: ${response.statusText}`);
           }
-          
-          return await response.json();
+          return await response.json() as { output?: { text: string } };
         } catch (error) {
           console.error('TogetherAI API request failed:', error);
           throw error;
@@ -128,7 +123,7 @@ export class TogetherAIService implements AIService {
         temperature: 0.7,
         top_p: 0.9,
         stop: ["</assistant>", "<user>"]
-      });
+      }) as any;
       
       const responseText = completion?.output?.text || "I'm having trouble responding right now. Please try again.";
       

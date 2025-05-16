@@ -86,7 +86,7 @@ export class GroqService implements AIService {
         }),
         temperature: 0.7,
         max_tokens: 800,
-      });
+      }) as any;
       const responseContent = completion.choices[0]?.message?.content || "I'm having trouble responding right now. Please try again.";
       const xpAwarded = this.calculateXpAward(prompt, responseContent);
       return { content: responseContent, xpAwarded };

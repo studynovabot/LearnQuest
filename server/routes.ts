@@ -84,14 +84,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         username: String(req.body.username ?? ''),
         password: String(req.body.password ?? ''),
         displayName: String(req.body.displayName ?? ''),
-        isPro: Boolean(req.body.isPro) // Ensure isPro is always a boolean
-      }) as Record<string, any>;
+        isPro: Boolean(req.body.isPro)
+      }) as import('./types/schema').InsertUser;
       // Check if user already exists
       const existingUser = await storage.getUserByUsername(userData.username);
       if (existingUser) {
         return res.status(409).json({ message: "Username already exists" });
       }
-      const user = await storage.createUser({ ...userData, isPro: userData.isPro ?? false });
+      const user = await storage.createUser(userData);
       // Don't return the password
       const { password, ...userWithoutPassword } = user;
       res.status(201).json(userWithoutPassword);
@@ -240,8 +240,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description: String(req.body.description ?? ''),
         xpReward: Number(req.body.xpReward ?? 0),
         priority: String(req.body.priority ?? 'medium')
-      }) as Record<string, any>;
-      const task = await storage.createTask({ ...taskData, priority: taskData.priority || 'medium' });
+      }) as import('./types/schema').InsertTask;
+      const task = await storage.createTask(taskData);
       res.status(201).json(task);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -660,8 +660,8 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
     try {
       // TODO: Replace with real authentication logic
       const userId = req.query.userId || req.body.userId || req.headers['x-user-id'] || 'userId';
-      if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-      const file = req.file;
+      const file = (req as any).file;
+      if (!file) return res.status(400).json({ error: 'No file uploaded' });
       const ext = file.originalname.split('.').pop();
       const fileName = `avatars/${userId}_${Date.now()}.${ext}`;
       const bucket = getStorage().bucket();
