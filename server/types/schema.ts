@@ -120,4 +120,26 @@ export type InsertStoreItem = z.infer<typeof insertStoreItemSchema>;
 export type InsertUserItem = z.infer<typeof insertUserItemSchema>;
 
 // XP system types
-export type QuestionRating = 'amazing' | 'decent' | 'needs_improvement' | 'incorrect'; 
+export type QuestionRating = 'amazing' | 'decent' | 'needs_improvement' | 'incorrect';
+
+export type Question = {
+  id: string;
+  userId: string;
+  content: string;
+  subjectId: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type InsertQuestion = Omit<Question, 'id' | 'createdAt' | 'updatedAt'>;
+
+export type Answer = {
+  id: string;
+  questionId: string;
+  content: string;
+  rating: QuestionRating;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type InsertAnswer = Omit<Answer, 'id' | 'createdAt' | 'updatedAt'>; 

@@ -9,7 +9,6 @@ import {
   type ChatMessage, type InsertChatMessage,
   type StoreItem, type InsertStoreItem,
   type UserItem, type InsertUserItem,
-  type Tutor,
   type Question, type InsertQuestion,
   type Answer, type InsertAnswer,
   type QuestionRating
@@ -21,16 +20,16 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
 export class FirebaseStorage implements IStorage {
   // User operations
-  async getUser(id: string): Promise<User | null> {
+  async getUser(id: string): Promise<User | undefined> {
     try {
       const userDoc = await adminDb.collection('users').doc(id).get();
       if (userDoc.exists) {
         return userDoc.data() as User;
       }
-      return null;
+      return undefined;
     } catch (error) {
       console.error('Error getting user:', error);
-      return null;
+      return undefined;
     }
   }
 
