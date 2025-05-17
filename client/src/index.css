@@ -64,6 +64,10 @@
 }
 
 @layer components {
+  .bg-background {
+    background-color: hsl(var(--background));
+  }
+
   .glow {
     position: relative;
   }

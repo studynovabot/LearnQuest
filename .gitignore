@@ -7,3 +7,4 @@ vite.config.ts.*
 # Firebase
 serviceAccountKey.json
 *-firebase-adminsdk-*.json
+.vercel
