@@ -4,6 +4,9 @@ import path from "path";
 import { registerRoutes } from "./routes.js";
 import { seedDatabase } from "./seed.js";
 import { FirebaseStorage } from './firebasestorage.js';
+import cors from 'cors';
+import { initializeFirebase } from './firebaseAdmin.js';
+import rateLimit from 'express-rate-limit';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -17,7 +20,39 @@ if (!process.env.GROQ_API_KEY || !process.env.TOGETHER_AI_API_KEY) {
 // Initialize Firebase storage
 export const storage = new FirebaseStorage();
 
+// Initialize Firebase
+initializeFirebase();
+
 const app = express();
+
+// Configure rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: process.env.NODE_ENV === 'production' ? 100 : 1000, // limit each IP to 100 requests per windowMs in production
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply rate limiting to all routes
+app.use(limiter);
+
+// Configure CORS for production
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? [
+        'https://studynovabot.com', 
+        'https://www.studynovabot.com',
+        'https://learnquest.vercel.app',  // Add your Vercel frontend URL
+        'https://*.vercel.app'  // Allow all Vercel preview deployments
+      ] 
+    : '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -89,9 +124,22 @@ declare global {
   }
 }
 
-// Add health check endpoint
-app.get('/api/health', (_req, res) => {
-  res.status(200).json({ status: 'ok' });
+// Security headers middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  next();
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString()
+  });
 });
 
 (async () => {
@@ -125,6 +173,16 @@ app.get('/api/health', (_req, res) => {
     host: "0.0.0.0",
   }, () => {
     console.log(`Server running on port ${port}`);
-    console.log(`Environment: ${app.get("env")}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   });
 })();
+
+// Error handling
+process.on('unhandledRejection', (error: Error) => {
+  console.error('Unhandled Rejection:', error);
+});
+
+process.on('uncaughtException', (error: Error) => {
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
