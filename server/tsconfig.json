@@ -9,7 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
     "rootDir": ".",
-    "types": ["node", "vite/client"],
+    "types": ["node"],
     "allowJs": true,
     "resolveJsonModule": true
   },

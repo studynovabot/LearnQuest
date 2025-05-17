@@ -1,13 +1,12 @@
 import * as dotenv from 'dotenv';
+import express, { type Request, Response, NextFunction } from "express";
+import path from "path";
+import { registerRoutes } from "./routes.js";
+import { seedDatabase } from "./seed.js";
+import { FirebaseStorage } from './firebasestorage.js';
 
 // Load environment variables from .env file
 dotenv.config();
-
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
-import { seedDatabase } from "./seed";
-import { FirebaseStorage } from './firebasestorage';
 
 // Set up AI API keys from environment variables
 if (!process.env.GROQ_API_KEY || !process.env.TOGETHER_AI_API_KEY) {
@@ -59,7 +58,7 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(logLine);
+      console.log(logLine);
     }
   });
 
@@ -97,8 +96,6 @@ app.get('/api/health', (_req, res) => {
 
 (async () => {
   console.log('Starting server...');
-  // Removed automatic seeding on server start
-  // If you want to seed, use the /api/seed endpoint or call seedDatabase() manually
   const server = await registerRoutes(app);
 
   // Error handling middleware
@@ -109,13 +106,15 @@ app.get('/api/health', (_req, res) => {
     res.status(status).json({ message });
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+  // Serve static files in production
+  if (app.get("env") === "production") {
+    const distPath = path.resolve(__dirname, "public");
+    app.use(express.static(distPath));
+    
+    // Serve index.html for all other routes
+    app.get("*", (_req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
   }
 
   // Use the PORT environment variable if available (for Vercel and other cloud platforms)
@@ -125,7 +124,7 @@ app.get('/api/health', (_req, res) => {
     port: Number(port),
     host: "0.0.0.0",
   }, () => {
-    log(`Server running on port ${port}`);
-    log(`Environment: ${app.get("env")}`);
+    console.log(`Server running on port ${port}`);
+    console.log(`Environment: ${app.get("env")}`);
   });
 })();
