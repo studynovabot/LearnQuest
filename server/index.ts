@@ -90,6 +90,11 @@ declare global {
   }
 }
 
+// Add health check endpoint
+app.get('/api/health', (_req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 (async () => {
   console.log('Starting server...');
   // Removed automatic seeding on server start
