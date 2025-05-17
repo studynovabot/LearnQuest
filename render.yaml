@@ -2,6 +2,7 @@ services:
   - type: web
     name: learnquest-backend
     env: node
+    plan: free
     buildCommand: cd server && npm install && npm run build
     startCommand: cd server && npm start
     envVars:
