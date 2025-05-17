@@ -7,7 +7,7 @@ import {
   type ChatMessage, type InsertChatMessage,
   type StoreItem, type InsertStoreItem,
   type UserItem, type InsertUserItem
-} from "./types/schema";
+} from "./types/schema.js";
 
 // Extend the storage interface with all the necessary CRUD operations
 export interface IStorage {

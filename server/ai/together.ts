@@ -1,5 +1,4 @@
-import TogetherAI from 'together-ai';
-import { AIService } from './index';
+import { AIService } from './index.js';
 
 type TogetherAIOptions = {
   apiKey: string;

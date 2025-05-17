@@ -1,17 +1,57 @@
-import TogetherAI from 'together-ai';
-import { QuestionRating } from '../types/schema';
+import { QuestionRating } from '../types/schema.js';
 
 type XPEvaluatorOptions = {
   apiKey: string;
 };
 
 export class XPEvaluator {
-  private client: any;
+  private client: {
+    evaluate: (params: {
+      question: string;
+      response: string;
+      criteria: string[];
+    }) => Promise<{
+      rating: string;
+    }>;
+  };
   private model: string = 'google/gemma-7b-it'; // The smaller, more efficient model for evaluations
   
   constructor(options: XPEvaluatorOptions) {
-    // Create client with proper type handling
-    this.client = new TogetherAI(options.apiKey as any);
+    const togetherApiUrl = process.env.TOGETHER_AI_API_URL || 'https://api.together.xyz/v1/completions';
+    
+    this.client = {
+      evaluate: async (params) => {
+        try {
+          const response = await fetch(togetherApiUrl, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${options.apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: this.model,
+              prompt: `Evaluate the following question and response:\nQuestion: ${params.question}\nResponse: ${params.response}\nCriteria: ${params.criteria.join(', ')}\nRating:`,
+              max_tokens: 100,
+              temperature: 0.3,
+              top_p: 0.9,
+              stop: ["\n"]
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error(`TogetherAI API error: ${response.statusText}`);
+          }
+          
+          const result = await response.json();
+          return {
+            rating: result.output?.text || 'decent'
+          };
+        } catch (error) {
+          console.error('Error evaluating with TogetherAI:', error);
+          throw error;
+        }
+      }
+    };
   }
   
   /**

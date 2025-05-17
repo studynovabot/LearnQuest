@@ -1,14 +1,14 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./index";
+import { storage } from "./index.js";
 import * as z from "zod";
 import { 
   insertUserSchema, 
   insertTaskSchema, 
   insertChatMessageSchema
-} from "./types/schema";
-import { seedDatabase } from "./seed"; // Import seedDatabase from the appropriate module
-import { getAIServiceForAgent } from './ai';
+} from "./types/schema.js";
+import { seedDatabase } from "./seed.js"; // Import seedDatabase from the appropriate module
+import { getAIServiceForAgent } from './ai/index.js';
 import multer from 'multer';
 import { getStorage } from 'firebase-admin/storage';
 
@@ -85,7 +85,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: String(req.body.password ?? ''),
         displayName: String(req.body.displayName ?? ''),
         isPro: Boolean(req.body.isPro)
-      }) as import('./types/schema').InsertUser;
+      }) as import('./types/schema.js').InsertUser;
       // Check if user already exists
       const existingUser = await storage.getUserByUsername(userData.username);
       if (existingUser) {
@@ -240,7 +240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description: String(req.body.description ?? ''),
         xpReward: Number(req.body.xpReward ?? 0),
         priority: String(req.body.priority ?? 'medium')
-      }) as import('./types/schema').InsertTask;
+      }) as import('./types/schema.js').InsertTask;
       const task = await storage.createTask(taskData);
       res.status(201).json(task);
     } catch (error) {

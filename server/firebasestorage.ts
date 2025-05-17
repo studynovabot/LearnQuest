@@ -1,5 +1,5 @@
 import { Timestamp } from 'firebase-admin/firestore';
-import { adminDb } from './firebaseAdmin';
+import { adminDb } from './firebaseAdmin.js';
 import { 
   type User, type InsertUser,
   type Subject, type InsertSubject,
@@ -8,30 +8,29 @@ import {
   type UserTutor,
   type ChatMessage, type InsertChatMessage,
   type StoreItem, type InsertStoreItem,
-  type UserItem, type InsertUserItem
-} from "./types/schema";
-import { IStorage } from './storage';
+  type UserItem, type InsertUserItem,
+  type Tutor,
+  type Question, type InsertQuestion,
+  type Answer, type InsertAnswer,
+  type QuestionRating
+} from "./types/schema.js";
+import { IStorage } from './storage.js';
 import bcrypt from 'bcryptjs';
+import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
 export class FirebaseStorage implements IStorage {
   // User operations
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | null> {
     try {
       const userDoc = await adminDb.collection('users').doc(id).get();
       if (userDoc.exists) {
-        const data = userDoc.data();
-        return {
-          id,
-          ...data,
-          lastLogin: data?.lastLogin?.toDate(),
-          createdAt: data?.createdAt?.toDate(),
-          updatedAt: data?.updatedAt?.toDate()
-        } as User;
+        return userDoc.data() as User;
       }
-      return undefined;
+      return null;
     } catch (error) {
       console.error('Error getting user:', error);
-      return undefined;
+      return null;
     }
   }
 
@@ -619,5 +618,30 @@ export class FirebaseStorage implements IStorage {
       console.error('Error deleting old chat messages:', error);
       return 0;
     }
+  }
+
+  async getTask(taskId: string): Promise<Task | null> {
+    const doc = await adminDb.collection('tasks').doc(taskId).get();
+    return doc.exists ? (doc.data() as Task) : null;
+  }
+
+  async getSubject(subjectId: string): Promise<Subject | null> {
+    const doc = await adminDb.collection('subjects').doc(subjectId).get();
+    return doc.exists ? (doc.data() as Subject) : null;
+  }
+
+  async getTutor(tutorId: string): Promise<AITutor | null> {
+    const doc = await adminDb.collection('tutors').doc(tutorId).get();
+    return doc.exists ? (doc.data() as AITutor) : null;
+  }
+
+  async getQuestion(questionId: string): Promise<Question | null> {
+    const doc = await adminDb.collection('questions').doc(questionId).get();
+    return doc.exists ? (doc.data() as Question) : null;
+  }
+
+  async getAnswer(answerId: string): Promise<Answer | null> {
+    const doc = await adminDb.collection('answers').doc(answerId).get();
+    return doc.exists ? (doc.data() as Answer) : null;
   }
 }

@@ -1,6 +1,6 @@
-import { AITutor } from '../types/schema';
-import { GroqService } from './groq';
-import { TogetherAIService } from './together';
+import { AITutor } from '../types/schema.js';
+import { GroqService } from './groq.js';
+import { TogetherAIService } from './together.js';
 
 export interface AIService {
   generateResponse(
