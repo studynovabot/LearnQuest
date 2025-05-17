@@ -1,37 +1,38 @@
 {
   "name": "learnquest-server",
   "version": "1.0.0",
+  "description": "LearnQuest Server",
+  "main": "dist/index.js",
   "private": true,
   "type": "module",
   "engines": {
     "node": "20.x"
   },
   "scripts": {
-    "dev": "cross-env NODE_ENV=development tsx index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only index.ts",
     "build": "npm install && npm i --save-dev @types/multer @types/cors @types/bcryptjs && tsc",
-    "start": "cross-env NODE_ENV=production node dist/index.js"
+    "start": "node dist/index.js"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.2",
+    "@types/express": "^4.17.21",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^4.21.2",
-    "firebase": "^11.7.3",
-    "firebase-admin": "^13.4.0",
-    "groq-sdk": "^0.22.0",
-    "multer": "^1.4.5-lts.2",
-    "nanoid": "^5.1.5",
-    "together-ai": "^0.16.0",
-    "zod": "^3.24.4"
+    "express": "^4.18.2",
+    "firebase-admin": "^11.11.1",
+    "groq-sdk": "^0.3.0",
+    "multer": "^1.4.5-lts.1",
+    "nanoid": "^5.0.4"
   },
   "devDependencies": {
-    "@types/node": "^20.11.24",
-    "@types/express": "^4.17.21",
-    "@types/multer": "^1.4.11",
-    "@types/cors": "^2.8.17",
     "@types/bcryptjs": "^2.4.6",
-    "cross-env": "^7.0.3",
-    "tsx": "^4.19.1",
-    "typescript": "^5.6.3"
+    "@types/cors": "^2.8.17",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.11.19",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.3",
+    "@vitejs/plugin-react": "^4.2.1",
+    "@replit/vite-plugin-runtime-error-modal": "^0.1.0",
+    "@replit/vite-plugin-cartographer": "^0.1.0"
   }
 }

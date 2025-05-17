@@ -1,11 +1,19 @@
 import Groq from 'groq-sdk';
-import { AIService } from './index';
+import { AIService } from './index.js';
 
 type GroqOptions = {
   apiKey: string;
   model: string;
   apiUrl?: string;
 };
+
+interface GroqCompletionResponse {
+  choices: Array<{
+    message: {
+      content: string;
+    };
+  }>;
+}
 
 export class GroqService implements AIService {
   private client: Groq;
@@ -69,24 +77,24 @@ export class GroqService implements AIService {
         return { content: responseContent, xpAwarded };
       }
       // Default SDK usage
-      const completion: any = await this.client.chat.completions.create({
+      const completion = (await this.client.chat.completions.create({
         model: this.model,
         messages: messages.map(message => {
           if (message.role === 'function') {
             return {
-              role: 'function', // Explicitly set role to 'function'
-              name: 'FunctionName', // Ensure name is always a valid string
+              role: 'function',
+              name: 'FunctionName',
               content: message.content,
             };
           }
           return {
-            role: 'assistant', // Explicitly set role to 'assistant'
+            role: 'assistant',
             content: message.content,
           };
         }),
         temperature: 0.7,
         max_tokens: 800,
-      });
+      })) as GroqCompletionResponse;
       const responseContent = completion.choices[0]?.message?.content || "I'm having trouble responding right now. Please try again.";
       const xpAwarded = this.calculateXpAward(prompt, responseContent);
       return { content: responseContent, xpAwarded };
