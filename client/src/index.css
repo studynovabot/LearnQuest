@@ -6,40 +6,40 @@
   :root {
     --background: 226 100% 2%;
     --foreground: 0 0% 98%;
-    
+
     --card: 222 47% 11%;
     --card-foreground: 0 0% 98%;
-    
+
     --popover: 222 47% 11%;
     --popover-foreground: 0 0% 98%;
-    
+
     --primary: 221 83% 53%;
     --primary-foreground: 0 0% 98%;
-    
+
     --secondary: 250 50% 50%;
     --secondary-foreground: 0 0% 98%;
-    
+
     --muted: 220 13% 18%;
     --muted-foreground: 215 16% 75%;
-    
+
     --accent: 250 50% 50%;
     --accent-foreground: 0 0% 98%;
-    
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    
+
     --border: 220 13% 18%;
     --input: 220 13% 18%;
     --ring: 220 83% 53%;
-    
+
     --radius: 0.75rem;
-    
+
     --chart-1: 221 83% 53%;
     --chart-2: 250 50% 50%;
     --chart-3: 160 84% 39%;
     --chart-4: 43 96% 58%;
     --chart-5: 0 84% 60%;
-    
+
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 221 83% 53%;
@@ -58,7 +58,7 @@
   body {
     @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))] antialiased overflow-x-hidden;
     font-family: ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
-    background-image: 
+    background-image:
       radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
       radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 50%);
   }
@@ -68,7 +68,7 @@
   .glow {
     position: relative;
   }
-  
+
   .glow::after {
     content: "";
     position: absolute;
@@ -80,62 +80,62 @@
     box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
     z-index: -1;
   }
-  
+
   .glow-blue::after {
     box-shadow: 0 0 15px rgba(37, 99, 235, 0.3);
   }
-  
+
   .glow-purple::after {
     box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
   }
-  
+
   .glow-green::after {
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
   }
-  
+
   .agent-card {
     @apply bg-[hsl(var(--card))] p-4 flex flex-col items-center transition duration-300;
     border-radius: 1rem;
   }
-  
+
   .agent-card:hover {
     transform: translateY(-4px);
     @apply shadow-lg;
   }
-  
+
   .nav-icon {
     @apply transition-all duration-200;
   }
-  
+
   .nav-icon:hover {
-    @apply text-secondary scale-110;
+    @apply text-blue-500 scale-110;
   }
-  
+
   .xp-gained {
     animation: fadeUp 1s ease forwards;
   }
-  
+
   .progress-bar {
     @apply overflow-hidden rounded-full h-2 bg-muted;
   }
-  
+
   .progress-fill {
     @apply h-full rounded-full transition-all duration-500 ease-out;
     background: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
   }
-  
+
   .progress-fill-red {
     background: linear-gradient(90deg, hsl(var(--chart-5)) 0%, hsl(var(--chart-4)) 100%);
   }
-  
+
   .progress-fill-yellow {
     background: linear-gradient(90deg, hsl(var(--chart-4)) 0%, hsl(43 96% 68%) 100%);
   }
-  
+
   .progress-fill-green {
     background: linear-gradient(90deg, hsl(var(--chart-3)) 0%, hsl(160 84% 29%) 100%);
   }
-  
+
   .progress-fill-blue {
     background: linear-gradient(90deg, hsl(var(--chart-1)) 0%, hsl(var(--primary)) 100%);
   }
@@ -167,13 +167,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-muted/50 rounded-lg;
+  @apply bg-muted rounded-lg;
+  opacity: 0.5;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-accent/50 rounded-lg;
+  @apply bg-accent rounded-lg;
+  opacity: 0.5;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-accent/80;
+  @apply bg-accent;
+  opacity: 0.8;
 }
