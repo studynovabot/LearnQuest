@@ -156,11 +156,10 @@ app.get('/health', (req, res) => {
 
   // Serve static files in production
   if (app.get("env") === "production") {
-    const distPath = path.resolve(__dirname, "public");
+    const distPath = path.resolve(__dirname, "../client/dist");
     app.use(express.static(distPath));
-    
-    // Serve index.html for all other routes
-    app.get("*", (_req, res) => {
+    // Serve index.html for all non-API routes
+    app.get(/^\/(?!api).*/, (_req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
