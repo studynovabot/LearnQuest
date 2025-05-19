@@ -25,8 +25,25 @@ export function useTasks() {
 
   const createTaskMutation = useMutation<Task, Error, Omit<Task, "id" | "completed">>({
     mutationFn: async (task: Omit<Task, "id" | "completed">) => {
-      const response = await apiRequest("POST", "/api/tasks", task);
-      return response.json();
+      try {
+        // Add timeout for the request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+        const response = await apiRequest("POST", "/api/tasks", task);
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => "Unknown error");
+          console.error(`Task creation failed with status ${response.status}: ${errorText}`);
+          throw new Error(`Failed to create task: ${response.status} ${response.statusText}`);
+        }
+
+        return response.json();
+      } catch (error) {
+        console.error("Task creation error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
@@ -37,6 +54,17 @@ export function useTasks() {
       });
     },
     onError: (error) => {
+      console.error("Create task mutation error:", error);
+
+      // Log detailed error information
+      if (error instanceof Error) {
+        console.error({
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+      }
+
       toast({
         title: "Failed to Create Task",
         description: error instanceof Error ? error.message : "An error occurred while creating the task.",
@@ -52,11 +80,11 @@ export function useTasks() {
     },
     onSuccess: (data: Task) => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-      
+
       // If a task was completed, refresh the user to get updated XP
       if (data.completed) {
         refreshUser();
-        
+
         toast({
           title: "Task Completed",
           description: `You earned +${data.xpReward} XP for completing this task!`,

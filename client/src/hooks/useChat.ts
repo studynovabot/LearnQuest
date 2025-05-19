@@ -44,35 +44,55 @@ export function useChat() {
       };
       setLocalMessages((prev) => [...prev, userMessage]);
 
-      // Send the message to the server
-      const response = await apiRequest("POST", "/api/chat", {
-        content,
-        agentId: activeAgent?.id || '1', // Default to the first agent if none is selected
-      });
+      // Send the message to the server with a timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-      if (!response.ok) {
-        throw new Error("Failed to send message");
+      try {
+        const response = await apiRequest("POST", "/api/chat", {
+          content,
+          agentId: activeAgent?.id || '1', // Default to the first agent if none is selected
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`Failed to send message: ${response.status} ${response.statusText}`);
+        }
+
+        const assistantMessage = await response.json();
+
+        // Add the assistant's response to local state
+        setLocalMessages((prev) => [...prev, {
+          ...assistantMessage,
+          timestamp: assistantMessage.timestamp || Date.now()
+        }]);
+      } catch (fetchError) {
+        console.error("API request failed:", fetchError);
+        throw fetchError;
       }
 
-      const assistantMessage = await response.json();
-      
-      // Add the assistant's response to local state
-      setLocalMessages((prev) => [...prev, {
-        ...assistantMessage,
-        timestamp: assistantMessage.timestamp || Date.now()
-      }]);
-      
     } catch (error) {
       console.error("Error in sendMessage:", error);
+
+      // Log detailed error information
+      if (error instanceof Error) {
+        console.error({
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+      }
+
       toast({
         title: "Error",
         description: "Failed to send message. Please try again later.",
         variant: "destructive",
       });
-      
+
       // Add a fallback error message
       setLocalMessages((prev) => [...prev, {
-        id: Date.now(), // Using a timestamp as a numeric ID instead of a string
+        id: Date.now(),
         content: "I'm sorry, I'm having trouble connecting right now. Please try again later.",
         role: 'assistant',
         timestamp: Date.now(),

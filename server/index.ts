@@ -39,13 +39,16 @@ app.use(limiter);
 
 // Configure CORS for production
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
+  origin: process.env.NODE_ENV === 'production'
     ? [
-        'https://studynovabot.com', 
+        'https://studynovabot.com',
         'https://www.studynovabot.com',
         'https://learnquest.vercel.app',  // Add your Vercel frontend URL
-        'https://*.vercel.app'  // Allow all Vercel preview deployments
-      ] 
+        'https://*.vercel.app',  // Allow all Vercel preview deployments
+        // Allow same-origin requests
+        /^https:\/\/[^.]+\.vercel\.app$/,
+        /^https:\/\/[^.]+\.vercel\.app:[0-9]+$/
+      ]
     : '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID'],
@@ -61,11 +64,11 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  
+
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-  
+
   next();
 });
 
@@ -135,8 +138,8 @@ app.use((req, res, next) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'ok', 
+  res.status(200).json({
+    status: 'ok',
     environment: process.env.NODE_ENV,
     timestamp: new Date().toISOString()
   });

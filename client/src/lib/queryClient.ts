@@ -12,12 +12,12 @@ async function throwIfResNotOk(res: Response) {
     });
 
     // Check if this is a Firestore API error
-    if (text.includes("Cloud Firestore API has not been used") || 
-        text.includes("PERMISSION_DENIED") || 
+    if (text.includes("Cloud Firestore API has not been used") ||
+        text.includes("PERMISSION_DENIED") ||
         text.includes("Firestore") ||
         text.includes("firebase")) {
       console.error("Firebase API error:", text);
-      
+
       // Show a more user-friendly error message
       throw new Error("Firebase connection issue. Please ensure you've enabled the Firestore API in your Google Cloud Console.");
     }
@@ -31,20 +31,50 @@ export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
+  options?: { signal?: AbortSignal }
 ): Promise<Response> {
   // Get userId from localStorage if available
   const userId = getUserId() || 'guest';
   const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
   headers["Authorization"] = userId;
-  const res = await fetch(url, {
-    method,
-    headers,
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
 
-  await throwIfResNotOk(res);
-  return res;
+  // Add debugging information
+  console.log(`Making API request: ${method} ${url}`);
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers,
+      body: data ? JSON.stringify(data) : undefined,
+      credentials: "include",
+      signal: options?.signal,
+    });
+
+    // Log response status
+    console.log(`API response status: ${res.status} ${res.statusText} for ${method} ${url}`);
+
+    // For 404 errors, provide more detailed logging
+    if (res.status === 404) {
+      console.error(`404 Not Found: ${method} ${url}`, {
+        headers: headers,
+        data: data ? JSON.stringify(data) : undefined
+      });
+
+      // Special handling for common API endpoints
+      if (url.includes('/api/tasks')) {
+        throw new Error('Task service is currently unavailable. Please try again later.');
+      }
+      if (url.includes('/api/chat')) {
+        throw new Error('Chat service is currently unavailable. Please try again later.');
+      }
+    }
+
+    await throwIfResNotOk(res);
+    return res;
+  } catch (error) {
+    console.error(`API request failed: ${method} ${url}`, error);
+    throw error;
+  }
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
