@@ -24,17 +24,30 @@ try {
         clientEmail,
         privateKey: privateKey.replace(/\\n/g, '\n'),
       }),
+      // Add databaseURL to fix connection issues
+      databaseURL: `https://${projectId}.firebaseio.com`
     });
     console.log('Firebase Admin initialized successfully');
   } else {
     app = getApps()[0];
     console.log('Using existing Firebase Admin app');
   }
-  
+
   // Get Firestore instance
   firestoreDb = getFirestore(app);
+
+  // Test Firestore connection
+  firestoreDb.collection('test').doc('connection-test').set({
+    timestamp: new Date(),
+    status: 'connected'
+  }).then(() => {
+    console.log('Firestore connection test successful');
+  }).catch(err => {
+    console.error('Firestore connection test failed:', err);
+  });
+
   console.log('Firestore instance created successfully');
-  
+
 } catch (error) {
   console.error('Failed to initialize Firebase Admin:', error);
   if (error instanceof Error) {
@@ -48,13 +61,15 @@ export const adminDb = firestoreDb;
 
 export function initializeFirebase() {
   if (getApps().length === 0) {
-    console.log('Initializing Firebase with project ID:', process.env.FIREBASE_PROJECT_ID);
+    console.log('Initializing Firebase with project ID:', process.env.FIREBASE_PROJECT_ID || projectId);
     initializeApp({
       credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
-      })
+        projectId: process.env.FIREBASE_PROJECT_ID || projectId,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL || clientEmail,
+        privateKey: (process.env.FIREBASE_PRIVATE_KEY || privateKey).replace(/\\n/g, '\n')
+      }),
+      // Add databaseURL to fix connection issues
+      databaseURL: `https://${process.env.FIREBASE_PROJECT_ID || projectId}.firebaseio.com`
     });
     console.log('Firebase Admin initialized successfully');
   }

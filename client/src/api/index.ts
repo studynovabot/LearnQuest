@@ -4,7 +4,12 @@ const API_URL = config.apiUrl;
 
 export const api = {
   async fetch(endpoint: string, options: RequestInit = {}) {
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    // Make sure endpoint starts with a slash if API_URL is empty
+    const formattedEndpoint = !API_URL && !endpoint.startsWith('/') ? `/${endpoint}` : endpoint;
+
+    console.log(`API fetch: ${API_URL}${formattedEndpoint}`);
+
+    const response = await fetch(`${API_URL}${formattedEndpoint}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -35,4 +40,4 @@ export const api = {
   },
 
   // Add more API methods as needed
-}; 
+};

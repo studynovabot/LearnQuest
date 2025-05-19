@@ -47,7 +47,9 @@ const corsOptions = {
         'https://*.vercel.app',  // Allow all Vercel preview deployments
         // Allow same-origin requests
         /^https:\/\/[^.]+\.vercel\.app$/,
-        /^https:\/\/[^.]+\.vercel\.app:[0-9]+$/
+        /^https:\/\/[^.]+\.vercel\.app:[0-9]+$/,
+        // Allow all origins in production for now to debug
+        '*'
       ]
     : '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

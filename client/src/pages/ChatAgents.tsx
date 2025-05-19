@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useChat } from "@/hooks/useChat";
 import { AITutor, ChatMessage } from "@/types";
-import { 
-  SendIcon, 
-  RobotIcon, 
-  UserIcon, 
-  CompassIcon, 
-  SmileIcon, 
+import {
+  SendIcon,
+  RobotIcon,
+  UserIcon,
+  CompassIcon,
+  SmileIcon,
   CalculatorIcon,
   LanguagesIcon,
   LockIcon
@@ -22,65 +22,60 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import FirebaseError from "@/components/firebase-error";
+import { FirebaseStatus } from "@/components/firebase/FirebaseStatus";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 const ChatAgents = () => {
-  const { 
-    agents, 
-    unlockedAgents, 
-    lockedAgents, 
-    activeAgent, 
-    isLoading, 
-    sendMessage, 
-    selectAgent, 
+  const {
+    agents,
+    unlockedAgents,
+    lockedAgents,
+    activeAgent,
+    isLoading,
+    sendMessage,
+    selectAgent,
     agentMessages,
     isSubmitting
   } = useChat();
-  
+
   const { user } = useAuth();
   const { toast } = useToast();
+  const { trackChatInteraction, trackError } = useAnalytics();
   const [inputMessage, setInputMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [unlockingId, setUnlockingId] = useState<number | null>(null);
-  const [firebaseError, setFirebaseError] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  // Check for Firebase connection on mount
-  useEffect(() => {
-    const checkFirebaseConnection = async () => {
-      try {
-        const response = await fetch('/api/health');
-        if (!response.ok) {
-          setFirebaseError(true);
-        } else {
-          setFirebaseError(false);
-        }
-      } catch (error) {
-        console.error('Error checking Firebase connection:', error);
-        setFirebaseError(true);
-      }
-    };
-    
-    checkFirebaseConnection();
-  }, []);
-  
+
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [agentMessages]);
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || isSending) return;
-    
+
     setIsSending(true);
     try {
       await sendMessage(inputMessage);
+      // Track chat interaction with analytics
+      if (activeAgent) {
+        trackChatInteraction(activeAgent.id.toString());
+      }
       setInputMessage("");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error sending message';
+      trackError('chat', errorMessage);
+      toast({
+        title: "Error sending message",
+        description: errorMessage,
+        variant: "destructive"
+      });
     } finally {
       setIsSending(false);
     }
   };
-  
+
   const handleUnlockAgent = async (agent: AITutor) => {
     if (!user || (agent.xpRequired && user.xp < agent.xpRequired)) {
       toast({
@@ -104,7 +99,7 @@ const ChatAgents = () => {
       setUnlockingId(null);
     }
   };
-  
+
   const getAgentIcon = (iconName?: string, size = 24) => {
     switch (iconName) {
       case 'user': return <UserIcon size={size} />;
@@ -116,7 +111,7 @@ const ChatAgents = () => {
       default: return <RobotIcon size={size} />;
     }
   };
-  
+
   const getAgentColorClass = (color?: string) => {
     switch (color) {
       case 'blue': return 'bg-primary text-white';
@@ -141,14 +136,12 @@ const ChatAgents = () => {
           <CardHeader className="bg-card">
             <CardTitle className="text-2xl font-bold">Study Nova AI Tutors</CardTitle>
           </CardHeader>
-          
+
           <CardContent className="p-0">
-            {firebaseError ? (
-              <div className="p-6">
-                <FirebaseError />
-              </div>
-            ) : (
-              <div className="flex flex-col md:flex-row h-[calc(100vh-16rem)]">
+            <div className="p-4">
+              <FirebaseStatus />
+            </div>
+            <div className="flex flex-col md:flex-row h-[calc(100vh-16rem)]">
                 {/* Sidebar with Agents */}
                 <div className="w-full md:w-64 lg:w-80 border-r border-border p-4 overflow-y-auto">
                   <div className="mb-6">
@@ -183,7 +176,7 @@ const ChatAgents = () => {
                     )}
                   </div>
                 </div>
-                
+
                 {lockedAgents.length > 0 && (
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Locked Tutors</h3>
@@ -200,8 +193,8 @@ const ChatAgents = () => {
                             <p className="font-medium">{agent.name}</p>
                             <p className="text-xs text-muted-foreground">{agent.xpRequired} XP required</p>
                           </div>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => handleUnlockAgent(agent)}
                             disabled={unlockingId === agent.id || (user && agent.xpRequired ? user.xp < agent.xpRequired : false)}
@@ -218,7 +211,7 @@ const ChatAgents = () => {
                   </div>
                 )}
               </div>
-              
+
               {/* Chat Area */}
               <div className="flex-grow flex flex-col">
                 <div className="flex-grow p-4 overflow-y-auto">
@@ -237,7 +230,7 @@ const ChatAgents = () => {
                           <span className="text-xs text-green-500">AI Enabled</span>
                         </div>
                       </div>
-                      
+
                       {agentMessages.length === 0 ? (
                         <div className="text-center py-12">
                           <RobotIcon size={48} className="mx-auto mb-4 text-primary opacity-50" />
@@ -268,7 +261,7 @@ const ChatAgents = () => {
                                 message.role === "user" ? "self-end flex-row-reverse ml-auto" : ""
                               )}
                             >
-                              <div 
+                              <div
                                 className={cn(
                                   "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
                                   message.role === "user" ? "bg-muted" : getAgentColorClass(activeAgent.color)
@@ -276,15 +269,15 @@ const ChatAgents = () => {
                               >
                                 {message.role === "user" ? (
                                   user?.avatarUrl ? (
-                                    <img 
-                                      src={user.avatarUrl} 
-                                      alt="User avatar" 
+                                    <img
+                                      src={user.avatarUrl}
+                                      alt="User avatar"
                                       className="w-full h-full rounded-full object-cover"
                                     />
                                   ) : (
-                                    <img 
-                                      src={generateAvatar(user?.displayName || "User")} 
-                                      alt="User avatar" 
+                                    <img
+                                      src={generateAvatar(user?.displayName || "User")}
+                                      alt="User avatar"
                                       className="w-full h-full rounded-full object-cover"
                                     />
                                   )
@@ -292,22 +285,22 @@ const ChatAgents = () => {
                                   getAgentIcon(activeAgent.iconName, 16)
                                 )}
                               </div>
-                              
+
                               <div className="relative">
-                                <div 
+                                <div
                                   className={cn(
                                     "rounded-xl p-3",
-                                    message.role === "user" 
-                                      ? "bg-primary rounded-tr-none" 
+                                    message.role === "user"
+                                      ? "bg-primary rounded-tr-none"
                                       : "bg-muted rounded-tl-none"
                                   )}
                                 >
                                   <p className="text-sm">{message.content}</p>
                                 </div>
-                                
+
                                 {/* XP Award Indicator */}
                                 {message.xpAwarded && message.xpAwarded > 0 && (
-                                  <motion.div 
+                                  <motion.div
                                     className="absolute -top-4 -right-4 bg-secondary rounded-lg px-2 py-1 text-xs font-bold flex items-center gap-1 xp-gained"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -336,7 +329,7 @@ const ChatAgents = () => {
                     </div>
                   )}
                 </div>
-                
+
                 {activeAgent && (
                   <div className="border-t border-border p-4">
                     <form onSubmit={handleSubmit} className="flex gap-2">
@@ -348,8 +341,8 @@ const ChatAgents = () => {
                         onChange={(e) => setInputMessage(e.target.value)}
                         disabled={isSending}
                       />
-                      <Button 
-                        type="submit" 
+                      <Button
+                        type="submit"
                         disabled={isSending || !inputMessage.trim()}
                       >
                         {isSending ? (
@@ -366,7 +359,6 @@ const ChatAgents = () => {
                 )}
               </div>
             </div>
-            )}
           </CardContent>
         </Card>
       </div>

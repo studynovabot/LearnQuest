@@ -42,7 +42,17 @@ export async function apiRequest(
   console.log(`Making API request: ${method} ${url}`);
 
   try {
-    const res = await fetch(url, {
+    // Ensure URL has the correct format for Vercel deployment
+    let requestUrl = url;
+
+    // Make sure API URLs are properly formatted
+    if (!url.startsWith('http') && !url.startsWith('/')) {
+      requestUrl = '/' + url;
+    }
+
+    console.log(`Final request URL: ${requestUrl}`);
+
+    const res = await fetch(requestUrl, {
       method,
       headers,
       body: data ? JSON.stringify(data) : undefined,
@@ -51,11 +61,11 @@ export async function apiRequest(
     });
 
     // Log response status
-    console.log(`API response status: ${res.status} ${res.statusText} for ${method} ${url}`);
+    console.log(`API response status: ${res.status} ${res.statusText} for ${method} ${requestUrl}`);
 
     // For 404 errors, provide more detailed logging
     if (res.status === 404) {
-      console.error(`404 Not Found: ${method} ${url}`, {
+      console.error(`404 Not Found: ${method} ${requestUrl}`, {
         headers: headers,
         data: data ? JSON.stringify(data) : undefined
       });
@@ -84,7 +94,18 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const userId = getUserId() || 'guest';
-    const res = await fetch(queryKey[0] as string, {
+
+    // Ensure URL has the correct format for Vercel deployment
+    let requestUrl = queryKey[0] as string;
+
+    // Make sure API URLs are properly formatted
+    if (!requestUrl.startsWith('http') && !requestUrl.startsWith('/')) {
+      requestUrl = '/' + requestUrl;
+    }
+
+    console.log(`Query request URL: ${requestUrl}`);
+
+    const res = await fetch(requestUrl, {
       credentials: "include",
       headers: { "Authorization": userId },
     });
