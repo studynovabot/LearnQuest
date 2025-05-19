@@ -1,5 +1,5 @@
 import express from 'express';
-import { adminDb } from '../firebaseAdmin';
+import { adminDb } from '../firebaseAdmin.js';
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
       timestamp: new Date(),
       status: 'ok'
     });
-    
+
     // If we get here, Firebase is connected
     res.json({
       status: 'ok',

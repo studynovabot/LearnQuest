@@ -9,7 +9,13 @@ import { initializeFirebase } from './firebaseAdmin.js';
 import rateLimit from 'express-rate-limit';
 
 // Load environment variables from .env file
-dotenv.config();
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
+
+// Log environment variables for debugging
+console.log('Environment variables loaded:');
+console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID);
+console.log('GROQ_API_KEY exists:', !!process.env.GROQ_API_KEY);
+console.log('TOGETHER_AI_API_KEY exists:', !!process.env.TOGETHER_AI_API_KEY);
 
 // Set up AI API keys from environment variables
 if (!process.env.GROQ_API_KEY || !process.env.TOGETHER_AI_API_KEY) {
