@@ -10,9 +10,12 @@
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only index.ts",
-    "build": "node build-script.cjs",
-    "build:tsc": "tsc",
-    "start": "node dist/index.js"
+    "build": "node simple-build.js && node postbuild.js",
+    "build:tsc": "tsc && node postbuild.js",
+    "build:legacy": "node build-script.cjs && node postbuild.js",
+    "postbuild": "node postbuild.js",
+    "predeploy": "node predeploy.js",
+    "start": "node predeploy.js && node dist/index.js"
   },
   "dependencies": {
     "@types/express": "^4.17.21",
