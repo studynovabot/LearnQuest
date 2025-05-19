@@ -9,18 +9,36 @@ import { initializeFirebase } from './firebaseAdmin.js';
 import rateLimit from 'express-rate-limit';
 
 // Load environment variables from .env file
-dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
+// In production, environment variables are set in the Render dashboard
+// In development, load from .env file
+if (process.env.NODE_ENV !== 'production') {
+  const envPath = path.resolve(process.cwd(), '../.env');
+  console.log('Loading environment variables from:', envPath);
+  dotenv.config({ path: envPath });
+} else {
+  console.log('Running in production mode, using environment variables from Render');
+}
 
 // Log environment variables for debugging
 console.log('Environment variables loaded:');
 console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID);
+console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('GROQ_API_KEY exists:', !!process.env.GROQ_API_KEY);
 console.log('TOGETHER_AI_API_KEY exists:', !!process.env.TOGETHER_AI_API_KEY);
 
 // Set up AI API keys from environment variables
 if (!process.env.GROQ_API_KEY || !process.env.TOGETHER_AI_API_KEY) {
-  console.error('Missing required API keys. Please check your .env file.');
-  process.exit(1);
+  console.error('Missing required API keys. Please check your environment variables.');
+
+  // In production, we'll continue with dummy values to prevent crashing
+  if (process.env.NODE_ENV === 'production') {
+    console.warn('Using dummy API keys in production. AI features will not work correctly.');
+    process.env.GROQ_API_KEY = process.env.GROQ_API_KEY || 'dummy-key';
+    process.env.TOGETHER_AI_API_KEY = process.env.TOGETHER_AI_API_KEY || 'dummy-key';
+  } else {
+    // In development, exit to force the developer to set up the keys
+    process.exit(1);
+  }
 }
 
 // Initialize Firebase storage

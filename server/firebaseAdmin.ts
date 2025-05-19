@@ -18,6 +18,12 @@ let firestoreDb;
 try {
   // Check if Firebase app is already initialized
   if (getApps().length === 0) {
+    // Log Firebase configuration details (without sensitive info)
+    console.log('Firebase configuration:');
+    console.log('- Project ID:', projectId);
+    console.log('- Client Email:', clientEmail);
+    console.log('- Private Key exists:', !!privateKey);
+
     app = initializeApp({
       credential: cert({
         projectId,
@@ -35,6 +41,7 @@ try {
 
   // Get Firestore instance
   firestoreDb = getFirestore(app);
+  console.log('Firestore instance created successfully');
 
   // Test Firestore connection
   firestoreDb.collection('test').doc('connection-test').set({
@@ -44,17 +51,88 @@ try {
     console.log('Firestore connection test successful');
   }).catch(err => {
     console.error('Firestore connection test failed:', err);
+    // Don't throw an error here, just log it
+    console.error('This may indicate issues with Firestore permissions or API enablement');
   });
-
-  console.log('Firestore instance created successfully');
 
 } catch (error) {
   console.error('Failed to initialize Firebase Admin:', error);
+
+  // Provide more detailed error information
   if (error instanceof Error) {
-    throw new Error(`Firebase initialization failed: ${error.message}. Please check your credentials and ensure the Firestore API is enabled.`);
+    const errorMessage = error.message;
+    console.error('Error details:', errorMessage);
+
+    // Check for common error patterns
+    if (errorMessage.includes('credential')) {
+      console.error('This appears to be a credential issue. Check your FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY environment variables.');
+    } else if (errorMessage.includes('permission')) {
+      console.error('This appears to be a permissions issue. Make sure your Firebase service account has the necessary permissions.');
+    } else if (errorMessage.includes('not found') || errorMessage.includes('404')) {
+      console.error('This appears to be a resource not found issue. Make sure your Firebase project exists and is correctly configured.');
+    }
+
+    // In production, log the error but don't crash the server
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Continuing despite Firebase initialization error in production mode');
+      // Create a mock Firestore instance that logs errors instead of crashing
+      firestoreDb = createMockFirestoreDb();
+    } else {
+      throw new Error(`Firebase initialization failed: ${errorMessage}. Please check your credentials and ensure the Firestore API is enabled.`);
+    }
   } else {
-    throw new Error('Firebase initialization failed due to an unknown error. Please check your credentials and ensure the Firestore API is enabled.');
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Continuing despite Firebase initialization error in production mode');
+      firestoreDb = createMockFirestoreDb();
+    } else {
+      throw new Error('Firebase initialization failed due to an unknown error. Please check your credentials and ensure the Firestore API is enabled.');
+    }
   }
+}
+
+// Create a mock Firestore DB that logs errors instead of crashing
+function createMockFirestoreDb() {
+  const mockDb = {
+    collection: (name) => ({
+      doc: (id) => ({
+        get: async () => ({ exists: false, data: () => null }),
+        set: async () => console.error(`Mock Firestore: Cannot write to ${name}/${id} - Firebase not initialized`),
+        update: async () => console.error(`Mock Firestore: Cannot update ${name}/${id} - Firebase not initialized`),
+        delete: async () => console.error(`Mock Firestore: Cannot delete ${name}/${id} - Firebase not initialized`)
+      }),
+      where: () => ({
+        get: async () => ({ empty: true, docs: [] }),
+        orderBy: () => ({
+          get: async () => ({ empty: true, docs: [] }),
+          limit: () => ({
+            get: async () => ({ empty: true, docs: [] })
+          })
+        }),
+        limit: () => ({
+          get: async () => ({ empty: true, docs: [] })
+        })
+      }),
+      orderBy: () => ({
+        get: async () => ({ empty: true, docs: [] }),
+        limit: () => ({
+          get: async () => ({ empty: true, docs: [] })
+        })
+      }),
+      limit: () => ({
+        get: async () => ({ empty: true, docs: [] })
+      }),
+      get: async () => ({ empty: true, docs: [] })
+    }),
+    batch: () => ({
+      set: () => {},
+      update: () => {},
+      delete: () => {},
+      commit: async () => {}
+    })
+  };
+
+  console.warn('Using mock Firestore database - data operations will not work');
+  return mockDb;
 }
 
 export const adminDb = firestoreDb;

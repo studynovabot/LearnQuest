@@ -3,7 +3,7 @@ services:
     name: learnquest-backend
     env: node
     plan: free
-    buildCommand: cd server && npm install && npm run build
+    buildCommand: cd server && npm install && npm install --save-dev @types/bcryptjs @types/cors @types/multer && npm run build
     startCommand: cd server && npm start
     envVars:
       - key: NODE_VERSION
@@ -11,4 +11,4 @@ services:
       - key: NODE_ENV
         value: production
     healthCheckPath: /api/health
-    autoDeploy: true 
+    autoDeploy: true

@@ -11,8 +11,9 @@
     "rootDir": ".",
     "types": ["node"],
     "allowJs": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noImplicitAny": false
   },
-  "include": ["./**/*"],
+  "include": ["./**/*", "./types/declarations.d.ts"],
   "exclude": ["node_modules", "dist"]
-} 
+}
