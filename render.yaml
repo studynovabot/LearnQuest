@@ -11,8 +11,9 @@ services:
       (echo "Standard build failed, trying fallback build..." &&
       node simple-build.cjs &&
       node postbuild.cjs &&
-      node fix-index.cjs)
-    startCommand: cd server && (npm start || (node fix-index.cjs && node dist/index.js) || node simple-server.js)
+      node fix-index.cjs &&
+      node direct-fix.cjs)
+    startCommand: cd server && (npm start || (node fix-index.cjs && node direct-fix.cjs && node dist/index.js) || node simple-server.cjs)
     envVars:
       - key: NODE_VERSION
         value: 20.11.1
