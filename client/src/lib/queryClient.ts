@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { config } from "../config";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -42,21 +43,33 @@ export async function apiRequest(
   console.log(`Making API request: ${method} ${url}`);
 
   try {
-    // Ensure URL has the correct format for Vercel deployment
+    // Ensure URL has the correct format
     let requestUrl = url;
 
-    // Make sure API URLs are properly formatted
-    if (!url.startsWith('http') && !url.startsWith('/')) {
+    // If we're in production and using a backend URL, prepend it to API requests
+    if (import.meta.env.PROD && config.apiUrl && url.includes('/api/')) {
+      // Remove leading slash if present to avoid double slashes
+      const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
+      requestUrl = `${config.apiUrl}/${cleanUrl}`;
+    }
+    // Otherwise make sure URLs are properly formatted
+    else if (!url.startsWith('http') && !url.startsWith('/')) {
       requestUrl = '/' + url;
     }
 
     console.log(`Final request URL: ${requestUrl}`);
 
+    // Determine if this is a cross-origin request
+    const isCrossOrigin = requestUrl.includes('http') && !requestUrl.includes(window.location.origin);
+
     const res = await fetch(requestUrl, {
       method,
       headers,
       body: data ? JSON.stringify(data) : undefined,
-      credentials: "include",
+      // Use 'same-origin' for same-origin requests and 'include' for cross-origin
+      credentials: isCrossOrigin ? "include" : "same-origin",
+      // Add mode: 'cors' for cross-origin requests
+      mode: isCrossOrigin ? 'cors' : undefined,
       signal: options?.signal,
     });
 
@@ -95,18 +108,30 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     const userId = getUserId() || 'guest';
 
-    // Ensure URL has the correct format for Vercel deployment
+    // Ensure URL has the correct format
     let requestUrl = queryKey[0] as string;
 
-    // Make sure API URLs are properly formatted
-    if (!requestUrl.startsWith('http') && !requestUrl.startsWith('/')) {
+    // If we're in production and using a backend URL, prepend it to API requests
+    if (import.meta.env.PROD && config.apiUrl && requestUrl.includes('/api/')) {
+      // Remove leading slash if present to avoid double slashes
+      const cleanUrl = requestUrl.startsWith('/') ? requestUrl.substring(1) : requestUrl;
+      requestUrl = `${config.apiUrl}/${cleanUrl}`;
+    }
+    // Otherwise make sure URLs are properly formatted
+    else if (!requestUrl.startsWith('http') && !requestUrl.startsWith('/')) {
       requestUrl = '/' + requestUrl;
     }
 
     console.log(`Query request URL: ${requestUrl}`);
 
+    // Determine if this is a cross-origin request
+    const isCrossOrigin = requestUrl.includes('http') && !requestUrl.includes(window.location.origin);
+
     const res = await fetch(requestUrl, {
-      credentials: "include",
+      // Use 'same-origin' for same-origin requests and 'include' for cross-origin
+      credentials: isCrossOrigin ? "include" : "same-origin",
+      // Add mode: 'cors' for cross-origin requests
+      mode: isCrossOrigin ? 'cors' : undefined,
       headers: { "Authorization": userId },
     });
 

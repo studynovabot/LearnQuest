@@ -43,7 +43,9 @@ This guide will help you deploy the LearnQuest application to Render (backend) a
    - Connect your GitHub repository.
    - Set the build command: `cd client && npm install && npm run build`
    - Set the output directory: `client/dist`
-   - Add environment variables if needed.
+   - Add the following environment variables:
+     - `VITE_NODE_ENV=production`
+     - `VITE_BACKEND_URL=https://your-backend-url.onrender.com` (replace with your actual Render backend URL)
 3. **Deploy the project.**
 
 ## Environment Variables
@@ -60,12 +62,30 @@ PORT=5000
 NODE_ENV=production
 ```
 
+## Split Deployment Architecture
+
+This application uses a split deployment architecture:
+- **Frontend**: Deployed on Vercel
+- **Backend**: Deployed on Render
+
+For this architecture to work correctly, the frontend needs to know the URL of the backend API. This is configured through the `VITE_BACKEND_URL` environment variable in Vercel.
+
+### CORS Configuration
+
+The backend is configured to accept requests from the frontend domain. If you're experiencing CORS issues, make sure:
+1. The backend's CORS configuration includes your Vercel frontend domain
+2. The `VITE_BACKEND_URL` in Vercel points to the correct Render backend URL
+
 ## Troubleshooting
 
 - If you encounter issues with API keys, refer to `API_KEYS_SETUP.md`.
 - For Firebase setup issues, refer to `FIREBASE_SETUP.md`.
 - If you get secret scanning errors, make sure you haven't committed any service account keys.
+- If you're seeing 404 errors for API endpoints, check that:
+  - The backend is deployed and running correctly on Render
+  - The `VITE_BACKEND_URL` environment variable is set correctly in Vercel
+  - The backend's CORS configuration allows requests from your Vercel domain
 
 ## Support
 
-If you need further assistance, please contact the development team. 
+If you need further assistance, please contact the development team.
