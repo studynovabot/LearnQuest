@@ -17,6 +17,7 @@ import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { useEffect } from "react";
+import { ConnectionStatus } from "@/components/ConnectionStatus";
 
 function Router() {
   const [location] = useLocation();
@@ -82,6 +83,7 @@ function InnerApp() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <ConnectionStatus />
         </TooltipProvider>
       </UserProvider>
     </ThemeProvider>

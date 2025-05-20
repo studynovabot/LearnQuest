@@ -31,6 +31,11 @@ export function ConnectionStatus() {
   // Always show during development for testing
   const isDevelopment = import.meta.env.DEV;
 
+  // If we're using mock data, only show in development mode
+  if (config.useMockData && !isDevelopment) {
+    return null;
+  }
+
   if (!isVisible && status.status !== 'error' && status.status !== 'warning' && !isDevelopment) {
     return null;
   }
@@ -123,7 +128,9 @@ export function ConnectionStatus() {
             <div className="flex items-center gap-1">
               <Database className="h-3 w-3" />
               <span>
-                {status.firebase === 'connected'
+                {config.useMockData
+                  ? 'Using mock data instead of real database'
+                  : status.firebase === 'connected'
                   ? 'Database is connected and working properly'
                   : status.firebase === 'partially_connected'
                   ? 'Database is partially connected'
@@ -132,6 +139,14 @@ export function ConnectionStatus() {
                   : 'Database connection status unknown'}
               </span>
             </div>
+
+            {config.useMockData && (
+              <div className="mt-2 p-2 bg-blue-100 dark:bg-blue-900 rounded text-blue-800 dark:text-blue-100">
+                <strong>NOTICE:</strong> The app is currently using mock data due to backend connection issues.
+                Your changes will not be saved to the database. This is a temporary measure until the backend
+                connection issues are resolved.
+              </div>
+            )}
           </div>
         )}
       </div>
