@@ -130,7 +130,8 @@ const corsOptions = {
     ? [
         'https://studynovabot.com',
         'https://www.studynovabot.com',
-        'https://learnquest.vercel.app',  // Add your Vercel frontend URL
+        'https://learnquest.vercel.app',
+        'https://learn-quest-eight.vercel.app',  // Your specific Vercel deployment
         'https://*.vercel.app',  // Allow all Vercel preview deployments
         // Allow same-origin requests
         /^https:\/\/[^.]+\.vercel\.app$/,
@@ -141,21 +142,44 @@ const corsOptions = {
     : '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID'],
-  credentials: true
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Add CORS headers for development
+// Add CORS headers for all environments
 app.use((req, res, next) => {
+  // For all environments, allow all origins for now to debug CORS issues
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+
+  // Alternatively, you can use this code to allow specific origins:
+  /*
+  const allowedOrigins = [
+    'https://studynovabot.com',
+    'https://www.studynovabot.com',
+    'https://learnquest.vercel.app',
+    'https://learn-quest-eight.vercel.app'
+  ];
+
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else {
+    // Fallback to allow all origins for now
+    res.header('Access-Control-Allow-Origin', '*');
+  }
+  */
+
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-User-ID');
+  res.header('Access-Control-Allow-Credentials', 'true');
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return res.status(204).end();
   }
 
   next();

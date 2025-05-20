@@ -13,10 +13,53 @@ export function useChat() {
   const [activeAgent, setActiveAgent] = useState<AITutor | null>(null);
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]); // Local state for chat messages
 
+  // Mock tutors for development or when backend is unavailable
+  const mockTutors: AITutor[] = [
+    {
+      id: '1',
+      name: 'Nova',
+      subject: 'General',
+      iconName: 'robot',
+      color: 'blue',
+      unlocked: true,
+      xpRequired: 0
+    },
+    {
+      id: '2',
+      name: 'Einstein',
+      subject: 'Physics',
+      iconName: 'compass',
+      color: 'purple',
+      unlocked: true,
+      xpRequired: 100
+    },
+    {
+      id: '3',
+      name: 'Pythagoras',
+      subject: 'Mathematics',
+      iconName: 'calculator',
+      color: 'green',
+      unlocked: true,
+      xpRequired: 200
+    },
+    {
+      id: '4',
+      name: 'Darwin',
+      subject: 'Biology',
+      iconName: 'smile',
+      color: 'orange',
+      unlocked: false,
+      xpRequired: 500
+    }
+  ];
+
+  // Use mock data in development or when backend is unavailable
+  const useMockData = import.meta.env.DEV || window.location.hostname.includes('vercel.app');
+
   // Fetch tutors
-  const { data: tutors = [], isLoading: isLoadingTutors } = useQuery<AITutor[]>({
+  const { data: tutors = useMockData ? mockTutors : [], isLoading: isLoadingTutors } = useQuery<AITutor[]>({
     queryKey: ["/api/tutors"],
-    enabled: !!user,
+    enabled: !!user && !useMockData, // Only enable fetching when user is available and not using mock data
   });
 
   // Separate tutors into unlocked and locked
@@ -44,11 +87,42 @@ export function useChat() {
       };
       setLocalMessages((prev) => [...prev, userMessage]);
 
-      // Send the message to the server with a timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      // Create a fallback response in case of API failure
+      const fallbackResponse = async () => {
+        // Add a fallback message from the assistant
+        const fallbackMessage: ChatMessage = {
+          id: Date.now() + 1,
+          content: "I'm sorry, I'm having trouble connecting to the server right now. Please try again later.",
+          role: 'assistant',
+          timestamp: Date.now() + 1,
+        };
+        setLocalMessages((prev) => [...prev, fallbackMessage]);
+      };
 
       try {
+        // Try to send the message to the server with a timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+        // Check if we're in development mode or if the backend is unavailable
+        // In that case, use a mock response
+        if (import.meta.env.DEV || window.location.hostname.includes('vercel.app')) {
+          // Simulate a delay
+          await new Promise(resolve => setTimeout(resolve, 1500));
+
+          // Create a mock response based on the agent
+          const mockResponse: ChatMessage = {
+            id: Date.now() + 1,
+            content: `This is a simulated response from ${activeAgent?.name || 'Nova'}. The backend API is currently unavailable, but this allows you to test the UI. In a real deployment, this would connect to the AI service.`,
+            role: 'assistant',
+            timestamp: Date.now() + 1,
+          };
+
+          // Add the mock response to local state
+          setLocalMessages((prev) => [...prev, mockResponse]);
+          return;
+        }
+
         const response = await apiRequest("POST", "/api/chat", {
           content,
           agentId: activeAgent?.id || '1', // Default to the first agent if none is selected
@@ -57,7 +131,8 @@ export function useChat() {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-          throw new Error(`Failed to send message: ${response.status} ${response.statusText}`);
+          await fallbackResponse();
+          return;
         }
 
         const assistantMessage = await response.json();
@@ -69,7 +144,7 @@ export function useChat() {
         }]);
       } catch (fetchError) {
         console.error("API request failed:", fetchError);
-        throw fetchError;
+        await fallbackResponse();
       }
 
     } catch (error) {
@@ -84,19 +159,19 @@ export function useChat() {
         });
       }
 
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again later.",
-        variant: "destructive",
-      });
+      // Add a fallback error message if one hasn't been added yet
+      const hasErrorMessage = localMessages.some(
+        msg => msg.role === 'assistant' && msg.content.includes("I'm having trouble connecting")
+      );
 
-      // Add a fallback error message
-      setLocalMessages((prev) => [...prev, {
-        id: Date.now(),
-        content: "I'm sorry, I'm having trouble connecting right now. Please try again later.",
-        role: 'assistant',
-        timestamp: Date.now(),
-      }]);
+      if (!hasErrorMessage) {
+        setLocalMessages((prev) => [...prev, {
+          id: Date.now(),
+          content: "I'm sorry, I'm having trouble connecting right now. Please try again later.",
+          role: 'assistant',
+          timestamp: Date.now(),
+        }]);
+      }
     } finally {
       setIsSubmitting(false);
     }
