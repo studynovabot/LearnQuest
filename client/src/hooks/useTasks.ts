@@ -208,7 +208,7 @@ export function useTasks() {
         await new Promise(resolve => setTimeout(resolve, 500));
 
         // Find the task index in the mock tasks
-        const taskIndex = mockTasks.findIndex(task => task.id === id);
+        const taskIndex = mockTasksState.findIndex(task => task.id === id);
         if (taskIndex !== -1) {
           // Remove the task from the mock tasks array
           const updatedTasks = mockTasksState.filter(task => task.id !== id);
@@ -218,16 +218,45 @@ export function useTasks() {
         return;
       }
 
-      try {
-        await apiRequest("DELETE", `/api/tasks/${id}`);
-      } catch (error) {
-        console.error("Error deleting task:", error);
-        // If there's an error, still remove the task from the local state
-        if (useMockData) {
-          const updatedTasks = mockTasksState.filter(task => task.id !== id);
-          setMockTasksState(updatedTasks);
+      // Set up retry logic for task deletion
+      const maxRetries = 3;
+      let retryCount = 0;
+      let lastError: Error | null = null;
+
+      while (retryCount <= maxRetries) {
+        try {
+          console.log(`Deleting task (attempt ${retryCount + 1}/${maxRetries + 1}): ${id}`);
+
+          // Add timeout for the request
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+          await apiRequest("DELETE", `/api/tasks/${id}`);
+          clearTimeout(timeoutId);
+
+          console.log(`Task deleted successfully: ${id}`);
+          return;
+        } catch (error) {
+          lastError = error instanceof Error ? error : new Error(String(error));
+          console.error(`Error deleting task (attempt ${retryCount + 1}/${maxRetries + 1}):`, lastError);
+
+          if (retryCount < maxRetries) {
+            retryCount++;
+            console.log(`Retrying task deletion (${retryCount}/${maxRetries})...`);
+            // Wait before retrying (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount - 1)));
+          } else {
+            // If all retries failed, but we're using mock data, still remove the task from the local state
+            if (useMockData) {
+              const updatedTasks = mockTasksState.filter(task => task.id !== id);
+              setMockTasksState(updatedTasks);
+              return;
+            }
+
+            // If we're not using mock data and all retries failed, throw the error
+            throw lastError;
+          }
         }
-        throw error;
       }
     },
     onSuccess: () => {

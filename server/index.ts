@@ -126,20 +126,8 @@ app.use(limiter);
 
 // Configure CORS for production
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production'
-    ? [
-        'https://studynovabot.com',
-        'https://www.studynovabot.com',
-        'https://learnquest.vercel.app',
-        'https://learn-quest-eight.vercel.app',  // Your specific Vercel deployment
-        'https://*.vercel.app',  // Allow all Vercel preview deployments
-        // Allow same-origin requests
-        /^https:\/\/[^.]+\.vercel\.app$/,
-        /^https:\/\/[^.]+\.vercel\.app:[0-9]+$/,
-        // Allow all origins in production for now to debug
-        '*'
-      ]
-    : '*',
+  // Allow all origins to fix CORS issues between Vercel frontend and Render backend
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID'],
   credentials: true,
@@ -153,27 +141,8 @@ app.use(express.urlencoded({ extended: false }));
 
 // Add CORS headers for all environments
 app.use((req, res, next) => {
-  // For all environments, allow all origins for now to debug CORS issues
+  // For all environments, allow all origins to fix CORS issues
   res.header('Access-Control-Allow-Origin', '*');
-
-  // Alternatively, you can use this code to allow specific origins:
-  /*
-  const allowedOrigins = [
-    'https://studynovabot.com',
-    'https://www.studynovabot.com',
-    'https://learnquest.vercel.app',
-    'https://learn-quest-eight.vercel.app'
-  ];
-
-  const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  } else {
-    // Fallback to allow all origins for now
-    res.header('Access-Control-Allow-Origin', '*');
-  }
-  */
-
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-User-ID');
   res.header('Access-Control-Allow-Credentials', 'true');

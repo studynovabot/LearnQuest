@@ -23,17 +23,56 @@ try {
     console.log('- Project ID:', projectId);
     console.log('- Client Email:', clientEmail);
     console.log('- Private Key exists:', !!privateKey);
+    console.log('- Private Key length:', privateKey ? privateKey.length : 0);
 
-    app = initializeApp({
-      credential: cert({
-        projectId,
-        clientEmail,
-        privateKey: privateKey.replace(/\\n/g, '\n'),
-      }),
-      // Add databaseURL to fix connection issues
-      databaseURL: `https://${projectId}.firebaseio.com`
-    });
-    console.log('Firebase Admin initialized successfully');
+    // Check if private key is properly formatted
+    let formattedPrivateKey = privateKey;
+
+    // If the private key doesn't contain newlines, try to format it
+    if (privateKey && !privateKey.includes('\n')) {
+      console.log('Private key does not contain newlines, attempting to format it');
+      formattedPrivateKey = privateKey.replace(/\\n/g, '\n');
+    }
+
+    // Additional check to ensure the private key is properly formatted
+    if (formattedPrivateKey && !formattedPrivateKey.startsWith('-----BEGIN PRIVATE KEY-----')) {
+      console.error('Private key does not start with the expected header. This may cause authentication issues.');
+    }
+
+    try {
+      app = initializeApp({
+        credential: cert({
+          projectId,
+          clientEmail,
+          privateKey: formattedPrivateKey,
+        }),
+        // Add databaseURL to fix connection issues
+        databaseURL: `https://${projectId}.firebaseio.com`
+      });
+      console.log('Firebase Admin initialized successfully');
+    } catch (initError) {
+      console.error('Error during Firebase initialization:', initError);
+
+      // Try an alternative initialization approach
+      console.log('Attempting alternative initialization approach...');
+
+      // Try with explicit JSON parsing for the private key
+      try {
+        const explicitPrivateKey = JSON.parse(`"${privateKey}"`);
+        app = initializeApp({
+          credential: cert({
+            projectId,
+            clientEmail,
+            privateKey: explicitPrivateKey,
+          }),
+          databaseURL: `https://${projectId}.firebaseio.com`
+        });
+        console.log('Firebase Admin initialized successfully with alternative approach');
+      } catch (altError) {
+        console.error('Alternative initialization also failed:', altError);
+        throw initError; // Throw the original error
+      }
+    }
   } else {
     app = getApps()[0];
     console.log('Using existing Firebase Admin app');
@@ -43,17 +82,35 @@ try {
   firestoreDb = getFirestore(app);
   console.log('Firestore instance created successfully');
 
-  // Test Firestore connection
-  firestoreDb.collection('test').doc('connection-test').set({
-    timestamp: new Date(),
-    status: 'connected'
-  }).then(() => {
-    console.log('Firestore connection test successful');
-  }).catch(err => {
-    console.error('Firestore connection test failed:', err);
-    // Don't throw an error here, just log it
-    console.error('This may indicate issues with Firestore permissions or API enablement');
-  });
+  // Test Firestore connection with retry logic
+  let retryCount = 0;
+  const maxRetries = 3;
+
+  const testConnection = async () => {
+    try {
+      await firestoreDb.collection('test').doc('connection-test').set({
+        timestamp: new Date(),
+        status: 'connected'
+      });
+      console.log('Firestore connection test successful');
+      return true;
+    } catch (err) {
+      console.error(`Firestore connection test failed (attempt ${retryCount + 1}/${maxRetries}):`, err);
+
+      if (retryCount < maxRetries - 1) {
+        retryCount++;
+        console.log(`Retrying connection in 2 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        return testConnection();
+      } else {
+        console.error('All Firestore connection attempts failed. This may indicate issues with Firestore permissions or API enablement');
+        return false;
+      }
+    }
+  };
+
+  // Execute the test connection
+  testConnection();
 
 } catch (error) {
   console.error('Failed to initialize Firebase Admin:', error);
@@ -145,15 +202,61 @@ export const adminDb = firestoreDb;
 export function initializeFirebase() {
   if (getApps().length === 0) {
     console.log('Initializing Firebase with project ID:', process.env.FIREBASE_PROJECT_ID || projectId);
-    initializeApp({
-      credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID || projectId,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL || clientEmail,
-        privateKey: (process.env.FIREBASE_PRIVATE_KEY || privateKey).replace(/\\n/g, '\n')
-      }),
-      // Add databaseURL to fix connection issues
-      databaseURL: `https://${process.env.FIREBASE_PROJECT_ID || projectId}.firebaseio.com`
-    });
-    console.log('Firebase Admin initialized successfully');
+
+    // Get the private key and ensure it's properly formatted
+    const privateKeyToUse = process.env.FIREBASE_PRIVATE_KEY || privateKey;
+    let formattedPrivateKey = privateKeyToUse;
+
+    // If the private key doesn't contain newlines, try to format it
+    if (privateKeyToUse && !privateKeyToUse.includes('\n')) {
+      console.log('Private key does not contain newlines, attempting to format it');
+      formattedPrivateKey = privateKeyToUse.replace(/\\n/g, '\n');
+    }
+
+    // Additional check to ensure the private key is properly formatted
+    if (formattedPrivateKey && !formattedPrivateKey.startsWith('-----BEGIN PRIVATE KEY-----')) {
+      console.error('Private key does not start with the expected header. This may cause authentication issues.');
+    }
+
+    try {
+      initializeApp({
+        credential: cert({
+          projectId: process.env.FIREBASE_PROJECT_ID || projectId,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL || clientEmail,
+          privateKey: formattedPrivateKey
+        }),
+        // Add databaseURL to fix connection issues
+        databaseURL: `https://${process.env.FIREBASE_PROJECT_ID || projectId}.firebaseio.com`
+      });
+      console.log('Firebase Admin initialized successfully');
+    } catch (initError) {
+      console.error('Error during Firebase initialization:', initError);
+
+      // Try an alternative initialization approach
+      console.log('Attempting alternative initialization approach...');
+
+      try {
+        // Try with explicit JSON parsing for the private key
+        const explicitPrivateKey = JSON.parse(`"${privateKeyToUse}"`);
+        initializeApp({
+          credential: cert({
+            projectId: process.env.FIREBASE_PROJECT_ID || projectId,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL || clientEmail,
+            privateKey: explicitPrivateKey
+          }),
+          databaseURL: `https://${process.env.FIREBASE_PROJECT_ID || projectId}.firebaseio.com`
+        });
+        console.log('Firebase Admin initialized successfully with alternative approach');
+      } catch (altError) {
+        console.error('Alternative initialization also failed:', altError);
+
+        // In production, continue despite errors
+        if (process.env.NODE_ENV === 'production') {
+          console.error('Continuing despite Firebase initialization error in production mode');
+        } else {
+          throw initError; // Throw the original error in development
+        }
+      }
+    }
   }
 }

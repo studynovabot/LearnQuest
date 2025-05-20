@@ -1,8 +1,8 @@
 // Helper function to determine if we should use mock data
 function shouldUseMockData() {
-  return import.meta.env.DEV ||
-         window.location.hostname.includes('vercel.app') ||
-         localStorage.getItem('useMockData') === 'true';
+  // Only use mock data if explicitly set in localStorage
+  // We're removing the automatic mock data for Vercel deployment
+  return localStorage.getItem('useMockData') === 'true';
 }
 
 // Helper function to determine the API URL
@@ -13,9 +13,10 @@ function getApiUrl() {
     return '';
   }
 
-  // In production, use the Render backend URL
+  // Always use the Render backend URL in production
   if (import.meta.env.PROD) {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://learnquest-backend.onrender.com';
+    // Force the backend URL to be the Render URL
+    const backendUrl = 'https://learnquest-backend.onrender.com';
     console.log(`Production mode - API URL set to: ${backendUrl}`);
     return backendUrl;
   }

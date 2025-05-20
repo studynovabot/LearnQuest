@@ -46,7 +46,7 @@ export async function apiRequest(
     // Ensure URL has the correct format
     let requestUrl = url;
 
-    // If we're in production and using a backend URL, prepend it to API requests
+    // Always use the backend URL for API requests in production
     if (import.meta.env.PROD && config.apiUrl && url.includes('/api/')) {
       // Remove leading slash if present to avoid double slashes
       const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
@@ -62,13 +62,6 @@ export async function apiRequest(
     // Determine if this is a cross-origin request
     const isCrossOrigin = requestUrl.includes('http') && !requestUrl.includes(window.location.origin);
 
-    // Add CORS headers for cross-origin requests
-    if (isCrossOrigin) {
-      headers['Access-Control-Allow-Origin'] = '*';
-      headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS';
-      headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
-    }
-
     // Log the request details for debugging
     console.log('Request details:', {
       url: requestUrl,
@@ -78,38 +71,60 @@ export async function apiRequest(
       body: data ? JSON.stringify(data).substring(0, 100) + '...' : undefined
     });
 
-    const res = await fetch(requestUrl, {
-      method,
-      headers,
-      body: data ? JSON.stringify(data) : undefined,
-      // Always use 'include' for credentials to ensure cookies are sent
-      credentials: "include",
-      // Always use 'cors' mode for all requests to handle potential CORS issues
-      mode: 'cors',
-      signal: options?.signal,
-    });
+    // Set up retry logic for API requests
+    const maxRetries = 3;
+    let retryCount = 0;
+    let lastError: Error | null = null;
 
-    // Log response status
-    console.log(`API response status: ${res.status} ${res.statusText} for ${method} ${requestUrl}`);
+    while (retryCount < maxRetries) {
+      try {
+        const res = await fetch(requestUrl, {
+          method,
+          headers,
+          body: data ? JSON.stringify(data) : undefined,
+          // Use 'same-origin' for same-origin requests and 'cors' for cross-origin
+          credentials: isCrossOrigin ? "include" : "same-origin",
+          // Always use 'cors' mode for cross-origin requests
+          mode: isCrossOrigin ? 'cors' : 'same-origin',
+          signal: options?.signal,
+        });
 
-    // For 404 errors, provide more detailed logging
-    if (res.status === 404) {
-      console.error(`404 Not Found: ${method} ${requestUrl}`, {
-        headers: headers,
-        data: data ? JSON.stringify(data) : undefined
-      });
+        // Log response status
+        console.log(`API response status: ${res.status} ${res.statusText} for ${method} ${requestUrl}`);
 
-      // Special handling for common API endpoints
-      if (url.includes('/api/tasks')) {
-        throw new Error('Task service is currently unavailable. Please try again later.');
-      }
-      if (url.includes('/api/chat')) {
-        throw new Error('Chat service is currently unavailable. Please try again later.');
+        // For 404 errors, provide more detailed logging
+        if (res.status === 404) {
+          console.error(`404 Not Found: ${method} ${requestUrl}`, {
+            headers: headers,
+            data: data ? JSON.stringify(data) : undefined
+          });
+
+          // Special handling for common API endpoints
+          if (url.includes('/api/tasks')) {
+            throw new Error('Task service is currently unavailable. Please try again later.');
+          }
+          if (url.includes('/api/chat')) {
+            throw new Error('Chat service is currently unavailable. Please try again later.');
+          }
+        }
+
+        // If we get here, the request was successful
+        return res;
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        retryCount++;
+
+        if (retryCount < maxRetries) {
+          console.log(`Retrying API request (${retryCount}/${maxRetries}): ${method} ${requestUrl}`);
+          // Wait before retrying (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount - 1)));
+        }
       }
     }
 
-    await throwIfResNotOk(res);
-    return res;
+    // If we get here, all retries failed
+    console.error(`API request failed after ${maxRetries} attempts: ${method} ${requestUrl}`, lastError);
+    throw lastError;
   } catch (error) {
     console.error(`API request failed: ${method} ${url}`, error);
     throw error;
@@ -127,7 +142,7 @@ export const getQueryFn: <T>(options: {
     // Ensure URL has the correct format
     let requestUrl = queryKey[0] as string;
 
-    // If we're in production and using a backend URL, prepend it to API requests
+    // Always use the backend URL for API requests in production
     if (import.meta.env.PROD && config.apiUrl && requestUrl.includes('/api/')) {
       // Remove leading slash if present to avoid double slashes
       const cleanUrl = requestUrl.startsWith('/') ? requestUrl.substring(1) : requestUrl;
@@ -146,13 +161,6 @@ export const getQueryFn: <T>(options: {
     // Create headers object
     const headers: Record<string, string> = { "Authorization": userId };
 
-    // Add CORS headers for cross-origin requests
-    if (isCrossOrigin) {
-      headers['Access-Control-Allow-Origin'] = '*';
-      headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS';
-      headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
-    }
-
     // Log the query details for debugging
     console.log('Query details:', {
       url: requestUrl,
@@ -160,20 +168,68 @@ export const getQueryFn: <T>(options: {
       isCrossOrigin
     });
 
-    const res = await fetch(requestUrl, {
-      // Always use 'include' for credentials to ensure cookies are sent
-      credentials: "include",
-      // Always use 'cors' mode for all requests to handle potential CORS issues
-      mode: 'cors',
-      headers,
-    });
+    // Set up retry logic for API requests
+    const maxRetries = 3;
+    let retryCount = 0;
+    let lastError: Error | null = null;
 
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+    while (retryCount < maxRetries) {
+      try {
+        const res = await fetch(requestUrl, {
+          // Use 'same-origin' for same-origin requests and 'cors' for cross-origin
+          credentials: isCrossOrigin ? "include" : "same-origin",
+          // Always use 'cors' mode for cross-origin requests
+          mode: isCrossOrigin ? 'cors' : 'same-origin',
+          headers,
+        });
+
+        if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+          return null;
+        }
+
+        // For 404 errors, provide more detailed logging
+        if (res.status === 404) {
+          console.error(`404 Not Found: GET ${requestUrl}`, {
+            headers: headers
+          });
+
+          // Special handling for common API endpoints
+          if (requestUrl.includes('/api/tasks')) {
+            throw new Error('Task service is currently unavailable. Please try again later.');
+          }
+          if (requestUrl.includes('/api/chat')) {
+            throw new Error('Chat service is currently unavailable. Please try again later.');
+          }
+        }
+
+        // Check if response is OK
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Response error details:", {
+            status: res.status,
+            statusText: res.statusText,
+            body: text,
+          });
+          throw new Error(`${res.status}: ${text}`);
+        }
+
+        // If we get here, the request was successful
+        return await res.json();
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        retryCount++;
+
+        if (retryCount < maxRetries) {
+          console.log(`Retrying query request (${retryCount}/${maxRetries}): GET ${requestUrl}`);
+          // Wait before retrying (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount - 1)));
+        }
+      }
     }
 
-    await throwIfResNotOk(res);
-    return await res.json();
+    // If we get here, all retries failed
+    console.error(`Query request failed after ${maxRetries} attempts: GET ${requestUrl}`, lastError);
+    throw lastError;
   };
 
 export const queryClient = new QueryClient({

@@ -15,6 +15,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { useEffect } from "react";
 
 function Router() {
@@ -67,6 +68,14 @@ function Router() {
 }
 
 function InnerApp() {
+  // Use the health check hook to verify backend connection
+  const { status, isChecking } = useHealthCheck();
+
+  // Log the backend connection status
+  useEffect(() => {
+    console.log('Backend connection status:', status);
+  }, [status]);
+
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark">
       <UserProvider>

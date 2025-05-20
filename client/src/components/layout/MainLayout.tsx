@@ -10,6 +10,7 @@ import { useState } from "react";
 import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
 import { MockDataBanner } from "@/components/ui/MockDataBanner";
 import { FirebaseStatus } from "@/components/firebase/FirebaseStatus";
+import { ConnectionStatus } from "@/components/ConnectionStatus";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -96,6 +97,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         {/* Profile/Settings Modal */}
         {showProfileModal && <ProfileSettingsModal onClose={() => setShowProfileModal(false)} />}
       </div>
+
+      {/* Backend connection status */}
+      <ConnectionStatus />
       {/* Desktop settings icon overlay */}
       <button
         className="fixed bottom-8 right-8 z-50 bg-card border border-border rounded-full p-4 shadow-lg hover:bg-muted transition"

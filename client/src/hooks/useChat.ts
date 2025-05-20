@@ -70,7 +70,7 @@ export function useChat() {
       try {
         // Try to send the message to the server with a timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
         // Check if we should use mock data
         if (useMockData) {
@@ -93,27 +93,62 @@ export function useChat() {
           return;
         }
 
-        const response = await apiRequest("POST", "/api/chat", {
-          content,
-          agentId: activeAgent?.id || '1', // Default to the first agent if none is selected
-        });
+        // Set up retry logic for the chat API request
+        const maxRetries = 2;
+        let retryCount = 0;
+        let success = false;
 
-        clearTimeout(timeoutId);
+        while (retryCount <= maxRetries && !success) {
+          try {
+            console.log(`Sending chat message to API (attempt ${retryCount + 1}/${maxRetries + 1})`);
 
-        if (!response.ok) {
-          await fallbackResponse();
-          return;
+            const response = await apiRequest("POST", "/api/chat", {
+              content,
+              agentId: activeAgent?.id || '1', // Default to the first agent if none is selected
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+              console.error(`Chat API returned error status: ${response.status}`);
+
+              if (retryCount < maxRetries) {
+                retryCount++;
+                console.log(`Retrying chat API request (${retryCount}/${maxRetries})...`);
+                // Wait before retrying (exponential backoff)
+                await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount - 1)));
+                continue;
+              } else {
+                await fallbackResponse();
+                return;
+              }
+            }
+
+            const assistantMessage = await response.json();
+
+            // Add the assistant's response to local state
+            setLocalMessages((prev) => [...prev, {
+              ...assistantMessage,
+              timestamp: assistantMessage.timestamp || Date.now()
+            }]);
+
+            success = true;
+          } catch (fetchError) {
+            console.error(`API request failed (attempt ${retryCount + 1}/${maxRetries + 1}):`, fetchError);
+
+            if (retryCount < maxRetries) {
+              retryCount++;
+              console.log(`Retrying chat API request (${retryCount}/${maxRetries})...`);
+              // Wait before retrying (exponential backoff)
+              await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount - 1)));
+            } else {
+              await fallbackResponse();
+              return;
+            }
+          }
         }
-
-        const assistantMessage = await response.json();
-
-        // Add the assistant's response to local state
-        setLocalMessages((prev) => [...prev, {
-          ...assistantMessage,
-          timestamp: assistantMessage.timestamp || Date.now()
-        }]);
       } catch (fetchError) {
-        console.error("API request failed:", fetchError);
+        console.error("All API request attempts failed:", fetchError);
         await fallbackResponse();
       }
 

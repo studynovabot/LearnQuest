@@ -19,6 +19,10 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
 export class FirebaseStorage implements IStorage {
+  // Method to get the Firestore database instance
+  getFirestoreDb() {
+    return adminDb;
+  }
   // User operations
   async getUser(id: string): Promise<User | undefined> {
     try {

@@ -2,9 +2,9 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./index.js";
 import * as z from "zod";
-import { 
-  insertUserSchema, 
-  insertTaskSchema, 
+import {
+  insertUserSchema,
+  insertTaskSchema,
   insertChatMessageSchema
 } from "./types/schema.js";
 import { seedDatabase } from "./seed.js"; // Import seedDatabase from the appropriate module
@@ -33,45 +33,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Health check route to verify Firebase connectivity
   app.get(`${apiRouter}/health`, async (req: Request, res: Response) => {
     try {
+      console.log('Health check endpoint called');
+
       // Try to get tutors as a simple test of Firebase connectivity
       const tutors = await storage.getAllTutors();
-      
+
       // If we get here, Firebase is connected
-      res.status(200).json({ 
-        status: 'ok', 
+      const response = {
+        status: 'ok',
         firebase: 'connected',
         tutorsCount: tutors.length,
-        message: 'Firebase connection is working properly'
-      });
+        message: 'Firebase connection is working properly',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'unknown'
+      };
+
+      console.log('Health check successful:', response);
+      res.status(200).json(response);
     } catch (error) {
       // If there's an error, Firebase is not connected properly
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      
+
       console.error('Firebase health check failed:', errorMessage);
-      
-      res.status(500).json({ 
-        status: 'error', 
-        firebase: 'disconnected',
-        message: 'Firebase connection issue. Please ensure the Firestore API is enabled.', 
-        error: errorMessage 
-      });
+
+      // Try a simpler test - just write to a test collection
+      try {
+        console.log('Attempting simpler Firebase connection test...');
+        const testRef = storage.getFirestoreDb().collection('test').doc('health-check');
+        await testRef.set({
+          timestamp: new Date(),
+          status: 'test'
+        });
+
+        console.log('Simple Firebase test successful');
+
+        const response = {
+          status: 'warning',
+          firebase: 'partially_connected',
+          message: 'Firebase basic connection works, but there was an error retrieving tutors',
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+          environment: process.env.NODE_ENV || 'unknown'
+        };
+
+        console.log('Health check partial success:', response);
+        res.status(200).json(response);
+      } catch (secondError) {
+        console.error('Simple Firebase test also failed:', secondError);
+
+        const response = {
+          status: 'error',
+          firebase: 'disconnected',
+          message: 'Firebase connection issue. Please ensure the Firestore API is enabled.',
+          error: errorMessage,
+          secondaryError: secondError instanceof Error ? secondError.message : 'Unknown error in secondary test',
+          timestamp: new Date().toISOString(),
+          environment: process.env.NODE_ENV || 'unknown'
+        };
+
+        console.log('Health check failed:', response);
+        res.status(500).json(response);
+      }
     }
   });
-  
+
   // Seed database route
   app.get(`${apiRouter}/seed`, async (req: Request, res: Response) => {
     try {
       await seedDatabase();
-      res.status(200).json({ 
-        status: 'ok', 
+      res.status(200).json({
+        status: 'ok',
         message: 'Database seeded successfully'
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      res.status(500).json({ 
-        status: 'error', 
-        message: 'Failed to seed database', 
-        error: errorMessage 
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to seed database',
+        error: errorMessage
       });
     }
   });
@@ -104,36 +143,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post(`${apiRouter}/auth/login`, async (req: Request, res: Response) => {
     try {
       const { username, password } = req.body;
-      
+
       if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
       }
-      
+
       const user = await storage.getUserByUsername(username);
-      
+
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
-      
+
       // Compare password with bcrypt
       const bcrypt = await import('bcryptjs');
       const isPasswordValid = await bcrypt.compare(password, user.password);
-      
+
       if (!isPasswordValid) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
-      
+
       // Update login streak
       const lastLogin = await storage.getLastLoginDate(user.id);
       let streakUpdated = false;
-      
+
       if (lastLogin) {
         const now = new Date();
         const lastDate = new Date(lastLogin);
-        
+
         // Check if last login was yesterday or older but not more than 2 days ago
         const dayDiff = Math.floor((now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
-        
+
         if (dayDiff === 1) {
           // Consecutive day, increment streak
           await storage.updateUserStreak(user.id, true);
@@ -143,15 +182,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updateUserStreak(user.id, false);
         }
       }
-      
+
       // Add login XP reward
       const loginXP = user.isPro ? 30 : 15;
       const updatedUser = await storage.addUserXP(user.id, loginXP);
-      
+
       // Don't return the password
       const { password: _, ...userWithoutPassword } = updatedUser;
-      
-      res.status(200).json({ 
+
+      res.status(200).json({
         user: userWithoutPassword,
         loginReward: loginXP,
         streakUpdated
@@ -312,13 +351,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user?.id;
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
       const tutorId = req.params.id;
-      
+
       const result = await storage.unlockTutor(userId, tutorId);
-      
+
       if (!result) {
         return res.status(400).json({ message: "Failed to unlock tutor. You may not have enough XP." });
       }
-      
+
       const tutors = await storage.getUserTutors(userId);
       res.status(200).json(tutors);
     } catch (error) {
@@ -365,7 +404,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const completedTasks = tasks.filter(task => task.completed);
           // Get user's subjects
           const subjects = await storage.getUserSubjects(userId);
-          
+
           // Create context string
           context = `
 User has ${incompleteTasks.length} incomplete tasks and ${completedTasks.length} completed tasks.
@@ -379,7 +418,7 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
 
       // Get the appropriate AI service for this agent
       const aiService = await getAIServiceForAgent(agent);
-      
+
       // Generate a response using the AI service
       const { content: responseContent, xpAwarded } = await aiService.generateResponse(
         content,
@@ -422,12 +461,12 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
       const items = await storage.getAllStoreItems();
       const userItems = await storage.getUserItems(userId);
-      
+
       const itemsWithPurchaseStatus = items.map(item => ({
         ...item,
         unlocked: userItems.includes(item.id)
       }));
-      
+
       res.status(200).json(itemsWithPurchaseStatus);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -440,21 +479,21 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
       const userId = req.user?.id;
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
       const itemId = req.params.id;
-      
+
       const result = await storage.purchaseItem(userId, itemId);
-      
+
       if (!result) {
         return res.status(400).json({ message: "Failed to purchase item. You may not have enough XP." });
       }
-      
+
       const items = await storage.getAllStoreItems();
       const userItems = await storage.getUserItems(userId);
-      
+
       const itemsWithPurchaseStatus = items.map(item => ({
         ...item,
         unlocked: userItems.includes(item.id)
       }));
-      
+
       res.status(200).json(itemsWithPurchaseStatus);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -499,7 +538,7 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
         { quote: "The function of education is to teach one to think intensively and to think critically.", author: "Martin Luther King Jr." },
         { quote: "Education is not the learning of facts, but the training of the mind to think.", author: "Albert Einstein" }
       ];
-      
+
       // Return a random quote
       const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
       res.status(200).json(randomQuote);
@@ -513,29 +552,29 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
   app.post(`${apiRouter}/xp/award`, async (req: Request, res: Response) => {
     try {
       const { username, amount, reason } = req.body;
-      
+
       if (!username || !amount) {
         return res.status(400).json({ message: "Username and amount are required" });
       }
-      
+
       const awardAmount = parseInt(amount);
-      
+
       if (isNaN(awardAmount) || awardAmount <= 0) {
         return res.status(400).json({ message: "Amount must be a positive number" });
       }
-      
+
       const user = await storage.getUserByUsername(username);
-      
+
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      
+
       const updatedUser = await storage.addUserXP(user.id, awardAmount);
-      
+
       // Don't return the password
       const { password, ...userWithoutPassword } = updatedUser;
-      
-      res.status(200).json({ 
+
+      res.status(200).json({
         success: true,
         user: userWithoutPassword,
         awarded: awardAmount,
@@ -553,14 +592,14 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
       const userId = req.user?.id;
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
       const { rating } = req.body;
-      
+
       if (!rating) {
         return res.status(400).json({ message: "Rating is required" });
       }
-      
+
       // Calculate XP based on rating
       let xpAwarded = 0;
-      
+
       switch (rating) {
         case 'amazing':
           xpAwarded = 30;
@@ -577,7 +616,7 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
         default:
           return res.status(400).json({ message: "Invalid rating" });
       }
-      
+
       // Award XP if applicable
       let updatedUser = null;
       if (xpAwarded > 0) {
@@ -586,10 +625,10 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
         const { password, ...userWithoutPassword } = updatedUser;
         updatedUser = userWithoutPassword;
       }
-      
-      res.status(200).json({ 
-        success: true, 
-        rating, 
+
+      res.status(200).json({
+        success: true,
+        rating,
         xpAwarded,
         user: updatedUser
       });
