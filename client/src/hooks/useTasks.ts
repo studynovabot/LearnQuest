@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useUserContext } from "@/context/UserContext";
+import { mockTasks, shouldUseMockData } from "@/lib/mockData";
 
 export function useTasks() {
   const queryClient = useQueryClient();
@@ -11,38 +12,28 @@ export function useTasks() {
   const { user, refreshUser } = useUserContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Mock tasks for development or when backend is unavailable
-  const mockTasks: Task[] = [
-    {
-      id: 'mock-1',
-      description: 'Study physics for 1 hour',
-      completed: false,
-      xpReward: 30,
-      priority: 'high'
-    },
-    {
-      id: 'mock-2',
-      description: 'Complete math homework',
-      completed: false,
-      xpReward: 20,
-      priority: 'medium'
-    },
-    {
-      id: 'mock-3',
-      description: 'Review biology notes',
-      completed: false,
-      xpReward: 15,
-      priority: 'low'
+  // Using useState to make the mock tasks mutable and persist changes
+  const [mockTasksState, setMockTasksState] = useState<Task[]>([]);
+
+  // Initialize mock tasks from our centralized mock data
+  useEffect(() => {
+    if (mockTasksState.length === 0) {
+      setMockTasksState(mockTasks);
     }
-  ];
+  }, []);
 
-  // Use mock data in development or when backend is unavailable
-  const useMockData = import.meta.env.DEV || window.location.hostname.includes('vercel.app');
+  // Use the shouldUseMockData helper to determine if we should use mock data
+  const useMockData = shouldUseMockData();
 
-  const { data: tasks = useMockData ? mockTasks : [], isLoading, error, refetch: refetchTasks } = useQuery<Task[]>({
+  // Use mock data directly if we're in development or on Vercel
+  const { data: backendTasks = [], isLoading: isLoadingBackend, error, refetch: refetchTasks } = useQuery<Task[]>({
     queryKey: ["/api/tasks"],
     enabled: !!user && !useMockData, // Only enable fetching when user is available and not using mock data
   });
+
+  // Combine the data sources - use mock data if we're in development or on Vercel
+  const tasks = useMockData ? mockTasksState : backendTasks;
+  const isLoading = useMockData ? false : isLoadingBackend;
 
   // Add a function to manually fetch tasks
   const fetchTasks = () => {
@@ -54,9 +45,8 @@ export function useTasks() {
   const createTaskMutation = useMutation<Task, Error, Omit<Task, "id" | "completed">>({
     mutationFn: async (task: Omit<Task, "id" | "completed">) => {
       try {
-        // Check if we're in development mode or if the backend is unavailable
-        // In that case, use a mock response
-        if (import.meta.env.DEV || window.location.hostname.includes('vercel.app')) {
+        // Check if we should use mock data
+        if (useMockData) {
           // Simulate a delay
           await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -68,6 +58,9 @@ export function useTasks() {
             priority: task.priority as 'low' | 'medium' | 'high',
             completed: false
           };
+
+          // Add the new task to the mock tasks array
+          setMockTasksState([...mockTasksState, mockTask]);
 
           return mockTask;
         }
@@ -121,8 +114,64 @@ export function useTasks() {
 
   const updateTaskMutation = useMutation<Task, Error, { id: string; data: Partial<Task> }>({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Task> }) => {
-      const response = await apiRequest("PATCH", `/api/tasks/${id}`, data);
-      return response.json();
+      // Check if we should use mock data
+      if (useMockData) {
+        // Simulate a delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Find the task in the mock tasks
+        const taskIndex = mockTasks.findIndex(task => task.id === id);
+        if (taskIndex !== -1) {
+          // Create an updated task
+          const updatedTask: Task = {
+            ...mockTasks[taskIndex],
+            ...data
+          };
+
+          // Update the mock tasks array
+          const updatedTasks = [...mockTasksState];
+          updatedTasks[taskIndex] = updatedTask;
+          setMockTasksState(updatedTasks);
+
+          return updatedTask;
+        }
+
+        // If task not found, return a mock task
+        return {
+          id,
+          description: "Mock task",
+          completed: data.completed || false,
+          xpReward: 20,
+          priority: "medium"
+        };
+      }
+
+      try {
+        const response = await apiRequest("PATCH", `/api/tasks/${id}`, data);
+        return response.json();
+      } catch (error) {
+        console.error("Error updating task:", error);
+        // If there's an error, still update the task in the local state
+        if (useMockData) {
+          // Find the task in the mock tasks
+          const taskIndex = mockTasksState.findIndex(task => task.id === id);
+          if (taskIndex !== -1) {
+            // Create an updated task
+            const updatedTask: Task = {
+              ...mockTasksState[taskIndex],
+              ...data
+            };
+
+            // Update the mock tasks array
+            const updatedTasks = [...mockTasksState];
+            updatedTasks[taskIndex] = updatedTask;
+            setMockTasksState(updatedTasks);
+
+            return updatedTask;
+          }
+        }
+        throw error;
+      }
     },
     onSuccess: (data: Task) => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
@@ -153,7 +202,33 @@ export function useTasks() {
 
   const deleteTaskMutation = useMutation<void, Error, string>({
     mutationFn: async (id: string) => {
-      await apiRequest("DELETE", `/api/tasks/${id}`);
+      // Check if we should use mock data
+      if (useMockData) {
+        // Simulate a delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Find the task index in the mock tasks
+        const taskIndex = mockTasks.findIndex(task => task.id === id);
+        if (taskIndex !== -1) {
+          // Remove the task from the mock tasks array
+          const updatedTasks = mockTasksState.filter(task => task.id !== id);
+          setMockTasksState(updatedTasks);
+        }
+
+        return;
+      }
+
+      try {
+        await apiRequest("DELETE", `/api/tasks/${id}`);
+      } catch (error) {
+        console.error("Error deleting task:", error);
+        // If there's an error, still remove the task from the local state
+        if (useMockData) {
+          const updatedTasks = mockTasksState.filter(task => task.id !== id);
+          setMockTasksState(updatedTasks);
+        }
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
@@ -171,6 +246,28 @@ export function useTasks() {
     },
   });
 
+  // Function to complete a task with error handling
+  const completeTask = async (id: string) => {
+    try {
+      await updateTaskMutation.mutateAsync({ id, data: { completed: true } });
+    } catch (error) {
+      console.error("Error completing task:", error);
+      // If we're using mock data, update the task in the local state
+      if (useMockData) {
+        const taskIndex = mockTasksState.findIndex(task => task.id === id);
+        if (taskIndex !== -1) {
+          const updatedTasks = [...mockTasksState];
+          updatedTasks[taskIndex] = {
+            ...updatedTasks[taskIndex],
+            completed: true
+          };
+          setMockTasksState(updatedTasks);
+        }
+      }
+      // Don't rethrow the error to prevent UI disruption
+    }
+  };
+
   return {
     tasks,
     isLoading: isLoading || isSubmitting,
@@ -179,8 +276,6 @@ export function useTasks() {
     createTask: createTaskMutation.mutateAsync,
     updateTask: updateTaskMutation.mutateAsync,
     deleteTask: deleteTaskMutation.mutateAsync,
-    completeTask: async (id: string) => {
-      await updateTaskMutation.mutateAsync({ id, data: { completed: true } });
-    },
+    completeTask
   };
 }

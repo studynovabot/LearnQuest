@@ -8,6 +8,8 @@ import { FlashlightIcon, FireIcon, HomeIcon, MessageIcon, TrophyIcon, StoreIcon,
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
+import { MockDataBanner } from "@/components/ui/MockDataBanner";
+import { FirebaseStatus } from "@/components/firebase/FirebaseStatus";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -64,9 +66,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           {mobileNavItems.map((item, index) => (
             <Link key={index} href={item.path}>
               <button className="nav-icon flex flex-col items-center">
-                <item.icon 
-                  className={cn("text-xl", item.active ? "text-secondary" : "")} 
-                  size={24} 
+                <item.icon
+                  className={cn("text-xl", item.active ? "text-secondary" : "")}
+                  size={24}
                 />
                 <span className={cn("text-xs mt-1", item.active ? "text-secondary" : "")}>{item.label}</span>
               </button>
@@ -82,8 +84,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
         {/* Main content */}
         <div className="flex-grow flex flex-col gap-6">
-          {/* Top header */}
-          {/* Remove user-dependent header, or replace with static header if needed */}
+          {/* Mock data banner */}
+          <MockDataBanner />
+
+          {/* Firebase status */}
+          <FirebaseStatus />
+
+          {/* Main content */}
           {children}
         </div>
         {/* Profile/Settings Modal */}

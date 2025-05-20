@@ -18,6 +18,7 @@ import { cn, getPriorityColor } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 // Form schema
 const taskSchema = z.object({
@@ -31,10 +32,11 @@ type TaskFormData = z.infer<typeof taskSchema>;
 const TaskManagement = () => {
   const { tasks, isLoading, completeTask, createTask, deleteTask } = useTasks();
   const { user, refreshUser } = useAuth();
+  const { toast } = useToast();
   const [isCreating, setIsCreating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [pendingTaskId, setPendingTaskId] = useState<string | null>(null);
-  
+
   const form = useForm({
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -43,34 +45,59 @@ const TaskManagement = () => {
       priority: "medium" as const
     }
   });
-  
+
   const onSubmit = async (data: TaskFormData) => {
     setIsCreating(true);
     try {
       await createTask(data);
       form.reset();
       setIsDialogOpen(false);
+
+      // Show success toast
+      toast({
+        title: "Task Created",
+        description: "Your new task has been created successfully.",
+      });
+    } catch (error) {
+      console.error("Error creating task:", error);
+      // Show error toast
+      toast({
+        title: "Error",
+        description: "Failed to create task. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsCreating(false);
     }
   };
-  
+
   const handleCompleteTask = async (id: string) => {
-    setPendingTaskId(id);
-    await completeTask(id);
-    await refreshUser();
-    setPendingTaskId(null);
+    try {
+      setPendingTaskId(id);
+      await completeTask(id);
+      await refreshUser();
+    } catch (error) {
+      console.error("Error completing task:", error);
+      // Show a toast notification
+      toast({
+        title: "Error",
+        description: "Failed to complete task. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setPendingTaskId(null);
+    }
   };
-  
+
   const tasksArray = Array.isArray(tasks) ? tasks : [];
   const incompleteTasks = tasksArray.filter((task: Task) => !task.completed);
   const completedTasks = tasksArray.filter((task: Task) => task.completed);
   const highPriorityTasks = incompleteTasks.filter((task: Task) => task.priority === "high");
   const mediumPriorityTasks = incompleteTasks.filter((task: Task) => task.priority === "medium");
   const lowPriorityTasks = incompleteTasks.filter((task: Task) => task.priority === "low");
-  
+
   const totalAvailableXP = incompleteTasks.reduce((sum: number, task: Task) => sum + task.xpReward, 0);
-  
+
   const renderTask = (task: Task) => (
     <motion.div
       key={task.id}
@@ -79,8 +106,8 @@ const TaskManagement = () => {
       exit={{ opacity: 0, x: 20 }}
       className={cn(
         "flex items-center gap-4 p-4 border-b border-border last:border-0",
-        task.priority === "high" ? "bg-red-500/5" : 
-        task.priority === "medium" ? "bg-yellow-500/5" : 
+        task.priority === "high" ? "bg-red-500/5" :
+        task.priority === "medium" ? "bg-yellow-500/5" :
         "bg-green-500/5"
       )}
     >
@@ -89,10 +116,10 @@ const TaskManagement = () => {
           "w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0",
           task.completed
             ? "border-primary bg-primary/20"
-            : task.priority === "high" 
-              ? "border-red-500 hover:bg-red-500/10" 
-              : task.priority === "medium" 
-                ? "border-yellow-500 hover:bg-yellow-500/10" 
+            : task.priority === "high"
+              ? "border-red-500 hover:bg-red-500/10"
+              : task.priority === "medium"
+                ? "border-yellow-500 hover:bg-yellow-500/10"
                 : "border-green-500 hover:bg-green-500/10",
           "transition-colors"
         )}
@@ -105,7 +132,7 @@ const TaskManagement = () => {
           <div className="h-3 w-3 rounded-full border-2 border-t-transparent border-current animate-spin"></div>
         ) : null}
       </button>
-      
+
       <div className="flex-grow">
         <p className={cn(task.completed ? "text-muted-foreground line-through" : "")}>
           {task.description}
@@ -114,13 +141,25 @@ const TaskManagement = () => {
           {task.priority.charAt(0).toUpperCase() + (task.priority || '').slice(1)} priority
         </p>
       </div>
-      
+
       <div className="flex items-center gap-2">
         <div className="bg-muted rounded-md px-2 py-1 text-sm font-medium text-primary">
           +{task.xpReward} XP
         </div>
         <button
-          onClick={() => deleteTask(task.id)}
+          onClick={async () => {
+            try {
+              await deleteTask(task.id);
+            } catch (error) {
+              console.error("Error deleting task:", error);
+              // Show a toast notification
+              toast({
+                title: "Error",
+                description: "Failed to delete task. Please try again.",
+                variant: "destructive",
+              });
+            }
+          }}
           className="p-1 hover:bg-destructive/10 rounded-md transition-colors"
           title="Delete task"
         >
@@ -137,7 +176,7 @@ const TaskManagement = () => {
         <meta name="description" content="Manage your learning tasks, track progress, and earn XP rewards as you complete tasks in this gamified learning experience." />
       </Helmet>
 
-      <motion.div 
+      <motion.div
         className="flex flex-col gap-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -152,13 +191,13 @@ const TaskManagement = () => {
                   Track and manage your learning tasks to earn XP
                 </CardDescription>
               </div>
-              
+
               <div className="flex gap-4 items-center">
                 <div className="bg-primary/10 rounded-xl px-4 py-2 border border-primary/30">
                   <div className="text-sm text-muted-foreground">Available XP:</div>
                   <div className="text-xl font-bold text-primary">{totalAvailableXP} XP</div>
                 </div>
-                
+
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button>Create Task</Button>
@@ -167,7 +206,7 @@ const TaskManagement = () => {
                     <DialogHeader>
                       <DialogTitle>Create New Learning Task</DialogTitle>
                     </DialogHeader>
-                    
+
                     <Form {...form}>
                       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
@@ -183,7 +222,7 @@ const TaskManagement = () => {
                             </FormItem>
                           )}
                         />
-                        
+
                         <div className="grid grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
@@ -198,7 +237,7 @@ const TaskManagement = () => {
                               </FormItem>
                             )}
                           />
-                          
+
                           <FormField
                             control={form.control}
                             name="priority"
@@ -222,7 +261,7 @@ const TaskManagement = () => {
                             )}
                           />
                         </div>
-                        
+
                         <DialogFooter>
                           <Button type="submit" disabled={isCreating}>
                             {isCreating ? (
@@ -238,7 +277,7 @@ const TaskManagement = () => {
               </div>
             </div>
           </CardHeader>
-          
+
           <CardContent className="p-0">
             <Tabs defaultValue="all" className="w-full">
               <div className="border-b border-border">
@@ -252,7 +291,7 @@ const TaskManagement = () => {
                   </TabsList>
                 </div>
               </div>
-              
+
               <div className="p-6">
                 <TabsContent value="all" className="mt-0">
                   {isLoading ? (
@@ -282,7 +321,7 @@ const TaskManagement = () => {
                     </div>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="high" className="mt-0">
                   {highPriorityTasks.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
@@ -296,7 +335,7 @@ const TaskManagement = () => {
                     </div>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="medium" className="mt-0">
                   {mediumPriorityTasks.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
@@ -310,7 +349,7 @@ const TaskManagement = () => {
                     </div>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="low" className="mt-0">
                   {lowPriorityTasks.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
@@ -324,7 +363,7 @@ const TaskManagement = () => {
                     </div>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="completed" className="mt-0">
                   {completedTasks.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
@@ -340,7 +379,7 @@ const TaskManagement = () => {
                 </TabsContent>
               </div>
             </Tabs>
-            
+
             <div className="p-6 bg-muted/30 border-t border-border">
               <h3 className="text-xl font-semibold mb-4">Task Rewards</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -359,7 +398,7 @@ const TaskManagement = () => {
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">Complete 7 days for a bonus 50 XP</p>
                 </div>
-                
+
                 <div className="bg-card rounded-lg p-4">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
@@ -387,7 +426,7 @@ const TaskManagement = () => {
                     </li>
                   </ul>
                 </div>
-                
+
                 <div className="bg-card rounded-lg p-4">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">

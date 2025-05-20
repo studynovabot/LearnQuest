@@ -4,6 +4,7 @@ import { ChatMessage, AITutor } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useUserContext } from "@/context/UserContext";
+import { mockTutors, mockChatMessages, shouldUseMockData, generateMockResponse } from "@/lib/mockData";
 
 export function useChat() {
   const queryClient = useQueryClient();
@@ -13,48 +14,15 @@ export function useChat() {
   const [activeAgent, setActiveAgent] = useState<AITutor | null>(null);
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]); // Local state for chat messages
 
-  // Mock tutors for development or when backend is unavailable
-  const mockTutors: AITutor[] = [
-    {
-      id: '1',
-      name: 'Nova',
-      subject: 'General',
-      iconName: 'robot',
-      color: 'blue',
-      unlocked: true,
-      xpRequired: 0
-    },
-    {
-      id: '2',
-      name: 'Einstein',
-      subject: 'Physics',
-      iconName: 'compass',
-      color: 'purple',
-      unlocked: true,
-      xpRequired: 100
-    },
-    {
-      id: '3',
-      name: 'Pythagoras',
-      subject: 'Mathematics',
-      iconName: 'calculator',
-      color: 'green',
-      unlocked: true,
-      xpRequired: 200
-    },
-    {
-      id: '4',
-      name: 'Darwin',
-      subject: 'Biology',
-      iconName: 'smile',
-      color: 'orange',
-      unlocked: false,
-      xpRequired: 500
-    }
-  ];
+  // Use the shouldUseMockData helper to determine if we should use mock data
+  const useMockData = shouldUseMockData();
 
-  // Use mock data in development or when backend is unavailable
-  const useMockData = import.meta.env.DEV || window.location.hostname.includes('vercel.app');
+  // Initialize local messages with mock chat messages if using mock data
+  useEffect(() => {
+    if (useMockData && localMessages.length === 0) {
+      setLocalMessages(mockChatMessages);
+    }
+  }, [useMockData]);
 
   // Fetch tutors
   const { data: tutors = useMockData ? mockTutors : [], isLoading: isLoadingTutors } = useQuery<AITutor[]>({
@@ -104,16 +72,18 @@ export function useChat() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-        // Check if we're in development mode or if the backend is unavailable
-        // In that case, use a mock response
-        if (import.meta.env.DEV || window.location.hostname.includes('vercel.app')) {
+        // Check if we should use mock data
+        if (useMockData) {
           // Simulate a delay
           await new Promise(resolve => setTimeout(resolve, 1500));
+
+          // Generate a more realistic mock response based on the message content
+          const responseContent = generateMockResponse(content, activeAgent?.name || 'Nova');
 
           // Create a mock response based on the agent
           const mockResponse: ChatMessage = {
             id: Date.now() + 1,
-            content: `This is a simulated response from ${activeAgent?.name || 'Nova'}. The backend API is currently unavailable, but this allows you to test the UI. In a real deployment, this would connect to the AI service.`,
+            content: responseContent,
             role: 'assistant',
             timestamp: Date.now() + 1,
           };

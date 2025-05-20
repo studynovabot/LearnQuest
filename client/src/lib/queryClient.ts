@@ -62,14 +62,30 @@ export async function apiRequest(
     // Determine if this is a cross-origin request
     const isCrossOrigin = requestUrl.includes('http') && !requestUrl.includes(window.location.origin);
 
+    // Add CORS headers for cross-origin requests
+    if (isCrossOrigin) {
+      headers['Access-Control-Allow-Origin'] = '*';
+      headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS';
+      headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
+    }
+
+    // Log the request details for debugging
+    console.log('Request details:', {
+      url: requestUrl,
+      method,
+      headers,
+      isCrossOrigin,
+      body: data ? JSON.stringify(data).substring(0, 100) + '...' : undefined
+    });
+
     const res = await fetch(requestUrl, {
       method,
       headers,
       body: data ? JSON.stringify(data) : undefined,
-      // Use 'same-origin' for same-origin requests and 'include' for cross-origin
-      credentials: isCrossOrigin ? "include" : "same-origin",
-      // Add mode: 'cors' for cross-origin requests
-      mode: isCrossOrigin ? 'cors' : undefined,
+      // Always use 'include' for credentials to ensure cookies are sent
+      credentials: "include",
+      // Always use 'cors' mode for all requests to handle potential CORS issues
+      mode: 'cors',
       signal: options?.signal,
     });
 
@@ -127,12 +143,29 @@ export const getQueryFn: <T>(options: {
     // Determine if this is a cross-origin request
     const isCrossOrigin = requestUrl.includes('http') && !requestUrl.includes(window.location.origin);
 
+    // Create headers object
+    const headers: Record<string, string> = { "Authorization": userId };
+
+    // Add CORS headers for cross-origin requests
+    if (isCrossOrigin) {
+      headers['Access-Control-Allow-Origin'] = '*';
+      headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS';
+      headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
+    }
+
+    // Log the query details for debugging
+    console.log('Query details:', {
+      url: requestUrl,
+      headers,
+      isCrossOrigin
+    });
+
     const res = await fetch(requestUrl, {
-      // Use 'same-origin' for same-origin requests and 'include' for cross-origin
-      credentials: isCrossOrigin ? "include" : "same-origin",
-      // Add mode: 'cors' for cross-origin requests
-      mode: isCrossOrigin ? 'cors' : undefined,
-      headers: { "Authorization": userId },
+      // Always use 'include' for credentials to ensure cookies are sent
+      credentials: "include",
+      // Always use 'cors' mode for all requests to handle potential CORS issues
+      mode: 'cors',
+      headers,
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
