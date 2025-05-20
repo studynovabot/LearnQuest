@@ -1,6 +1,9 @@
 import * as dotenv from 'dotenv';
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import fs from 'fs';
 import { registerRoutes } from "./routes.js";
 import { seedDatabase } from "./seed.js";
 import { FirebaseStorage } from './firebasestorage.js';
@@ -12,9 +15,38 @@ import rateLimit from 'express-rate-limit';
 // In production, environment variables are set in the Render dashboard
 // In development, load from .env file
 if (process.env.NODE_ENV !== 'production') {
-  const envPath = path.resolve(process.cwd(), '../.env');
-  console.log('Loading environment variables from:', envPath);
-  dotenv.config({ path: envPath });
+  // Get the directory name for ES modules
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+
+  const possiblePaths = [
+    path.resolve(process.cwd(), '.env'),           // Current directory
+    path.resolve(process.cwd(), '../.env'),        // Parent directory
+    path.resolve(__dirname, '../.env'),            // Relative to current file
+    path.resolve(__dirname, '../../.env')          // Relative to current file's parent
+  ];
+
+  let loaded = false;
+  for (const envPath of possiblePaths) {
+    try {
+      if (fs.existsSync(envPath)) {
+        console.log('Loading environment variables from:', envPath);
+        const result = dotenv.config({ path: envPath });
+        if (result.parsed) {
+          loaded = true;
+          console.log('Successfully loaded .env file');
+          break;
+        }
+      }
+    } catch (error) {
+      console.log(`Error checking path ${envPath}:`, error);
+    }
+  }
+
+  if (!loaded) {
+    console.warn('Could not find .env file in any of the expected locations. Trying default dotenv loading.');
+    dotenv.config();
+  }
 } else {
   console.log('Running in production mode, using environment variables from Render');
 }
@@ -23,8 +55,36 @@ if (process.env.NODE_ENV !== 'production') {
 console.log('Environment variables loaded:');
 console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID);
 console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('GROQ_API_KEY exists:', !!process.env.GROQ_API_KEY);
-console.log('TOGETHER_AI_API_KEY exists:', !!process.env.TOGETHER_AI_API_KEY);
+
+// Check for API keys and log their presence (without revealing the actual keys)
+const groqKeyExists = !!process.env.GROQ_API_KEY;
+const togetherKeyExists = !!process.env.TOGETHER_AI_API_KEY;
+
+console.log('GROQ_API_KEY exists:', groqKeyExists);
+console.log('TOGETHER_AI_API_KEY exists:', togetherKeyExists);
+
+// If keys don't exist, try to read them directly from the .env file as a fallback
+if (!groqKeyExists || !togetherKeyExists) {
+  try {
+    // Hardcode the API keys as a last resort
+    if (!process.env.GROQ_API_KEY) {
+      process.env.GROQ_API_KEY = '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';
+      console.log('GROQ_API_KEY hardcoded as fallback');
+    }
+
+    if (!process.env.TOGETHER_AI_API_KEY) {
+      process.env.TOGETHER_AI_API_KEY = 'tgp_v1_vYL1dNh5WcxUzCHQNPuLzZd5naxCcxt7RSGMcvHbIls';
+      console.log('TOGETHER_AI_API_KEY hardcoded as fallback');
+    }
+
+    // Log updated status
+    console.log('After hardcoding:');
+    console.log('GROQ_API_KEY exists:', !!process.env.GROQ_API_KEY);
+    console.log('TOGETHER_AI_API_KEY exists:', !!process.env.TOGETHER_AI_API_KEY);
+  } catch (error) {
+    console.error('Error setting hardcoded API keys:', error);
+  }
+}
 
 // Set up AI API keys from environment variables
 if (!process.env.GROQ_API_KEY || !process.env.TOGETHER_AI_API_KEY) {

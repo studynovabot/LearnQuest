@@ -93,13 +93,18 @@ try {
 // Create a mock Firestore DB that logs errors instead of crashing
 function createMockFirestoreDb() {
   const mockDb = {
-    collection: (name) => ({
-      doc: (id) => ({
-        get: async () => ({ exists: false, data: () => null }),
-        set: async () => console.error(`Mock Firestore: Cannot write to ${name}/${id} - Firebase not initialized`),
-        update: async () => console.error(`Mock Firestore: Cannot update ${name}/${id} - Firebase not initialized`),
-        delete: async () => console.error(`Mock Firestore: Cannot delete ${name}/${id} - Firebase not initialized`)
-      }),
+    collection: (name: string) => ({
+      doc: (id?: string) => {
+        const docId = id || `mock-${Date.now()}`;
+        const docRef = {
+          id: docId,
+          get: async () => ({ exists: false, data: () => null }),
+          set: async () => console.error(`Mock Firestore: Cannot write to ${name}/${docId} - Firebase not initialized`),
+          update: async () => console.error(`Mock Firestore: Cannot update ${name}/${docId} - Firebase not initialized`),
+          delete: async () => console.error(`Mock Firestore: Cannot delete ${name}/${docId} - Firebase not initialized`)
+        };
+        return docRef;
+      },
       where: () => ({
         get: async () => ({ empty: true, docs: [] }),
         orderBy: () => ({

@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase-admin/firestore';
 import { adminDb } from './firebaseAdmin.js';
-import { 
+import {
   type User, type InsertUser,
   type Subject, type InsertSubject,
   type Task, type InsertTask,
@@ -58,10 +58,12 @@ export class FirebaseStorage implements IStorage {
   async createUser(user: InsertUser): Promise<User> {
     try {
       const usersRef = adminDb.collection('users');
-      const newUserRef = usersRef.doc();
-      
+      // Generate a unique ID for the document
+      const uniqueId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      const newUserRef = usersRef.doc(uniqueId);
+
       const newUser: User = {
-        id: newUserRef.id,
+        id: uniqueId,
         ...user,
         xp: 0,
         level: 1,
@@ -94,18 +96,18 @@ export class FirebaseStorage implements IStorage {
     try {
       const userRef = adminDb.collection('users').doc(id);
       const userDoc = await userRef.get();
-      
+
       if (!userDoc.exists) {
         return undefined;
       }
-      
+
       const updatedData = {
         ...data,
         updatedAt: Timestamp.fromDate(new Date())
       };
-      
+
       await userRef.update(updatedData);
-      
+
       const updatedUserDoc = await userRef.get();
       const userData = updatedUserDoc.data();
       return {
@@ -144,17 +146,19 @@ export class FirebaseStorage implements IStorage {
   async createSubject(subject: InsertSubject): Promise<Subject> {
     try {
       const subjectsRef = adminDb.collection('subjects');
-      const newSubjectRef = subjectsRef.doc();
-      
+      // Generate a unique ID for the document
+      const uniqueId = `subject_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      const newSubjectRef = subjectsRef.doc(uniqueId);
+
       const newSubject: Subject = {
-        id: newSubjectRef.id,
+        id: uniqueId,
         ...subject,
         status: subject.status || 'average',
         progress: subject.progress ?? 0
       };
-      
+
       await newSubjectRef.set(newSubject);
-      
+
       return newSubject;
     } catch (error) {
       console.error('Error creating subject:', error);
@@ -166,13 +170,13 @@ export class FirebaseStorage implements IStorage {
     try {
       const subjectRef = adminDb.collection('subjects').doc(id);
       const subjectDoc = await subjectRef.get();
-      
+
       if (!subjectDoc.exists) {
         return undefined;
       }
-      
+
       await subjectRef.update(data);
-      
+
       const updatedSubjectDoc = await subjectRef.get();
       return { id, ...updatedSubjectDoc.data() } as Subject;
     } catch (error) {
@@ -186,7 +190,7 @@ export class FirebaseStorage implements IStorage {
     try {
       const tasksRef = adminDb.collection('tasks');
       const querySnapshot = await tasksRef.where('userId', '==', userId).get();
-      
+
       return querySnapshot.docs.map(doc => {
         const data = doc.data();
         return {
@@ -204,22 +208,24 @@ export class FirebaseStorage implements IStorage {
   async createTask(task: InsertTask): Promise<Task> {
     try {
       const tasksRef = adminDb.collection('tasks');
-      const newTaskRef = tasksRef.doc();
-      
+      // Generate a unique ID for the document
+      const uniqueId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      const newTaskRef = tasksRef.doc(uniqueId);
+
       const newTask: Task = {
-        id: newTaskRef.id,
+        id: uniqueId,
         ...task,
         completed: false,
         priority: task.priority || 'medium',
         progress: null,
         createdAt: new Date()
       };
-      
+
       await newTaskRef.set({
         ...newTask,
         createdAt: Timestamp.fromDate(newTask.createdAt)
       });
-      
+
       return newTask;
     } catch (error) {
       console.error('Error creating task:', error);
@@ -231,20 +237,20 @@ export class FirebaseStorage implements IStorage {
     try {
       const taskRef = adminDb.collection('tasks').doc(id);
       const taskDoc = await taskRef.get();
-      
+
       if (!taskDoc.exists) {
         return undefined;
       }
-      
+
       await taskRef.update(data);
-      
+
       const updatedTaskDoc = await taskRef.get();
       const updatedData = updatedTaskDoc.data();
-      
+
       if (!updatedData) {
         return undefined;
       }
-      
+
       return {
         id,
         ...updatedData,
@@ -271,16 +277,16 @@ export class FirebaseStorage implements IStorage {
     try {
       const tutorsRef = adminDb.collection('tutors');
       const tutorRef = tutorsRef.doc(tutor.id);
-      
+
       await tutorRef.set(tutor);
-      
+
       return tutor;
     } catch (error) {
       console.error('Error creating tutor:', error);
       throw new Error('Failed to create tutor in database');
     }
   }
-  
+
   async getAllTutors(): Promise<AITutor[]> {
     try {
       const tutorsRef = adminDb.collection('tutors');
@@ -318,12 +324,12 @@ export class FirebaseStorage implements IStorage {
       const allTutors = await this.getAllTutors();
       const userTutorsRef = adminDb.collection('userTutors');
       const querySnapshot = await userTutorsRef.where('userId', '==', userId).get();
-      
+
       const unlockedTutorIds = new Set(querySnapshot.docs.map(doc => doc.data().tutorId));
-      
+
       // Main tutor is always unlocked
       unlockedTutorIds.add('main');
-      
+
       return allTutors.map(tutor => ({
         ...tutor,
         unlocked: unlockedTutorIds.has(tutor.id)
@@ -337,15 +343,17 @@ export class FirebaseStorage implements IStorage {
   async unlockTutor(userId: string, tutorId: string): Promise<boolean> {
     try {
       const userTutorsRef = adminDb.collection('userTutors');
-      const newUserTutorRef = userTutorsRef.doc();
-      
+      // Generate a unique ID for the document
+      const uniqueId = `userTutor_${userId}_${tutorId}_${Date.now()}`;
+      const newUserTutorRef = userTutorsRef.doc(uniqueId);
+
       await newUserTutorRef.set({
-        id: newUserTutorRef.id,
+        id: uniqueId,
         userId,
         tutorId,
         unlocked: true
       });
-      
+
       return true;
     } catch (error) {
       console.error('Error unlocking tutor:', error);
@@ -362,7 +370,7 @@ export class FirebaseStorage implements IStorage {
         .orderBy('createdAt', 'desc')
         .limit(limit)
         .get();
-      
+
       // Convert Firestore documents to ChatMessage objects and reverse to get chronological order
       const uniqueMessages = new Map<string, ChatMessage>();
       querySnapshot.docs.forEach(doc => {
@@ -385,15 +393,17 @@ export class FirebaseStorage implements IStorage {
   async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
     try {
       const messagesRef = adminDb.collection('chatMessages');
-      const newMessageRef = messagesRef.doc();
-      
+      // Generate a unique ID for the document
+      const uniqueId = `message_${message.userId}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      const newMessageRef = messagesRef.doc(uniqueId);
+
       // Create the new message object
       const newMessage: ChatMessage = {
-        id: newMessageRef.id,
+        id: uniqueId,
         ...message,
         createdAt: new Date()
       };
-      
+
       // Save the new message to Firestore
       await newMessageRef.set({
         ...newMessage,
@@ -413,13 +423,13 @@ export class FirebaseStorage implements IStorage {
         if (querySnapshot.docs.length > 50) {
           console.log(`Enforcing 50 message limit. Current count: ${querySnapshot.docs.length}`);
           const messagesToDelete = querySnapshot.docs.slice(50);
-          
+
           // Use a batch to delete multiple messages efficiently
           const batch = adminDb.batch();
           messagesToDelete.forEach(doc => {
             batch.delete(doc.ref);
           });
-          
+
           await batch.commit();
           console.log(`Deleted ${messagesToDelete.length} old messages for user ${message.userId}`);
         }
@@ -428,7 +438,7 @@ export class FirebaseStorage implements IStorage {
         console.error('Error enforcing message limit:', limitError);
         console.log('Continuing without enforcing message limit');
       }
-      
+
       return newMessage;
     } catch (error) {
       console.error('Error creating chat message:', error);
@@ -445,7 +455,7 @@ export class FirebaseStorage implements IStorage {
     try {
       const itemsRef = adminDb.collection('storeItems');
       const querySnapshot = await itemsRef.get();
-      
+
       return querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
@@ -460,7 +470,7 @@ export class FirebaseStorage implements IStorage {
     try {
       const userItemsRef = adminDb.collection('userItems');
       const querySnapshot = await userItemsRef.where('userId', '==', userId).get();
-      
+
       return querySnapshot.docs.map(doc => doc.data().itemId);
     } catch (error) {
       console.error('Error getting user items:', error);
@@ -473,27 +483,29 @@ export class FirebaseStorage implements IStorage {
       const user = await this.getUser(userId);
       const items = await this.getAllStoreItems();
       const item = items.find(i => i.id === itemId);
-      
+
       if (!user || !item) {
         return false;
       }
-      
+
       if (user.xp < item.price) {
         return false;
       }
-      
+
       await this.updateUser(userId, { xp: user.xp - item.price });
-      
+
       const userItemsRef = adminDb.collection('userItems');
-      const newUserItemRef = userItemsRef.doc();
-      
+      // Generate a unique ID for the document
+      const uniqueId = `userItem_${userId}_${itemId}_${Date.now()}`;
+      const newUserItemRef = userItemsRef.doc(uniqueId);
+
       await newUserItemRef.set({
-        id: newUserItemRef.id,
+        id: uniqueId,
         userId,
         itemId,
         purchasedAt: Timestamp.fromDate(new Date())
       });
-      
+
       return true;
     } catch (error) {
       console.error('Error purchasing item:', error);
@@ -509,7 +521,7 @@ export class FirebaseStorage implements IStorage {
         .orderBy('xp', 'desc')
         .limit(limit)
         .get();
-      
+
       return querySnapshot.docs.map(doc => {
         const data = doc.data();
         return {
@@ -531,14 +543,14 @@ export class FirebaseStorage implements IStorage {
     try {
       const user = await this.getUser(userId);
       if (!user) return 0;
-      
+
       const newStreak = increment ? user.streak + 1 : 0;
-      
-      await this.updateUser(userId, { 
+
+      await this.updateUser(userId, {
         streak: newStreak,
         lastLogin: new Date()
       });
-      
+
       return newStreak;
     } catch (error) {
       console.error('Error updating user streak:', error);
@@ -561,15 +573,15 @@ export class FirebaseStorage implements IStorage {
     try {
       const user = await this.getUser(userId);
       if (!user) throw new Error('User not found');
-      
+
       const newXp = user.xp + amount;
-      
+
       const updatedUser = await this.updateUser(userId, {
         xp: newXp
       });
-      
+
       if (!updatedUser) throw new Error('Failed to update user');
-      
+
       return updatedUser;
     } catch (error) {
       console.error('Error adding user XP:', error);
@@ -583,7 +595,7 @@ export class FirebaseStorage implements IStorage {
       const querySnapshot = await usersRef
         .orderBy('xp', 'desc')
         .get();
-      
+
       const rank = querySnapshot.docs.findIndex(doc => doc.id === userId) + 1;
       return rank === 0 ? querySnapshot.docs.length + 1 : rank;
     } catch (error) {
@@ -610,7 +622,7 @@ export class FirebaseStorage implements IStorage {
       querySnapshot.docs.slice(keep).forEach(doc => {
         batch.delete(doc.ref);
       });
-      
+
       await batch.commit();
       return querySnapshot.docs.length - keep;
     } catch (error) {
