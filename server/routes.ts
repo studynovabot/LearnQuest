@@ -131,6 +131,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(409).json({ message: "Username already exists" });
       }
       const user = await storage.createUser(userData);
+
+      // Unlock the first 3 tutors for new users
+      const defaultUnlockedTutors = ['1', '2', '3']; // Nova, Math Mentor, Science Sage
+      for (const tutorId of defaultUnlockedTutors) {
+        try {
+          await storage.unlockTutor(user.id, tutorId);
+          console.log(`✅ Unlocked tutor ${tutorId} for new user ${user.id}`);
+        } catch (error) {
+          console.log(`⚠️ Failed to unlock tutor ${tutorId} for user ${user.id}:`, error);
+        }
+      }
+
       // Don't return the password
       const { password, ...userWithoutPassword } = user;
       res.status(201).json(userWithoutPassword);
@@ -333,18 +345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Tutor routes
-  app.get(`${apiRouter}/tutors`, async (req: Request, res: Response) => {
-    try {
-      const userId = req.user?.id;
-      if (!userId) return res.status(401).json({ message: "Unauthorized" });
-      const tutors = await storage.getUserTutors(userId);
-      res.status(200).json(tutors);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      res.status(400).json({ message: errorMessage });
-    }
-  });
+  // AI Tutor routes (this endpoint is handled below)
 
   app.post(`${apiRouter}/tutors/:id/unlock`, async (req: Request, res: Response) => {
     try {
@@ -641,9 +642,15 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
   // --- Tutors endpoint ---
   app.get('/api/tutors', async (req: Request, res: Response) => {
     try {
-      const tutors = await storage.getAllTutors();
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const tutors = await storage.getUserTutors(userId);
       res.json(tutors);
     } catch (error) {
+      console.error('Error fetching tutors:', error);
       res.status(500).json({ error: 'Failed to fetch tutors' });
     }
   });

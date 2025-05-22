@@ -12,8 +12,8 @@ const privateKey = process.env.FIREBASE_PRIVATE_KEY || "-----BEGIN PRIVATE KEY--
 console.log('Initializing Firebase with project ID:', projectId);
 
 // Initialize Firebase Admin with service account credentials
-let app;
-let firestoreDb;
+let app: any;
+let firestoreDb: any;
 
 try {
   // Check if Firebase app is already initialized

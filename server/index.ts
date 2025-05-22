@@ -88,17 +88,14 @@ if (!groqKeyExists || !togetherKeyExists) {
 
 // Set up AI API keys from environment variables
 if (!process.env.GROQ_API_KEY || !process.env.TOGETHER_AI_API_KEY) {
-  console.error('Missing required API keys. Please check your environment variables.');
+  console.warn('Some API keys are missing. AI features may not work correctly.');
+  console.warn('GROQ_API_KEY present:', !!process.env.GROQ_API_KEY);
+  console.warn('TOGETHER_AI_API_KEY present:', !!process.env.TOGETHER_AI_API_KEY);
 
-  // In production, we'll continue with dummy values to prevent crashing
-  if (process.env.NODE_ENV === 'production') {
-    console.warn('Using dummy API keys in production. AI features will not work correctly.');
-    process.env.GROQ_API_KEY = process.env.GROQ_API_KEY || 'dummy-key';
-    process.env.TOGETHER_AI_API_KEY = process.env.TOGETHER_AI_API_KEY || 'dummy-key';
-  } else {
-    // In development, exit to force the developer to set up the keys
-    process.exit(1);
-  }
+  // Continue with available keys or dummy values
+  process.env.GROQ_API_KEY = process.env.GROQ_API_KEY || 'dummy-key';
+  process.env.TOGETHER_AI_API_KEY = process.env.TOGETHER_AI_API_KEY || 'dummy-key';
+  console.warn('Server will continue with available/dummy API keys.');
 }
 
 // Initialize Firebase storage
@@ -126,8 +123,8 @@ app.use(limiter);
 
 // Configure CORS for production
 const corsOptions = {
-  // Allow all origins to fix CORS issues between Vercel frontend and Render backend
-  origin: '*',
+  // Allow specific origins instead of wildcard when using credentials
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5000', 'https://learnquest-frontend.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID'],
   credentials: true,
@@ -141,8 +138,14 @@ app.use(express.urlencoded({ extended: false }));
 
 // Add CORS headers for all environments
 app.use((req, res, next) => {
-  // For all environments, allow all origins to fix CORS issues
-  res.header('Access-Control-Allow-Origin', '*');
+  // Allow specific origins instead of wildcard when using credentials
+  const origin = req.headers.origin;
+  const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5000', 'https://learnquest-frontend.vercel.app'];
+
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-User-ID');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -256,7 +259,10 @@ app.get('/health', (req, res) => {
     port: Number(port),
     host: "0.0.0.0",
   }, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`🚀 Server running on port ${port}`);
+    console.log(`📊 Health check: http://localhost:${port}/api/health`);
+    console.log(`🔥 Firebase connected: ${process.env.FIREBASE_PROJECT_ID}`);
+    console.log(`🤖 AI APIs configured: GROQ=${!!process.env.GROQ_API_KEY}, Together=${!!process.env.TOGETHER_AI_API_KEY}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   });
 })();

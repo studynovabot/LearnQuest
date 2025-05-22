@@ -41,10 +41,26 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Try to get user from localStorage or a token
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-          setUser(JSON.parse(storedUser));
+          const parsedUser = JSON.parse(storedUser);
+
+          // Check if this is an old mock user that needs to be replaced
+          if (parsedUser.id === 'user-123' || parsedUser.id.startsWith('demo-user') || parsedUser.id.startsWith('mock-') || parsedUser.id.startsWith('fallback-')) {
+            console.log('Found old mock user, clearing and creating new demo user...');
+            localStorage.removeItem('user');
+            await createDemoUser();
+          } else {
+            setUser(parsedUser);
+            console.log('User loaded from localStorage:', parsedUser);
+          }
+        } else {
+          // Always try to create/login demo user if no user is stored
+          console.log('No stored user found, creating demo user...');
+          await createDemoUser();
         }
       } catch (error) {
         console.error("Authentication check failed:", error);
+        // Create a fallback user if everything fails
+        await createFallbackUser();
       } finally {
         setLoading(false);
       }
@@ -53,31 +69,119 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     checkAuth();
   }, []);
 
+  // Create a demo user for development
+  const createDemoUser = async () => {
+    console.log('🔄 Starting demo user creation process...');
+
+    try {
+      // First try to register the demo user
+      console.log('📝 Attempting to register demo user...');
+      const registerResponse = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: 'demo_user',
+          displayName: 'Demo User',
+          password: 'demo123',
+          isPro: false
+        }),
+      });
+
+      let userData;
+      if (registerResponse.status === 409) {
+        // User already exists, try to login
+        console.log('👤 Demo user already exists, attempting login...');
+        const loginResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: 'demo_user',
+            password: 'demo123',
+          }),
+        });
+
+        if (loginResponse.ok) {
+          const loginData = await loginResponse.json();
+          userData = loginData.user;
+          console.log('✅ Demo user login successful!');
+        } else {
+          const errorData = await loginResponse.json().catch(() => ({ message: 'Unknown error' }));
+          console.error('❌ Demo user login failed:', errorData);
+          throw new Error(`Failed to login demo user: ${errorData.message}`);
+        }
+      } else if (registerResponse.ok) {
+        // Registration successful
+        userData = await registerResponse.json();
+        console.log('✅ Demo user registration successful!');
+      } else {
+        const errorData = await registerResponse.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('❌ Demo user registration failed:', errorData);
+        throw new Error(`Failed to create demo user: ${errorData.message}`);
+      }
+
+      if (userData) {
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        console.log('🎉 Demo user setup complete:', userData);
+      }
+    } catch (error) {
+      console.error('💥 Demo user creation failed, using fallback:', error);
+      await createFallbackUser();
+    }
+  };
+
+  // Create a fallback user if backend is not available
+  const createFallbackUser = async () => {
+    console.log('🆘 Creating fallback user (backend unavailable)...');
+    const fallbackUser: User = {
+      id: `fallback-user-${Date.now()}`,
+      username: "demo_user_fallback",
+      displayName: "Demo User (Offline)",
+      xp: 0,
+      level: 1,
+      streak: 0,
+      title: null,
+      avatarUrl: null,
+      questionsCompleted: 0,
+      hoursStudied: 0,
+      maxLevel: 100,
+    };
+
+    setUser(fallbackUser);
+    localStorage.setItem('user', JSON.stringify(fallbackUser));
+    console.log('🔧 Fallback user created:', fallbackUser);
+  };
+
   // Login function
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
-      // Mock login - replace with actual API call
-      // const response = await api.post('/auth/login', { username, password });
-      
-      // Simulate successful login
-      const mockUser: User = {
-        id: "user-123",
-        username,
-        displayName: username,
-        xp: 0,
-        level: 1,
-        streak: 0,
-        title: null,
-        avatarUrl: null,
-        questionsCompleted: 0,
-        hoursStudied: 0,
-        maxLevel: 100,
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      return true;
+
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const userData = data.user;
+
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        console.log('User logged in successfully:', userData);
+        return true;
+      } else {
+        const errorData = await response.json();
+        console.error('Login failed:', errorData.message);
+        return false;
+      }
     } catch (error) {
       console.error("Login failed:", error);
       return false;
@@ -90,27 +194,27 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (username: string, displayName: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
-      // Mock registration - replace with actual API call
-      // const response = await api.post('/auth/register', { username, displayName, password });
-      
-      // Simulate successful registration
-      const mockUser: User = {
-        id: "user-" + Date.now(),
-        username,
-        displayName,
-        xp: 0,
-        level: 1,
-        streak: 0,
-        title: null,
-        avatarUrl: null,
-        questionsCompleted: 0,
-        hoursStudied: 0,
-        maxLevel: 100,
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      return true;
+
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, displayName, password, isPro: false }),
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        console.log('User registered successfully:', userData);
+        return true;
+      } else {
+        const errorData = await response.json();
+        console.error('Registration failed:', errorData.message);
+        return false;
+      }
     } catch (error) {
       console.error("Registration failed:", error);
       return false;
@@ -131,7 +235,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       // Mock refresh - replace with actual API call
       // const response = await api.get('/auth/me');
-      
+
       // For now, just use the stored user
       const storedUser = localStorage.getItem('user');
       if (storedUser) {

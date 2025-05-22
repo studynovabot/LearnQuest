@@ -3,7 +3,7 @@ import { AITutor, ChatMessage, Task, StoreItem, Subject } from '@/types';
 // Mock AI Tutors
 export const mockTutors: AITutor[] = [
   {
-    id: '1',
+    id: 1,
     name: 'Nova',
     subject: 'General',
     iconName: 'robot',
@@ -12,7 +12,7 @@ export const mockTutors: AITutor[] = [
     xpRequired: 0
   },
   {
-    id: '2',
+    id: 2,
     name: 'Einstein',
     subject: 'Physics',
     iconName: 'compass',
@@ -21,7 +21,7 @@ export const mockTutors: AITutor[] = [
     xpRequired: 100
   },
   {
-    id: '3',
+    id: 3,
     name: 'Pythagoras',
     subject: 'Mathematics',
     iconName: 'calculator',
@@ -30,7 +30,7 @@ export const mockTutors: AITutor[] = [
     xpRequired: 200
   },
   {
-    id: '4',
+    id: 4,
     name: 'Darwin',
     subject: 'Biology',
     iconName: 'smile',
@@ -68,13 +68,13 @@ export const mockTasks: Task[] = [
 // Mock Chat Messages
 export const mockChatMessages: ChatMessage[] = [
   {
-    id: 'user-1',
+    id: 1,
     content: 'Hi',
     role: 'user',
     timestamp: Date.now() - 60000
   },
   {
-    id: 'assistant-1',
+    id: 2,
     content: 'Hello! I\'m Nova, your AI study buddy. How can I help you with your studies today?',
     role: 'assistant',
     timestamp: Date.now() - 55000
@@ -84,45 +84,46 @@ export const mockChatMessages: ChatMessage[] = [
 // Mock Store Items
 export const mockStoreItems: StoreItem[] = [
   {
-    id: 'item-1',
+    id: 1,
     name: 'Study Streak Booster',
     description: 'Maintains your study streak for 1 day if you miss a day',
+    type: 'badge',
     price: 100,
-    imageUrl: 'https://i.imgur.com/JkBtlnN.png',
-    category: 'boost'
+    unlocked: false,
+    iconName: 'star',
+    gradient: ['#FF6B6B', '#4ECDC4']
   },
   {
-    id: 'item-2',
+    id: 2,
     name: 'XP Multiplier',
     description: 'Doubles XP earned for 24 hours',
+    type: 'badge',
     price: 200,
-    imageUrl: 'https://i.imgur.com/8sRXFZ7.png',
-    category: 'boost'
+    unlocked: false,
+    iconName: 'zap',
+    gradient: ['#A8E6CF', '#FFD93D']
   }
 ];
 
 // Mock Subjects
 export const mockSubjects: Subject[] = [
   {
-    id: 'subject-1',
+    id: 1,
     name: 'Mathematics',
-    icon: 'calculator',
-    color: 'blue',
-    xp: 120
+    progress: 75,
+    status: 'good'
   },
   {
-    id: 'subject-2',
+    id: 2,
     name: 'Physics',
-    icon: 'compass',
-    color: 'purple',
-    xp: 85
+    progress: 60,
+    status: 'average'
   },
   {
-    id: 'subject-3',
+    id: 3,
     name: 'Biology',
-    icon: 'smile',
-    color: 'green',
-    xp: 50
+    progress: 40,
+    status: 'needs_improvement'
   }
 ];
 
@@ -138,9 +139,9 @@ export const shouldUseMockData = () => {
     // If config is not yet available, use the default logic
   }
 
-  return import.meta.env.DEV ||
-         window.location.hostname.includes('vercel.app') ||
-         localStorage.getItem('useMockData') === 'true';
+  // Force mock data only if explicitly set in localStorage
+  // Don't use mock data just because we're in development mode
+  return localStorage.getItem('useMockData') === 'true';
 };
 
 // Helper function to generate a mock response for Nova Chat

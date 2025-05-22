@@ -135,7 +135,7 @@ export class FirebaseStorage implements IStorage {
 
       // Filter out duplicates based on unique subject IDs
       const uniqueSubjects = new Map<string, Subject>();
-      querySnapshot.docs.forEach(doc => {
+      querySnapshot.docs.forEach((doc: any) => {
         const subject = { id: doc.id, ...doc.data() } as Subject;
         uniqueSubjects.set(subject.id, subject);
       });
@@ -195,7 +195,7 @@ export class FirebaseStorage implements IStorage {
       const tasksRef = adminDb.collection('tasks');
       const querySnapshot = await tasksRef.where('userId', '==', userId).get();
 
-      return querySnapshot.docs.map(doc => {
+      return querySnapshot.docs.map((doc: any) => {
         const data = doc.data();
         return {
           id: doc.id,
@@ -295,7 +295,7 @@ export class FirebaseStorage implements IStorage {
     try {
       const tutorsRef = adminDb.collection('tutors');
       const querySnapshot = await tutorsRef.get();
-      return querySnapshot.docs.map(doc => {
+      return querySnapshot.docs.map((doc: any) => {
         const data = doc.data();
         // Add unlockXp if not present (example values)
         if (data.unlockXp === undefined) {
@@ -329,10 +329,10 @@ export class FirebaseStorage implements IStorage {
       const userTutorsRef = adminDb.collection('userTutors');
       const querySnapshot = await userTutorsRef.where('userId', '==', userId).get();
 
-      const unlockedTutorIds = new Set(querySnapshot.docs.map(doc => doc.data().tutorId));
+      const unlockedTutorIds = new Set(querySnapshot.docs.map((doc: any) => doc.data().tutorId));
 
-      // Main tutor is always unlocked
-      unlockedTutorIds.add('main');
+      // Main tutor (Nova) is always unlocked
+      unlockedTutorIds.add('1');
 
       return allTutors.map(tutor => ({
         ...tutor,
@@ -377,7 +377,7 @@ export class FirebaseStorage implements IStorage {
 
       // Convert Firestore documents to ChatMessage objects and reverse to get chronological order
       const uniqueMessages = new Map<string, ChatMessage>();
-      querySnapshot.docs.forEach(doc => {
+      querySnapshot.docs.forEach((doc: any) => {
         const data = doc.data();
         const message = {
           id: doc.id,
@@ -430,7 +430,7 @@ export class FirebaseStorage implements IStorage {
 
           // Use a batch to delete multiple messages efficiently
           const batch = adminDb.batch();
-          messagesToDelete.forEach(doc => {
+          messagesToDelete.forEach((doc: any) => {
             batch.delete(doc.ref);
           });
 
@@ -460,7 +460,7 @@ export class FirebaseStorage implements IStorage {
       const itemsRef = adminDb.collection('storeItems');
       const querySnapshot = await itemsRef.get();
 
-      return querySnapshot.docs.map(doc => ({
+      return querySnapshot.docs.map((doc: any) => ({
         id: doc.id,
         ...doc.data()
       })) as StoreItem[];
@@ -475,7 +475,7 @@ export class FirebaseStorage implements IStorage {
       const userItemsRef = adminDb.collection('userItems');
       const querySnapshot = await userItemsRef.where('userId', '==', userId).get();
 
-      return querySnapshot.docs.map(doc => doc.data().itemId);
+      return querySnapshot.docs.map((doc: any) => doc.data().itemId);
     } catch (error) {
       console.error('Error getting user items:', error);
       return [];
@@ -526,7 +526,7 @@ export class FirebaseStorage implements IStorage {
         .limit(limit)
         .get();
 
-      return querySnapshot.docs.map(doc => {
+      return querySnapshot.docs.map((doc: any) => {
         const data = doc.data();
         return {
           id: doc.id,
@@ -600,7 +600,7 @@ export class FirebaseStorage implements IStorage {
         .orderBy('xp', 'desc')
         .get();
 
-      const rank = querySnapshot.docs.findIndex(doc => doc.id === userId) + 1;
+      const rank = querySnapshot.docs.findIndex((doc: any) => doc.id === userId) + 1;
       return rank === 0 ? querySnapshot.docs.length + 1 : rank;
     } catch (error) {
       console.error('Error getting user rank:', error);
@@ -623,7 +623,7 @@ export class FirebaseStorage implements IStorage {
       }
 
       const batch = adminDb.batch();
-      querySnapshot.docs.slice(keep).forEach(doc => {
+      querySnapshot.docs.slice(keep).forEach((doc: any) => {
         batch.delete(doc.ref);
       });
 

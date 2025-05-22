@@ -9,20 +9,20 @@ export function ConnectionStatus() {
   const [isVisible, setIsVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
-  // Show the connection status if there's an error or warning
+  // Show the connection status if there's an error, warning, or success
   useEffect(() => {
-    if (status.status === 'error' || status.status === 'warning') {
+    if (status.status === 'error' || status.status === 'warning' || status.status === 'ok') {
       setIsVisible(true);
     }
   }, [status]);
 
-  // Hide the connection status after 8 seconds if it's OK
+  // Hide the connection status after 3 seconds if it's OK
   useEffect(() => {
     if (status.status === 'ok' && isVisible) {
       const timer = setTimeout(() => {
         setIsVisible(false);
         setShowDetails(false);
-      }, 8000);
+      }, 3000); // Reduced from 8 seconds to 3 seconds
 
       return () => clearTimeout(timer);
     }
@@ -106,14 +106,14 @@ export function ConnectionStatus() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 rounded-full p-0 flex-shrink-0"
+              className="h-8 w-8 rounded-full p-0 flex-shrink-0 hover:bg-white/20"
               onClick={() => {
                 setIsVisible(false);
                 setShowDetails(false);
               }}
               title="Close"
             >
-              <span className="text-xs">×</span>
+              <span className="text-lg font-bold">×</span>
             </Button>
           </div>
         </div>

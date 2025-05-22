@@ -1,14 +1,25 @@
 // Helper function to determine if we should use mock data
 function shouldUseMockData() {
-  // TEMPORARY FIX: Always use mock data until backend issues are resolved
-  // This ensures the app works even when the backend is unavailable
-  console.log('TEMPORARY FIX: Forcing mock data mode due to backend connection issues');
-  return true;
+  // Check if mock data is explicitly enabled in localStorage
+  if (localStorage.getItem('useMockData') === 'true') {
+    console.log('Using mock data (explicitly enabled in localStorage)');
+    return true;
+  }
 
-  // Original implementation (commented out)
-  // Only use mock data if explicitly set in localStorage
-  // We're removing the automatic mock data for Vercel deployment
-  // return localStorage.getItem('useMockData') === 'true';
+  // In development, try to connect to the real backend first
+  if (import.meta.env.DEV) {
+    console.log('Development mode - attempting to use real backend');
+    return false;
+  }
+
+  // In production (Vercel), use mock data as fallback only if backend fails
+  if (window.location.hostname.includes('vercel.app')) {
+    console.log('Production deployment detected - will try real backend first');
+    return false;
+  }
+
+  // Default to real backend
+  return false;
 }
 
 // Helper function to determine the API URL
@@ -19,13 +30,6 @@ function getApiUrl() {
     return '';
   }
 
-  // IMPORTANT: Due to backend connection issues, we're temporarily using mock data
-  // This is a temporary fix until the backend is properly configured
-  console.log('TEMPORARY FIX: Using mock data due to backend connection issues');
-  return '';
-
-  /*
-  // This code is commented out until the backend is properly configured
   // Always use the Render backend URL in production
   if (import.meta.env.PROD) {
     // Force the backend URL to be the Render URL
@@ -38,7 +42,6 @@ function getApiUrl() {
   const devUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   console.log(`Development mode - API URL set to: ${devUrl}`);
   return devUrl;
-  */
 }
 
 export const config = {

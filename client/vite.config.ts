@@ -15,7 +15,7 @@ export default defineConfig({
     sourcemap: true,
   },
   server: {
-    port: 3000,
+    port: 5173, // Use Vite's default port
     proxy: {
       '/api': {
         target: process.env.VITE_API_URL || 'http://localhost:5000',
@@ -38,7 +38,7 @@ export default defineConfig({
     cors: {
       origin: '*',
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID'],
       credentials: true
     }
   },

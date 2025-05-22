@@ -6,7 +6,7 @@ import { config } from '@/config';
 interface HealthCheckResult {
   status: 'ok' | 'error' | 'warning' | 'unknown';
   message: string;
-  firebase?: 'connected' | 'disconnected' | 'unknown';
+  firebase?: 'connected' | 'disconnected' | 'partially_connected' | 'mock' | 'unknown';
   timestamp?: string;
 }
 
@@ -45,6 +45,12 @@ export function useHealthCheck() {
       let retryCount = 0;
       let success = false;
 
+      // Construct the health check URL outside the loop
+      let healthUrl = '/api/health';
+      if (config.apiUrl) {
+        healthUrl = `${config.apiUrl}/api/health`;
+      }
+
       while (retryCount <= maxRetries && !success) {
         try {
           console.log(`Checking backend health (attempt ${retryCount + 1}/${maxRetries + 1})`);
@@ -52,12 +58,6 @@ export function useHealthCheck() {
           // Add timeout for the request
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
-
-          // Construct the health check URL
-          let healthUrl = '/api/health';
-          if (config.apiUrl) {
-            healthUrl = `${config.apiUrl}/api/health`;
-          }
 
           console.log(`Health check URL: ${healthUrl}`);
 
@@ -105,7 +105,7 @@ export function useHealthCheck() {
             toast({
               title: 'Backend Warning',
               description: result.message || 'Backend connection has issues.',
-              variant: 'warning',
+              variant: 'default',
             });
           } else if (result.status === 'error') {
             toast({
@@ -146,7 +146,7 @@ export function useHealthCheck() {
               toast({
                 title: 'Backend Partially Connected',
                 description: 'Backend is reachable but health check failed. Some features may not work correctly.',
-                variant: 'warning',
+                variant: 'default',
               });
             } catch (fallbackError) {
               // If even the fallback fails, set error status
