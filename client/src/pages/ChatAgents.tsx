@@ -43,7 +43,7 @@ const ChatAgents = () => {
   const { trackChatInteraction, trackError } = useAnalytics();
   const [inputMessage, setInputMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [unlockingId, setUnlockingId] = useState<number | null>(null);
+  const [unlockingId, setUnlockingId] = useState<string | number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when messages change
@@ -239,9 +239,9 @@ const ChatAgents = () => {
                             Ask questions about {activeAgent.subject?.toLowerCase()} and get personalized help with your studies.
                           </p>
                           <div className="inline-flex items-center bg-secondary/10 rounded-full px-3 py-1 text-xs text-secondary border border-secondary/20">
-                            {activeAgent.id === 1 ? (
+                            {Number(activeAgent.id) === 1 ? (
                               "Powered by Groq's llama-3.3-70b-versatile"
-                            ) : activeAgent.id >= 2 && activeAgent.id <= 4 ? (
+                            ) : Number(activeAgent.id) >= 2 && Number(activeAgent.id) <= 4 ? (
                               "Powered by Together AI's Mixtral-8x7B"
                             ) : (
                               "Powered by Together AI's Gemma-7B"

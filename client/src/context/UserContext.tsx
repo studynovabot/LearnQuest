@@ -1,20 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-
-// Define the User type
-interface User {
-  id: string;
-  username: string;
-  displayName: string;
-  xp: number;
-  level: number;
-  streak: number;
-  title?: string | null;
-  avatarUrl?: string | null;
-  questionsCompleted: number;
-  hoursStudied: number;
-  maxLevel?: number;
-  // Add other user properties as needed
-}
+import { User } from "@/types";
+import { config } from "@/config";
 
 // Define the context type
 interface UserContextType {
@@ -38,7 +24,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Try to get user from localStorage or a token
+        // Try to get user from localStorage
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
@@ -76,7 +62,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       // First try to register the demo user
       console.log('📝 Attempting to register demo user...');
-      const registerResponse = await fetch('/api/auth/register', {
+      const registerResponse = await fetch(`${config.apiUrl}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +79,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (registerResponse.status === 409) {
         // User already exists, try to login
         console.log('👤 Demo user already exists, attempting login...');
-        const loginResponse = await fetch('/api/auth/login', {
+        const loginResponse = await fetch(`${config.apiUrl}/api/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -144,11 +130,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       xp: 0,
       level: 1,
       streak: 0,
-      title: null,
-      avatarUrl: null,
+      title: undefined,
+      avatarUrl: undefined,
       questionsCompleted: 0,
       hoursStudied: 0,
-      maxLevel: 100,
+      isPro: false,
+      lastLogin: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     setUser(fallbackUser);
@@ -161,7 +150,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setLoading(true);
 
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${config.apiUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -195,7 +184,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setLoading(true);
 
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${config.apiUrl}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -3,7 +3,7 @@ import { AITutor, ChatMessage, Task, StoreItem, Subject } from '@/types';
 // Mock AI Tutors
 export const mockTutors: AITutor[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Nova',
     subject: 'General',
     iconName: 'robot',
@@ -12,7 +12,7 @@ export const mockTutors: AITutor[] = [
     xpRequired: 0
   },
   {
-    id: 2,
+    id: '2',
     name: 'Einstein',
     subject: 'Physics',
     iconName: 'compass',
@@ -21,7 +21,7 @@ export const mockTutors: AITutor[] = [
     xpRequired: 100
   },
   {
-    id: 3,
+    id: '3',
     name: 'Pythagoras',
     subject: 'Mathematics',
     iconName: 'calculator',
@@ -30,7 +30,7 @@ export const mockTutors: AITutor[] = [
     xpRequired: 200
   },
   {
-    id: 4,
+    id: '4',
     name: 'Darwin',
     subject: 'Biology',
     iconName: 'smile',
@@ -68,13 +68,13 @@ export const mockTasks: Task[] = [
 // Mock Chat Messages
 export const mockChatMessages: ChatMessage[] = [
   {
-    id: 1,
+    id: '1',
     content: 'Hi',
     role: 'user',
     timestamp: Date.now() - 60000
   },
   {
-    id: 2,
+    id: '2',
     content: 'Hello! I\'m Nova, your AI study buddy. How can I help you with your studies today?',
     role: 'assistant',
     timestamp: Date.now() - 55000

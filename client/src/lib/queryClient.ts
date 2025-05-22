@@ -40,7 +40,10 @@ export async function apiRequest(
   headers["Authorization"] = userId;
 
   // Add debugging information
-  console.log(`Making API request: ${method} ${url}`);
+  console.log(`🌐 Making API request: ${method} ${url}`);
+  console.log(`👤 User ID: ${userId}`);
+  console.log(`📋 Headers:`, headers);
+  console.log(`📦 Data:`, data);
 
   try {
     // Ensure URL has the correct format
@@ -252,8 +255,12 @@ function getUserId(): string | null {
     const user = localStorage.getItem('user');
     if (user) {
       const parsed = JSON.parse(user);
-      if (parsed && parsed.id) return String(parsed.id);
+      if (parsed && parsed.id) {
+        return String(parsed.id);
+      }
     }
-  } catch {}
+  } catch (error) {
+    console.error('Error getting user ID:', error);
+  }
   return null;
 }

@@ -17,7 +17,8 @@
     "fix-index": "node fix-index.cjs",
     "direct-fix": "node direct-fix.cjs",
     "predeploy": "node predeploy.cjs && node fix-index.cjs && node direct-fix.cjs",
-    "start": "node predeploy.cjs && node fix-index.cjs && node direct-fix.cjs && node dist/index.js || node simple-server.cjs"
+    "start": "node predeploy.cjs && node fix-index.cjs && node direct-fix.cjs && node dist/index.js || node simple-server.cjs",
+    "seed": "ts-node-dev --transpile-only seedRunner.ts"
   },
   "dependencies": {
     "@types/express": "^4.17.21",

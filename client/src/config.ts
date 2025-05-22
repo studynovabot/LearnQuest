@@ -1,15 +1,16 @@
 // Helper function to determine if we should use mock data
 function shouldUseMockData() {
+  // Force clear mock data flag in development to ensure we use real backend
+  if (import.meta.env.DEV) {
+    localStorage.removeItem('useMockData');
+    console.log('Development mode - forcing real backend usage');
+    return false;
+  }
+
   // Check if mock data is explicitly enabled in localStorage
   if (localStorage.getItem('useMockData') === 'true') {
     console.log('Using mock data (explicitly enabled in localStorage)');
     return true;
-  }
-
-  // In development, try to connect to the real backend first
-  if (import.meta.env.DEV) {
-    console.log('Development mode - attempting to use real backend');
-    return false;
   }
 
   // In production (Vercel), use mock data as fallback only if backend fails

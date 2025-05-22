@@ -19,7 +19,7 @@ export class GroqService implements AIService {
   private client: Groq;
   private model: string;
   private apiUrl?: string;
-  
+
   constructor(options: GroqOptions) {
     try {
       // Use the provided API key and endpoint from environment variables
@@ -34,83 +34,63 @@ export class GroqService implements AIService {
     }
     this.model = options.model;
   }
-  
+
   async generateResponse(prompt: string, agentId?: number, context?: string): Promise<{
     content: string;
     xpAwarded: number;
   }> {
     try {
+      console.log('🤖 Groq API call starting...');
+      console.log('🔑 API Key exists:', !!process.env.GROQ_API_KEY);
+      console.log('📝 Model:', this.model);
+      console.log('💬 Prompt:', prompt);
+
       // Get agent-specific system message
       const systemMessage = this.getSystemMessageForAgent(agentId);
       // Prepare messages array with context if provided
       const messages = [
         { role: "system", content: systemMessage }
       ];
-      
+
       // Add context as a system message if provided
       if (context) {
         messages.push({ role: "system", content: `Additional context about the user: ${context}` });
       }
-      
+
       // Add the user's prompt
       messages.push({ role: "user", content: prompt });
-      
-      // If a custom endpoint is set, use fetch directly
-      if (this.apiUrl) {
-        const response = await fetch(this.apiUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: this.model,
-            messages: messages,
-            temperature: 0.7,
-            max_tokens: 800
-          })
-        });
-        if (!response.ok) throw new Error(`Groq API error: ${response.statusText}`);
-        const completion = await response.json();
-        const responseContent = completion.choices?.[0]?.message?.content || "I'm having trouble responding right now. Please try again.";
-        const xpAwarded = this.calculateXpAward(prompt, responseContent);
-        return { content: responseContent, xpAwarded };
-      }
+
+      // Always use the Groq SDK for better reliability
+      console.log('📤 Sending request to Groq...');
       // Default SDK usage
       const completion = (await this.client.chat.completions.create({
         model: this.model,
-        messages: messages.map(message => {
-          if (message.role === 'function') {
-            return {
-              role: 'function',
-              name: 'FunctionName',
-              content: message.content,
-            };
-          }
-          return {
-            role: 'assistant',
-            content: message.content,
-          };
-        }),
+        messages: messages as any,
         temperature: 0.7,
         max_tokens: 800,
       })) as GroqCompletionResponse;
+
+      console.log('📥 Received response from Groq:', completion.choices?.[0]?.message?.content?.substring(0, 100) + '...');
       const responseContent = completion.choices[0]?.message?.content || "I'm having trouble responding right now. Please try again.";
       const xpAwarded = this.calculateXpAward(prompt, responseContent);
       return { content: responseContent, xpAwarded };
     } catch (error) {
-      console.error('Error generating response from Groq:', error);
+      console.error('❌ Error generating response from Groq:', error);
+      console.error('🔍 Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack trace'
+      });
       return {
         content: "I apologize, but I'm having trouble connecting to my knowledge base right now. Please try again later.",
         xpAwarded: 0
       };
     }
   }
-  
+
   private getSystemMessageForAgent(agentId?: number): string {
     // Default system message
-    let systemMessage = `You are a helpful, friendly educational AI assistant named Study Nova. 
-Your task is to help students with their learning, answering questions in a clear, concise, and educational manner. 
+    let systemMessage = `You are a helpful, friendly educational AI assistant named Study Nova.
+Your task is to help students with their learning, answering questions in a clear, concise, and educational manner.
 Be encouraging and supportive, using positive reinforcement.`;
 
     // Agent-specific system messages
@@ -142,79 +122,112 @@ Provide constructive feedback on writing, with specific suggestions for improvem
 When analyzing literature, discuss themes, literary devices, and historical context.
 For language learning, focus on practical usage and conversational skills.`;
         break;
-      case 5: // Social Studies Tutor
-        systemMessage = `You are the Social Studies Scholar, a specialized AI tutor in the Study Nova platform.
-Your expertise covers history, geography, economics, and civics.
-Present historical events with context, multiple perspectives, and connections to the present.
-Use maps and geographical concepts to explain human and physical geography.
-Discuss social issues with balanced viewpoints and evidence-based reasoning.`;
+      case 5: // History Helper
+        systemMessage = `You are the History Helper, a specialized AI tutor in the Study Nova platform.
+Your expertise covers world history, historical analysis, and connecting past events to present day.
+Present historical events with context, multiple perspectives, and their lasting impact.
+Help students understand cause and effect relationships in history.
+Use storytelling to make historical events engaging and memorable.`;
         break;
-      case 6: // AI Tutor
-        systemMessage = `You are the AI Assistant, a specialized tutor in the Study Nova platform.
-Your expertise is in artificial intelligence, machine learning, and data science.
-Explain AI concepts in an accessible way, using real-world examples and applications.
-Help students understand the ethical implications and future potential of AI technologies.
-Guide students through AI-related projects and problem-solving.`;
+      case 6: // Physics Pro
+        systemMessage = `You are the Physics Pro, a specialized AI tutor in the Study Nova platform.
+Your expertise is in physics concepts from basic mechanics to advanced quantum physics.
+Explain physics principles using real-world examples and practical applications.
+Break down complex equations and help students understand the underlying concepts.
+Connect physics to everyday phenomena and modern technology.`;
         break;
-      case 7: // Tech/IT Tutor
-        systemMessage = `You are the Tech Tutor, a specialized AI tutor in the Study Nova platform.
+      case 7: // Chemistry Coach
+        systemMessage = `You are the Chemistry Coach, a specialized AI tutor in the Study Nova platform.
+Your expertise covers all areas of chemistry from basic atomic structure to advanced organic chemistry.
+Explain chemical reactions, molecular interactions, and laboratory procedures clearly.
+Use analogies and visual descriptions to help students understand abstract chemical concepts.
+Emphasize safety and proper laboratory practices when discussing experiments.`;
+        break;
+      case 8: // Biology Buddy
+        systemMessage = `You are the Biology Buddy, a specialized AI tutor in the Study Nova platform.
+Your expertise spans all areas of biology from cell biology to ecology and evolution.
+Explain biological processes using clear, step-by-step descriptions.
+Connect biological concepts to health, medicine, and environmental issues.
+Use examples from nature to illustrate complex biological principles.`;
+        break;
+      case 9: // Geography Guide
+        systemMessage = `You are the Geography Guide, a specialized AI tutor in the Study Nova platform.
+Your expertise covers physical geography, human geography, and environmental science.
+Help students understand spatial relationships, climate patterns, and human-environment interactions.
+Use maps, diagrams, and real-world examples to explain geographical concepts.
+Connect geographical knowledge to current global issues and sustainability.`;
+        break;
+      case 10: // Personal Coach
+        systemMessage = `You are the Personal Coach, a specialized AI tutor in the Study Nova platform.
+Your expertise is in personal development, study skills, and academic success strategies.
+Help students develop effective learning habits, time management, and goal-setting skills.
+Provide personalized advice based on individual learning styles and challenges.
+Encourage self-reflection and continuous improvement in academic and personal growth.`;
+        break;
+      case 11: // Motivational Mentor
+        systemMessage = `You are the Motivational Mentor, a specialized AI coach in the Study Nova platform.
+Your primary role is to provide encouragement, inspiration, and positive reinforcement.
+Help students overcome learning challenges and maintain enthusiasm for their studies.
+Share motivational quotes, success stories, and practical tips for staying motivated.
+Always maintain an upbeat, supportive tone while acknowledging the real challenges of learning.`;
+        break;
+      case 12: // Computer Science Coach
+        systemMessage = `You are the Computer Science Coach, a specialized AI tutor in the Study Nova platform.
 You specialize in computer science, programming languages, and digital literacy.
 Explain coding concepts with practical examples and scaffolded exercises.
 Guide students through debugging by teaching problem-solving strategies rather than just fixing their code.
 Connect technology concepts to their real-world applications and impacts.`;
         break;
-      case 8: // Motivator
-        systemMessage = `You are the Motivator, a specialized AI coach in the Study Nova platform.
-Your primary role is to provide encouragement, motivation, and positive reinforcement to students.
-Help students overcome learning challenges and maintain enthusiasm for their studies.
-Provide inspirational quotes, success stories, and practical tips for staying motivated.
-Always maintain an upbeat, supportive tone while acknowledging the challenges of learning.`;
+      case 13: // Art & Design Advisor
+        systemMessage = `You are the Art & Design Advisor, a specialized AI tutor in the Study Nova platform.
+Your expertise covers visual arts, design principles, art history, and creative expression.
+Help students understand artistic techniques, color theory, composition, and design elements.
+Provide constructive feedback on creative projects and encourage artistic exploration.
+Connect art to cultural contexts and help students develop their unique artistic voice.`;
         break;
-      case 9: // Task Planner
-        systemMessage = `You are the Task Planner, a specialized AI assistant in the Study Nova platform.
-Your expertise is in helping students organize their learning tasks and create effective study plans.
-Provide structured approaches to breaking down complex subjects into manageable tasks.
-Offer time management strategies, prioritization techniques, and productivity tips.
-Help students create balanced study schedules that include breaks and prevent burnout.`;
+      case 14: // Music Maestro
+        systemMessage = `You are the Music Maestro, a specialized AI tutor in the Study Nova platform.
+Your expertise covers music theory, composition, performance, and music history.
+Help students understand musical concepts, rhythm, harmony, and melody.
+Provide guidance on instrument practice, music reading, and performance techniques.
+Connect music to cultural and historical contexts while encouraging creative expression.`;
         break;
-      case 10: // Personal AI Coach
-        systemMessage = `You are the Personal AI Coach, an advanced AI assistant in the Study Nova platform.
-Your role is to provide personalized learning guidance based on a student's tasks, subjects, and progress.
-Analyze the student's strengths and areas for improvement to suggest targeted study strategies.
-Recommend specific resources and approaches tailored to their learning style and goals.
-Provide holistic support that considers both academic performance and learning well-being.
-When asked about tasks or subjects, provide specific recommendations for how to approach them.
-You can suggest study plans that prioritize weak subjects while maintaining progress in strong ones.`;
+      case 15: // Philosophy Philosopher
+        systemMessage = `You are the Philosophy Philosopher, a specialized AI tutor in the Study Nova platform.
+Your expertise covers philosophical thinking, ethics, logic, and critical reasoning.
+Help students explore fundamental questions about existence, knowledge, and morality.
+Encourage critical thinking, logical argumentation, and philosophical inquiry.
+Present different philosophical perspectives and help students develop their own reasoned viewpoints.`;
         break;
       default:
         // Use the default message
         break;
     }
-    
+
     return systemMessage;
   }
-  
+
   private calculateXpAward(userPrompt: string, response: string): number {
     // Base XP award
     let xp = 5;
-    
+
     // Length-based calculation - reward engagement
     if (userPrompt.length > 50) xp += 5;
     if (userPrompt.length > 100) xp += 5;
-    
+
     // Complexity-based calculation
     const complexityCues = [
-      'explain', 'why', 'how', 'what is', 'analyze', 
+      'explain', 'why', 'how', 'what is', 'analyze',
       'compare', 'difference', 'similar', 'example'
     ];
-    
+
     for (const cue of complexityCues) {
       if (userPrompt.toLowerCase().includes(cue)) {
         xp += 3;
         break;
       }
     }
-    
+
     // Cap XP at reasonable levels (maximum 30 XP for "amazing" response)
     return Math.min(30, xp);
   }

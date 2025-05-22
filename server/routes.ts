@@ -132,9 +132,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const user = await storage.createUser(userData);
 
-      // Unlock the first 3 tutors for new users
-      const defaultUnlockedTutors = ['1', '2', '3']; // Nova, Math Mentor, Science Sage
-      for (const tutorId of defaultUnlockedTutors) {
+      // Unlock ALL tutors for new users
+      const allTutorIds = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
+      for (const tutorId of allTutorIds) {
         try {
           await storage.unlockTutor(user.id, tutorId);
           console.log(`✅ Unlocked tutor ${tutorId} for new user ${user.id}`);

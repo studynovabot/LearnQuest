@@ -4,7 +4,8 @@ import { ChatMessage, AITutor } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useUserContext } from "@/context/UserContext";
-import { mockTutors, mockChatMessages, shouldUseMockData, generateMockResponse } from "@/lib/mockData";
+import { mockTutors, mockChatMessages, generateMockResponse } from "@/lib/mockData";
+import { config } from "@/config";
 
 export function useChat() {
   const queryClient = useQueryClient();
@@ -14,8 +15,8 @@ export function useChat() {
   const [activeAgent, setActiveAgent] = useState<AITutor | null>(null);
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]); // Local state for chat messages
 
-  // Use the shouldUseMockData helper to determine if we should use mock data
-  const useMockData = shouldUseMockData();
+  // Use the config to determine if we should use mock data
+  const useMockData = config.useMockData;
 
   // Initialize local messages with mock chat messages if using mock data
   useEffect(() => {
@@ -24,11 +25,14 @@ export function useChat() {
     }
   }, [useMockData]);
 
-  // Fetch tutors
-  const { data: tutors = useMockData ? mockTutors : [], isLoading: isLoadingTutors } = useQuery<AITutor[]>({
+  // Fetch tutors - always try to fetch if not using mock data
+  const { data: backendTutors = [], isLoading: isLoadingTutors } = useQuery<AITutor[]>({
     queryKey: ["/api/tutors"],
-    enabled: !!user && !useMockData, // Only enable fetching when user is available and not using mock data
+    enabled: !useMockData, // Enable fetching when not using mock data
   });
+
+  // Use mock data if configured, otherwise use backend data
+  const tutors = useMockData ? mockTutors : backendTutors;
 
   // Separate tutors into unlocked and locked
   const unlockedAgents = tutors.filter(tutor => tutor.unlocked);

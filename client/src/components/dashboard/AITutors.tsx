@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  RobotIcon, 
-  UserIcon, 
-  CompassIcon, 
-  SmileIcon, 
+import {
+  RobotIcon,
+  UserIcon,
+  CompassIcon,
+  SmileIcon,
   CalculatorIcon,
   LanguagesIcon,
   LockIcon
@@ -22,7 +22,9 @@ const AITutors = () => {
   const { agents, unlockedAgents, lockedAgents, isLoading } = useChat();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [unlockingId, setUnlockingId] = useState<number | null>(null);
+  const [unlockingId, setUnlockingId] = useState<string | null>(null);
+
+
 
   const getAgentIcon = (iconName?: string, size = 24) => {
     switch (iconName) {
@@ -96,7 +98,7 @@ const AITutors = () => {
               </div>
             </Link>
           ))}
-          
+
           {/* Locked Agents */}
           {lockedAgents.map((agent: AITutor) => (
             <div key={agent.id} className="agent-card bg-card rounded-xl p-4 flex flex-col items-center transition duration-300 opacity-70">
@@ -105,10 +107,10 @@ const AITutors = () => {
               </div>
               <span className="font-medium text-center">{agent.name}</span>
               <span className="text-xs text-muted-foreground mt-1">{agent.xpRequired} XP</span>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-2" 
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
                 onClick={() => handleUnlockAgent(agent)}
                 disabled={true}
               >

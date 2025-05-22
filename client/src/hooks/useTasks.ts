@@ -4,7 +4,8 @@ import { Task } from "@/types";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useUserContext } from "@/context/UserContext";
-import { mockTasks, shouldUseMockData } from "@/lib/mockData";
+import { mockTasks } from "@/lib/mockData";
+import { config } from "@/config";
 
 export function useTasks() {
   const queryClient = useQueryClient();
@@ -22,8 +23,8 @@ export function useTasks() {
     }
   }, []);
 
-  // Use the shouldUseMockData helper to determine if we should use mock data
-  const useMockData = shouldUseMockData();
+  // Use the config to determine if we should use mock data
+  const useMockData = config.useMockData;
 
   // Use mock data directly if we're in development or on Vercel
   const { data: backendTasks = [], isLoading: isLoadingBackend, error, refetch: refetchTasks } = useQuery<Task[]>({

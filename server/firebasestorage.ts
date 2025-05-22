@@ -297,20 +297,9 @@ export class FirebaseStorage implements IStorage {
       const querySnapshot = await tutorsRef.get();
       return querySnapshot.docs.map((doc: any) => {
         const data = doc.data();
-        // Add unlockXp if not present (example values)
+        // All tutors are now unlocked by default (0 XP required)
         if (data.unlockXp === undefined) {
-          switch (doc.id) {
-            case '1': data.unlockXp = 0; break; // Main tutor always unlocked
-            case '2': data.unlockXp = 50; break; // Math Mentor
-            case '3': data.unlockXp = 100; break; // Science Sage
-            case '4': data.unlockXp = 150; break; // Language Luminary
-            case '5': data.unlockXp = 200; break; // Social Studies Scholar
-            case '6': data.unlockXp = 250; break; // AI Assistant
-            case '7': data.unlockXp = 300; break; // Tech Tutor
-            case '8': data.unlockXp = 350; break; // Motivator
-            case '9': data.unlockXp = 400; break; // Task Planner
-            default: data.unlockXp = 500; break;
-          }
+          data.unlockXp = 0; // All tutors unlocked
         }
         return {
           id: doc.id,
@@ -326,17 +315,11 @@ export class FirebaseStorage implements IStorage {
   async getUserTutors(userId: string): Promise<(AITutor & { unlocked: boolean })[]> {
     try {
       const allTutors = await this.getAllTutors();
-      const userTutorsRef = adminDb.collection('userTutors');
-      const querySnapshot = await userTutorsRef.where('userId', '==', userId).get();
 
-      const unlockedTutorIds = new Set(querySnapshot.docs.map((doc: any) => doc.data().tutorId));
-
-      // Main tutor (Nova) is always unlocked
-      unlockedTutorIds.add('1');
-
+      // ALL TUTORS ARE NOW UNLOCKED BY DEFAULT
       return allTutors.map(tutor => ({
         ...tutor,
-        unlocked: unlockedTutorIds.has(tutor.id)
+        unlocked: true // All tutors unlocked
       }));
     } catch (error) {
       console.error('Error getting user tutors:', error);

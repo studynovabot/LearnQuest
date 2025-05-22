@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id: string;
   username: string;
   displayName: string;
   xp: number;
@@ -33,7 +33,7 @@ export interface Task {
 }
 
 export interface AITutor {
-  id: number;
+  id: string | number;
   name: string;
   avatarUrl?: string;
   subject?: string;
@@ -44,11 +44,11 @@ export interface AITutor {
 }
 
 export interface ChatMessage {
-  id: number;
+  id: string | number;
   role: 'user' | 'assistant';
   content: string;
   timestamp: number;
-  agentId?: number;
+  agentId?: string;
   xpAwarded?: number;
 }
 

@@ -5,7 +5,7 @@ import { type User, type Subject, type Task, type AITutor, type ChatMessage } fr
 export async function seedDatabase() {
   console.log('Seeding database (Firebase)...');
   try {
-    // Create default AI tutors
+    // Create default AI tutors - ALL UNLOCKED
     const defaultTutors: AITutor[] = [
       {
         id: '1',
@@ -21,7 +21,7 @@ export async function seedDatabase() {
         subject: 'Mathematics',
         iconName: 'calculator',
         color: 'green',
-        xpRequired: 50
+        xpRequired: 0
       },
       {
         id: '3',
@@ -29,7 +29,7 @@ export async function seedDatabase() {
         subject: 'Science',
         iconName: 'compass',
         color: 'purple',
-        xpRequired: 100
+        xpRequired: 0
       },
       {
         id: '4',
@@ -37,47 +37,95 @@ export async function seedDatabase() {
         subject: 'Language Arts',
         iconName: 'languages',
         color: 'orange',
-        xpRequired: 150
+        xpRequired: 0
       },
       {
         id: '5',
-        name: 'Social Studies Scholar',
-        subject: 'Social Studies',
+        name: 'History Helper',
+        subject: 'History',
         iconName: 'user',
         color: 'red',
-        xpRequired: 200
+        xpRequired: 0
       },
       {
         id: '6',
-        name: 'AI Assistant',
-        subject: 'Technology',
-        iconName: 'robot',
-        color: 'cyan',
-        xpRequired: 250
+        name: 'Physics Pro',
+        subject: 'Physics',
+        iconName: 'compass',
+        color: 'indigo',
+        xpRequired: 0
       },
       {
         id: '7',
-        name: 'Tech Tutor',
-        subject: 'Computer Science',
-        iconName: 'robot',
-        color: 'indigo',
-        xpRequired: 300
+        name: 'Chemistry Coach',
+        subject: 'Chemistry',
+        iconName: 'smile',
+        color: 'yellow',
+        xpRequired: 0
       },
       {
         id: '8',
-        name: 'Motivator',
-        subject: 'Personal Development',
+        name: 'Biology Buddy',
+        subject: 'Biology',
         iconName: 'smile',
-        color: 'pink',
-        xpRequired: 350
+        color: 'emerald',
+        xpRequired: 0
       },
       {
         id: '9',
-        name: 'Task Planner',
-        subject: 'Organization',
+        name: 'Geography Guide',
+        subject: 'Geography',
+        iconName: 'compass',
+        color: 'teal',
+        xpRequired: 0
+      },
+      {
+        id: '10',
+        name: 'Personal Coach',
+        subject: 'Personal Development',
         iconName: 'user',
-        color: 'yellow',
-        xpRequired: 400
+        color: 'pink',
+        xpRequired: 0
+      },
+      {
+        id: '11',
+        name: 'Motivational Mentor',
+        subject: 'Motivation',
+        iconName: 'smile',
+        color: 'amber',
+        xpRequired: 0
+      },
+      {
+        id: '12',
+        name: 'Computer Science Coach',
+        subject: 'Computer Science',
+        iconName: 'robot',
+        color: 'cyan',
+        xpRequired: 0
+      },
+      {
+        id: '13',
+        name: 'Art & Design Advisor',
+        subject: 'Art & Design',
+        iconName: 'smile',
+        color: 'rose',
+        xpRequired: 0
+      },
+      {
+        id: '14',
+        name: 'Music Maestro',
+        subject: 'Music',
+        iconName: 'smile',
+        color: 'violet',
+        xpRequired: 0
+      },
+      {
+        id: '15',
+        name: 'Philosophy Philosopher',
+        subject: 'Philosophy',
+        iconName: 'user',
+        color: 'slate',
+        xpRequired: 0
       }
     ];
 
