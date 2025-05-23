@@ -16,8 +16,26 @@ if (!fs.existsSync(distDir)) {
 const indexFile = path.join(distDir, 'index.js');
 if (!fs.existsSync(indexFile)) {
   console.error('Error: index.js not found in dist directory. Build may have failed.');
-  
-  // Create a minimal index.js file as a fallback
+
+  // Try to copy the backup index.js file
+  const backupIndexFile = path.join(__dirname, 'backup-index.js');
+  if (fs.existsSync(backupIndexFile)) {
+    try {
+      console.log('Copying backup index.js file...');
+      fs.copyFileSync(backupIndexFile, indexFile);
+      console.log('Successfully copied backup index.js file.');
+    } catch (error) {
+      console.error('Error copying backup index.js:', error.message);
+      // Fall back to creating a minimal index.js
+      createMinimalIndex();
+    }
+  } else {
+    // Create a minimal index.js file as a fallback
+    createMinimalIndex();
+  }
+}
+
+function createMinimalIndex() {
   try {
     console.log('Creating minimal index.js file as fallback...');
     const minimalIndexContent = `
@@ -41,7 +59,7 @@ app.listen(port, () => {
   console.log(\`Fallback server running on port \${port}\`);
 });
 `;
-    fs.writeFileSync(indexFile, minimalIndexContent);
+    fs.writeFileSync(path.join(__dirname, 'dist', 'index.js'), minimalIndexContent);
     console.log('Created fallback index.js file.');
   } catch (error) {
     console.error('Error creating fallback index.js:', error.message);
