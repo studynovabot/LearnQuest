@@ -1,19 +1,9 @@
 // Helper function to determine the API URL
 function getApiUrl() {
-  // Check if we have a specific backend URL set
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL;
-
-  if (import.meta.env.PROD) {
-    // In production, use the current working Render backend URL
-    const renderBackendUrl = backendUrl || 'https://learnquest-backend.onrender.com';
-    console.log(`Production mode - using backend URL: ${renderBackendUrl}`);
-    return renderBackendUrl;
-  }
-
-  // In development, use the local API URL
-  const devUrl = backendUrl || 'http://localhost:5000';
-  console.log(`Development mode - API URL set to: ${devUrl}`);
-  return devUrl;
+  // Always use local backend for now until deployment is fixed
+  const localUrl = 'http://localhost:5000';
+  console.log(`Using local backend: ${localUrl}`);
+  return localUrl;
 }
 
 export const config = {
