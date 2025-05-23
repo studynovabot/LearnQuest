@@ -122,14 +122,20 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Configure CORS for production
-const corsOptions = {
-  // Allow all origins for debugging CORS issues
-  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+const allowedOrigins = [
+  'https://learn-quest-eight.vercel.app',
+  'https://www.learn-quest-eight.vercel.app',
+  'https://learnquest-eight.vercel.app',
+  'https://www.learnquest-eight.vercel.app',
+  'https://learnquest.onrender.com', // If you want to allow direct backend access
+];
 
-    // Allow all origins for now to debug CORS issues
-    return callback(null, true);
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept'],
