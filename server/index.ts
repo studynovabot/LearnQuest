@@ -123,14 +123,8 @@ app.use(limiter);
 
 // Configure CORS for production
 const corsOptions = {
-  // Allow specific origins instead of wildcard when using credentials
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://localhost:5000',
-    'https://learn-quest-eight.vercel.app',
-    'https://learnquest-frontend.vercel.app'
-  ],
+  // Allow all origins for debugging CORS issues
+  origin: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept'],
   credentials: true,
@@ -144,18 +138,13 @@ app.use(express.urlencoded({ extended: false }));
 
 // Add CORS headers for all environments (additional layer)
 app.use((req, res, next) => {
-  // Allow specific origins instead of wildcard when using credentials
+  // Allow all origins for debugging
   const origin = req.headers.origin;
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://localhost:5000',
-    'https://learn-quest-eight.vercel.app',
-    'https://learnquest-frontend.vercel.app'
-  ];
 
-  if (origin && allowedOrigins.includes(origin)) {
+  if (origin) {
     res.header('Access-Control-Allow-Origin', origin);
+  } else {
+    res.header('Access-Control-Allow-Origin', '*');
   }
 
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
