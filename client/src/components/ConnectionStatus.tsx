@@ -148,13 +148,7 @@ export function ConnectionStatus() {
               </span>
             </div>
 
-            {config.useMockData && (
-              <div className="mt-2 p-2 bg-blue-100 dark:bg-blue-900 rounded text-blue-800 dark:text-blue-100">
-                <strong>NOTICE:</strong> The app is currently using mock data due to backend connection issues.
-                Your changes will not be saved to the database. This is a temporary measure until the backend
-                connection issues are resolved.
-              </div>
-            )}
+            {/* Always use real database - no mock data notice */}
           </div>
         )}
       </div>

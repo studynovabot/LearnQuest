@@ -119,10 +119,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post(`${apiRouter}/auth/register`, async (req: Request, res: Response) => {
     try {
       // Always set isPro to a boolean value (never undefined)
-      // Support both email and username for registration
-      const email = String(req.body.email ?? req.body.username ?? '');
+      const email = String(req.body.email ?? '');
       const userData = validateRequest(insertUserSchema, {
-        username: email, // Store email as username for compatibility
+        email: email,
         password: String(req.body.password ?? ''),
         displayName: String(req.body.displayName ?? ''),
         isPro: Boolean(req.body.isPro)
@@ -135,7 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user already exists
-      const existingUser = await storage.getUserByUsername(userData.username);
+      const existingUser = await storage.getUserByEmail(userData.email);
       if (existingUser) {
         return res.status(409).json({ message: "Email already exists" });
       }
@@ -163,15 +162,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post(`${apiRouter}/auth/login`, async (req: Request, res: Response) => {
     try {
-      // Support both email and username fields for login
-      const email = req.body.email || req.body.username;
-      const { password } = req.body;
+      const { email, password } = req.body;
 
       if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required" });
       }
 
-      const user = await storage.getUserByUsername(email);
+      const user = await storage.getUserByEmail(email);
 
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
@@ -557,7 +554,7 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
       const users = await storage.getLeaderboard(limit);
       // Filter out demo users
-      const filteredUsers = users.filter(user => user.displayName !== 'Demo User' && user.username !== 'Demo User');
+      const filteredUsers = users.filter(user => user.displayName !== 'Demo User' && user.email !== 'demo@example.com');
       // Only return safe fields for leaderboard
       const leaderboard = filteredUsers.map(user => ({
         displayName: user.displayName,
@@ -601,10 +598,10 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
   // XP Award route - for teacher or admin to award XP
   app.post(`${apiRouter}/xp/award`, async (req: Request, res: Response) => {
     try {
-      const { username, amount, reason } = req.body;
+      const { email, amount, reason } = req.body;
 
-      if (!username || !amount) {
-        return res.status(400).json({ message: "Username and amount are required" });
+      if (!email || !amount) {
+        return res.status(400).json({ message: "Email and amount are required" });
       }
 
       const awardAmount = parseInt(amount);
@@ -613,7 +610,7 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
         return res.status(400).json({ message: "Amount must be a positive number" });
       }
 
-      const user = await storage.getUserByUsername(username);
+      const user = await storage.getUserByEmail(email);
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });

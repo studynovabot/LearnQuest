@@ -13,7 +13,8 @@ import {
 export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>; // For backward compatibility
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, data: Partial<User>): Promise<User | undefined>;
   updateUserProfile(id: string, data: { displayName?: string; className?: string; board?: string }): Promise<User | undefined>;

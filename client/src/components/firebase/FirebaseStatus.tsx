@@ -15,14 +15,6 @@ export function FirebaseStatus() {
   const checkFirebaseStatus = async () => {
     setIsChecking(true);
 
-    // If we're using mock data, always show as connected
-    if (config.useMockData) {
-      console.log('Using mock data - Firebase status set to connected');
-      setStatus('connected');
-      setIsChecking(false);
-      return;
-    }
-
     try {
       const response = await apiRequest('GET', '/api/health');
       const data = await response.json();
@@ -36,21 +28,10 @@ export function FirebaseStatus() {
       }
     } catch (error) {
       console.error('Firebase health check error:', error);
-
-      // If we can't connect to the backend, use mock data
-      if (window.location.hostname.includes('vercel.app') ||
-          (error instanceof Error && error.message.includes('Failed to fetch'))) {
-        console.log('Using mock data due to backend connection issues');
-        // Force mock data mode
-        localStorage.setItem('useMockData', 'true');
-        // Reload the page to apply the mock data setting
-        window.location.reload();
-      } else {
-        setStatus('error');
-        const message = error instanceof Error ? error.message : 'Unknown error connecting to Firebase';
-        setErrorMessage(message);
-        trackError('firebase', message);
-      }
+      setStatus('error');
+      const message = error instanceof Error ? error.message : 'Unknown error connecting to Firebase';
+      setErrorMessage(message);
+      trackError('firebase', message);
     } finally {
       setIsChecking(false);
     }
@@ -60,34 +41,7 @@ export function FirebaseStatus() {
     checkFirebaseStatus();
   }, []);
 
-  // If we're using mock data, show a special message
-  if (config.useMockData) {
-    return (
-      <Alert className="mb-4 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 border-blue-200 dark:border-blue-800">
-        <Database className="h-4 w-4" />
-        <AlertTitle>Using Mock Data Mode</AlertTitle>
-        <AlertDescription>
-          <p className="mb-2">
-            The app is currently using mock data due to backend connection issues.
-            Your changes will not be saved to the database. This is a temporary measure
-            until the backend connection issues are resolved.
-          </p>
-          <div className="flex gap-2 mt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                localStorage.removeItem('useMockData');
-                window.location.reload();
-              }}
-            >
-              Try Real Database
-            </Button>
-          </div>
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  // Always use real database - no mock data mode
 
   // If connected to real database, don't show anything
   if (status === 'connected') {

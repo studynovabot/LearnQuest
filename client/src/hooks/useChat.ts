@@ -4,8 +4,6 @@ import { ChatMessage, AITutor } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useUserContext } from "@/context/UserContext";
-import { mockTutors, mockChatMessages, generateMockResponse } from "@/lib/mockData";
-import { config } from "@/config";
 
 export function useChat() {
   const queryClient = useQueryClient();
@@ -15,24 +13,11 @@ export function useChat() {
   const [activeAgent, setActiveAgent] = useState<AITutor | null>(null);
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]); // Local state for chat messages
 
-  // Use the config to determine if we should use mock data
-  const useMockData = config.useMockData;
-
-  // Initialize local messages with mock chat messages if using mock data
-  useEffect(() => {
-    if (useMockData && localMessages.length === 0) {
-      setLocalMessages(mockChatMessages);
-    }
-  }, [useMockData]);
-
-  // Fetch tutors - always try to fetch if not using mock data
-  const { data: backendTutors = [], isLoading: isLoadingTutors } = useQuery<AITutor[]>({
+  // Fetch tutors - always fetch from real backend
+  const { data: tutors = [], isLoading: isLoadingTutors } = useQuery<AITutor[]>({
     queryKey: ["/api/tutors"],
-    enabled: !useMockData, // Enable fetching when not using mock data
+    enabled: true, // Always enable fetching from real backend
   });
-
-  // Use mock data if configured, otherwise use backend data
-  const tutors = useMockData ? mockTutors : backendTutors;
 
   // Separate tutors into unlocked and locked
   const unlockedAgents = tutors.filter(tutor => tutor.unlocked);
@@ -76,26 +61,7 @@ export function useChat() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
-        // Check if we should use mock data
-        if (useMockData) {
-          // Simulate a delay
-          await new Promise(resolve => setTimeout(resolve, 1500));
-
-          // Generate a more realistic mock response based on the message content
-          const responseContent = generateMockResponse(content, activeAgent?.name || 'Nova');
-
-          // Create a mock response based on the agent
-          const mockResponse: ChatMessage = {
-            id: Date.now() + 1,
-            content: responseContent,
-            role: 'assistant',
-            timestamp: Date.now() + 1,
-          };
-
-          // Add the mock response to local state
-          setLocalMessages((prev) => [...prev, mockResponse]);
-          return;
-        }
+        // Always use real backend - no mock data
 
         // Set up retry logic for the chat API request
         const maxRetries = 2;

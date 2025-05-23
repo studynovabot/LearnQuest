@@ -95,7 +95,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     console.log('🆘 Creating fallback user (backend unavailable)...');
     const fallbackUser: User = {
       id: `fallback-user-${Date.now()}`,
-      username: "demo_user_fallback",
+      email: "demo@example.com",
       displayName: "Demo User (Offline)",
       xp: 0,
       level: 1,

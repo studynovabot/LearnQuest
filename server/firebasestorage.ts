@@ -37,10 +37,10 @@ export class FirebaseStorage implements IStorage {
     }
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
+  async getUserByEmail(email: string): Promise<User | undefined> {
     try {
       const usersRef = adminDb.collection('users');
-      const querySnapshot = await usersRef.where('username', '==', username).get();
+      const querySnapshot = await usersRef.where('email', '==', email).get();
       if (!querySnapshot.empty) {
         const userDoc = querySnapshot.docs[0];
         const data = userDoc.data();
@@ -54,9 +54,14 @@ export class FirebaseStorage implements IStorage {
       }
       return undefined;
     } catch (error) {
-      console.error('Error getting user by username:', error);
+      console.error('Error getting user by email:', error);
       return undefined;
     }
+  }
+
+  // Keep the old method for backward compatibility but redirect to email
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return this.getUserByEmail(username);
   }
 
   async createUser(user: InsertUser): Promise<User> {

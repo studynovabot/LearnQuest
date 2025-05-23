@@ -25,10 +25,10 @@ export const api = {
   },
 
   // Add your API methods here
-  async login(username: string, password: string) {
+  async login(email: string, password: string) {
     return this.fetch('/api/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email, password }),
     });
   },
 

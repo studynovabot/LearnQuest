@@ -173,20 +173,9 @@ export function useHealthCheck() {
     }
   };
 
-  // Run health check on component mount, but only if we're not using mock data
+  // Run health check on component mount - always use real backend
   useEffect(() => {
-    if (!config.useMockData) {
-      checkHealth();
-    } else {
-      // If using mock data, set a fake "ok" status
-      setStatus({
-        status: 'ok',
-        message: 'Using mock data - no backend connection needed',
-        firebase: 'mock',
-        timestamp: new Date().toISOString(),
-      });
-      console.log('Using mock data - skipping health check');
-    }
+    checkHealth();
   }, []);
 
   return {

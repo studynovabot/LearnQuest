@@ -3,7 +3,7 @@ import { z } from "zod";
 // Base schemas
 export const userSchema = z.object({
   id: z.string(),
-  username: z.string(),
+  email: z.string().email(),
   password: z.string(),
   displayName: z.string(),
   xp: z.number().default(0),
@@ -82,18 +82,18 @@ export const userItemSchema = z.object({
 });
 
 // Insert schemas
-export const insertUserSchema = userSchema.omit({ 
-  id: true, 
-  xp: true, 
-  level: true, 
-  streak: true, 
-  lastLogin: true, 
-  title: true, 
-  avatarUrl: true, 
-  questionsCompleted: true, 
-  hoursStudied: true, 
-  createdAt: true, 
-  updatedAt: true 
+export const insertUserSchema = userSchema.omit({
+  id: true,
+  xp: true,
+  level: true,
+  streak: true,
+  lastLogin: true,
+  title: true,
+  avatarUrl: true,
+  questionsCompleted: true,
+  hoursStudied: true,
+  createdAt: true,
+  updatedAt: true
 });
 
 export const insertSubjectSchema = subjectSchema.omit({ id: true });

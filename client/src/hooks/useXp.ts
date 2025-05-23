@@ -27,7 +27,7 @@ export function useXp() {
           title: "XP Awarded!",
           description: `You earned +${data.xpAwarded} XP for your ${data.rating.replace('_', ' ')} answer!`,
         });
-        
+
         refreshUser();
       }
     },
@@ -41,8 +41,8 @@ export function useXp() {
   });
 
   const awardXpMutation = useMutation({
-    mutationFn: async ({ username, amount, reason }: { username: string; amount: number; reason?: string }) => {
-      const response = await apiRequest("POST", "/api/xp/award", { username, amount, reason });
+    mutationFn: async ({ email, amount, reason }: { email: string; amount: number; reason?: string }) => {
+      const response = await apiRequest("POST", "/api/xp/award", { email, amount, reason });
       return response.json();
     },
     onSuccess: (data) => {
@@ -50,7 +50,7 @@ export function useXp() {
         title: "XP Awarded!",
         description: `${data.user.displayName} was awarded +${data.awarded} XP for ${data.reason}!`,
       });
-      
+
       refreshUser();
     },
     onError: (error) => {
@@ -64,7 +64,7 @@ export function useXp() {
 
   const awardXpForAnswer = async (rating: QuestionRating) => {
     if (isSubmitting) return;
-    
+
     try {
       setIsSubmitting(true);
       await awardXpForAnswerMutation.mutateAsync(rating);
@@ -73,12 +73,12 @@ export function useXp() {
     }
   };
 
-  const awardXp = async (username: string, amount: number, reason?: string) => {
+  const awardXp = async (email: string, amount: number, reason?: string) => {
     if (isSubmitting) return;
-    
+
     try {
       setIsSubmitting(true);
-      await awardXpMutation.mutateAsync({ username, amount, reason });
+      await awardXpMutation.mutateAsync({ email, amount, reason });
     } finally {
       setIsSubmitting(false);
     }
@@ -89,7 +89,7 @@ export function useXp() {
     const nextLevelXp = level * 750;
     const currentLevelXp = (level - 1) * 750;
     const progress = ((xp - currentLevelXp) / (nextLevelXp - currentLevelXp)) * 100;
-    
+
     return {
       level,
       progress,

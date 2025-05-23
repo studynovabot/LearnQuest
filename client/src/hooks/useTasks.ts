@@ -4,8 +4,6 @@ import { Task } from "@/types";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useUserContext } from "@/context/UserContext";
-import { mockTasks } from "@/lib/mockData";
-import { config } from "@/config";
 
 export function useTasks() {
   const queryClient = useQueryClient();
@@ -13,28 +11,11 @@ export function useTasks() {
   const { user, refreshUser } = useUserContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Using useState to make the mock tasks mutable and persist changes
-  const [mockTasksState, setMockTasksState] = useState<Task[]>([]);
-
-  // Initialize mock tasks from our centralized mock data
-  useEffect(() => {
-    if (mockTasksState.length === 0) {
-      setMockTasksState(mockTasks);
-    }
-  }, []);
-
-  // Use the config to determine if we should use mock data
-  const useMockData = config.useMockData;
-
-  // Use mock data directly if we're in development or on Vercel
-  const { data: backendTasks = [], isLoading: isLoadingBackend, error, refetch: refetchTasks } = useQuery<Task[]>({
+  // Always fetch from real backend
+  const { data: tasks = [], isLoading, error, refetch: refetchTasks } = useQuery<Task[]>({
     queryKey: ["/api/tasks"],
-    enabled: !!user && !useMockData, // Only enable fetching when user is available and not using mock data
+    enabled: !!user, // Only enable fetching when user is available
   });
-
-  // Combine the data sources - use mock data if we're in development or on Vercel
-  const tasks = useMockData ? mockTasksState : backendTasks;
-  const isLoading = useMockData ? false : isLoadingBackend;
 
   // Add a function to manually fetch tasks
   const fetchTasks = () => {
@@ -46,26 +27,6 @@ export function useTasks() {
   const createTaskMutation = useMutation<Task, Error, Omit<Task, "id" | "completed">>({
     mutationFn: async (task: Omit<Task, "id" | "completed">) => {
       try {
-        // Check if we should use mock data
-        if (useMockData) {
-          // Simulate a delay
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-          // Create a mock task
-          const mockTask: Task = {
-            id: `mock-${Date.now()}`,
-            description: task.description,
-            xpReward: task.xpReward,
-            priority: task.priority as 'low' | 'medium' | 'high',
-            completed: false
-          };
-
-          // Add the new task to the mock tasks array
-          setMockTasksState([...mockTasksState, mockTask]);
-
-          return mockTask;
-        }
-
         // Add timeout for the request
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -115,62 +76,11 @@ export function useTasks() {
 
   const updateTaskMutation = useMutation<Task, Error, { id: string; data: Partial<Task> }>({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Task> }) => {
-      // Check if we should use mock data
-      if (useMockData) {
-        // Simulate a delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Find the task in the mock tasks
-        const taskIndex = mockTasks.findIndex(task => task.id === id);
-        if (taskIndex !== -1) {
-          // Create an updated task
-          const updatedTask: Task = {
-            ...mockTasks[taskIndex],
-            ...data
-          };
-
-          // Update the mock tasks array
-          const updatedTasks = [...mockTasksState];
-          updatedTasks[taskIndex] = updatedTask;
-          setMockTasksState(updatedTasks);
-
-          return updatedTask;
-        }
-
-        // If task not found, return a mock task
-        return {
-          id,
-          description: "Mock task",
-          completed: data.completed || false,
-          xpReward: 20,
-          priority: "medium"
-        };
-      }
-
       try {
         const response = await apiRequest("PATCH", `/api/tasks/${id}`, data);
         return response.json();
       } catch (error) {
         console.error("Error updating task:", error);
-        // If there's an error, still update the task in the local state
-        if (useMockData) {
-          // Find the task in the mock tasks
-          const taskIndex = mockTasksState.findIndex(task => task.id === id);
-          if (taskIndex !== -1) {
-            // Create an updated task
-            const updatedTask: Task = {
-              ...mockTasksState[taskIndex],
-              ...data
-            };
-
-            // Update the mock tasks array
-            const updatedTasks = [...mockTasksState];
-            updatedTasks[taskIndex] = updatedTask;
-            setMockTasksState(updatedTasks);
-
-            return updatedTask;
-          }
-        }
         throw error;
       }
     },
@@ -203,22 +113,6 @@ export function useTasks() {
 
   const deleteTaskMutation = useMutation<void, Error, string>({
     mutationFn: async (id: string) => {
-      // Check if we should use mock data
-      if (useMockData) {
-        // Simulate a delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Find the task index in the mock tasks
-        const taskIndex = mockTasksState.findIndex(task => task.id === id);
-        if (taskIndex !== -1) {
-          // Remove the task from the mock tasks array
-          const updatedTasks = mockTasksState.filter(task => task.id !== id);
-          setMockTasksState(updatedTasks);
-        }
-
-        return;
-      }
-
       // Set up retry logic for task deletion
       const maxRetries = 3;
       let retryCount = 0;
@@ -247,14 +141,7 @@ export function useTasks() {
             // Wait before retrying (exponential backoff)
             await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount - 1)));
           } else {
-            // If all retries failed, but we're using mock data, still remove the task from the local state
-            if (useMockData) {
-              const updatedTasks = mockTasksState.filter(task => task.id !== id);
-              setMockTasksState(updatedTasks);
-              return;
-            }
-
-            // If we're not using mock data and all retries failed, throw the error
+            // If all retries failed, throw the error
             throw lastError;
           }
         }
@@ -282,18 +169,6 @@ export function useTasks() {
       await updateTaskMutation.mutateAsync({ id, data: { completed: true } });
     } catch (error) {
       console.error("Error completing task:", error);
-      // If we're using mock data, update the task in the local state
-      if (useMockData) {
-        const taskIndex = mockTasksState.findIndex(task => task.id === id);
-        if (taskIndex !== -1) {
-          const updatedTasks = [...mockTasksState];
-          updatedTasks[taskIndex] = {
-            ...updatedTasks[taskIndex],
-            completed: true
-          };
-          setMockTasksState(updatedTasks);
-        }
-      }
       // Don't rethrow the error to prevent UI disruption
     }
   };
