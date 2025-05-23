@@ -200,6 +200,26 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check endpoints (BEFORE authentication middleware)
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString(),
+    message: 'Server is running'
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString(),
+    message: 'API is running'
+  });
+});
+
+// Authentication middleware (after health checks)
 app.use(async (req, res, next) => {
   const userId = req.headers.authorization;
   if (userId && typeof userId === "string") {
@@ -224,15 +244,6 @@ app.use((req, res, next) => {
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   next();
-});
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'ok',
-    environment: process.env.NODE_ENV,
-    timestamp: new Date().toISOString()
-  });
 });
 
 (async () => {
