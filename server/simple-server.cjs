@@ -50,8 +50,9 @@ app.get('/health', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
-    message: 'API is running in fallback mode',
-    timestamp: new Date().toISOString()
+    message: 'API is running in fallback mode - CORS enabled',
+    timestamp: new Date().toISOString(),
+    version: '1.0.1-fallback'
   });
 });
 
@@ -59,7 +60,7 @@ app.get('/api/health', (req, res) => {
 const distPath = path.resolve(__dirname, '../client/dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
-  
+
   // Serve index.html for all non-API routes
   app.get(/^\/(?!api).*/, (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
