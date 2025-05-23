@@ -206,7 +206,8 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     environment: process.env.NODE_ENV,
     timestamp: new Date().toISOString(),
-    message: 'API is running'
+    message: 'API is running - CORS fixed',
+    version: '1.0.1'
   });
 });
 
