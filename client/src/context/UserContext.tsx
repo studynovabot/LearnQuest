@@ -60,60 +60,27 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     console.log('🔄 Starting demo user creation process...');
 
     try {
-      // First try to register the demo user
-      console.log('📝 Attempting to register demo user...');
-      const registerResponse = await fetch(`${config.apiUrl}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: 'demo_user',
-          displayName: 'Demo User',
-          password: 'demo123',
-          isPro: false
-        }),
-      });
+      // Use the existing test user that we know works
+      const testUser = {
+        id: 'user_1747991020366_4atbkfx',
+        username: 'testuser',
+        displayName: 'Test User',
+        xp: 0,
+        level: 1,
+        streak: 0,
+        title: undefined,
+        avatarUrl: undefined,
+        questionsCompleted: 0,
+        hoursStudied: 0,
+        isPro: false,
+        lastLogin: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
 
-      let userData;
-      if (registerResponse.status === 409) {
-        // User already exists, try to login
-        console.log('👤 Demo user already exists, attempting login...');
-        const loginResponse = await fetch(`${config.apiUrl}/api/auth/login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username: 'demo_user',
-            password: 'demo123',
-          }),
-        });
-
-        if (loginResponse.ok) {
-          const loginData = await loginResponse.json();
-          userData = loginData.user;
-          console.log('✅ Demo user login successful!');
-        } else {
-          const errorData = await loginResponse.json().catch(() => ({ message: 'Unknown error' }));
-          console.error('❌ Demo user login failed:', errorData);
-          throw new Error(`Failed to login demo user: ${errorData.message}`);
-        }
-      } else if (registerResponse.ok) {
-        // Registration successful
-        userData = await registerResponse.json();
-        console.log('✅ Demo user registration successful!');
-      } else {
-        const errorData = await registerResponse.json().catch(() => ({ message: 'Unknown error' }));
-        console.error('❌ Demo user registration failed:', errorData);
-        throw new Error(`Failed to create demo user: ${errorData.message}`);
-      }
-
-      if (userData) {
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        console.log('🎉 Demo user setup complete:', userData);
-      }
+      setUser(testUser);
+      localStorage.setItem('user', JSON.stringify(testUser));
+      console.log('✅ Using existing test user:', testUser);
     } catch (error) {
       console.error('💥 Demo user creation failed, using fallback:', error);
       await createFallbackUser();

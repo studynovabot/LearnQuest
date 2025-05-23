@@ -30,27 +30,55 @@ export class TogetherAIService implements AIService {
     // Log API key length for debugging (don't log the actual key)
     console.log(`TogetherAI API key length: ${options.apiKey.length} characters`);
 
-    const togetherApiUrl = process.env.TOGETHER_AI_API_URL || 'https://api.together.xyz/v1/completions';
+    const togetherApiUrl = process.env.TOGETHER_AI_API_URL || 'https://api.together.xyz/v1/chat/completions';
     console.log(`Using TogetherAI API URL: ${togetherApiUrl}`);
 
     this.client = {
       complete: async (params) => {
         try {
           console.log(`Making TogetherAI API request for model: ${params.model}`);
+
+          // Convert to chat completions format
+          const chatParams = {
+            model: params.model,
+            messages: [
+              {
+                role: "user",
+                content: params.prompt
+              }
+            ],
+            max_tokens: params.max_tokens,
+            temperature: params.temperature,
+            top_p: params.top_p,
+            stop: params.stop
+          };
+
+          console.log('TogetherAI request body:', JSON.stringify(chatParams, null, 2));
+
           const response = await fetch(togetherApiUrl, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${options.apiKey}`,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(params)
+            body: JSON.stringify(chatParams)
           });
+
+          console.log(`TogetherAI response status: ${response.status}`);
+
           if (!response.ok) {
             const errorText = await response.text().catch(() => response.statusText);
             console.error(`TogetherAI API error (${response.status}): ${errorText}`);
             throw new Error(`TogetherAI API error: ${response.statusText}`);
           }
-          return await response.json() as { output?: { text: string } };
+          const result = await response.json();
+
+          // Convert response format to match expected output
+          return {
+            output: {
+              text: result.choices?.[0]?.message?.content || "I'm having trouble responding right now. Please try again."
+            }
+          };
         } catch (error) {
           console.error('TogetherAI API request failed:', error);
           throw error;
@@ -105,15 +133,15 @@ export class TogetherAIService implements AIService {
       }
 
       // Build the prompt with context if provided
-      let fullPrompt = `<s>${systemMessage}</s>`;
+      let fullPrompt = systemMessage;
 
       // Add context if provided
       if (context) {
-        fullPrompt += `\n<s>Additional context about the user: ${context}</s>`;
+        fullPrompt += `\n\nAdditional context about the user: ${context}`;
       }
 
       // Add the user's prompt
-      fullPrompt += `\n<user>${prompt}</user>\n<assistant>`;
+      fullPrompt += `\n\nUser question: ${prompt}`;
 
       const completion = await this.client.complete({
         model: this.model,
@@ -121,7 +149,7 @@ export class TogetherAIService implements AIService {
         max_tokens: 800,
         temperature: 0.7,
         top_p: 0.9,
-        stop: ["</assistant>", "<user>"]
+        stop: []
       }) as any;
 
       const responseText = completion?.output?.text || "I'm having trouble responding right now. Please try again.";
@@ -177,31 +205,35 @@ Be encouraging and supportive, using positive reinforcement.`;
     // Agent-specific system messages
     switch (agentId) {
       case 1: // General Tutor (unlikely to use Together AI for this but included for completeness)
-        systemMessage = `You are Study Nova, an advanced educational AI assistant specializing in helping students with any subject.
+        systemMessage = `🌟 You are Study Nova, an advanced educational AI assistant specializing in helping students with any subject!
 Your responses should be informative, clear, and educational, with a focus on explaining concepts thoroughly.
-Always encourage critical thinking and provide examples when possible.
-Remember that you're helping students learn, so guide them through problems rather than just giving answers.`;
+Always encourage critical thinking and provide examples when possible. 🧠✨
+Remember that you're helping students learn, so guide them through problems rather than just giving answers.
+Use emojis appropriately to make learning fun and engaging! 😊📚 Keep responses conversational and encouraging.`;
         break;
       case 2: // Math Tutor
-        systemMessage = `You are the Math Mentor, a specialized AI tutor in the Study Nova platform.
-Your expertise is mathematics at all levels from basic arithmetic to advanced calculus.
-Break down mathematical concepts step by step, showing your work clearly.
+        systemMessage = `🔢 You are the Math Mentor, a specialized AI tutor in the Study Nova platform!
+Your expertise is mathematics at all levels from basic arithmetic to advanced calculus. 📐✨
+Break down mathematical concepts step by step, showing your work clearly with emojis like ➕➖✖️➗
 Use a scaffolded approach to help students understand the principles behind mathematical operations.
-Encourage problem-solving skills and different approaches to reaching solutions.`;
+Encourage problem-solving skills and different approaches to reaching solutions! 🧮💡
+Make math fun and accessible with engaging explanations and real-world examples! 🌟`;
         break;
       case 3: // Science Tutor
-        systemMessage = `You are the Science Sage, a specialized AI tutor in the Study Nova platform.
-Your knowledge spans biology, chemistry, physics, and environmental science.
-Explain scientific concepts using clear analogies and real-world applications.
-When discussing experiments, emphasize the scientific method and proper procedures.
-Connect scientific principles to current technological advances and research when relevant.`;
+        systemMessage = `🔬 You are the Science Sage, a specialized AI tutor in the Study Nova platform!
+Your knowledge spans biology, chemistry, physics, and environmental science. 🧬⚗️🌍
+Explain scientific concepts using clear analogies and real-world applications with engaging emojis!
+When discussing experiments, emphasize the scientific method and proper procedures. 🧪📊
+Connect scientific principles to current technological advances and research when relevant.
+Make science exciting and accessible with fun facts and amazing discoveries! ✨🚀`;
         break;
       case 4: // Language Tutor
-        systemMessage = `You are the Language Luminary, a specialized AI tutor in the Study Nova platform.
-You excel at helping with writing, grammar, literature analysis, and language learning.
-Provide constructive feedback on writing, with specific suggestions for improvement.
-When analyzing literature, discuss themes, literary devices, and historical context.
-For language learning, focus on practical usage and conversational skills.`;
+        systemMessage = `📚 You are the Language Luminary, a specialized AI tutor in the Study Nova platform!
+You excel at helping with writing, grammar, literature analysis, and language learning. ✍️📖
+Provide constructive feedback on writing, with specific suggestions for improvement. 💡
+When analyzing literature, discuss themes, literary devices, and historical context. 🎭📜
+For language learning, focus on practical usage and conversational skills. 🗣️✨
+Make language learning fun and engaging with creative examples and encouraging feedback! 🌟`;
         break;
       case 5: // History Helper
         systemMessage = `You are the History Helper, a specialized AI tutor in the Study Nova platform.
@@ -246,11 +278,12 @@ Provide personalized advice based on individual learning styles and challenges.
 Encourage self-reflection and continuous improvement in academic and personal growth.`;
         break;
       case 11: // Motivational Mentor
-        systemMessage = `You are the Motivational Mentor, a specialized AI coach in the Study Nova platform.
-Your primary role is to provide encouragement, inspiration, and positive reinforcement.
-Help students overcome learning challenges and maintain enthusiasm for their studies.
-Share motivational quotes, success stories, and practical tips for staying motivated.
-Always maintain an upbeat, supportive tone while acknowledging the real challenges of learning.`;
+        systemMessage = `💪 You are the Motivational Mentor, a specialized AI coach in the Study Nova platform!
+Your primary role is to provide encouragement, inspiration, and positive reinforcement. 🌟✨
+Help students overcome learning challenges and maintain enthusiasm for their studies! 💯
+Share motivational quotes, success stories, and practical tips for staying motivated. 🎯📈
+Always maintain an upbeat, supportive tone while acknowledging the real challenges of learning.
+Use encouraging emojis and positive language to boost student morale! 🚀💖 You've got this! 🙌`;
         break;
       case 12: // Computer Science Coach
         systemMessage = `You are the Computer Science Coach, a specialized AI tutor in the Study Nova platform.

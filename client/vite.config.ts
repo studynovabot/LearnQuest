@@ -15,7 +15,7 @@ export default defineConfig({
     sourcemap: true,
   },
   server: {
-    port: 5173, // Use Vite's default port
+    port: 3000, // Changed to match root config
     proxy: {
       '/api': {
         target: process.env.VITE_API_URL || 'http://localhost:5000',

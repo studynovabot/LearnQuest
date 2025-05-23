@@ -13,11 +13,11 @@ import ChatAgents from "@/pages/ChatAgents";
 import TaskManagement from "@/pages/TaskManagement";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import Settings from "@/pages/Settings";
 import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { useEffect } from "react";
-import { ConnectionStatus } from "@/components/ConnectionStatus";
 
 function Router() {
   const [location] = useLocation();
@@ -61,6 +61,11 @@ function Router() {
       <Route path="/register">
         <Register />
       </Route>
+      <Route path="/settings">
+        <MainLayout>
+          <Settings />
+        </MainLayout>
+      </Route>
       <Route>
         <NotFound />
       </Route>
@@ -83,7 +88,6 @@ function InnerApp() {
         <TooltipProvider>
           <Toaster />
           <Router />
-          <ConnectionStatus />
         </TooltipProvider>
       </UserProvider>
     </ThemeProvider>

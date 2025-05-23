@@ -68,12 +68,12 @@ if (!groqKeyExists || !togetherKeyExists) {
   try {
     // Hardcode the API keys as a last resort
     if (!process.env.GROQ_API_KEY) {
-      process.env.GROQ_API_KEY = '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';
+      process.env.GROQ_API_KEY = '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';
       console.log('GROQ_API_KEY hardcoded as fallback');
     }
 
     if (!process.env.TOGETHER_AI_API_KEY) {
-      process.env.TOGETHER_AI_API_KEY = 'tgp_v1_vYL1dNh5WcxUzCHQNPuLzZd5naxCcxt7RSGMcvHbIls';
+      process.env.TOGETHER_AI_API_KEY = '386f94fa38882002186da7d11fa278a2b0b729dcda437ef07b8b0f14e1fc2ee7';
       console.log('TOGETHER_AI_API_KEY hardcoded as fallback');
     }
 

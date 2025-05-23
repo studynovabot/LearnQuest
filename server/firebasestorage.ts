@@ -66,9 +66,13 @@ export class FirebaseStorage implements IStorage {
       const uniqueId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
       const newUserRef = usersRef.doc(uniqueId);
 
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+
       const newUser: User = {
         id: uniqueId,
         ...user,
+        password: hashedPassword,
         xp: 0,
         level: 1,
         streak: 0,
@@ -123,6 +127,37 @@ export class FirebaseStorage implements IStorage {
       } as User;
     } catch (error) {
       console.error('Error updating user:', error);
+      return undefined;
+    }
+  }
+
+  async updateUserProfile(id: string, data: { displayName?: string; className?: string; board?: string }): Promise<User | undefined> {
+    try {
+      const userRef = adminDb.collection('users').doc(id);
+      const userDoc = await userRef.get();
+
+      if (!userDoc.exists) {
+        return undefined;
+      }
+
+      const updatedData = {
+        ...data,
+        updatedAt: Timestamp.fromDate(new Date())
+      };
+
+      await userRef.update(updatedData);
+
+      const updatedUserDoc = await userRef.get();
+      const userData = updatedUserDoc.data();
+      return {
+        id,
+        ...userData,
+        lastLogin: userData?.lastLogin?.toDate(),
+        createdAt: userData?.createdAt?.toDate(),
+        updatedAt: userData?.updatedAt?.toDate()
+      } as User;
+    } catch (error) {
+      console.error('Error updating user profile:', error);
       return undefined;
     }
   }

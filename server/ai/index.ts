@@ -42,7 +42,7 @@ export function calculateXP(userPrompt: string, agentResponse: string): number {
 export async function getAIServiceForAgent(agent: AITutor | undefined): Promise<AIService> {
   const agentIdNum = parseInt(agent?.id || '1', 10);
 
-  // Nova (General AI Tutor) - Use Groq
+  // Nova (General AI Tutor) - Use Groq with llama-3.1-8b-instant
   if (!agent || agent.id === '1') {
     return new GroqService({
       apiKey: process.env.GROQ_API_KEY || '',
@@ -51,33 +51,11 @@ export async function getAIServiceForAgent(agent: AITutor | undefined): Promise<
     });
   }
 
-  // Academic Subject Tutors (2-9) - Use Together AI with specialized models
-  if (agentIdNum >= 2 && agentIdNum <= 9) {
-    return new TogetherAIService({
-      apiKey: process.env.TOGETHER_AI_API_KEY || '',
-      model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free'
-    });
-  }
-
-  // Personal Development & Motivation Tutors (10-11) - Use DeepSeek for better reasoning
-  if (agentIdNum >= 10 && agentIdNum <= 11) {
-    return new TogetherAIService({
-      apiKey: process.env.TOGETHER_AI_API_KEY || '',
-      model: 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free'
-    });
-  }
-
-  // Creative & Technical Tutors (12-15) - Use Llama for versatility
-  if (agentIdNum >= 12 && agentIdNum <= 15) {
-    return new TogetherAIService({
-      apiKey: process.env.TOGETHER_AI_API_KEY || '',
-      model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free'
-    });
-  }
-
-  // Default fallback
-  return new TogetherAIService({
-    apiKey: process.env.TOGETHER_AI_API_KEY || '',
-    model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free'
+  // All other tutors (2-15) - Temporarily use Groq with llama-3.3-70b-versatile for better performance
+  // TODO: Switch back to Together AI once API issues are resolved
+  return new GroqService({
+    apiKey: process.env.GROQ_API_KEY || '',
+    model: 'llama-3.3-70b-versatile',
+    apiUrl: process.env.GROQ_API_URL || ''
   });
 }

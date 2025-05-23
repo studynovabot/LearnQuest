@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import FirebaseError from "@/components/firebase-error";
 import { FirebaseStatus } from "@/components/firebase/FirebaseStatus";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { TypewriterText } from "@/components/ui/TypewriterText";
 
 const ChatAgents = () => {
   const {
@@ -44,6 +45,7 @@ const ChatAgents = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [unlockingId, setUnlockingId] = useState<string | number | null>(null);
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when messages change
@@ -295,7 +297,16 @@ const ChatAgents = () => {
                                       : "bg-muted rounded-tl-none"
                                   )}
                                 >
-                                  <p className="text-sm">{message.content}</p>
+                                  {message.role === "assistant" ? (
+                                    <TypewriterText
+                                      text={message.content}
+                                      speed={20}
+                                      className="text-sm"
+                                      onComplete={() => setTypingMessageId(null)}
+                                    />
+                                  ) : (
+                                    <p className="text-sm">{message.content}</p>
+                                  )}
                                 </div>
 
                                 {/* XP Award Indicator */}

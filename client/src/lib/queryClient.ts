@@ -49,8 +49,8 @@ export async function apiRequest(
     // Ensure URL has the correct format
     let requestUrl = url;
 
-    // Always use the backend URL for API requests in production
-    if (import.meta.env.PROD && config.apiUrl && url.includes('/api/')) {
+    // Always use the backend URL for API requests when config.apiUrl is available
+    if (config.apiUrl && url.includes('/api/')) {
       // Remove leading slash if present to avoid double slashes
       const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
       requestUrl = `${config.apiUrl}/${cleanUrl}`;
@@ -145,8 +145,8 @@ export const getQueryFn: <T>(options: {
     // Ensure URL has the correct format
     let requestUrl = queryKey[0] as string;
 
-    // Always use the backend URL for API requests in production
-    if (import.meta.env.PROD && config.apiUrl && requestUrl.includes('/api/')) {
+    // Always use the backend URL for API requests when config.apiUrl is available
+    if (config.apiUrl && requestUrl.includes('/api/')) {
       // Remove leading slash if present to avoid double slashes
       const cleanUrl = requestUrl.startsWith('/') ? requestUrl.substring(1) : requestUrl;
       requestUrl = `${config.apiUrl}/${cleanUrl}`;

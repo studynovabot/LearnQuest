@@ -5,38 +5,45 @@ import { useEffect, useState } from "react";
 import { config } from "@/config";
 
 export function ConnectionStatus() {
+  // Component disabled to prevent annoying popups
+  return null;
+
   const { status, isChecking, checkHealth } = useHealthCheck();
   const [isVisible, setIsVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
 
-  // Show the connection status if there's an error, warning, or success
+  // Show the connection status if there's an error or warning (but not for success)
   useEffect(() => {
-    if (status.status === 'error' || status.status === 'warning' || status.status === 'ok') {
+    if (status.status === 'error' || status.status === 'warning') {
       setIsVisible(true);
+      setIsDismissed(false); // Reset dismissal for errors/warnings
     }
   }, [status]);
 
-  // Hide the connection status after 3 seconds if it's OK
+  // Don't show success messages at all to avoid annoyance
   useEffect(() => {
-    if (status.status === 'ok' && isVisible) {
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-        setShowDetails(false);
-      }, 3000); // Reduced from 8 seconds to 3 seconds
-
-      return () => clearTimeout(timer);
+    if (status.status === 'ok') {
+      setIsVisible(false);
+      setShowDetails(false);
     }
-  }, [status, isVisible]);
+  }, [status]);
 
-  // Always show during development for testing
+  // Always show during development for testing (but only errors/warnings)
   const isDevelopment = import.meta.env.DEV;
+
+  // If dismissed by user, don't show again
+  if (isDismissed) {
+    return null;
+  }
 
   // If we're using mock data, only show in development mode
   if (config.useMockData && !isDevelopment) {
     return null;
   }
 
-  if (!isVisible && status.status !== 'error' && status.status !== 'warning' && !isDevelopment) {
+  // Only show for errors and warnings, not for success
+  if (!isVisible && status.status !== 'error' && status.status !== 'warning') {
     return null;
   }
 
@@ -110,6 +117,7 @@ export function ConnectionStatus() {
               onClick={() => {
                 setIsVisible(false);
                 setShowDetails(false);
+                setIsDismissed(true); // Permanently dismiss
               }}
               title="Close"
             >

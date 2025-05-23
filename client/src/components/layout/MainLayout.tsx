@@ -8,9 +8,6 @@ import { FlashlightIcon, FireIcon, HomeIcon, MessageIcon, TrophyIcon, StoreIcon,
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
-import { MockDataBanner } from "@/components/ui/MockDataBanner";
-import { FirebaseStatus } from "@/components/firebase/FirebaseStatus";
-import { ConnectionStatus } from "@/components/ConnectionStatus";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -85,12 +82,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
         {/* Main content */}
         <div className="flex-grow flex flex-col gap-6">
-          {/* Mock data banner */}
-          <MockDataBanner />
-
-          {/* Firebase status */}
-          <FirebaseStatus />
-
           {/* Main content */}
           {children}
         </div>
@@ -98,16 +89,16 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         {showProfileModal && <ProfileSettingsModal onClose={() => setShowProfileModal(false)} />}
       </div>
 
-      {/* Backend connection status */}
-      <ConnectionStatus />
+
       {/* Desktop settings icon overlay */}
-      <button
-        className="fixed bottom-8 right-8 z-50 bg-card border border-border rounded-full p-4 shadow-lg hover:bg-muted transition"
-        onClick={() => setShowProfileModal(true)}
-        title="Settings"
-      >
-        <SettingsIcon size={28} />
-      </button>
+      <Link href="/settings">
+        <button
+          className="fixed bottom-8 right-8 z-50 bg-card border border-border rounded-full p-4 shadow-lg hover:bg-muted transition"
+          title="Settings"
+        >
+          <SettingsIcon size={28} />
+        </button>
+      </Link>
     </div>
   );
 };

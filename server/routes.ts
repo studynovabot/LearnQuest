@@ -168,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Compare password with bcrypt
       const bcrypt = await import('bcryptjs');
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+      const isPasswordValid = await bcrypt.default.compare(password, user.password);
 
       if (!isPasswordValid) {
         return res.status(401).json({ message: "Invalid credentials" });
@@ -226,6 +226,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { password, ...userWithoutPassword } = user;
       const rank = await storage.getUserRank(userId);
       res.status(200).json({ ...userWithoutPassword, rank });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      res.status(400).json({ message: errorMessage });
+    }
+  });
+
+  // Update user profile
+  app.patch(`${apiRouter}/profile`, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+      const { displayName, className, board } = req.body;
+
+      // Update user profile
+      const updatedUser = await storage.updateUserProfile(userId, {
+        displayName,
+        className,
+        board
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.status(200).json(userWithoutPassword);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
       res.status(400).json({ message: errorMessage });
@@ -345,7 +372,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Tutor routes (this endpoint is handled below)
+  // AI Tutor routes
+  app.get(`${apiRouter}/tutors`, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
+      const tutors = await storage.getUserTutors(userId);
+      res.status(200).json(tutors);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      res.status(400).json({ message: errorMessage });
+    }
+  });
 
   app.post(`${apiRouter}/tutors/:id/unlock`, async (req: Request, res: Response) => {
     try {

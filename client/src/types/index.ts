@@ -11,6 +11,8 @@ export interface User {
   questionsCompleted: number;
   hoursStudied: number;
   maxLevel?: number; // Optional for database compatibility
+  className?: string; // User's class/grade
+  board?: string; // Educational board (CBSE/ICSE)
   createdAt?: Date;
   updatedAt?: Date;
   lastLogin?: Date | null;
