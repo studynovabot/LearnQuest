@@ -93,6 +93,31 @@ export class FirebaseStorage implements IStorage {
         updatedAt: Timestamp.fromDate(newUser.updatedAt)
       });
 
+      // Auto-unlock all tutors for new users
+      try {
+        console.log(`🔓 Auto-unlocking all tutors for new user: ${uniqueId}`);
+        const allTutors = await this.getAllTutors();
+        const batch = adminDb.batch();
+
+        for (const tutor of allTutors) {
+          const userTutorId = `${uniqueId}_${tutor.id}`;
+          const userTutorRef = adminDb.collection('userTutors').doc(userTutorId);
+          batch.set(userTutorRef, {
+            id: userTutorId,
+            userId: uniqueId,
+            tutorId: tutor.id,
+            unlocked: true,
+            unlockedAt: Timestamp.fromDate(new Date())
+          });
+        }
+
+        await batch.commit();
+        console.log(`✅ Unlocked ${allTutors.length} tutors for user ${uniqueId}`);
+      } catch (tutorError) {
+        console.error('⚠️ Failed to auto-unlock tutors for new user:', tutorError);
+        // Don't fail user creation if tutor unlocking fails
+      }
+
       return newUser;
     } catch (error) {
       console.error('Error creating user:', error);

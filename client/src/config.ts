@@ -13,13 +13,8 @@ function shouldUseMockData() {
     return true;
   }
 
-  // In production (Vercel), use mock data as fallback only if backend fails
-  if (window.location.hostname.includes('vercel.app')) {
-    console.log('Production deployment detected - will try real backend first');
-    return false;
-  }
-
-  // Default to real backend
+  // Never use mock data in production - always try real backend
+  console.log('Production mode - using real backend');
   return false;
 }
 
@@ -31,12 +26,10 @@ function getApiUrl() {
     return '';
   }
 
-  // Always use the Render backend URL in production
+  // In production, use relative URLs for Vercel deployment (same domain)
   if (import.meta.env.PROD) {
-    // Force the backend URL to be the Render URL
-    const backendUrl = 'https://learnquest-backend.onrender.com';
-    console.log(`Production mode - API URL set to: ${backendUrl}`);
-    return backendUrl;
+    console.log('Production mode - using relative API URLs for Vercel deployment');
+    return '';
   }
 
   // In development, use the local API URL

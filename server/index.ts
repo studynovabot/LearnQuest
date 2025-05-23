@@ -124,7 +124,13 @@ app.use(limiter);
 // Configure CORS for production
 const corsOptions = {
   // Allow specific origins instead of wildcard when using credentials
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5000', 'https://learnquest-frontend.vercel.app'],
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:5000',
+    'https://learn-quest-eight.vercel.app',
+    'https://learnquest-frontend.vercel.app'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID'],
   credentials: true,
@@ -140,7 +146,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
   // Allow specific origins instead of wildcard when using credentials
   const origin = req.headers.origin;
-  const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5000', 'https://learnquest-frontend.vercel.app'];
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:5000',
+    'https://learn-quest-eight.vercel.app',
+    'https://learnquest-frontend.vercel.app'
+  ];
 
   if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
@@ -225,6 +237,23 @@ app.get('/health', (req, res) => {
 
 (async () => {
   console.log('Starting server...');
+
+  // Auto-seed database if empty (for production deployment)
+  try {
+    console.log('Checking if database needs seeding...');
+    const tutors = await storage.getAllTutors();
+    if (tutors.length === 0) {
+      console.log('Database is empty, seeding with initial data...');
+      await seedDatabase();
+      console.log('✅ Database seeded successfully!');
+    } else {
+      console.log(`✅ Database already has ${tutors.length} tutors`);
+    }
+  } catch (error) {
+    console.warn('⚠️ Could not check/seed database:', error);
+    // Continue anyway - the app should still work
+  }
+
   const server = await registerRoutes(app);
 
   // Error handling middleware

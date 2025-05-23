@@ -6,8 +6,8 @@ import { config } from "@/config";
 interface UserContextType {
   user: User | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
-  register: (username: string, displayName: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (email: string, displayName: string, password: string) => Promise<boolean>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -31,22 +31,27 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
           // Check if this is an old mock user that needs to be replaced
           if (parsedUser.id === 'user-123' || parsedUser.id.startsWith('demo-user') || parsedUser.id.startsWith('mock-') || parsedUser.id.startsWith('fallback-')) {
-            console.log('Found old mock user, clearing and creating new demo user...');
+            console.log('Found old mock user, clearing...');
             localStorage.removeItem('user');
-            await createDemoUser();
+            setUser(null);
           } else {
             setUser(parsedUser);
             console.log('User loaded from localStorage:', parsedUser);
           }
         } else {
-          // Always try to create/login demo user if no user is stored
-          console.log('No stored user found, creating demo user...');
-          await createDemoUser();
+          // In development, try to auto-login with your credentials
+          if (import.meta.env.DEV) {
+            console.log('Development mode - attempting auto-login...');
+            await createDeveloperUser();
+          } else {
+            // In production, no auto-login - user must register/login manually
+            console.log('Production mode - user must login manually');
+            setUser(null);
+          }
         }
       } catch (error) {
         console.error("Authentication check failed:", error);
-        // Create a fallback user if everything fails
-        await createFallbackUser();
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -55,35 +60,33 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     checkAuth();
   }, []);
 
-  // Create a demo user for development
-  const createDemoUser = async () => {
-    console.log('🔄 Starting demo user creation process...');
+  // Create developer user for local development only
+  const createDeveloperUser = async () => {
+    console.log('🔄 Development mode - attempting auto-login...');
 
     try {
-      // Use the existing test user that we know works
-      const testUser = {
-        id: 'user_1747991020366_4atbkfx',
-        username: 'testuser',
-        displayName: 'Test User',
-        xp: 0,
-        level: 1,
-        streak: 0,
-        title: undefined,
-        avatarUrl: undefined,
-        questionsCompleted: 0,
-        hoursStudied: 0,
-        isPro: false,
-        lastLogin: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+      // Try to login with your credentials first
+      console.log('🔄 Attempting login with developer credentials...');
+      const loginSuccess = await login('thakurranveersingh505@gmail.com', 'India#321');
 
-      setUser(testUser);
-      localStorage.setItem('user', JSON.stringify(testUser));
-      console.log('✅ Using existing test user:', testUser);
+      if (loginSuccess) {
+        console.log('✅ Logged in with developer credentials');
+        return;
+      } else {
+        console.log('⚠️ Login failed, attempting to register developer account...');
+        // Try to register your account
+        const registerSuccess = await register('thakurranveersingh505@gmail.com', 'Ranveer Singh', 'India#321');
+        if (registerSuccess) {
+          console.log('✅ Developer account registered successfully');
+          return;
+        }
+      }
+
+      throw new Error('Could not login or register developer account');
     } catch (error) {
-      console.error('💥 Demo user creation failed, using fallback:', error);
-      await createFallbackUser();
+      console.error('💥 Developer auto-login failed:', error);
+      console.log('🔄 You will need to login manually');
+      setUser(null);
     }
   };
 
@@ -113,7 +116,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // Login function
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
 
@@ -122,7 +125,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
 
       if (response.ok) {
@@ -147,7 +150,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // Register function
-  const register = async (username: string, displayName: string, password: string): Promise<boolean> => {
+  const register = async (email: string, displayName: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
 
@@ -156,7 +159,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, displayName, password, isPro: false }),
+        body: JSON.stringify({ email, displayName, password, isPro: false }),
       });
 
       if (response.ok) {

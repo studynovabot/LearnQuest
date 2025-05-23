@@ -119,16 +119,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post(`${apiRouter}/auth/register`, async (req: Request, res: Response) => {
     try {
       // Always set isPro to a boolean value (never undefined)
+      // Support both email and username for registration
+      const email = String(req.body.email ?? req.body.username ?? '');
       const userData = validateRequest(insertUserSchema, {
-        username: String(req.body.username ?? ''),
+        username: email, // Store email as username for compatibility
         password: String(req.body.password ?? ''),
         displayName: String(req.body.displayName ?? ''),
         isPro: Boolean(req.body.isPro)
       }) as import('./types/schema.js').InsertUser;
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Please provide a valid email address" });
+      }
+
       // Check if user already exists
       const existingUser = await storage.getUserByUsername(userData.username);
       if (existingUser) {
-        return res.status(409).json({ message: "Username already exists" });
+        return res.status(409).json({ message: "Email already exists" });
       }
       const user = await storage.createUser(userData);
 
@@ -154,13 +163,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post(`${apiRouter}/auth/login`, async (req: Request, res: Response) => {
     try {
-      const { username, password } = req.body;
+      // Support both email and username fields for login
+      const email = req.body.email || req.body.username;
+      const { password } = req.body;
 
-      if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required" });
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
       }
 
-      const user = await storage.getUserByUsername(username);
+      const user = await storage.getUserByUsername(email);
 
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });

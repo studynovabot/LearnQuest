@@ -7,23 +7,23 @@ export function useAuth() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleLogin = async (username: string, password: string) => {
+  const handleLogin = async (email: string, password: string) => {
     if (isSubmitting) return false;
 
     try {
       setIsSubmitting(true);
-      return await login(username, password);
+      return await login(email, password);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleRegister = async (username: string, displayName: string, password: string) => {
+  const handleRegister = async (email: string, displayName: string, password: string) => {
     if (isSubmitting) return false;
 
     try {
       setIsSubmitting(true);
-      return await register(username, displayName, password);
+      return await register(email, displayName, password);
     } finally {
       setIsSubmitting(false);
     }

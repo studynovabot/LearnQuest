@@ -7,11 +7,13 @@
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
     "dev:unix": "NODE_ENV=development tsx server/index.ts",
     "build": "tsc && vite build",
-    "build:vercel": "tsc && vite build",
+    "build:vercel": "tsc && vite build && npm run seed:deploy",
     "start": "set NODE_ENV=production && node dist/index.js",
     "start:unix": "NODE_ENV=production node dist/index.js",
     "check": "tsc",
-    "vercel-build": "npm run build:vercel"
+    "vercel-build": "npm run build:vercel",
+    "seed:deploy": "node scripts/deploy-seed.js",
+    "test:deployment": "node scripts/test-deployment.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
