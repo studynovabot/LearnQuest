@@ -1,13 +1,17 @@
 // Helper function to determine the API URL
 function getApiUrl() {
-  // In production, use relative URLs for Vercel deployment (same domain)
+  // Check if we have a specific backend URL set
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL;
+
   if (import.meta.env.PROD) {
-    console.log('Production mode - using relative API URLs for Vercel deployment');
-    return '';
+    // In production, use the Render backend URL
+    const renderBackendUrl = backendUrl || 'https://learnquest-backend.onrender.com';
+    console.log(`Production mode - using backend URL: ${renderBackendUrl}`);
+    return renderBackendUrl;
   }
 
   // In development, use the local API URL
-  const devUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const devUrl = backendUrl || 'http://localhost:5000';
   console.log(`Development mode - API URL set to: ${devUrl}`);
   return devUrl;
 }
