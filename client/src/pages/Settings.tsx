@@ -160,7 +160,7 @@ const Settings = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-sm font-medium">Username</Label>
-                <p className="text-sm text-muted-foreground">{user?.username}</p>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
               </div>
               <div>
                 <Label className="text-sm font-medium">XP Points</Label>

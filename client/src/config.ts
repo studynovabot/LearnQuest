@@ -4,8 +4,8 @@ function getApiUrl() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL;
 
   if (import.meta.env.PROD) {
-    // In production, use the new Render backend URL
-    const renderBackendUrl = backendUrl || 'https://learnquest-backend-v2.onrender.com';
+    // In production, use the current working Render backend URL
+    const renderBackendUrl = backendUrl || 'https://learnquest-backend.onrender.com';
     console.log(`Production mode - using backend URL: ${renderBackendUrl}`);
     return renderBackendUrl;
   }

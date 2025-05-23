@@ -132,7 +132,7 @@ export function ConnectionStatus() {
             <div><strong>Environment:</strong> {import.meta.env.MODE}</div>
             <div><strong>Mock Data:</strong> {config.useMockData ? 'Enabled' : 'Disabled'}</div>
             <div><strong>Firebase:</strong> {status.firebase || 'Unknown'}</div>
-            <div><strong>Last Check:</strong> {status.timestamp ? new Date(status.timestamp).toLocaleTimeString() : 'Unknown'}</div>
+            <div><strong>Last Check:</strong> {status.timestamp ? new Date(status.timestamp as string).toLocaleTimeString() : 'Unknown'}</div>
             <div className="flex items-center gap-1">
               <Database className="h-3 w-3" />
               <span>

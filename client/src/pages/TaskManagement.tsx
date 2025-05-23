@@ -49,7 +49,7 @@ const TaskManagement = () => {
   const onSubmit = async (data: TaskFormData) => {
     setIsCreating(true);
     try {
-      await createTask(data);
+      await createTask(data as any);
       form.reset();
       setIsDialogOpen(false);
 
