@@ -10,15 +10,11 @@
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only index.ts",
-    "build": "node simple-build.cjs && node postbuild.cjs && node fix-namespace.cjs && node fix-index.cjs && node direct-fix.cjs",
-    "build:tsc": "tsc --skipLibCheck && node postbuild.cjs && node fix-namespace.cjs && node fix-index.cjs && node direct-fix.cjs",
-    "build:legacy": "node build-script.cjs && node postbuild.cjs && node fix-namespace.cjs && node fix-index.cjs && node direct-fix.cjs",
+    "build": "node simple-build.cjs && node postbuild.cjs",
+    "build:tsc": "tsc --skipLibCheck && node postbuild.cjs",
     "postbuild": "node postbuild.cjs",
-    "fix-namespace": "node fix-namespace.cjs",
-    "fix-index": "node fix-index.cjs",
-    "direct-fix": "node direct-fix.cjs",
-    "predeploy": "node predeploy.cjs && node fix-namespace.cjs && node fix-index.cjs && node direct-fix.cjs",
-    "start": "node predeploy.cjs && node fix-namespace.cjs && node fix-index.cjs && node direct-fix.cjs && node dist/index.js || node simple-server.cjs",
+    "predeploy": "node predeploy.cjs",
+    "start": "node predeploy.cjs && node dist/index.js || node simple-server.cjs",
     "seed": "ts-node-dev --transpile-only seedRunner.ts"
   },
   "dependencies": {
@@ -43,6 +39,6 @@
     "@types/multer": "^1.4.11",
     "@types/node": "^20.11.19",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.8.3"
   }
 }
