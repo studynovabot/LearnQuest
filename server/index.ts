@@ -267,17 +267,40 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
   });
 
-  // Serve static files in production
+  // Serve static files in production (only if client dist exists)
   if (app.get("env") === "production") {
-    // Get the directory name for ES modules
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
-    const distPath = path.resolve(__dirname, "../client/dist");
-    app.use(express.static(distPath));
-    // Serve index.html for all non-API routes
-    app.get(/^\/(?!api).*/, (_req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
+    try {
+      // Get the directory name for ES modules
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = dirname(__filename);
+      const distPath = path.resolve(__dirname, "../client/dist");
+
+      // Check if the client dist directory exists before serving static files
+      if (fs.existsSync(distPath)) {
+        console.log('Serving static files from:', distPath);
+        app.use(express.static(distPath));
+        // Serve index.html for all non-API routes
+        app.get(/^\/(?!api).*/, (_req, res) => {
+          const indexPath = path.join(distPath, "index.html");
+          if (fs.existsSync(indexPath)) {
+            res.sendFile(indexPath);
+          } else {
+            res.status(404).json({ message: "Frontend not found" });
+          }
+        });
+      } else {
+        console.log('Client dist directory not found, skipping static file serving');
+        // Serve a simple message for non-API routes
+        app.get(/^\/(?!api).*/, (_req, res) => {
+          res.status(200).json({
+            message: "Backend API is running. Frontend not deployed.",
+            apiHealth: "/api/health"
+          });
+        });
+      }
+    } catch (error) {
+      console.error('Error setting up static file serving:', error);
+    }
   }
 
   // Use the PORT environment variable if available (for Vercel and other cloud platforms)
