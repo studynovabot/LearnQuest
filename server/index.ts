@@ -132,7 +132,7 @@ const corsOptions = {
     'https://learnquest-frontend.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept'],
   credentials: true,
   preflightContinue: false,
   optionsSuccessStatus: 204
@@ -142,7 +142,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Add CORS headers for all environments
+// Add CORS headers for all environments (additional layer)
 app.use((req, res, next) => {
   // Allow specific origins instead of wildcard when using credentials
   const origin = req.headers.origin;
@@ -162,7 +162,9 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-User-ID');
   res.header('Access-Control-Allow-Credentials', 'true');
 
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('Handling OPTIONS preflight request for:', req.url);
     return res.status(204).end();
   }
 

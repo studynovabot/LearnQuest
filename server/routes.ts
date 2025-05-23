@@ -30,10 +30,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API routes (prefix with /api)
   const apiRouter = '/api';
 
-  // Health check route to verify Firebase connectivity
-  app.get(`${apiRouter}/health`, async (req: Request, res: Response) => {
+  // Firebase health check route (requires authentication)
+  app.get(`${apiRouter}/firebase-health`, async (req: Request, res: Response) => {
     try {
-      console.log('Health check endpoint called');
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+      console.log('Firebase health check endpoint called');
 
       // Try to get tutors as a simple test of Firebase connectivity
       const tutors = await storage.getAllTutors();
@@ -48,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         environment: process.env.NODE_ENV || 'unknown'
       };
 
-      console.log('Health check successful:', response);
+      console.log('Firebase health check successful:', response);
       res.status(200).json(response);
     } catch (error) {
       // If there's an error, Firebase is not connected properly
@@ -76,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           environment: process.env.NODE_ENV || 'unknown'
         };
 
-        console.log('Health check partial success:', response);
+        console.log('Firebase health check partial success:', response);
         res.status(200).json(response);
       } catch (secondError) {
         console.error('Simple Firebase test also failed:', secondError);
@@ -91,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           environment: process.env.NODE_ENV || 'unknown'
         };
 
-        console.log('Health check failed:', response);
+        console.log('Firebase health check failed:', response);
         res.status(500).json(response);
       }
     }
