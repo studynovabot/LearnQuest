@@ -124,7 +124,13 @@ app.use(limiter);
 // Configure CORS for production
 const corsOptions = {
   // Allow all origins for debugging CORS issues
-  origin: true,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    // Allow all origins for now to debug CORS issues
+    return callback(null, true);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept'],
   credentials: true,
@@ -141,6 +147,8 @@ app.use((req, res, next) => {
   // Allow all origins for debugging
   const origin = req.headers.origin;
 
+  console.log(`CORS: ${req.method} ${req.url} from origin: ${origin || 'no-origin'}`);
+
   if (origin) {
     res.header('Access-Control-Allow-Origin', origin);
   } else {
@@ -153,7 +161,8 @@ app.use((req, res, next) => {
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    console.log('Handling OPTIONS preflight request for:', req.url);
+    console.log('Handling OPTIONS preflight request for:', req.url, 'from origin:', origin);
+    res.header('Access-Control-Max-Age', '86400'); // 24 hours
     return res.status(204).end();
   }
 
