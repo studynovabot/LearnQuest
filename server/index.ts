@@ -269,6 +269,9 @@ app.use((req, res, next) => {
 
   // Serve static files in production
   if (app.get("env") === "production") {
+    // Get the directory name for ES modules
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
     const distPath = path.resolve(__dirname, "../client/dist");
     app.use(express.static(distPath));
     // Serve index.html for all non-API routes
