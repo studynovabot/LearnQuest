@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { seedDatabase } from './seed';
+import { seedDatabase } from './seed.js';
 
 // Load environment variables
 dotenv.config();

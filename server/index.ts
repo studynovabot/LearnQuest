@@ -203,14 +203,7 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Extend Express Request type to include 'user'
-declare global {
-  namespace Express {
-    interface Request {
-      user?: any;
-    }
-  }
-}
+// Express Request type extension moved to types/express.d.ts
 
 // Security headers middleware
 app.use((req, res, next) => {

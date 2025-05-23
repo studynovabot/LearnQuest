@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import express, { type Express, type Request, type Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./index.js";
 import * as z from "zod";
@@ -657,12 +657,14 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
       }
 
       // Award XP if applicable
-      let updatedUser = null;
+      let updatedUser: any = null;
       if (xpAwarded > 0) {
-        updatedUser = await storage.addUserXP(userId, xpAwarded);
-        // Don't return the password
-        const { password, ...userWithoutPassword } = updatedUser;
-        updatedUser = userWithoutPassword;
+        const userWithXP = await storage.addUserXP(userId, xpAwarded);
+        if (userWithXP) {
+          // Don't return the password
+          const { password, ...userWithoutPassword } = userWithXP;
+          updatedUser = userWithoutPassword;
+        }
       }
 
       res.status(200).json({

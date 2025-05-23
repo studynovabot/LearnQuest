@@ -12,8 +12,11 @@
     "types": ["node"],
     "allowJs": true,
     "resolveJsonModule": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "declaration": false,
+    "removeComments": true,
+    "stripInternal": true
   },
-  "include": ["./**/*", "./types/declarations.d.ts"],
+  "include": ["./**/*", "./types/declarations.d.ts", "./types/express.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
