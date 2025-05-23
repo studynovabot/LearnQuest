@@ -14,7 +14,7 @@
     "build:tsc": "tsc --skipLibCheck && node postbuild.cjs",
     "postbuild": "node postbuild.cjs",
     "predeploy": "node predeploy.cjs",
-    "start": "node predeploy.cjs && node dist/index.js || node simple-server.cjs",
+    "start": "node dist/index.js",
     "seed": "ts-node-dev --transpile-only seedRunner.ts"
   },
   "dependencies": {

@@ -202,22 +202,33 @@ app.use((req, res, next) => {
 
 // Health check endpoints (BEFORE authentication middleware)
 app.get('/health', (req, res) => {
+  console.log('Health check requested from:', req.headers.origin || 'no-origin');
   res.status(200).json({
     status: 'ok',
     environment: process.env.NODE_ENV,
     timestamp: new Date().toISOString(),
-    message: 'Server is running'
+    message: 'Server is running',
+    port: process.env.PORT || 5000
   });
 });
 
 app.get('/api/health', (req, res) => {
+  console.log('API health check requested from:', req.headers.origin || 'no-origin');
   res.status(200).json({
     status: 'ok',
     environment: process.env.NODE_ENV,
     timestamp: new Date().toISOString(),
     message: 'API is running - CORS fixed',
-    version: '1.0.1'
+    version: '1.0.2',
+    port: process.env.PORT || 5000,
+    agents: 15,
+    database: 'firebase-connected'
   });
+});
+
+// Simple ping endpoint for testing
+app.get('/ping', (req, res) => {
+  res.status(200).send('pong');
 });
 
 // Authentication middleware (after health checks)

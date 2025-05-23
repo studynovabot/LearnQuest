@@ -1,28 +1,20 @@
 services:
   - type: web
-    name: learnquest-backend
+    name: learnquest-backend-v2
     env: node
     plan: free
     buildCommand: >
       cd server &&
       npm install &&
-      npm install --save-dev @types/bcryptjs @types/cors @types/multer &&
-      npm install -g typescript@5.3.3 &&
-      npm run build ||
-      (echo "Standard build failed, trying fallback build..." &&
-      npm install typescript@5.3.3 &&
-      npx tsc --version &&
-      node simple-build.cjs &&
-      node postbuild.cjs &&
-      node fix-index.cjs &&
-      node direct-fix.cjs)
-    startCommand: cd server && (npm start || (node fix-index.cjs && node direct-fix.cjs && node dist/index.js) || node simple-server.cjs)
+      npm install --save-dev @types/bcryptjs @types/cors @types/multer typescript@5.3.3 &&
+      npm run build
+    startCommand: cd server && npm start
     envVars:
       - key: NODE_VERSION
         value: 20.11.1
       - key: NODE_ENV
         value: production
-      - key: SKIP_TYPESCRIPT_CHECK
-        value: "true"
+      - key: PORT
+        value: "10000"
     healthCheckPath: /api/health
     autoDeploy: true
