@@ -6,9 +6,12 @@ services:
     buildCommand: >
       cd server &&
       npm install &&
-      npm install --save-dev @types/bcryptjs @types/cors @types/multer typescript@5.3.3 &&
+      npm install --save-dev @types/bcryptjs @types/cors @types/multer &&
+      npm install -g typescript@5.3.3 &&
       npm run build ||
       (echo "Standard build failed, trying fallback build..." &&
+      npm install typescript@5.3.3 &&
+      npx tsc --version &&
       node simple-build.cjs &&
       node postbuild.cjs &&
       node fix-index.cjs &&

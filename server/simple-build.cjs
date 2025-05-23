@@ -18,16 +18,19 @@ try {
 
   // First, try to install typescript if it's not available
   try {
-    execSync('npm install typescript --save-dev', { stdio: 'pipe' });
+    console.log('Ensuring TypeScript is installed...');
+    execSync('npm install typescript@5.3.3 --save-dev', { stdio: 'inherit' });
+    console.log('TypeScript installation completed.');
   } catch (e) {
-    // Ignore if already installed
+    console.log('TypeScript installation failed or already installed:', e.message);
   }
 
   // Try different paths for tsc
   const tscCommands = [
-    'npx tsc',
-    './node_modules/.bin/tsc',
-    'node ./node_modules/typescript/bin/tsc'
+    'npx tsc --skipLibCheck',
+    './node_modules/.bin/tsc --skipLibCheck',
+    'node ./node_modules/typescript/bin/tsc --skipLibCheck',
+    'npm run build:tsc'
   ];
 
   let tscSuccess = false;
