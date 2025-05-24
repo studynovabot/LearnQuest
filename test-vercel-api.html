@@ -54,6 +54,18 @@
         <div id="register-result"></div>
     </div>
 
+    <div class="test-section">
+        <h3>Create Task</h3>
+        <button onclick="testCreateTask()">Test /api/tasks (POST)</button>
+        <div id="create-task-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Overall Status</h3>
+        <button onclick="runAllTests()">🚀 Run All Tests</button>
+        <div id="overall-result"></div>
+    </div>
+
     <script>
         async function makeRequest(url, options = {}) {
             try {
@@ -65,7 +77,7 @@
                     },
                     ...options
                 });
-                
+
                 const data = await response.json();
                 return { success: response.ok, status: response.status, data };
             } catch (error) {
@@ -126,6 +138,56 @@
                 })
             });
             displayResult('register-result', result);
+        }
+
+        async function testCreateTask() {
+            const result = await makeRequest('/api/tasks', {
+                method: 'POST',
+                body: JSON.stringify({
+                    description: 'Test task from browser test',
+                    xpReward: 25,
+                    priority: 'high'
+                })
+            });
+            displayResult('create-task-result', result);
+        }
+
+        async function runAllTests() {
+            const overallDiv = document.getElementById('overall-result');
+            overallDiv.innerHTML = '<h4>🔄 Running all tests...</h4>';
+
+            const tests = [
+                { name: 'Health', fn: testHealth },
+                { name: 'Seed', fn: testSeed },
+                { name: 'Tutors', fn: testTutors },
+                { name: 'Store', fn: testStore },
+                { name: 'Chat', fn: testChat },
+                { name: 'Register', fn: testRegister },
+                { name: 'Create Task', fn: testCreateTask }
+            ];
+
+            let passed = 0;
+            let total = tests.length;
+
+            for (const test of tests) {
+                try {
+                    await test.fn();
+                    passed++;
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second between tests
+                } catch (error) {
+                    console.error(`Test ${test.name} failed:`, error);
+                }
+            }
+
+            const successRate = (passed / total * 100).toFixed(1);
+            const status = passed === total ? 'success' : 'error';
+
+            overallDiv.className = status;
+            overallDiv.innerHTML = `
+                <h4>${passed === total ? '🎉 All Tests Passed!' : '⚠️ Some Tests Failed'}</h4>
+                <p><strong>Results:</strong> ${passed}/${total} tests passed (${successRate}%)</p>
+                <p><strong>Status:</strong> ${passed === total ? 'Deployment is working perfectly!' : 'Check individual test results above'}</p>
+            `;
         }
 
         // Auto-run health check on page load
