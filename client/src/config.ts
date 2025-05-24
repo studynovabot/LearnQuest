@@ -13,9 +13,9 @@ function getApiUrl() {
     return localUrl;
   }
 
-  // Use Railway production backend URL (more reliable than Render)
-  const prodUrl = 'https://learnquest-production.up.railway.app';
-  console.log(`Using Railway production backend: ${prodUrl}`);
+  // Use Vercel production backend URL (FREE and reliable)
+  const prodUrl = 'https://learnquest-backend.vercel.app';
+  console.log(`Using Vercel production backend: ${prodUrl}`);
   return prodUrl;
 }
 
