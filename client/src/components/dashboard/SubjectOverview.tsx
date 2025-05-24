@@ -9,7 +9,8 @@ const SubjectOverview = () => {
   const { subjects, isLoading } = useXp();
 
   const getStatusText = (status: string): string => {
-    return status.split('_').map(word => 
+    if (!status) return 'Unknown';
+    return status.split('_').map(word =>
       word.charAt(0).toUpperCase() + (word || '').slice(1)
     ).join(' ');
   };
@@ -55,17 +56,17 @@ const SubjectOverview = () => {
               <div key={`${subject.id}-${index}`}>
                 <div className="flex justify-between text-sm mb-1">
                   <span>{subject.name}</span>
-                  <span className="text-muted-foreground">{getStatusText(subject.status)}</span>
+                  <span className="text-muted-foreground">{getStatusText(subject.status || 'unknown')}</span>
                 </div>
                 <div className="progress-bar">
-                  <div 
-                    className={cn("progress-fill", getStatusColor(subject.status))} 
-                    style={{ width: `${subject.progress}%` }}
+                  <div
+                    className={cn("progress-fill", getStatusColor(subject.status || 'unknown'))}
+                    style={{ width: `${subject.progress || 0}%` }}
                   ></div>
                 </div>
               </div>
             ))}
-            
+
             <Button variant="ghost" className="w-full mt-4 text-muted-foreground hover:text-foreground">
               View Detailed Analysis
             </Button>

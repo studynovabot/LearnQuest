@@ -15,42 +15,52 @@ export default function handler(req, res) {
   }
 
   try {
-    // Return hardcoded subjects data
+    // Return hardcoded subjects data with status and progress
     const subjects = [
       {
-        id: '1',
+        id: 1,
         name: 'Mathematics',
         icon: '🔢',
         description: 'Numbers, algebra, geometry, and more',
-        color: 'blue'
+        color: 'blue',
+        progress: 75,
+        status: 'good'
       },
       {
-        id: '2',
+        id: 2,
         name: 'Science',
         icon: '🔬',
         description: 'Physics, chemistry, biology, and earth science',
-        color: 'green'
+        color: 'green',
+        progress: 60,
+        status: 'average'
       },
       {
-        id: '3',
+        id: 3,
         name: 'English',
         icon: '📚',
         description: 'Literature, grammar, writing, and reading',
-        color: 'purple'
+        color: 'purple',
+        progress: 85,
+        status: 'excellent'
       },
       {
-        id: '4',
+        id: 4,
         name: 'History',
         icon: '🏛️',
         description: 'World history, civilizations, and events',
-        color: 'orange'
+        color: 'orange',
+        progress: 45,
+        status: 'needs_improvement'
       },
       {
-        id: '5',
+        id: 5,
         name: 'Geography',
         icon: '🌍',
         description: 'World geography, maps, and cultures',
-        color: 'teal'
+        color: 'teal',
+        progress: 70,
+        status: 'good'
       }
     ];
 
