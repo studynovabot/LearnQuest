@@ -2,18 +2,15 @@
   "version": 2,
   "buildCommand": "cd client && npm install && npm run build",
   "outputDirectory": "client/dist",
-  "installCommand": "npm install",
+  "installCommand": "cd api && npm install",
   "framework": "vite",
   "functions": {
     "api/**/*.js": {
+      "runtime": "nodejs18.x",
       "maxDuration": 30
     }
   },
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
@@ -57,6 +54,8 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "VITE_NODE_ENV": "production"
+    "VITE_NODE_ENV": "production",
+    "FIREBASE_PROJECT_ID": "studynovabot",
+    "FIREBASE_CLIENT_EMAIL": "firebase-adminsdk-fbsvc@studynovabot.iam.gserviceaccount.com"
   }
 }
