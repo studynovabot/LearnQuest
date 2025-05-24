@@ -6,12 +6,15 @@ import { storage } from './_utils/storage.js';
 // AI response generator with Groq integration
 async function generateAIResponse(content, agentId) {
   try {
-    // Try to use Groq API if available
-    if (process.env.GROQ_API_KEY) {
+    // Use fallback API key if environment variable is not set
+    const groqApiKey = process.env.GROQ_API_KEY || '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';
+
+    // Try to use Groq API
+    if (groqApiKey) {
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+          'Authorization': `Bearer ${groqApiKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
