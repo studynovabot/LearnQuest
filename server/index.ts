@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv';
 import express from "express";
+import cors from 'cors';
 import { registerRoutes } from "./routes.js";
 import { FirebaseStorage } from './firebasestorage.js';
-import cors from 'cors';
 import { initializeFirebase } from './firebaseAdmin.js';
 import rateLimit from 'express-rate-limit';
 
@@ -13,7 +13,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const app = express();
 
-// Configure CORS - MUST BE FIRST
+// Enable CORS for all routes (ABSOLUTELY FIRST)
 const allowedOrigins = [
   'https://learn-quest-eight.vercel.app',
   'https://www.learn-quest-eight.vercel.app',
@@ -30,7 +30,6 @@ const allowedOrigins = [
   'http://localhost:5173'
 ];
 
-// CORS options
 const corsOptions = {
   origin: function (origin, callback) {
     console.log('Incoming request from origin:', origin);
@@ -58,7 +57,6 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// Enable CORS for all routes
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
