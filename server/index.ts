@@ -99,16 +99,6 @@ app.get('/health', (_req, res) => {
   });
 });
 
-// Health check endpoint for API (for CORS debugging)
-app.get('/api/health', (_req, res) => {
-  res.status(200).json({
-    status: 'ok',
-    message: 'LearnQuest API is healthy (API route)',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'unknown'
-  });
-});
-
 // Add a simple route to test the server
 app.get('/', (_req, res) => {
   res.status(200).json({

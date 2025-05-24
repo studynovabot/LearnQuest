@@ -780,6 +780,16 @@ Subject progress: ${subjects.map(s => `${s.name}: ${s.progress}% (${s.status})`)
     }
   });
 
+  // Public API health check (for CORS and frontend connection test)
+  app.get(`${apiRouter}/health`, (_req: Request, res: Response) => {
+    res.status(200).json({
+      status: 'ok',
+      message: 'LearnQuest API is healthy (API route)',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'unknown'
+    });
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
