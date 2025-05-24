@@ -20,8 +20,9 @@ export function useChat() {
   });
 
   // Separate tutors into unlocked and locked
-  const unlockedAgents = tutors.filter(tutor => tutor.unlocked);
-  const lockedAgents = tutors.filter(tutor => !tutor.unlocked);
+  const tutorsArray = Array.isArray(tutors) ? tutors : [];
+  const unlockedAgents = tutorsArray.filter(tutor => tutor.unlocked);
+  const lockedAgents = tutorsArray.filter(tutor => !tutor.unlocked);
 
   // Set the first agent as active by default if none is selected
   useEffect(() => {
@@ -159,7 +160,7 @@ export function useChat() {
   };
 
   return {
-    agents: tutors,
+    agents: tutorsArray,
     unlockedAgents,
     lockedAgents,
     isLoading: isLoadingTutors,

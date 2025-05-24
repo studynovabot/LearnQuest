@@ -33,14 +33,8 @@ export default function handler(req, res) {
         const userId = req.headers['x-user-id'] || 'demo-user';
 
         // Return all 15 tutors (all unlocked by default as requested)
-        res.status(200).json({
-          tutors: ALL_TUTORS,
-          message: 'All 15 AI tutors loaded successfully',
-          totalTutors: ALL_TUTORS.length,
-          unlockedTutors: ALL_TUTORS.filter(t => t.unlocked).length,
-          cors: 'enabled',
-          platform: 'vercel'
-        });
+        // Frontend expects just the array, not an object with tutors property
+        res.status(200).json(ALL_TUTORS);
       } else {
         res.status(405).json({ message: 'Method not allowed' });
       }

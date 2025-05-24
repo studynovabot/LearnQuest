@@ -14,26 +14,32 @@ export default function handler(req, res) {
       const userId = req.headers['x-user-id'] || 'demo-user';
 
       if (req.method === 'GET') {
-        // Get user tasks
+        // Get user tasks (removed orderBy to avoid index requirement)
         const snapshot = await db.collection('tasks')
           .where('userId', '==', userId)
-          .orderBy('createdAt', 'desc')
           .get();
-        
+
         const tasks = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        
+
+        // Sort tasks by createdAt in JavaScript instead of Firestore
+        tasks.sort((a, b) => {
+          const aDate = a.createdAt?.toDate?.() || new Date(a.createdAt) || new Date(0);
+          const bDate = b.createdAt?.toDate?.() || new Date(b.createdAt) || new Date(0);
+          return bDate.getTime() - aDate.getTime(); // Descending order
+        });
+
         res.status(200).json(tasks);
       } else if (req.method === 'POST') {
         // Create new task
         const { description, xpReward, priority } = req.body;
-        
+
         if (!description) {
           return res.status(400).json({ message: 'Description is required' });
         }
-        
+
         const task = {
           userId,
           description,
@@ -43,10 +49,10 @@ export default function handler(req, res) {
           progress: 0,
           createdAt: new Date()
         };
-        
+
         const docRef = await db.collection('tasks').add(task);
         const newTask = { id: docRef.id, ...task };
-        
+
         res.status(201).json(newTask);
       } else {
         res.status(405).json({ message: 'Method not allowed' });
