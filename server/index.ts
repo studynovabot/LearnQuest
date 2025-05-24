@@ -42,8 +42,8 @@ const corsOptions = {
       origin.includes('.vercel.app') ||
       origin.includes('localhost')
     ) {
-      // Allow and reflect the origin
-      return callback(null, origin);
+      // Allow the origin
+      return callback(null, true);
     } else {
       console.log('Blocked origin:', origin);
       // Block by not setting the header
@@ -53,12 +53,29 @@ const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Access-Control-Allow-Origin'],
   maxAge: 86400,
   optionsSuccessStatus: 204,
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+
+// Handle preflight requests explicitly
+app.options('*', (req, res) => {
+  const origin = req.headers.origin;
+  console.log('Preflight request from origin:', origin);
+
+  if (origin && (allowedOrigins.includes(origin) || origin.includes('.vercel.app') || origin.includes('localhost'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-User-ID,Origin,X-Requested-With,Accept');
+    res.header('Access-Control-Max-Age', '86400');
+    res.status(204).end();
+  } else {
+    res.status(403).end();
+  }
+});
 
 // Initialize Firebase first
 initializeFirebase();
@@ -117,8 +134,12 @@ app.get('/', (_req, res) => {
     console.log(`Attempting to start server on port ${port}`);
 
     // Global error handler to ensure CORS headers are always set (must be after all routes)
-    app.use((err, req, res, next) => {
-      res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    app.use((err: any, req: any, res: any, _next: any) => {
+      // Set CORS headers for error responses
+      const origin = req.headers.origin;
+      if (origin && (allowedOrigins.includes(origin) || origin.includes('.vercel.app') || origin.includes('localhost'))) {
+        res.header('Access-Control-Allow-Origin', origin);
+      }
       res.header('Access-Control-Allow-Credentials', 'true');
       res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
       res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-User-ID,Origin,X-Requested-With,Accept');
