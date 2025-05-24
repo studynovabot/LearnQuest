@@ -12,6 +12,59 @@ export default function handler(req, res) {
 
       // Get user ID from headers (you'll need to implement proper auth)
       const userId = req.headers['x-user-id'] || 'demo-user';
+      const { id } = req.query;
+
+      // Handle individual task operations when ID is provided
+      if (id) {
+        if (req.method === 'PATCH') {
+          // Update task
+          const updates = req.body;
+
+          // Get the task first to check ownership
+          const taskDoc = await db.collection('tasks').doc(id).get();
+
+          if (!taskDoc.exists) {
+            return res.status(404).json({ message: 'Task not found' });
+          }
+
+          const task = taskDoc.data();
+
+          if (task.userId !== userId) {
+            return res.status(403).json({ message: 'Unauthorized' });
+          }
+
+          // Update the task
+          await db.collection('tasks').doc(id).update({
+            ...updates,
+            updatedAt: new Date()
+          });
+
+          // Get updated task
+          const updatedDoc = await db.collection('tasks').doc(id).get();
+          const updatedTask = { id: updatedDoc.id, ...updatedDoc.data() };
+
+          return res.status(200).json(updatedTask);
+        } else if (req.method === 'DELETE') {
+          // Delete task
+          const taskDoc = await db.collection('tasks').doc(id).get();
+
+          if (!taskDoc.exists) {
+            return res.status(404).json({ message: 'Task not found' });
+          }
+
+          const task = taskDoc.data();
+
+          if (task.userId !== userId) {
+            return res.status(403).json({ message: 'Unauthorized' });
+          }
+
+          await db.collection('tasks').doc(id).delete();
+
+          return res.status(204).send();
+        } else {
+          return res.status(405).json({ message: 'Method not allowed for individual task operations' });
+        }
+      }
 
       if (req.method === 'GET') {
         // Get user tasks (removed orderBy to avoid index requirement)

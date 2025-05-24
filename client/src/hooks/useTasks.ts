@@ -77,7 +77,7 @@ export function useTasks() {
   const updateTaskMutation = useMutation<Task, Error, { id: string; data: Partial<Task> }>({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Task> }) => {
       try {
-        const response = await apiRequest("PATCH", `/api/tasks/${id}`, data);
+        const response = await apiRequest("PATCH", `/api/tasks?id=${id}`, data);
         return response.json();
       } catch (error) {
         console.error("Error updating task:", error);
@@ -126,7 +126,7 @@ export function useTasks() {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-          await apiRequest("DELETE", `/api/tasks/${id}`);
+          await apiRequest("DELETE", `/api/tasks?id=${id}`);
           clearTimeout(timeoutId);
 
           console.log(`Task deleted successfully: ${id}`);
