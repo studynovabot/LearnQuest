@@ -4,15 +4,39 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 5000;
 
-console.log('Starting emergency server...');
+console.log('🚨 EMERGENCY SERVER - CORS FIX ACTIVE');
+console.log('Environment:', process.env.NODE_ENV || 'development');
+console.log('Port:', port);
+console.log('Time:', new Date().toISOString());
 
-// Enable CORS for all origins
+// CORS configuration - Allow ALL origins to fix Vercel errors
 app.use(cors({
   origin: '*',
-  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept'],
+  credentials: false,
+  optionsSuccessStatus: 204
 }));
+
+// Additional CORS headers as backup
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} from ${origin || 'no-origin'}`);
+
+  // Set CORS headers manually for all requests
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-User-ID,Origin,X-Requested-With,Accept');
+  res.header('Access-Control-Max-Age', '86400');
+
+  // Handle preflight requests immediately
+  if (req.method === 'OPTIONS') {
+    console.log('✅ Handling OPTIONS preflight request from:', origin);
+    return res.status(204).end();
+  }
+
+  next();
+});
 
 // Parse JSON
 app.use(express.json());
