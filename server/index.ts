@@ -106,23 +106,24 @@ app.get('/', (_req, res) => {
   });
 });
 
-// Global error handler to ensure CORS headers are always set
-app.use((err, req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-User-ID,Origin,X-Requested-With,Accept');
-  res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
-});
-
 // Start the server
 (async () => {
   try {
     const server = await registerRoutes(app);
+
     const port = process.env.PORT || 5000;
 
     // Explicitly log the port we're trying to use
     console.log(`Attempting to start server on port ${port}`);
+
+    // Global error handler to ensure CORS headers are always set (must be after all routes)
+    app.use((err, req, res, next) => {
+      res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.header('Access-Control-Allow-Credentials', 'true');
+      res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-User-ID,Origin,X-Requested-With,Accept');
+      res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
+    });
 
     server.listen(Number(port), '0.0.0.0', () => {
       console.log(`🚀 Server running on port ${port}`);
