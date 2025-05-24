@@ -82,15 +82,27 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Add a simple route to test the server
+// Root endpoint - MUST work for Render health checks
 app.get('/', (req, res) => {
   console.log('Root endpoint requested from:', req.headers.origin || 'no-origin');
   res.status(200).json({
     status: 'ok',
     message: 'LearnQuest API is running - CORS FIXED',
     timestamp: new Date().toISOString(),
-    cors: 'enabled'
+    cors: 'enabled',
+    environment: process.env.NODE_ENV || 'development'
   });
+});
+
+// Alternative health check endpoints
+app.get('/ping', (req, res) => {
+  console.log('Ping endpoint requested from:', req.headers.origin || 'no-origin');
+  res.status(200).send('pong');
+});
+
+app.get('/status', (req, res) => {
+  console.log('Status endpoint requested from:', req.headers.origin || 'no-origin');
+  res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
 // Start the server

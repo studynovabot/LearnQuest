@@ -8,6 +8,7 @@ services:
       npm install &&
       npm run build
     startCommand: cd server && npm start
+    healthCheckPath: /health
     envVars:
       - key: NODE_VERSION
         value: 20.11.1
