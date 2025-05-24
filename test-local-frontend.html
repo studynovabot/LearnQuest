@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Local Frontend Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Local Frontend Connection Test</h1>
+        <p>Testing if the local frontend can connect to the local backend without CORS errors</p>
+        
+        <div class="test-section info">
+            <h3>Test Configuration</h3>
+            <div><strong>Frontend:</strong> http://localhost:3002</div>
+            <div><strong>Backend:</strong> http://localhost:5004</div>
+            <div><strong>Expected:</strong> No CORS errors, successful API calls</div>
+        </div>
+
+        <div class="test-section">
+            <h3>Connection Tests</h3>
+            <button onclick="testDirectConnection()">🔗 Test Direct Connection</button>
+            <button onclick="testAllEndpoints()">🚀 Test All API Endpoints</button>
+            <button onclick="simulateFrontendCall()">🎯 Simulate Frontend Call</button>
+            <button onclick="clearResults()">🧹 Clear Results</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Instructions</h3>
+            <ol>
+                <li><strong>Make sure both servers are running:</strong>
+                    <ul>
+                        <li>Backend: <code>cd server && npm start</code> (should be on port 5004)</li>
+                        <li>Frontend: <code>cd client && npm run dev</code> (should be on port 3002)</li>
+                    </ul>
+                </li>
+                <li><strong>Open the frontend:</strong> <a href="http://localhost:3002" target="_blank">http://localhost:3002</a></li>
+                <li><strong>Check console:</strong> Press F12 → Console tab → Look for CORS errors</li>
+                <li><strong>Run tests below:</strong> Click the test buttons to verify connectivity</li>
+            </ol>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function addResult(type, message, details = null) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-section ${type}`;
+            
+            let content = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            if (details) {
+                content += `<pre>${JSON.stringify(details, null, 2)}</pre>`;
+            }
+            
+            div.innerHTML = content;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testDirectConnection() {
+            addResult('info', '🔗 Testing direct connection to local backend...');
+            
+            try {
+                const response = await fetch('http://localhost:5004/api/health', {
+                    method: 'GET',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('success', '✅ Direct connection successful!', {
+                        status: response.status,
+                        cors: response.headers.get('access-control-allow-origin'),
+                        data: data
+                    });
+                } else {
+                    addResult('error', `❌ Direct connection failed (${response.status}): ${response.statusText}`);
+                }
+            } catch (error) {
+                addResult('error', `❌ Direct connection error: ${error.message}`);
+                
+                if (error.message.includes('CORS')) {
+                    addResult('error', '🚨 CORS ERROR DETECTED! The local backend is not properly configured.');
+                } else if (error.message.includes('fetch')) {
+                    addResult('error', '🚨 CONNECTION ERROR! Make sure the backend server is running on port 5004.');
+                }
+            }
+        }
+
+        async function testAllEndpoints() {
+            addResult('info', '🚀 Testing all API endpoints...');
+            
+            const endpoints = [
+                { path: '/api/health', desc: 'Health Check' },
+                { path: '/api/tasks', desc: 'Tasks' },
+                { path: '/api/tutors', desc: 'Tutors' },
+                { path: '/api/subjects', desc: 'Subjects' },
+                { path: '/api/leaderboard', desc: 'Leaderboard' }
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`http://localhost:5004${endpoint.path}`, {
+                        method: 'GET',
+                        headers: {
+                            'Origin': window.location.origin
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        addResult('success', `✅ ${endpoint.desc} - Working`, {
+                            endpoint: endpoint.path,
+                            status: response.status,
+                            cors: response.headers.get('access-control-allow-origin'),
+                            message: data.message
+                        });
+                    } else {
+                        addResult('error', `❌ ${endpoint.desc} - Failed (${response.status})`);
+                    }
+                } catch (error) {
+                    addResult('error', `❌ ${endpoint.desc} - Error: ${error.message}`);
+                }
+                
+                // Small delay between requests
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            addResult('success', '🎉 All endpoint tests completed!');
+        }
+
+        async function simulateFrontendCall() {
+            addResult('info', '🎯 Simulating how the frontend would make API calls...');
+            
+            // This simulates how the actual frontend config works
+            const isDev = true; // Simulating development mode
+            const apiUrl = isDev ? 'http://localhost:5004' : 'https://learnquest.onrender.com';
+            
+            addResult('info', `Using API URL: ${apiUrl} (development mode: ${isDev})`);
+            
+            try {
+                // Simulate the exact call the frontend would make
+                const response = await fetch(`${apiUrl}/api/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': window.location.origin
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('success', '✅ Frontend simulation successful! No CORS errors expected.', {
+                        apiUrl: apiUrl,
+                        status: response.status,
+                        cors: response.headers.get('access-control-allow-origin'),
+                        response: data
+                    });
+                    
+                    addResult('success', '🎉 The local frontend should work without CORS errors!');
+                } else {
+                    addResult('error', `❌ Frontend simulation failed (${response.status}): ${response.statusText}`);
+                }
+            } catch (error) {
+                addResult('error', `❌ Frontend simulation error: ${error.message}`);
+                
+                if (error.message.includes('CORS')) {
+                    addResult('error', '🚨 The frontend WILL have CORS errors! Backend needs fixing.');
+                }
+            }
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            addResult('info', '🚀 Local Frontend Connection Test loaded');
+            addResult('info', '📋 Make sure both servers are running before testing');
+            
+            // Auto-test after a short delay
+            setTimeout(() => {
+                addResult('info', '🔄 Auto-testing direct connection...');
+                testDirectConnection();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
