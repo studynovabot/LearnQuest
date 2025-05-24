@@ -56,26 +56,14 @@ const corsOptions = {
   exposedHeaders: ['Access-Control-Allow-Origin'],
   maxAge: 86400,
   optionsSuccessStatus: 204,
+  preflightContinue: false,
 };
 
+// Apply CORS middleware first
 app.use(cors(corsOptions));
 
-// Handle preflight requests explicitly
-app.options('*', (req, res) => {
-  const origin = req.headers.origin;
-  console.log('Preflight request from origin:', origin);
-
-  if (origin && (allowedOrigins.includes(origin) || origin.includes('.vercel.app') || origin.includes('localhost'))) {
-    res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-User-ID,Origin,X-Requested-With,Accept');
-    res.header('Access-Control-Max-Age', '86400');
-    res.status(204).end();
-  } else {
-    res.status(403).end();
-  }
-});
+// Handle all OPTIONS requests explicitly before other middleware
+app.options('*', cors(corsOptions));
 
 // Initialize Firebase first
 initializeFirebase();
@@ -85,7 +73,11 @@ const storage = new FirebaseStorage();
 export { storage };
 export default storage;
 
-// Configure rate limiting
+// Enable JSON and URL-encoded body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// Configure rate limiting (after CORS but before routes)
 const isProduction = process.env.NODE_ENV === 'production';
 const maxRequests = isProduction ? 100 : 1000;
 
@@ -95,14 +87,14 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req: any) => {
+    // Skip rate limiting for OPTIONS requests (CORS preflight)
+    return req.method === 'OPTIONS';
+  },
 });
 
-// Apply rate limiting to all routes
+// Apply rate limiting to all routes (except OPTIONS)
 app.use(limiter);
-
-// Enable JSON and URL-encoded body parsing
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
 // Health check endpoint for Render
 app.get('/health', (_req, res) => {
