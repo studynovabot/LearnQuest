@@ -30,40 +30,50 @@ const allowedOrigins = [
   'http://localhost:5173'
 ];
 
+// Simplified CORS configuration that should work
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  console.log('Request from origin:', origin, 'Method:', req.method);
+
+  // Always set CORS headers for allowed origins
+  if (origin && (allowedOrigins.includes(origin) || origin.includes('.vercel.app') || origin.includes('localhost'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-User-ID,Origin,X-Requested-With,Accept');
+    res.header('Access-Control-Max-Age', '86400');
+  }
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    console.log('Handling OPTIONS preflight request from:', origin);
+    return res.status(204).end();
+  }
+
+  next();
+});
+
+// Also use the cors middleware as backup
 const corsOptions = {
-  origin: function (origin, callback) {
-    console.log('Incoming request from origin:', origin);
+  origin: function (origin: any, callback: any) {
+    console.log('CORS middleware - origin:', origin);
     if (!origin) {
-      // Allow requests with no origin (like curl, mobile apps)
       return callback(null, true);
     }
-    if (
-      allowedOrigins.includes(origin) ||
-      origin.includes('.vercel.app') ||
-      origin.includes('localhost')
-    ) {
-      // Allow the origin
+    if (allowedOrigins.includes(origin) || origin.includes('.vercel.app') || origin.includes('localhost')) {
       return callback(null, true);
     } else {
-      console.log('Blocked origin:', origin);
-      // Block by not setting the header
-      return callback(new Error('Not allowed by CORS'), false);
+      console.log('CORS blocked origin:', origin);
+      return callback(null, false);
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept'],
-  exposedHeaders: ['Access-Control-Allow-Origin'],
-  maxAge: 86400,
   optionsSuccessStatus: 204,
-  preflightContinue: false,
 };
 
-// Apply CORS middleware first
 app.use(cors(corsOptions));
-
-// Handle all OPTIONS requests explicitly before other middleware
-app.options('*', cors(corsOptions));
 
 // Initialize Firebase first
 initializeFirebase();
@@ -97,7 +107,8 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Health check endpoint for Render
-app.get('/health', (_req, res) => {
+app.get('/health', (req, res) => {
+  console.log('Health check requested from:', req.headers.origin || 'no-origin');
   res.status(200).json({
     status: 'ok',
     message: 'LearnQuest API is healthy',
@@ -106,8 +117,21 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// API health check endpoint (with CORS headers already applied)
+app.get('/api/health', (req, res) => {
+  console.log('API health check requested from:', req.headers.origin || 'no-origin');
+  res.status(200).json({
+    status: 'ok',
+    message: 'LearnQuest API is healthy (API route)',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'unknown',
+    cors: 'enabled'
+  });
+});
+
 // Add a simple route to test the server
-app.get('/', (_req, res) => {
+app.get('/', (req, res) => {
+  console.log('Root endpoint requested from:', req.headers.origin || 'no-origin');
   res.status(200).json({
     status: 'ok',
     message: 'LearnQuest API is running',
