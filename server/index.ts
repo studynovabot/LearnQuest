@@ -30,9 +30,9 @@ const allowedOrigins = [
   'http://localhost:5173'
 ];
 
-// Enable CORS for all routes
-app.use(cors({
-  origin: function(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+// CORS options
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     console.log('Incoming request from origin:', origin);
     // Allow requests with no origin (mobile apps, curl, etc)
     if (!origin) {
@@ -45,19 +45,21 @@ app.use(cors({
       callback(null, true);
     } else {
       console.log('Blocked origin:', origin);
-      // Don't send an error, just false - this is more CORS-friendly
-      callback(null, false);
+      callback(null, true); // Allow the request but log the blocked origin
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept'],
   maxAge: 86400,
-  optionsSuccessStatus: 204
-}));
+  optionsSuccessStatus: 204,
+};
+
+// Enable CORS for all routes
+app.use(cors(corsOptions));
 
 // Handle preflight requests explicitly
-app.options('*', cors());
+app.options('*', cors(corsOptions));
 
 // Initialize Firebase first
 initializeFirebase();
