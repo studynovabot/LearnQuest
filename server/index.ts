@@ -106,6 +106,15 @@ app.get('/', (_req, res) => {
   });
 });
 
+// Global error handler to ensure CORS headers are always set
+app.use((err, req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-User-ID,Origin,X-Requested-With,Accept');
+  res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
+});
+
 // Start the server
 (async () => {
   try {
