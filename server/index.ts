@@ -1,119 +1,128 @@
-// EMERGENCY CORS FIX - Replace complex server with simple CORS-enabled server
-const express = require('express');
-const cors = require('cors');
+import * as dotenv from 'dotenv';
+import express from "express";
+import cors from 'cors';
+import { registerRoutes } from "./routes.js";
+import { FirebaseStorage } from './firebasestorage.js';
+import { initializeFirebase } from './firebaseAdmin.js';
+
+// Load environment variables from .env file
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 const app = express();
-const port = process.env.PORT || 5000;
 
-console.log('🚀 EMERGENCY CORS FIX - Starting simple server...');
+console.log('🚀 Starting LearnQuest API with CORS fix...');
 console.log('Environment:', process.env.NODE_ENV || 'development');
-console.log('Port:', port);
 console.log('Time:', new Date().toISOString());
 
-// CORS configuration - Allow ALL origins to fix Vercel errors
+// SIMPLIFIED CORS - Allow ALL origins to fix Vercel errors
 app.use(cors({
   origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept'],
-  credentials: false
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept'],
+  credentials: false,
+  optionsSuccessStatus: 204
 }));
 
-// Log all requests
+// Additional CORS headers as backup
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} from ${req.headers.origin || 'no-origin'}`);
+  const origin = req.headers.origin;
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} from ${origin || 'no-origin'}`);
+
+  // Set CORS headers manually for all requests
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-User-ID,Origin,X-Requested-With,Accept');
+  res.header('Access-Control-Max-Age', '86400');
+
+  // Handle preflight requests immediately
+  if (req.method === 'OPTIONS') {
+    console.log('✅ Handling OPTIONS preflight request from:', origin);
+    return res.status(204).end();
+  }
+
   next();
 });
 
+// Initialize Firebase first
+initializeFirebase();
+
+// Initialize and export Firebase storage
+const storage = new FirebaseStorage();
+export { storage };
+export default storage;
+
+// Enable JSON and URL-encoded body parsing
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-// Root endpoint for Render health checks
-app.get('/', (req, res) => {
-  console.log('Root endpoint requested from:', req.headers.origin || 'no-origin');
-  res.json({
-    status: 'ok',
-    message: 'EMERGENCY CORS FIX - LearnQuest API is running',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    cors: 'enabled'
-  });
-});
-
-// Health endpoint for Render
+// Health check endpoint for Render
 app.get('/health', (req, res) => {
   console.log('Health check requested from:', req.headers.origin || 'no-origin');
-  res.json({
+  res.status(200).json({
     status: 'ok',
-    message: 'EMERGENCY CORS FIX - Health check',
+    message: 'LearnQuest API is healthy - CORS FIXED',
     timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'unknown',
     cors: 'enabled'
   });
 });
 
-// API health check endpoint
+// API health check endpoint (with CORS headers already applied)
 app.get('/api/health', (req, res) => {
   console.log('API health check requested from:', req.headers.origin || 'no-origin');
-  res.json({
+  res.status(200).json({
     status: 'ok',
-    message: 'EMERGENCY CORS FIX - API health check working',
+    message: 'LearnQuest API is healthy (API route) - CORS FIXED',
     timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'unknown',
     cors: 'enabled',
-    fix: 'This should resolve Vercel CORS errors'
+    fix: 'Vercel CORS errors should be resolved'
   });
 });
 
-// Mock API endpoints to prevent 404 errors
-app.get('/api/tasks', (req, res) => {
-  console.log('Tasks endpoint requested from:', req.headers.origin || 'no-origin');
-  res.json({
-    tasks: [],
-    message: 'EMERGENCY CORS FIX - Mock tasks endpoint',
-    cors: 'enabled'
-  });
-});
-
-app.get('/api/tutors', (req, res) => {
-  console.log('Tutors endpoint requested from:', req.headers.origin || 'no-origin');
-  res.json({
-    tutors: [],
-    message: 'EMERGENCY CORS FIX - Mock tutors endpoint',
-    cors: 'enabled'
-  });
-});
-
-app.get('/api/subjects', (req, res) => {
-  console.log('Subjects endpoint requested from:', req.headers.origin || 'no-origin');
-  res.json({
-    subjects: [],
-    message: 'EMERGENCY CORS FIX - Mock subjects endpoint',
-    cors: 'enabled'
-  });
-});
-
-app.get('/api/leaderboard', (req, res) => {
-  console.log('Leaderboard endpoint requested from:', req.headers.origin || 'no-origin');
-  res.json({
-    leaderboard: [],
-    message: 'EMERGENCY CORS FIX - Mock leaderboard endpoint',
-    cors: 'enabled'
-  });
-});
-
-// Catch all for other API routes
-app.get('/api/*', (req, res) => {
-  console.log('Catch-all API endpoint hit:', req.path, 'from:', req.headers.origin || 'no-origin');
-  res.json({
+// Add a simple route to test the server
+app.get('/', (req, res) => {
+  console.log('Root endpoint requested from:', req.headers.origin || 'no-origin');
+  res.status(200).json({
     status: 'ok',
-    message: 'EMERGENCY CORS FIX - API endpoint available',
-    path: req.path,
+    message: 'LearnQuest API is running - CORS FIXED',
     timestamp: new Date().toISOString(),
     cors: 'enabled'
   });
 });
 
-app.listen(port, '0.0.0.0', () => {
-  console.log('🚀 EMERGENCY CORS FIX - Server running on port', port);
-  console.log('📊 Health check: http://localhost:' + port + '/api/health');
-  console.log('🌐 CORS enabled for ALL origins');
-  console.log('✅ This should fix Vercel CORS errors immediately!');
-  console.log('🔥 Emergency fix deployed successfully');
-});
+// Start the server
+(async () => {
+  try {
+    const server = await registerRoutes(app);
+
+    const port = process.env.PORT || 5000;
+
+    // Explicitly log the port we're trying to use
+    console.log(`Attempting to start server on port ${port}`);
+
+    // Global error handler to ensure CORS headers are always set (must be after all routes)
+    app.use((err: any, req: any, res: any, _next: any) => {
+      // Set CORS headers for error responses
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-User-ID,Origin,X-Requested-With,Accept');
+      res.status(err.status || 500).json({
+        message: err.message || 'Internal Server Error',
+        cors: 'enabled'
+      });
+    });
+
+    server.listen(Number(port), '0.0.0.0', () => {
+      console.log(`🚀 Server running on port ${port}`);
+      console.log(`📊 Health check: http://localhost:${port}/health`);
+      console.log(`🔥 Firebase connected: ${process.env.FIREBASE_PROJECT_ID}`);
+      console.log(`✅ CORS FIXED - Vercel should connect without errors`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+})();
