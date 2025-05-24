@@ -18,6 +18,46 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
 
+const app = express();
+
+// Configure CORS - MUST BE FIRST
+const allowedOrigins = [
+  'https://learn-quest-eight.vercel.app',
+  'https://www.learn-quest-eight.vercel.app',
+  'https://learnquest-eight.vercel.app',
+  'https://www.learnquest-eight.vercel.app',
+  'https://learnquest.onrender.com',
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://localhost:5173'
+];
+
+// Enable CORS for all routes
+app.use(cors({
+  origin: function(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    console.log('Incoming request from origin:', origin);
+    // Allow requests with no origin (mobile apps, curl, etc)
+    if (!origin) {
+      return callback(null, true);
+    }
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('Blocked origin:', origin);
+      // Don't send an error, just false - this is more CORS-friendly
+      callback(null, false);
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept'],
+  maxAge: 86400,
+  optionsSuccessStatus: 204
+}));
+
+// Handle preflight requests explicitly
+app.options('*', cors());
+
 // Initialize Firebase first
 initializeFirebase();
 
@@ -25,8 +65,6 @@ initializeFirebase();
 const storage = new FirebaseStorage();
 export { storage };
 export default storage;
-
-const app = express();
 
 // Configure rate limiting
 const isProduction = process.env.NODE_ENV === 'production';
@@ -42,40 +80,6 @@ const limiter = rateLimit({
 
 // Apply rate limiting to all routes
 app.use(limiter);
-
-// Configure CORS
-const allowedOrigins = [
-  'https://learn-quest-eight.vercel.app',
-  'https://www.learn-quest-eight.vercel.app',
-  'https://learnquest-eight.vercel.app',
-  'https://www.learnquest-eight.vercel.app',
-  'https://learnquest.onrender.com',
-  'http://localhost:3000',
-  'http://localhost:5000',
-  'http://localhost:5173'
-];
-
-// Configure CORS with proper options
-const corsOptions = {
-  origin: function(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-    console.log('Incoming request from origin:', origin);
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('Blocked origin:', origin);
-      callback(null, false);
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Origin', 'X-Requested-With', 'Accept'],
-  credentials: true,
-  maxAge: 86400,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-};
-
-// Apply CORS middleware before any other middleware
-app.use(cors(corsOptions));
 
 // Enable JSON and URL-encoded body parsing
 app.use(express.json());
