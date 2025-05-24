@@ -15,6 +15,7 @@
     "postbuild": "node postbuild.cjs",
     "predeploy": "node predeploy.cjs",
     "start": "node dist/index.js",
+    "test-server": "node test-server.js",
     "seed": "ts-node-dev --transpile-only seedRunner.ts"
   },
   "dependencies": {

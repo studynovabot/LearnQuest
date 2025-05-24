@@ -84,3 +84,32 @@ app.use(limiter);
 // Enable JSON and URL-encoded body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Add a simple route to test the server
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'LearnQuest API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Start the server
+(async () => {
+  try {
+    const server = await registerRoutes(app);
+    const port = process.env.PORT || 5000;
+    
+    // Explicitly log the port we're trying to use
+    console.log(`Attempting to start server on port ${port}`);
+    
+    server.listen(Number(port), '0.0.0.0', () => {
+      console.log(`🚀 Server running on port ${port}`);
+      console.log(`📊 Health check: http://localhost:${port}/health`);
+      console.log(`🔥 Firebase connected: ${process.env.FIREBASE_PROJECT_ID}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+})();
