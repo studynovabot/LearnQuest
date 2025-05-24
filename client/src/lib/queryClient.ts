@@ -51,9 +51,9 @@ export async function apiRequest(
 
     // Always use the backend URL for API requests when config.apiUrl is available
     if (config.apiUrl && url.includes('/api/')) {
-      // Remove leading slash if present to avoid double slashes
-      const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
-      requestUrl = `${config.apiUrl}/${cleanUrl}`;
+      // config.apiUrl already includes /api, so we need to remove /api from the url
+      const cleanUrl = url.replace('/api/', '/');
+      requestUrl = `${config.apiUrl}${cleanUrl}`;
     }
     // Otherwise make sure URLs are properly formatted
     else if (!url.startsWith('http') && !url.startsWith('/')) {
@@ -147,8 +147,8 @@ export const getQueryFn: <T>(options: {
 
     // Always use the backend URL for API requests when config.apiUrl is available
     if (config.apiUrl && requestUrl.startsWith('/api/')) {
-      // Remove the /api prefix since config.apiUrl already includes it
-      const cleanUrl = requestUrl.substring(4); // Remove '/api'
+      // config.apiUrl already includes /api, so we need to remove /api from the url
+      const cleanUrl = requestUrl.replace('/api/', '/');
       requestUrl = `${config.apiUrl}${cleanUrl}`;
     }
     // Otherwise make sure URLs are properly formatted
