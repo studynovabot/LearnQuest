@@ -8,3 +8,4 @@ vite.config.ts.*
 serviceAccountKey.json
 *-firebase-adminsdk-*.json
 .vercel
+.env*.local
