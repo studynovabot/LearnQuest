@@ -57,6 +57,11 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "VITE_NODE_ENV": "production"
+    "VITE_NODE_ENV": "production",
+    "GROQ_API_KEY": "@groq_api_key",
+    "TOGETHER_API_KEY": "@together_api_key",
+    "FIREBASE_PROJECT_ID": "@firebase_project_id",
+    "FIREBASE_PRIVATE_KEY": "@firebase_private_key",
+    "FIREBASE_CLIENT_EMAIL": "@firebase_client_email"
   }
 }

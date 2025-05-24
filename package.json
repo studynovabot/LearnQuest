@@ -1,20 +1,19 @@
 {
-  "name": "rest-express",
-  "version": "1.0.0",
+  "name": "learnquest",
+  "version": "2.0.0",
   "type": "module",
   "license": "MIT",
+  "description": "LearnQuest - Gamified Learning Platform with 15 AI Tutors",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development tsx server/index.ts",
-    "dev:unix": "NODE_ENV=development tsx server/index.ts",
+    "dev": "cd client && npm run dev",
     "dev:client": "cd client && npm run dev",
     "build": "cd client && npm install && npm run build",
     "build:api": "cd api && npm install",
     "build:vercel": "npm run build:api && npm run build",
     "start": "cd client && npm run preview",
-    "check": "tsc",
     "vercel-build": "npm run build:vercel",
-    "seed:deploy": "node scripts/deploy-seed.js",
-    "test:deployment": "node scripts/test-deployment.js"
+    "test:api": "node scripts/test-deployment.js",
+    "test:tutors": "node test-ai-agents.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

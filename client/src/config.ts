@@ -6,17 +6,10 @@ function getApiUrl() {
     return import.meta.env.VITE_API_URL;
   }
 
-  // In development, use the local CORS-fixed server
-  if (import.meta.env.DEV) {
-    const localUrl = 'http://localhost:5004';
-    console.log(`Using local development backend: ${localUrl}`);
-    return localUrl;
-  }
-
-  // Use Vercel serverless functions (same domain, no CORS issues!)
-  const prodUrl = '/api';
-  console.log(`Using Vercel serverless functions: ${prodUrl}`);
-  return prodUrl;
+  // Always use Vercel serverless functions (same domain, no CORS issues!)
+  const apiUrl = '/api';
+  console.log(`Using Vercel serverless functions: ${apiUrl}`);
+  return apiUrl;
 }
 
 export const config = {
