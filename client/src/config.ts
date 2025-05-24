@@ -6,10 +6,19 @@ function getApiUrl() {
     return import.meta.env.VITE_API_URL;
   }
 
-  // Always use Vercel serverless functions (same domain, no CORS issues!)
-  const apiUrl = '/api';
-  console.log(`Using Vercel serverless functions: ${apiUrl}`);
-  return apiUrl;
+  // Check if we're in development or production
+  if (import.meta.env.DEV) {
+    // In development, try to use local API first, fallback to Vercel
+    const localApi = 'http://localhost:5000/api';
+    console.log(`Development mode - using local API: ${localApi}`);
+    return localApi;
+  } else {
+    // In production, use the current domain's API endpoints
+    const currentDomain = window.location.origin;
+    const apiUrl = `${currentDomain}/api`;
+    console.log(`Production mode - using same domain API: ${apiUrl}`);
+    return apiUrl;
+  }
 }
 
 export const config = {

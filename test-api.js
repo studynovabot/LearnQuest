@@ -1,5 +1,5 @@
 // Test script for API endpoints
-const API_BASE = 'https://studynovaai-ge1k49wwv-ranveer-singh-rajputs-projects.vercel.app/api';
+const API_BASE = 'https://studynovaai-bk981e6b5-ranveer-singh-rajputs-projects.vercel.app/api';
 
 async function testAPI() {
   console.log('🧪 Testing API endpoints...\n');

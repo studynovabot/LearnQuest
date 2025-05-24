@@ -46,14 +46,7 @@ export function useHealthCheck() {
       let success = false;
 
       // Construct the health check URL outside the loop
-      let healthUrl = '/api/health';
-      if (config.apiUrl && config.apiUrl !== '/api') {
-        // Only add /api/health if apiUrl is not already /api
-        healthUrl = `${config.apiUrl}/api/health`;
-      } else if (config.apiUrl === '/api') {
-        // If apiUrl is /api, just add /health
-        healthUrl = `${config.apiUrl}/health`;
-      }
+      let healthUrl = `${config.apiUrl}/health`;
 
       while (retryCount <= maxRetries && !success) {
         try {
