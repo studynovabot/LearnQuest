@@ -2,15 +2,41 @@
   "version": 2,
   "buildCommand": "cd client && npm install && npm run build",
   "outputDirectory": "client/dist",
-  "installCommand": "cd client && npm install",
+  "installCommand": "npm install",
   "framework": "vite",
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
@@ -30,8 +56,12 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "https://learnquest.onrender.com",
-    "VITE_BACKEND_URL": "https://learnquest.onrender.com",
-    "VITE_NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "VITE_NODE_ENV": "production",
+    "FIREBASE_PROJECT_ID": "@firebase_project_id",
+    "FIREBASE_CLIENT_EMAIL": "@firebase_client_email",
+    "FIREBASE_PRIVATE_KEY": "@firebase_private_key",
+    "GROQ_API_KEY": "@groq_api_key",
+    "TOGETHER_API_KEY": "@together_api_key"
   }
 }

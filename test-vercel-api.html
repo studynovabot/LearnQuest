@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Vercel API</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Vercel API Test Suite</h1>
+    <p>Test your Vercel serverless functions to ensure they're working correctly.</p>
+
+    <div class="test-section">
+        <h3>Health Check</h3>
+        <button onclick="testHealth()">Test /api/health</button>
+        <div id="health-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Seed Database</h3>
+        <button onclick="testSeed()">Test /api/seed</button>
+        <div id="seed-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Get Tutors</h3>
+        <button onclick="testTutors()">Test /api/tutors</button>
+        <div id="tutors-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Get Store Items</h3>
+        <button onclick="testStore()">Test /api/store</button>
+        <div id="store-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>AI Chat</h3>
+        <button onclick="testChat()">Test /api/chat</button>
+        <div id="chat-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>User Registration</h3>
+        <button onclick="testRegister()">Test /api/auth/register</button>
+        <div id="register-result"></div>
+    </div>
+
+    <script>
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': 'test-user-123',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json();
+                return { success: response.ok, status: response.status, data };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        function displayResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            const className = result.success ? 'success' : 'error';
+            element.className = className;
+            element.innerHTML = `
+                <h4>${result.success ? '✅ Success' : '❌ Error'}</h4>
+                <pre>${JSON.stringify(result, null, 2)}</pre>
+            `;
+        }
+
+        async function testHealth() {
+            const result = await makeRequest('/api/health');
+            displayResult('health-result', result);
+        }
+
+        async function testSeed() {
+            const result = await makeRequest('/api/seed');
+            displayResult('seed-result', result);
+        }
+
+        async function testTutors() {
+            const result = await makeRequest('/api/tutors');
+            displayResult('tutors-result', result);
+        }
+
+        async function testStore() {
+            const result = await makeRequest('/api/store');
+            displayResult('store-result', result);
+        }
+
+        async function testChat() {
+            const result = await makeRequest('/api/chat', {
+                method: 'POST',
+                body: JSON.stringify({
+                    content: 'Hello, can you help me with math?',
+                    agentId: '2'
+                })
+            });
+            displayResult('chat-result', result);
+        }
+
+        async function testRegister() {
+            const randomEmail = `test${Date.now()}@example.com`;
+            const result = await makeRequest('/api/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: randomEmail,
+                    password: 'testpassword123',
+                    displayName: 'Test User',
+                    isPro: false
+                })
+            });
+            displayResult('register-result', result);
+        }
+
+        // Auto-run health check on page load
+        window.onload = () => {
+            testHealth();
+        };
+    </script>
+</body>
+</html>

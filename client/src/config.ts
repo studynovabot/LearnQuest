@@ -13,9 +13,9 @@ function getApiUrl() {
     return localUrl;
   }
 
-  // Use Vercel production backend URL (FREE and reliable)
-  const prodUrl = 'https://learnquest-backend.vercel.app';
-  console.log(`Using Vercel production backend: ${prodUrl}`);
+  // Use Vercel serverless functions (same domain, no CORS issues!)
+  const prodUrl = '/api';
+  console.log(`Using Vercel serverless functions: ${prodUrl}`);
   return prodUrl;
 }
 
@@ -23,9 +23,9 @@ export const config = {
   apiUrl: getApiUrl(),
   environment: import.meta.env.VITE_NODE_ENV || 'production',
 
-  // Use mock data when backend is not available (temporary fix for Render deployment issue)
-  useMockData: import.meta.env.VITE_USE_MOCK_DATA === 'true' || false,
+  // Disable mock data since we're using real Vercel backend
+  useMockData: false,
 
-  // Fallback to mock data if backend health check fails
-  enableMockFallback: true
+  // Disable mock fallback since Vercel is reliable
+  enableMockFallback: false
 };
