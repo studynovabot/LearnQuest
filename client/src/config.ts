@@ -13,9 +13,9 @@ function getApiUrl() {
     return localUrl;
   }
 
-  // Use the correct production backend URL
-  const prodUrl = 'https://learnquest.onrender.com';
-  console.log(`Using production backend: ${prodUrl}`);
+  // Use Railway production backend URL (more reliable than Render)
+  const prodUrl = 'https://learnquest-production.up.railway.app';
+  console.log(`Using Railway production backend: ${prodUrl}`);
   return prodUrl;
 }
 
@@ -23,6 +23,9 @@ export const config = {
   apiUrl: getApiUrl(),
   environment: import.meta.env.VITE_NODE_ENV || 'production',
 
-  // Always use real backend - no mock data
-  useMockData: false
+  // Use mock data when backend is not available (temporary fix for Render deployment issue)
+  useMockData: import.meta.env.VITE_USE_MOCK_DATA === 'true' || false,
+
+  // Fallback to mock data if backend health check fails
+  enableMockFallback: true
 };

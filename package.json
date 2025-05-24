@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
     "dev:unix": "NODE_ENV=development tsx server/index.ts",
-    "build": "tsc && vite build",
+    "build": "cd server && npm install && npm run build",
+    "start": "cd server && npm start",
     "build:vercel": "tsc && vite build && npm run seed:deploy",
-    "start": "set NODE_ENV=production && node dist/index.js",
+    "start:old": "set NODE_ENV=production && node dist/index.js",
     "start:unix": "NODE_ENV=production node dist/index.js",
     "check": "tsc",
     "vercel-build": "npm run build:vercel",
