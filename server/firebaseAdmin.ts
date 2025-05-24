@@ -12,8 +12,8 @@ if (!projectId || !clientEmail || !privateKey) {
 
 console.log('Initializing Firebase with project ID:', projectId);
 
-let app;
-let firestoreDb;
+let app: any;
+let firestoreDb: any;
 
 try {
   if (getApps().length === 0) {

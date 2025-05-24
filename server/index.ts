@@ -1,11 +1,6 @@
 import * as dotenv from 'dotenv';
-import express, { type Request, Response, NextFunction } from "express";
-import path from "path";
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import fs from 'fs';
+import express from "express";
 import { registerRoutes } from "./routes.js";
-import { seedDatabase } from "./seed.js";
 import { FirebaseStorage } from './firebasestorage.js';
 import cors from 'cors';
 import { initializeFirebase } from './firebaseAdmin.js';
@@ -13,8 +8,6 @@ import rateLimit from 'express-rate-limit';
 
 // Load environment variables from .env file
 if (process.env.NODE_ENV !== 'production') {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
   dotenv.config();
 }
 
@@ -26,6 +19,7 @@ const allowedOrigins = [
   'https://www.learn-quest-eight.vercel.app',
   'https://learnquest-eight.vercel.app',
   'https://www.learnquest-eight.vercel.app',
+  'https://learn-quest-itgxg37qt-ranveer-singh-rajputs-projects.vercel.app',
   'https://learnquest.onrender.com',
   'https://learnquest-backend-v2.onrender.com',
   'https://learnquest-frontend.vercel.app',
@@ -93,7 +87,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Add a simple route to test the server
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.status(200).json({
     status: 'ok',
     message: 'LearnQuest API is running',
