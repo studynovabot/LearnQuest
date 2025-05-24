@@ -5,9 +5,7 @@ services:
     plan: free
     buildCommand: >
       cd server &&
-      npm install &&
-      npm install --save-dev @types/bcryptjs @types/cors @types/multer typescript@5.3.3 &&
-      npm run build
+      npm install
     startCommand: cd server && npm start
     envVars:
       - key: NODE_VERSION
@@ -16,5 +14,5 @@ services:
         value: production
       - key: PORT
         value: "10000"
-    healthCheckPath: /health
+    healthCheckPath: /api/health
     autoDeploy: true
