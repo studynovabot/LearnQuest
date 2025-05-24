@@ -63,39 +63,12 @@ const togetherKeyExists = !!process.env.TOGETHER_AI_API_KEY;
 console.log('GROQ_API_KEY exists:', groqKeyExists);
 console.log('TOGETHER_AI_API_KEY exists:', togetherKeyExists);
 
-// If keys don't exist, try to read them directly from the .env file as a fallback
+// Remove fallback API keys and hardcoded values
 if (!groqKeyExists || !togetherKeyExists) {
-  try {
-    // Hardcode the API keys as a last resort
-    if (!process.env.GROQ_API_KEY) {
-      process.env.GROQ_API_KEY = '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';
-      console.log('GROQ_API_KEY hardcoded as fallback');
-    }
-
-    if (!process.env.TOGETHER_AI_API_KEY) {
-      process.env.TOGETHER_AI_API_KEY = '386f94fa38882002186da7d11fa278a2b0b729dcda437ef07b8b0f14e1fc2ee7';
-      console.log('TOGETHER_AI_API_KEY hardcoded as fallback');
-    }
-
-    // Log updated status
-    console.log('After hardcoding:');
-    console.log('GROQ_API_KEY exists:', !!process.env.GROQ_API_KEY);
-    console.log('TOGETHER_AI_API_KEY exists:', !!process.env.TOGETHER_AI_API_KEY);
-  } catch (error) {
-    console.error('Error setting hardcoded API keys:', error);
-  }
-}
-
-// Set up AI API keys from environment variables
-if (!process.env.GROQ_API_KEY || !process.env.TOGETHER_AI_API_KEY) {
   console.warn('Some API keys are missing. AI features may not work correctly.');
   console.warn('GROQ_API_KEY present:', !!process.env.GROQ_API_KEY);
   console.warn('TOGETHER_AI_API_KEY present:', !!process.env.TOGETHER_AI_API_KEY);
-
-  // Continue with available keys or dummy values
-  process.env.GROQ_API_KEY = process.env.GROQ_API_KEY || 'dummy-key';
-  process.env.TOGETHER_AI_API_KEY = process.env.TOGETHER_AI_API_KEY || 'dummy-key';
-  console.warn('Server will continue with available/dummy API keys.');
+  // Do not set any fallback or dummy keys
 }
 
 // Initialize Firebase storage
