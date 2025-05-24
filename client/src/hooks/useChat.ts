@@ -76,6 +76,7 @@ export function useChat() {
             const response = await apiRequest("POST", "/api/chat", {
               content,
               agentId: activeAgent?.id || '1', // Default to the first agent if none is selected
+              userId: user?.id, // Pass user ID for performance tracking
             });
 
             clearTimeout(timeoutId);

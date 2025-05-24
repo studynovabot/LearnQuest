@@ -1,7 +1,6 @@
 // Vercel serverless function for AI chat
 import { handleCors } from './_utils/cors.js';
-import { initializeFirebase } from './_utils/firebase.js';
-import { storage } from './_utils/storage.js';
+import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
 
 // Agent-specific system prompts for all 15 AI tutors
 const AGENT_PROMPTS = {
@@ -131,8 +130,10 @@ export default function handler(req, res) {
     try {
       // Initialize Firebase
       initializeFirebase();
+      const db = getFirestoreDb();
 
-      const { content, agentId } = req.body;
+      const { content, agentId, userId } = req.body;
+      const actualUserId = userId || req.headers['x-user-id'] || 'demo-user';
 
       if (!content) {
         return res.status(400).json({ message: 'No content provided' });
@@ -140,6 +141,24 @@ export default function handler(req, res) {
 
       // Generate AI response
       const { content: responseContent, xpAwarded } = await generateAIResponse(content, agentId);
+
+      // Track user interaction for performance calculation
+      try {
+        const subject = getSubjectFromAgent(agentId);
+        await trackUserInteraction(db, {
+          userId: actualUserId,
+          subject: subject,
+          action: 'chat_interaction',
+          agentId: agentId || '1',
+          difficulty: 'medium',
+          correct: true, // Chat interactions are considered positive engagement
+          timeSpent: 0,
+          xpEarned: xpAwarded
+        });
+      } catch (trackingError) {
+        console.error('Error tracking user interaction:', trackingError);
+        // Don't fail the chat if tracking fails
+      }
 
       // Create response object
       const assistantResponse = {
@@ -159,4 +178,118 @@ export default function handler(req, res) {
       res.status(400).json({ message: errorMessage });
     }
   });
+}
+
+// Map agent IDs to subjects for performance tracking
+function getSubjectFromAgent(agentId) {
+  const agentSubjectMap = {
+    '1': 'General', // Nova
+    '2': 'Mathematics', // MathWiz
+    '3': 'Science', // ScienceBot
+    '4': 'English', // LinguaLearn
+    '5': 'History', // HistoryWise
+    '6': 'Computer Science', // CodeMaster
+    '7': 'Art', // ArtVision
+    '8': 'Environmental Science', // EcoExpert
+    '9': 'Philosophy', // PhiloThink
+    '10': 'Psychology', // PsychoGuide
+    '11': 'Economics', // EconAnalyst
+    '12': 'Geography', // GeoExplorer
+    '13': 'Motivation', // MotivateMe
+    '14': 'Study Skills', // StudyBuddy
+    '15': 'Personalized Learning' // PersonalAI
+  };
+
+  return agentSubjectMap[agentId] || 'General';
+}
+
+// Track user interaction for performance calculation
+async function trackUserInteraction(db, interaction) {
+  try {
+    // Save interaction to database
+    await db.collection('user_interactions').add({
+      ...interaction,
+      timestamp: new Date()
+    });
+
+    // Update user's subject performance
+    await updateUserSubjectPerformance(db, interaction.userId, interaction.subject, interaction);
+  } catch (error) {
+    console.error('Error tracking user interaction:', error);
+    throw error;
+  }
+}
+
+// Update user's subject performance based on interaction
+async function updateUserSubjectPerformance(db, userId, subject, interaction) {
+  const performanceRef = db.collection('user_performance').doc(`${userId}_${subject}`);
+
+  try {
+    const doc = await performanceRef.get();
+
+    if (doc.exists) {
+      const data = doc.data();
+      const newStats = calculateNewPerformance(data, interaction);
+      await performanceRef.update(newStats);
+    } else {
+      // Create new performance record
+      const initialStats = {
+        userId,
+        subject,
+        totalInteractions: 1,
+        correctAnswers: interaction.correct ? 1 : 0,
+        totalTimeSpent: interaction.timeSpent,
+        totalXpEarned: interaction.xpEarned,
+        averageAccuracy: interaction.correct ? 100 : 0,
+        progress: calculateProgress(1, interaction.correct ? 1 : 0),
+        status: getPerformanceStatus(interaction.correct ? 100 : 0),
+        lastUpdated: new Date(),
+        createdAt: new Date()
+      };
+      await performanceRef.set(initialStats);
+    }
+  } catch (error) {
+    console.error('Error updating user performance:', error);
+  }
+}
+
+// Calculate new performance metrics
+function calculateNewPerformance(currentData, newInteraction) {
+  const totalInteractions = currentData.totalInteractions + 1;
+  const correctAnswers = currentData.correctAnswers + (newInteraction.correct ? 1 : 0);
+  const totalTimeSpent = currentData.totalTimeSpent + newInteraction.timeSpent;
+  const totalXpEarned = currentData.totalXpEarned + newInteraction.xpEarned;
+  const averageAccuracy = (correctAnswers / totalInteractions) * 100;
+  const progress = calculateProgress(totalInteractions, correctAnswers);
+  const status = getPerformanceStatus(averageAccuracy);
+
+  return {
+    totalInteractions,
+    correctAnswers,
+    totalTimeSpent,
+    totalXpEarned,
+    averageAccuracy,
+    progress,
+    status,
+    lastUpdated: new Date()
+  };
+}
+
+// Calculate progress percentage based on interactions and accuracy
+function calculateProgress(totalInteractions, correctAnswers) {
+  const accuracyWeight = 0.7;
+  const volumeWeight = 0.3;
+
+  const accuracy = totalInteractions > 0 ? (correctAnswers / totalInteractions) : 0;
+  const volume = Math.min(totalInteractions / 50, 1); // Cap at 50 interactions for 100% volume
+
+  return Math.round((accuracy * accuracyWeight + volume * volumeWeight) * 100);
+}
+
+// Determine performance status based on accuracy
+function getPerformanceStatus(accuracy) {
+  if (accuracy >= 85) return 'excellent';
+  if (accuracy >= 70) return 'good';
+  if (accuracy >= 50) return 'average';
+  return 'needs_improvement';
 }

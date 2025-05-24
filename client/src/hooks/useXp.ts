@@ -12,7 +12,24 @@ export function useXp() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: subjects = [], isLoading: isLoadingSubjects } = useQuery({
-    queryKey: ["/api/subjects"],
+    queryKey: ["/api/subjects", user?.id],
+    queryFn: async () => {
+      // Create a custom fetch request with headers
+      const headers: Record<string, string> = {
+        'x-user-id': user?.id || 'demo-user'
+      };
+
+      const response = await fetch('/api/subjects', {
+        method: 'GET',
+        headers
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch subjects: ${response.statusText}`);
+      }
+
+      return response.json();
+    },
     enabled: !!user,
   });
 
