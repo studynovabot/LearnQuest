@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>CORS Test for LearnQuest Backend</h1>
+    <p>This page tests the CORS configuration between the Vercel frontend and Render backend.</p>
+    
+    <div>
+        <button onclick="testHealthEndpoint()">Test Health Endpoint</button>
+        <button onclick="testTasksEndpoint()">Test Tasks Endpoint</button>
+        <button onclick="testTutorsEndpoint()">Test Tutors Endpoint</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const BACKEND_URL = 'https://learnquest.onrender.com';
+        const resultsDiv = document.getElementById('results');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            resultsDiv.appendChild(div);
+        }
+
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+        }
+
+        async function testEndpoint(endpoint, description) {
+            const url = `${BACKEND_URL}${endpoint}`;
+            addResult(`Testing ${description}: ${url}`, 'info');
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    credentials: 'include',
+                    mode: 'cors'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ ${description} - Success (${response.status}):<br><pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+                } else {
+                    addResult(`❌ ${description} - Failed with status ${response.status}: ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ ${description} - Error: ${error.message}`, 'error');
+                console.error(`Error testing ${endpoint}:`, error);
+            }
+        }
+
+        async function testHealthEndpoint() {
+            await testEndpoint('/api/health', 'Health Check');
+        }
+
+        async function testTasksEndpoint() {
+            await testEndpoint('/api/tasks', 'Tasks API');
+        }
+
+        async function testTutorsEndpoint() {
+            await testEndpoint('/api/tutors', 'Tutors API');
+        }
+
+        // Auto-run health check on page load
+        window.addEventListener('load', () => {
+            addResult('Page loaded. Testing CORS configuration...', 'info');
+            testHealthEndpoint();
+        });
+    </script>
+</body>
+</html>
