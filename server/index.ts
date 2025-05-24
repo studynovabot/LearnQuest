@@ -27,6 +27,10 @@ const allowedOrigins = [
   'https://learnquest-eight.vercel.app',
   'https://www.learnquest-eight.vercel.app',
   'https://learnquest.onrender.com',
+  'https://learnquest-backend-v2.onrender.com',
+  'https://learnquest-frontend.vercel.app',
+  'https://learnquest-git-main.vercel.app',
+  'https://learnquest-git-main-your-username.vercel.app',
   'http://localhost:3000',
   'http://localhost:5000',
   'http://localhost:5173'
@@ -40,7 +44,10 @@ app.use(cors({
     if (!origin) {
       return callback(null, true);
     }
-    if (allowedOrigins.includes(origin)) {
+    // Allow all Vercel domains and specific allowed origins
+    if (allowedOrigins.includes(origin) ||
+        (origin && origin.includes('.vercel.app')) ||
+        (origin && origin.includes('localhost'))) {
       callback(null, true);
     } else {
       console.log('Blocked origin:', origin);
@@ -99,10 +106,10 @@ app.get('/', (req, res) => {
   try {
     const server = await registerRoutes(app);
     const port = process.env.PORT || 5000;
-    
+
     // Explicitly log the port we're trying to use
     console.log(`Attempting to start server on port ${port}`);
-    
+
     server.listen(Number(port), '0.0.0.0', () => {
       console.log(`🚀 Server running on port ${port}`);
       console.log(`📊 Health check: http://localhost:${port}/health`);
