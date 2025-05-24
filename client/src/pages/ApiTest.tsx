@@ -9,9 +9,9 @@ export default function ApiTest() {
   const testHealthEndpoint = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      const response = await fetch(`${config.apiUrl}/api/health`);
+      const response = await fetch(`${config.apiUrl}/health`);
       const data = await response.json();
       setHealthStatus(data);
     } catch (err) {
@@ -28,7 +28,7 @@ export default function ApiTest() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">API Configuration Test</h1>
-      
+
       <div className="space-y-4">
         <div className="bg-gray-100 p-4 rounded-lg">
           <h2 className="text-lg font-semibold mb-2">Current Configuration</h2>
@@ -45,7 +45,7 @@ export default function ApiTest() {
           <h2 className="text-lg font-semibold mb-2">Health Check Test</h2>
           <div className="space-y-2">
             <div><strong>Test URL:</strong> {config.apiUrl}/api/health</div>
-            <button 
+            <button
               onClick={testHealthEndpoint}
               disabled={loading}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"

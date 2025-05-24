@@ -26,14 +26,14 @@ export const api = {
 
   // Add your API methods here
   async login(email: string, password: string) {
-    return this.fetch('/api/auth/login', {
+    return this.fetch('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
   },
 
   async register(userData: any) {
-    return this.fetch('/api/auth/register', {
+    return this.fetch('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });

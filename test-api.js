@@ -1,5 +1,5 @@
 // Test script for API endpoints
-const API_BASE = 'https://studynovaai-bk981e6b5-ranveer-singh-rajputs-projects.vercel.app/api';
+const API_BASE = 'https://studynovaai-qiqmwagh4-ranveer-singh-rajputs-projects.vercel.app/api';
 
 async function testAPI() {
   console.log('🧪 Testing API endpoints...\n');
@@ -42,6 +42,16 @@ async function testAPI() {
         password: 'India#321'
       }),
     });
+
+    console.log('Login response status:', loginResponse.status);
+    console.log('Login response headers:', Object.fromEntries(loginResponse.headers.entries()));
+
+    if (!loginResponse.ok) {
+      const errorText = await loginResponse.text();
+      console.log('Login error response:', errorText);
+      throw new Error(`Login failed: ${loginResponse.status} ${loginResponse.statusText}`);
+    }
+
     const loginData = await loginResponse.json();
     console.log('✅ Login test:', loginData);
   } catch (error) {

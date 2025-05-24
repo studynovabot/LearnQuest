@@ -146,10 +146,10 @@ export const getQueryFn: <T>(options: {
     let requestUrl = queryKey[0] as string;
 
     // Always use the backend URL for API requests when config.apiUrl is available
-    if (config.apiUrl && requestUrl.includes('/api/')) {
-      // Remove leading slash if present to avoid double slashes
-      const cleanUrl = requestUrl.startsWith('/') ? requestUrl.substring(1) : requestUrl;
-      requestUrl = `${config.apiUrl}/${cleanUrl}`;
+    if (config.apiUrl && requestUrl.startsWith('/api/')) {
+      // Remove the /api prefix since config.apiUrl already includes it
+      const cleanUrl = requestUrl.substring(4); // Remove '/api'
+      requestUrl = `${config.apiUrl}${cleanUrl}`;
     }
     // Otherwise make sure URLs are properly formatted
     else if (!requestUrl.startsWith('http') && !requestUrl.startsWith('/')) {
