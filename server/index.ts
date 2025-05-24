@@ -86,6 +86,16 @@ app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Health check endpoint for Render
+app.get('/health', (_req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'LearnQuest API is healthy',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'unknown'
+  });
+});
+
 // Add a simple route to test the server
 app.get('/', (_req, res) => {
   res.status(200).json({
