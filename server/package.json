@@ -16,6 +16,7 @@
     "predeploy": "node predeploy.cjs",
     "start": "node simple-test-server.cjs",
     "start-production": "node simple-test-server.cjs",
+    "start-render": "node simple-test-server.cjs",
     "start-original": "node dist/index.js || node emergency-server.js",
     "emergency": "node emergency-server.js",
     "test-server": "node test-server.js",
