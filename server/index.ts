@@ -32,20 +32,23 @@ const allowedOrigins = [
 
 // CORS options
 const corsOptions = {
-  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+  origin: function (origin, callback) {
     console.log('Incoming request from origin:', origin);
-    // Allow requests with no origin (mobile apps, curl, etc)
     if (!origin) {
+      // Allow requests with no origin (like curl, mobile apps)
       return callback(null, true);
     }
-    // Allow all Vercel domains and specific allowed origins
-    if (allowedOrigins.includes(origin) ||
-        (origin && origin.includes('.vercel.app')) ||
-        (origin && origin.includes('localhost'))) {
-      callback(null, true);
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.includes('.vercel.app') ||
+      origin.includes('localhost')
+    ) {
+      // Allow and reflect the origin
+      return callback(null, origin);
     } else {
       console.log('Blocked origin:', origin);
-      callback(null, true); // Allow the request but log the blocked origin
+      // Block by not setting the header
+      return callback(new Error('Not allowed by CORS'), false);
     }
   },
   credentials: true,
@@ -57,8 +60,6 @@ const corsOptions = {
 
 // Enable CORS for all routes
 app.use(cors(corsOptions));
-
-// Handle preflight requests explicitly
 app.options('*', cors(corsOptions));
 
 // Initialize Firebase first
