@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: learnquest-backend-v2
+    name: learnquest
     env: node
     plan: free
     buildCommand: >
