@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Direct Backend Test</title>
+    <title>CORS Fixed Backend Test</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,27 +52,37 @@
     </style>
 </head>
 <body>
-    <h1>Direct Backend Test</h1>
-    <p>This page tests the backend directly without CORS restrictions.</p>
-    
-    <div>
-        <button onclick="testRootEndpoint()">Test Root Endpoint</button>
-        <button onclick="testHealthEndpoint()">Test /health</button>
-        <button onclick="testApiHealthEndpoint()">Test /api/health</button>
-        <button onclick="clearResults()">Clear Results</button>
+    <h1>🧪 CORS Fixed Backend Test</h1>
+    <p>Testing the new CORS-fixed backend server</p>
+
+    <div style="margin: 20px 0; padding: 15px; background-color: #e7f3ff; border-radius: 5px;">
+        <h3>Instructions:</h3>
+        <ol>
+            <li>Start the new server: <code>cd server && npm start</code></li>
+            <li>The server should run on <strong>http://localhost:5004</strong></li>
+            <li>Click the test buttons below to verify CORS is working</li>
+        </ol>
     </div>
-    
+
+    <div>
+        <button onclick="testLocalServer()">🏠 Test Local Server (port 5004)</button>
+        <button onclick="testRenderServer()">☁️ Test Render Server</button>
+        <button onclick="testCORSSpecific()">🌐 Test CORS Headers</button>
+        <button onclick="clearResults()">🧹 Clear Results</button>
+    </div>
+
     <div id="results"></div>
 
     <script>
-        const BACKEND_URL = 'https://learnquest.onrender.com';
+        let BACKEND_URL = 'http://localhost:5004'; // Default to local server
         const resultsDiv = document.getElementById('results');
 
         function addResult(message, type = 'info') {
             const div = document.createElement('div');
             div.className = `test-result ${type}`;
-            div.innerHTML = message;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
             resultsDiv.appendChild(div);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
         }
 
         function clearResults() {
@@ -82,7 +92,7 @@
         async function testEndpoint(endpoint, description) {
             const url = `${BACKEND_URL}${endpoint}`;
             addResult(`Testing ${description}: ${url}`, 'info');
-            
+
             try {
                 // Use no-cors mode to bypass CORS restrictions for testing
                 const response = await fetch(url, {
@@ -105,7 +115,7 @@
         async function testWithCors(endpoint, description) {
             const url = `${BACKEND_URL}${endpoint}`;
             addResult(`Testing ${description} with CORS: ${url}`, 'info');
-            
+
             try {
                 const response = await fetch(url, {
                     method: 'GET',
@@ -129,27 +139,63 @@
             }
         }
 
-        async function testRootEndpoint() {
-            await testEndpoint('/', 'Root Endpoint (no-cors)');
-            await testWithCors('/', 'Root Endpoint (with CORS)');
+        async function testLocalServer() {
+            BACKEND_URL = 'http://localhost:5004';
+            addResult('🏠 Switched to local server: ' + BACKEND_URL, 'info');
+            await testCORSEndpoints();
         }
 
-        async function testHealthEndpoint() {
-            await testEndpoint('/health', 'Health Check (no-cors)');
-            await testWithCors('/health', 'Health Check (with CORS)');
+        async function testRenderServer() {
+            BACKEND_URL = 'https://learnquest.onrender.com';
+            addResult('☁️ Switched to Render server: ' + BACKEND_URL, 'info');
+            await testCORSEndpoints();
         }
 
-        async function testApiHealthEndpoint() {
-            await testEndpoint('/api/health', 'API Health Check (no-cors)');
-            await testWithCors('/api/health', 'API Health Check (with CORS)');
+        async function testCORSSpecific() {
+            addResult('🌐 Testing CORS headers specifically...', 'info');
+
+            try {
+                // Test OPTIONS preflight
+                const optionsResponse = await fetch(`${BACKEND_URL}/api/health`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'GET',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+
+                const corsHeaders = {};
+                optionsResponse.headers.forEach((value, key) => {
+                    if (key.startsWith('access-control-')) {
+                        corsHeaders[key] = value;
+                    }
+                });
+
+                addResult(`✅ CORS OPTIONS test passed (${optionsResponse.status})<br><pre>${JSON.stringify(corsHeaders, null, 2)}</pre>`, 'success');
+
+            } catch (error) {
+                addResult(`❌ CORS OPTIONS test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCORSEndpoints() {
+            const endpoints = [
+                { path: '/api/health', desc: '❤️ Health Check' },
+                { path: '/api/tasks', desc: '📋 Tasks' },
+                { path: '/api/tutors', desc: '👨‍🏫 Tutors' },
+                { path: '/api/subjects', desc: '📚 Subjects' }
+            ];
+
+            for (const endpoint of endpoints) {
+                await testWithCors(endpoint.path, endpoint.desc);
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
         }
 
         // Auto-run tests on page load
         window.addEventListener('load', () => {
-            addResult('Page loaded. Testing backend endpoints...', 'info');
-            setTimeout(() => {
-                testRootEndpoint();
-            }, 1000);
+            addResult('🚀 CORS Fixed Backend Test loaded. Click a test button to start.', 'info');
         });
     </script>
 </body>
