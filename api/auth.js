@@ -96,13 +96,6 @@ export default function handler(req, res) {
           password: hashedPassword,
           displayName,
           isPro: isPro || false,
-          xp: 100, // Welcome bonus
-          level: 1,
-          streak: 0,
-          title: undefined,
-          avatarUrl: undefined,
-          questionsCompleted: 0,
-          hoursStudied: 0,
           className: '',
           board: '',
           role: isAdmin ? 'admin' : 'user',

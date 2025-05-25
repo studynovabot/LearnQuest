@@ -25,12 +25,9 @@ export class FirebaseStorage {
       password: hashedPassword,
       displayName: userData.displayName,
       isPro: userData.isPro || false,
-      xp: 0,
-      streak: 0,
       className: userData.className || '',
       board: userData.board || '',
       role: userData.role || 'user',
-      avatarUrl: '',
       createdAt: new Date(),
       lastLogin: new Date()
     };

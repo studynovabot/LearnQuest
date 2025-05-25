@@ -51,24 +51,8 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
 
-    // Tasks
-    match /tasks/{taskId} {
-      allow read, write: if isOwner(resource.data.userId) || isAdmin();
-    }
-
     // Chat messages
     match /chatMessages/{messageId} {
-      allow read, write: if isOwner(resource.data.userId) || isAdmin();
-    }
-
-    // Store items
-    match /store_items/{itemId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    // User items
-    match /user_items/{userItemId} {
       allow read, write: if isOwner(resource.data.userId) || isAdmin();
     }
 

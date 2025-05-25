@@ -7,10 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { UserProvider } from "@/context/UserContext";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
-import Leaderboard from "@/pages/Leaderboard";
-import Store from "@/pages/Store";
 import ChatAgents from "@/pages/ChatAgents";
-import TaskManagement from "@/pages/TaskManagement";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Settings from "@/pages/Settings";
@@ -43,24 +40,9 @@ function Router() {
           <Dashboard />
         </MainLayout>
       </Route>
-      <Route path="/leaderboard">
-        <MainLayout>
-          <Leaderboard />
-        </MainLayout>
-      </Route>
-      <Route path="/store">
-        <MainLayout>
-          <Store />
-        </MainLayout>
-      </Route>
       <Route path="/chat">
         <MainLayout>
           <ChatAgents />
-        </MainLayout>
-      </Route>
-      <Route path="/tasks">
-        <MainLayout>
-          <TaskManagement />
         </MainLayout>
       </Route>
       <Route path="/login">
@@ -123,7 +105,7 @@ function Router() {
 
 function InnerApp() {
   // Use the health check hook to verify backend connection
-  const { status, isChecking } = useHealthCheck();
+  const { status } = useHealthCheck();
 
   // Log the backend connection status
   useEffect(() => {

@@ -4,14 +4,10 @@ import {
   FlashlightIcon,
   HomeIcon,
   MessageIcon,
-  ChartIcon,
-  TrophyIcon,
-  StoreIcon,
   CreditCardIcon,
   SettingsIcon,
   BookOpenIcon,
   GitBranchIcon,
-  FileTextIcon,
   ImageIcon,
   SparklesIcon,
   UploadIcon
@@ -31,9 +27,6 @@ const Sidebar = () => {
     { icon: ImageIcon, path: "/image-tools", active: location === "/image-tools" },
     { icon: SparklesIcon, path: "/personalized-agent", active: location === "/personalized-agent" },
     { icon: UploadIcon, path: "/content-manager", active: location === "/content-manager" },
-    { icon: ChartIcon, path: "/leaderboard", active: location === "/leaderboard" },
-    { icon: TrophyIcon, path: "/tasks", active: location === "/tasks" },
-    { icon: StoreIcon, path: "/store", active: location === "/store" },
     { icon: CreditCardIcon, path: "/subscription", active: location === "/subscription" },
   ];
 

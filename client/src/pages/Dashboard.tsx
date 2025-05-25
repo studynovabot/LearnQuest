@@ -1,11 +1,6 @@
 import { Helmet } from 'react-helmet';
-import DailyTasks from "@/components/dashboard/DailyTasks";
 import SubjectOverview from "@/components/dashboard/SubjectOverview";
-import RewardsSection from "@/components/dashboard/RewardsSection";
 import AITutors from "@/components/dashboard/AITutors";
-import ProfileSection from "@/components/dashboard/ProfileSection";
-import WeeklyStreak from "@/components/dashboard/WeeklyStreak";
-import LeaderboardSection from "@/components/dashboard/LeaderboardSection";
 import ChatInterface from "@/components/dashboard/ChatInterface";
 import NovaLogo from "@/components/ui/NovaLogo";
 import { useAuth } from "@/hooks/useAuth";
@@ -43,22 +38,22 @@ const Dashboard = () => {
               <h2 className="font-display text-3xl font-bold mb-2">
                 Ace Your Exams with AI, <span className="text-secondary">{user?.displayName?.split(' ')[0] || 'Student'}!</span>
               </h2>
-              <p className="text-muted-foreground mb-4">Complete daily tasks and challenges to maximize your learning and earn XP.</p>
+              <p className="text-muted-foreground mb-4">Access AI tutors, educational content, and personalized learning tools.</p>
 
               <div className="bg-muted rounded-xl p-4 flex items-start gap-4 max-w-md">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 8L15 13.2L19 14.1L15.5 18.2L16.5 22L12 20.2L7.5 22L8.5 18.2L5 14.1L9 13.2L12 8Z" fill="currentColor" />
+                      <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" fill="currentColor" />
                     </svg>
                   </div>
                 </div>
                 <div>
                   <p className="text-primary font-semibold mb-1">
-                    You're on fire, {user?.displayName?.split(' ')[0] || 'Student'}!
+                    Welcome back, {user?.displayName?.split(' ')[0] || 'Student'}!
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Complete your daily tasks to earn more XP and keep your {user?.streak || 0}-day streak going.
+                    Explore AI tutors and educational content to enhance your learning experience.
                   </p>
                 </div>
               </div>
@@ -70,33 +65,20 @@ const Dashboard = () => {
           </div>
         </motion.section>
 
-        {/* Three Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-            <DailyTasks />
-          </motion.div>
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
-            <SubjectOverview />
-          </motion.div>
-          {/* <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
-            <RewardsSection />
-          </motion.div> */}
-        </div>
+        {/* Subject Overview */}
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+          <SubjectOverview />
+        </motion.div>
 
         {/* AI Tutors Section */}
-        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
           <AITutors />
         </motion.div>
 
-        {/* Leaderboard & Chat Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}>
-            <LeaderboardSection />
-          </motion.div>
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
-            <ChatInterface />
-          </motion.div>
-        </div>
+        {/* Chat Interface */}
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+          <ChatInterface />
+        </motion.div>
       </motion.div>
     </>
   );
