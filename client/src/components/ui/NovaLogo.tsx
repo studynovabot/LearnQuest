@@ -29,14 +29,14 @@ const NovaLogo: React.FC<NovaLogoProps> = ({
   const iconSvg = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
       <defs>
-        <!-- Exact blue gradients from the original -->
+        <!-- Lighter blue gradients for better visibility -->
         <linearGradient id="iconHexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
-          <stop offset="100%" style="stop-color:#1E1B4B;stop-opacity:1" />
+          <stop offset="0%" style="stop-color:#60A5FA;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
         </linearGradient>
         <linearGradient id="iconRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#6366F1;stop-opacity:0.8" />
-          <stop offset="100%" style="stop-color:#4338CA;stop-opacity:0.6" />
+          <stop offset="0%" style="stop-color:#93C5FD;stop-opacity:0.9" />
+          <stop offset="100%" style="stop-color:#60A5FA;stop-opacity:0.7" />
         </linearGradient>
       </defs>
 
@@ -64,14 +64,14 @@ const NovaLogo: React.FC<NovaLogoProps> = ({
   const fullLogoSvg = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120">
       <defs>
-        <!-- Exact blue gradients from the original -->
+        <!-- Lighter blue gradients for better visibility -->
         <linearGradient id="fullHexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
-          <stop offset="100%" style="stop-color:#1E1B4B;stop-opacity:1" />
+          <stop offset="0%" style="stop-color:#60A5FA;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
         </linearGradient>
         <linearGradient id="fullRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#6366F1;stop-opacity:0.8" />
-          <stop offset="100%" style="stop-color:#4338CA;stop-opacity:0.6" />
+          <stop offset="0%" style="stop-color:#93C5FD;stop-opacity:0.9" />
+          <stop offset="100%" style="stop-color:#60A5FA;stop-opacity:0.7" />
         </linearGradient>
       </defs>
 
@@ -93,11 +93,11 @@ const NovaLogo: React.FC<NovaLogoProps> = ({
         <line x1="8" y1="-3" x2="12" y2="3" stroke="white" stroke-width="1.5"/>
       </g>
 
-      <!-- NOVA text - exact typography -->
-      <text x="140" y="50" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="#1E1B4B">NOVA</text>
+      <!-- NOVA text - lighter color for better visibility -->
+      <text x="140" y="50" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="#60A5FA">NOVA AI</text>
 
-      <!-- Subtitle - exact positioning and styling -->
-      <text x="140" y="70" font-family="Arial, sans-serif" font-size="14" font-weight="normal" fill="#6B7280">YOUR AI STUDY BUDDY</text>
+      <!-- Subtitle - updated text and lighter color -->
+      <text x="140" y="70" font-family="Arial, sans-serif" font-size="14" font-weight="normal" fill="#93C5FD">Your AI Study Buddy</text>
     </svg>
   `;
 
@@ -113,7 +113,7 @@ const NovaLogo: React.FC<NovaLogoProps> = ({
     )}>
       <img
         src={logoUrl}
-        alt="NOVA - Your AI Study Buddy"
+        alt="NOVA AI - Your AI Study Buddy"
         className="w-full h-full object-contain"
       />
     </div>

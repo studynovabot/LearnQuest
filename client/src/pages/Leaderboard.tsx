@@ -29,7 +29,7 @@ const Leaderboard = () => {
 
   const getEntryClass = (rank: number, isCurrentUser: boolean) => {
     if (isCurrentUser) return "bg-primary/10 border border-primary/30";
-    
+
     switch (rank) {
       case 1:
         return "bg-yellow-500/10 border border-yellow-500/30";
@@ -49,7 +49,7 @@ const Leaderboard = () => {
         <meta name="description" content="See the top learners on Study Nova's leaderboard! Compete with others to earn XP and climb the ranks in this gamified learning experience." />
       </Helmet>
 
-      <motion.div 
+      <motion.div
         className="flex flex-col gap-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -63,15 +63,15 @@ const Leaderboard = () => {
           <Card className="overflow-hidden">
             <CardHeader className="bg-card py-6">
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <CardTitle className="text-2xl font-bold">Study Nova Leaderboard</CardTitle>
-                
+                <CardTitle className="text-2xl font-bold">Nova AI Leaderboard</CardTitle>
+
                 <div className="flex items-center gap-1 bg-muted py-2 px-4 rounded-full">
                   <span className="text-muted-foreground">Your Rank:</span>
                   <span className="font-bold text-primary ml-2">#{currentUserRank}</span>
                 </div>
               </div>
             </CardHeader>
-            
+
             <CardContent className="p-6">
               {isLoading ? (
                 <div className="space-y-4">
@@ -98,23 +98,23 @@ const Leaderboard = () => {
                       )}>
                         {entry.rank}
                       </div>
-                      
+
                       <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center overflow-hidden">
                         {entry.avatarUrl ? (
-                          <img 
-                            src={entry.avatarUrl} 
-                            alt={`${entry.displayName} avatar`} 
-                            className="w-full h-full object-cover" 
+                          <img
+                            src={entry.avatarUrl}
+                            alt={`${entry.displayName} avatar`}
+                            className="w-full h-full object-cover"
                           />
                         ) : (
-                          <img 
-                            src={generateAvatar(entry.displayName)} 
-                            alt={`${entry.displayName} avatar`} 
-                            className="w-full h-full object-cover" 
+                          <img
+                            src={generateAvatar(entry.displayName)}
+                            alt={`${entry.displayName} avatar`}
+                            className="w-full h-full object-cover"
                           />
                         )}
                       </div>
-                      
+
                       <div className="flex-grow">
                         <div className="flex items-center gap-3">
                           <h3 className="font-semibold text-lg">{entry.displayName}</h3>
@@ -131,25 +131,25 @@ const Leaderboard = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="text-right">
                         <p className="font-bold text-xl">{entry.xp} XP</p>
                         <div className="progress-bar h-2 w-32 mt-1">
-                          <div 
+                          <div
                             className={cn(
-                              "progress-fill", 
+                              "progress-fill",
                               entry.rank === 1 ? "bg-gradient-to-r from-yellow-500 to-amber-500" :
                               entry.rank === 2 ? "bg-gradient-to-r from-gray-400 to-gray-500" :
                               entry.rank === 3 ? "bg-gradient-to-r from-amber-700 to-amber-800" :
                               ""
-                            )} 
+                            )}
                             style={{ width: `${entry.progress}%` }}
                           ></div>
                         </div>
                       </div>
                     </motion.div>
                   ))}
-                  
+
                   {/* If current user is not in the displayed list, show their entry */}
                   {currentUserEntry && !filteredLeaderboard.some(entry => entry.isCurrentUser) && (
                     <motion.div
@@ -161,23 +161,23 @@ const Leaderboard = () => {
                       <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center font-bold text-white">
                         {currentUserEntry.rank}
                       </div>
-                      
+
                       <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center overflow-hidden">
                         {currentUserEntry.avatarUrl ? (
-                          <img 
-                            src={currentUserEntry.avatarUrl} 
-                            alt="Your avatar" 
-                            className="w-full h-full object-cover" 
+                          <img
+                            src={currentUserEntry.avatarUrl}
+                            alt="Your avatar"
+                            className="w-full h-full object-cover"
                           />
                         ) : (
-                          <img 
-                            src={generateAvatar(currentUserEntry.displayName)} 
-                            alt="Your avatar" 
-                            className="w-full h-full object-cover" 
+                          <img
+                            src={generateAvatar(currentUserEntry.displayName)}
+                            alt="Your avatar"
+                            className="w-full h-full object-cover"
                           />
                         )}
                       </div>
-                      
+
                       <div className="flex-grow">
                         <h3 className="font-semibold text-lg">You ({currentUserEntry.displayName})</h3>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -187,12 +187,12 @@ const Leaderboard = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="text-right">
                         <p className="font-bold text-xl">{currentUserEntry.xp} XP</p>
                         <div className="progress-bar h-2 w-32 mt-1">
-                          <div 
-                            className="progress-fill" 
+                          <div
+                            className="progress-fill"
                             style={{ width: `${currentUserEntry.progress}%` }}
                           ></div>
                         </div>
@@ -201,7 +201,7 @@ const Leaderboard = () => {
                   )}
                 </div>
               )}
-              
+
               <div className="mt-8 text-center text-sm text-muted-foreground">
                 <p>Monthly leaderboard resets on the 1st of each month</p>
                 <p className="mt-1">Top 3 users will receive a 7-day pro trial</p>

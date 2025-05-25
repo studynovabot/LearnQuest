@@ -17,8 +17,8 @@ const Dashboard = () => {
   return (
     <>
       <Helmet>
-        <title>Dashboard | Study Nova - Gamified Learning Platform</title>
-        <meta name="description" content="Track your learning progress, complete tasks, and interact with AI tutors on the Study Nova gamified learning platform." />
+        <title>Dashboard | Nova AI - Your AI Study Buddy</title>
+        <meta name="description" content="Track your learning progress, complete tasks, and interact with AI tutors on the Nova AI gamified learning platform." />
       </Helmet>
 
       <motion.div

@@ -27,8 +27,8 @@ const Login = () => {
   return (
     <>
       <Helmet>
-        <title>Login | Study Nova</title>
-        <meta name="description" content="Log in to your Study Nova account to continue your learning journey." />
+        <title>Login | Nova AI</title>
+        <meta name="description" content="Log in to your Nova AI account to continue your learning journey." />
       </Helmet>
 
       <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-background/80">
@@ -46,7 +46,7 @@ const Login = () => {
               <div className="space-y-1">
                 <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
                 <CardDescription>
-                  Enter your credentials to access your Study Nova account
+                  Enter your credentials to access your Nova AI account
                 </CardDescription>
               </div>
             </CardHeader>

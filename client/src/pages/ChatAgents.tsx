@@ -162,14 +162,14 @@ const ChatAgents = () => {
   return (
     <>
       <Helmet>
-        <title>AI Tutors | Study Nova - Gamified Learning Platform</title>
+        <title>AI Tutors | Nova AI - Your AI Study Buddy</title>
         <meta name="description" content="Chat with specialized AI tutors for different subjects. Get help with math, languages, sciences and more through our AI-powered learning assistants." />
       </Helmet>
 
       <div className="flex flex-col gap-6">
         <Card className="overflow-hidden">
           <CardHeader className="bg-card">
-            <CardTitle className="text-2xl font-bold">Study Nova AI Tutors</CardTitle>
+            <CardTitle className="text-2xl font-bold">Nova AI Tutors</CardTitle>
           </CardHeader>
 
           <CardContent className="p-0">

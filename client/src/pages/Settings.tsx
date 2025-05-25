@@ -58,8 +58,8 @@ const Settings = () => {
   return (
     <>
       <Helmet>
-        <title>Settings | Study Nova - Gamified Learning Platform</title>
-        <meta name="description" content="Manage your profile settings and preferences on Study Nova." />
+        <title>Settings | Nova AI - Your AI Study Buddy</title>
+        <meta name="description" content="Manage your profile settings and preferences on Nova AI." />
       </Helmet>
 
       <motion.div

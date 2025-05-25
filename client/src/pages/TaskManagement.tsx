@@ -172,7 +172,7 @@ const TaskManagement = () => {
   return (
     <>
       <Helmet>
-        <title>Task Management | Study Nova - Gamified Learning Platform</title>
+        <title>Task Management | Nova AI - Your AI Study Buddy</title>
         <meta name="description" content="Manage your learning tasks, track progress, and earn XP rewards as you complete tasks in this gamified learning experience." />
       </Helmet>
 
@@ -186,7 +186,7 @@ const TaskManagement = () => {
           <CardHeader className="bg-card py-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div>
-                <CardTitle className="text-2xl font-bold">Study Nova Tasks</CardTitle>
+                <CardTitle className="text-2xl font-bold">Nova AI Tasks</CardTitle>
                 <CardDescription className="mt-2">
                   Track and manage your learning tasks to earn XP
                 </CardDescription>
