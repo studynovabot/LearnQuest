@@ -18,7 +18,7 @@ export async function verifyAdminAccess(req) {
     const userEmail = req.headers['x-user-email'];
 
     if (!userId && !userEmail) {
-      return { isAdmin: false, error: 'No user credentials provided' };
+      return { isAdmin: false, user: null, error: 'No user credentials provided' };
     }
 
     let user = null;
@@ -45,7 +45,7 @@ export async function verifyAdminAccess(req) {
     }
 
     if (!user) {
-      return { isAdmin: false, error: 'User not found' };
+      return { isAdmin: false, user: null, error: 'User not found' };
     }
 
     // Check if user is admin by email or role
@@ -69,7 +69,7 @@ export async function verifyAdminAccess(req) {
 
   } catch (error) {
     console.error('Admin verification error:', error);
-    return { isAdmin: false, error: error.message };
+    return { isAdmin: false, user: null, error: error.message };
   }
 }
 
@@ -92,12 +92,21 @@ export function requireAdmin(handler) {
 
 export function optionalAdmin(handler) {
   return async (req, res) => {
-    const { isAdmin, user } = await verifyAdminAccess(req);
+    try {
+      const { isAdmin, user } = await verifyAdminAccess(req);
 
-    // Add admin status to request
-    req.isAdmin = isAdmin;
-    req.adminUser = isAdmin ? user : null;
+      // Add admin status to request
+      req.isAdmin = isAdmin;
+      req.adminUser = isAdmin ? user : null;
 
-    return handler(req, res);
+      return handler(req, res);
+    } catch (error) {
+      // If admin verification fails, continue as non-admin user
+      console.warn('Admin verification failed, continuing as non-admin:', error.message);
+      req.isAdmin = false;
+      req.adminUser = null;
+
+      return handler(req, res);
+    }
   };
 }

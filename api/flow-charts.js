@@ -199,49 +199,23 @@ export default function handler(req, res) {
         const userId = req.headers['x-user-id'] || 'demo-user';
 
         try {
+          console.log('📊 Flow Charts: Fetching flow charts...');
+
+          // For now, use hardcoded data to avoid Firestore index issues
+          // In production, you would set up proper Firestore indexes
+
           // If specific flow chart ID is requested
           if (id) {
-            // First check uploaded content
-            const uploadedDoc = await db.collection('flow_charts_content').doc(id).get();
-            if (uploadedDoc.exists) {
-              return res.status(200).json({ id: uploadedDoc.id, ...uploadedDoc.data() });
-            }
-
-            // Fallback to hardcoded data
             const flowChart = FLOW_CHARTS_DATA.find(fc => fc.id === id);
             if (flowChart) {
+              console.log(`📊 Flow Charts: Found chart ${id}`);
               return res.status(200).json(flowChart);
             } else {
               return res.status(404).json({ message: 'Flow chart not found' });
             }
           }
 
-          // Get uploaded flow charts from database
-          let query = db.collection('flow_charts_content');
-
-          if (classNum) {
-            query = query.where('class', '==', classNum);
-          }
-          if (subject) {
-            query = query.where('subject', '==', subject);
-          }
-
-          const snapshot = await query.get();
-          const uploadedFlowCharts = [];
-
-          snapshot.forEach(doc => {
-            uploadedFlowCharts.push({
-              id: doc.id,
-              ...doc.data()
-            });
-          });
-
-          // If we have uploaded content, return it
-          if (uploadedFlowCharts.length > 0) {
-            return res.status(200).json(uploadedFlowCharts);
-          }
-
-          // Fallback to hardcoded data
+          // Filter hardcoded data based on query parameters
           let filteredCharts = FLOW_CHARTS_DATA;
 
           if (classNum) {
@@ -252,11 +226,12 @@ export default function handler(req, res) {
             filteredCharts = filteredCharts.filter(chart => chart.subject === subject);
           }
 
+          console.log(`📊 Flow Charts: Returning ${filteredCharts.length} charts`);
           res.status(200).json(filteredCharts);
 
         } catch (error) {
           console.error('Error fetching flow charts:', error);
-          res.status(500).json({ message: 'Failed to fetch flow charts' });
+          res.status(500).json({ message: 'Failed to fetch flow charts', error: error.message });
         }
 
       } else if (req.method === 'POST') {

@@ -1,50 +1,54 @@
 // Test AI agents functionality
-const https = require('https');
+const http = require('http');
 
 console.log('🤖 AI AGENTS FUNCTIONALITY TEST');
 console.log('===============================');
 
-const BACKEND_URL = 'learnquest.onrender.com';
+const BACKEND_URL = 'localhost';
 
-function testAIAgent(endpoint, prompt, description) {
+function testAIAgent(endpoint, prompt, description, agentId) {
   return new Promise((resolve) => {
     console.log(`🤖 Testing: ${description}`);
     console.log(`   Endpoint: ${endpoint}`);
     console.log(`   Prompt: "${prompt}"`);
-    
+    console.log(`   Agent ID: ${agentId}`);
+
     const postData = JSON.stringify({
-      message: prompt,
+      content: prompt,
+      agentId: agentId,
       userId: 'test_user_123'
     });
-    
+
     const options = {
       hostname: BACKEND_URL,
-      port: 443,
+      port: 5000,
       path: endpoint,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Origin': 'https://learn-quest-eight.vercel.app',
         'Content-Length': Buffer.byteLength(postData)
       },
       timeout: 30000
     };
 
-    const req = https.request(options, (res) => {
+    const req = http.request(options, (res) => {
       console.log(`   Status: ${res.statusCode}`);
       console.log(`   CORS: ${res.headers['access-control-allow-origin'] || 'Missing'}`);
-      
+
       let data = '';
       res.on('data', (chunk) => {
         data += chunk;
       });
-      
+
       res.on('end', () => {
         try {
           const json = JSON.parse(data);
-          if (json.response || json.message) {
-            console.log(`   ✅ AI Response: ${(json.response || json.message).substring(0, 100)}...`);
+          if (json.content) {
+            console.log(`   ✅ AI Response: ${json.content.substring(0, 100)}...`);
             console.log(`   ✅ ${description} is working!`);
+            if (json.xpAwarded) {
+              console.log(`   🎯 XP Awarded: ${json.xpAwarded}`);
+            }
           } else {
             console.log(`   ⚠️  Unexpected response format:`, json);
           }
@@ -80,42 +84,107 @@ function testAIAgent(endpoint, prompt, description) {
 
 async function testAllAIAgents() {
   console.log('🚀 Testing AI Agents...\n');
-  
-  // Test different AI agents with sample prompts
+
+  // Test all 15 AI agents with sample prompts using correct endpoint
   const tests = [
     {
-      endpoint: '/api/chat/nova',
+      endpoint: '/api/chat',
       prompt: 'Hello, can you help me with my studies?',
+      agentId: '1',
       description: 'Nova Chat Agent'
     },
     {
-      endpoint: '/api/tutors/math',
+      endpoint: '/api/chat',
       prompt: 'Explain quadratic equations',
-      description: 'Math Tutor'
+      agentId: '2',
+      description: 'Math Mentor'
     },
     {
-      endpoint: '/api/tutors/science',
+      endpoint: '/api/chat',
       prompt: 'What is photosynthesis?',
-      description: 'Science Tutor'
+      agentId: '3',
+      description: 'Science Sage'
     },
     {
-      endpoint: '/api/tutors/english',
+      endpoint: '/api/chat',
       prompt: 'Help me with grammar',
-      description: 'English Tutor'
+      agentId: '4',
+      description: 'Language Linguist'
     },
     {
-      endpoint: '/api/tutors/history',
+      endpoint: '/api/chat',
       prompt: 'Tell me about World War 2',
-      description: 'History Tutor'
+      agentId: '5',
+      description: 'History Helper'
+    },
+    {
+      endpoint: '/api/chat',
+      prompt: 'What are the continents?',
+      agentId: '6',
+      description: 'Geography Guide'
+    },
+    {
+      endpoint: '/api/chat',
+      prompt: 'Explain chemical bonds',
+      agentId: '7',
+      description: 'Chemistry Coach'
+    },
+    {
+      endpoint: '/api/chat',
+      prompt: 'What is gravity?',
+      agentId: '8',
+      description: 'Physics Professor'
+    },
+    {
+      endpoint: '/api/chat',
+      prompt: 'Explain cell division',
+      agentId: '9',
+      description: 'Biology Buddy'
+    },
+    {
+      endpoint: '/api/chat',
+      prompt: 'Help me with essay writing',
+      agentId: '10',
+      description: 'Writing Wizard'
+    },
+    {
+      endpoint: '/api/chat',
+      prompt: 'What is economics?',
+      agentId: '11',
+      description: 'Economics Expert'
+    },
+    {
+      endpoint: '/api/chat',
+      prompt: 'Explain programming basics',
+      agentId: '12',
+      description: 'Code Companion'
+    },
+    {
+      endpoint: '/api/chat',
+      prompt: 'Help me with art techniques',
+      agentId: '13',
+      description: 'Art Advisor'
+    },
+    {
+      endpoint: '/api/chat',
+      prompt: 'I need motivation to study',
+      agentId: '14',
+      description: 'Motivational Mentor'
+    },
+    {
+      endpoint: '/api/chat',
+      prompt: 'Create a study plan for me',
+      agentId: '15',
+      description: 'Study Strategist'
     }
   ];
-  
+
   for (const test of tests) {
-    await testAIAgent(test.endpoint, test.prompt, test.description);
+    await testAIAgent(test.endpoint, test.prompt, test.description, test.agentId);
     // Small delay between tests
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
-  
+
   console.log('🎯 AI AGENTS TEST SUMMARY');
   console.log('========================');
   console.log('If you see ✅ AI Response messages, the agents are working.');

@@ -26,70 +26,61 @@ async function generateAIResponse(content, agentId) {
   const agent = agentId || '1';
   const systemPrompt = AGENT_PROMPTS[agent] || AGENT_PROMPTS['1'];
 
+  console.log(`🚀 generateAIResponse called for agent ${agent} with content: "${content}"`);
+
   try {
     // Use your provided API keys
     const groqApiKey = process.env.GROQ_API_KEY || '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';
     const togetherApiKey = process.env.TOGETHER_API_KEY || '386f94fa38882002186da7d11fa278a2b0b729dcda437ef07b8b0f14e1fc2ee7';
 
-    // Nova (Agent 1) uses Groq with llama-3.1-8b-instant
-    if (agent === '1' && groqApiKey) {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${groqApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: content }
-          ],
-          max_tokens: 500,
-          temperature: 0.7,
-          stream: false
-        })
-      });
+    console.log(`🔑 API Keys available - Groq: ${groqApiKey ? 'Yes' : 'No'}, Together: ${togetherApiKey ? 'Yes' : 'No'}`);
 
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          content: data.choices[0].message.content,
-          xpAwarded: Math.floor(Math.random() * 10) + 15 // 15-25 XP for AI responses
-        };
+    // All agents use Groq with llama-3.1-8b-instant (temporary fix until Together AI key is valid)
+    if (groqApiKey) {
+      console.log(`🤖 Calling Groq API for agent ${agent}...`);
+      try {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${groqApiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'llama-3.1-8b-instant',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: content }
+            ],
+            max_tokens: 500,
+            temperature: 0.7,
+            stream: false
+          })
+        });
+
+        console.log(`📡 Groq API response status: ${response.status}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`✅ Groq API success for agent ${agent}`);
+          return {
+            content: data.choices[0].message.content,
+            xpAwarded: Math.floor(Math.random() * 10) + 15 // 15-25 XP for AI responses
+          };
+        } else {
+          const errorText = await response.text();
+          console.error(`❌ Groq API error: ${response.status} - ${errorText}`);
+        }
+      } catch (fetchError) {
+        console.error(`❌ Groq API fetch error:`, fetchError);
       }
     }
 
-    // All other agents (2-15) use Together AI
-    if (togetherApiKey) {
-      const model = agent === '1' ? 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free' : 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free';
-
-      const response = await fetch('https://api.together.xyz/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${togetherApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: content }
-          ],
-          max_tokens: 500,
-          temperature: 0.7,
-          stream: false
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          content: data.choices[0].message.content,
-          xpAwarded: Math.floor(Math.random() * 10) + 15 // 15-25 XP for AI responses
-        };
-      }
-    }
+    // Together AI section temporarily disabled - using Groq for all agents
+    // if (togetherApiKey) {
+    //   const model = agent === '1' ? 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free' : 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free';
+    //   console.log(`🤖 Calling Together AI for agent ${agent} with model ${model}...`);
+    //   // ... Together AI code commented out
+    // }
   } catch (error) {
     console.error(`AI API error for agent ${agent}:`, error);
   }
