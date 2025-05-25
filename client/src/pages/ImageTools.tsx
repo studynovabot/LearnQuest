@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,11 @@ const ImageTools = () => {
   const [textPrompt, setTextPrompt] = useState('');
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Debug log for generatedImage state changes
+  React.useEffect(() => {
+    console.log('generatedImage state changed to:', generatedImage);
+  }, [generatedImage]);
 
   // Image to Text states
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -63,16 +68,21 @@ const ImageTools = () => {
 
         // Validate the imageUrl before setting it
         if (data.imageUrl && typeof data.imageUrl === 'string' && data.imageUrl.startsWith('http')) {
+          console.log('Setting generated image to:', data.imageUrl);
           setGeneratedImage(data.imageUrl);
+          console.log('Generated image state should now be:', data.imageUrl);
           toast({
             title: "Image Generated! 🎨",
             description: "Your image has been successfully generated.",
           });
         } else {
           console.error('Invalid imageUrl received:', data.imageUrl);
+          console.log('imageUrl type:', typeof data.imageUrl);
+          console.log('imageUrl starts with http:', data.imageUrl?.startsWith('http'));
           throw new Error('Invalid image URL received from server');
         }
       } else {
+        console.error('Response not ok:', response.status, response.statusText);
         throw new Error('Failed to generate image');
       }
     } catch (error) {
@@ -289,13 +299,19 @@ const ImageTools = () => {
                     className="mt-6"
                   >
                     <h3 className="font-semibold mb-3">Generated Image:</h3>
-                    <div className="border rounded-lg overflow-hidden">
+                    <div className="border rounded-lg overflow-hidden bg-white p-4">
                       <img
                         src={generatedImage}
                         alt="Generated"
                         className="w-full max-w-md mx-auto block"
+                        onLoad={() => console.log('Image loaded successfully:', generatedImage)}
+                        onError={(e) => console.error('Image failed to load:', e, generatedImage)}
+                        style={{ minHeight: '200px', backgroundColor: '#f3f4f6' }}
                       />
                     </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Image URL: {generatedImage}
+                    </p>
                   </motion.div>
                 )}
               </CardContent>
