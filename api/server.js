@@ -3,6 +3,7 @@ import cors from 'cors';
 import path from 'path';
 
 // Import route handlers
+import authHandler from './auth.js';
 import chatHandler from './chat.js';
 import tutorsHandler from './tutors.js';
 import tasksHandler from './tasks.js';
@@ -26,12 +27,8 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
 // Route handlers
+app.all('/api/auth*', (req, res) => authHandler(req, res));
 app.all('/api/chat', (req, res) => chatHandler(req, res));
 app.all('/api/tutors', (req, res) => tutorsHandler(req, res));
 app.all('/api/tasks', (req, res) => tasksHandler(req, res));
