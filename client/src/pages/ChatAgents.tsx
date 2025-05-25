@@ -100,27 +100,11 @@ const ChatAgents = () => {
   };
 
   const handleUnlockAgent = async (agent: AITutor) => {
-    if (!user || (agent.xpRequired && user.xp < agent.xpRequired)) {
-      toast({
-        title: "Cannot Unlock Agent",
-        description: `You need ${agent.xpRequired} XP to unlock this agent.`,
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setUnlockingId(agent.id);
-    try {
-      // unlockAgent is not available, so just show a success toast for now
-      toast({
-        title: "Agent Unlocked!",
-        description: `You've successfully unlocked the ${agent.name} agent.`
-      });
-    } catch (error) {
-      console.error("Failed to unlock agent:", error);
-    } finally {
-      setUnlockingId(null);
-    }
+    // All agents are unlocked by default now
+    toast({
+      title: "Agent Available!",
+      description: `${agent.name} is ready to help you.`
+    });
   };
 
   const getAgentIcon = (iconName?: string, size = 24) => {
@@ -288,13 +272,13 @@ const ChatAgents = () => {
                             </div>
                             <div className="flex-grow">
                               <p className="font-medium">{agent.name}</p>
-                              <p className="text-xs text-muted-foreground">{agent.xpRequired} XP required</p>
+                              <p className="text-xs text-muted-foreground">Available soon</p>
                             </div>
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleUnlockAgent(agent)}
-                              disabled={unlockingId === agent.id || (user && agent.xpRequired ? user.xp < agent.xpRequired : false)}
+                              disabled={unlockingId === agent.id}
                             >
                               {unlockingId === agent.id ? (
                                 <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-current animate-spin" />
@@ -380,19 +364,11 @@ const ChatAgents = () => {
                                 )}
                               >
                                 {message.role === "user" ? (
-                                  user?.avatarUrl ? (
-                                    <img
-                                      src={user.avatarUrl}
-                                      alt="User avatar"
-                                      className="w-full h-full rounded-full object-cover"
-                                    />
-                                  ) : (
-                                    <img
-                                      src={generateAvatar(user?.displayName || "User")}
-                                      alt="User avatar"
-                                      className="w-full h-full rounded-full object-cover"
-                                    />
-                                  )
+                                  <img
+                                    src={generateAvatar(user?.displayName || "User")}
+                                    alt="User avatar"
+                                    className="w-full h-full rounded-full object-cover"
+                                  />
                                 ) : (
                                   getAgentIcon(activeAgent.iconName, 16)
                                 )}
@@ -419,20 +395,7 @@ const ChatAgents = () => {
                                   )}
                                 </div>
 
-                                {/* XP Award Indicator */}
-                                {message.xpAwarded && message.xpAwarded > 0 && (
-                                  <motion.div
-                                    className="absolute -top-4 -right-4 bg-secondary rounded-lg px-2 py-1 text-xs font-bold flex items-center gap-1 xp-gained"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.3 }}
-                                  >
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M12 8L15 13.2L19 14.1L15.5 18.2L16.5 22L12 20.2L7.5 22L8.5 18.2L5 14.1L9 13.2L12 8Z" fill="currentColor" />
-                                    </svg>
-                                    <span>+{message.xpAwarded} XP</span>
-                                  </motion.div>
-                                )}
+
                               </div>
                             </motion.div>
                           ))}

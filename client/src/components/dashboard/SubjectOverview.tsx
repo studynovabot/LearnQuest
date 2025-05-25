@@ -2,11 +2,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn, getStatusColor } from "@/lib/utils";
 import { Subject } from "@/types";
-import { useXp } from "@/hooks/useXp";
+import { useUserContext } from "@/context/UserContext";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const SubjectOverview = () => {
-  const { subjects, isLoading } = useXp();
+  const { user } = useUserContext();
+
+  // Mock subjects data for now
+  const subjects: Subject[] = [
+    { id: 1, name: "Mathematics", progress: 75, status: "good" },
+    { id: 2, name: "Science", progress: 60, status: "average" },
+    { id: 3, name: "English", progress: 85, status: "excellent" },
+    { id: 4, name: "History", progress: 45, status: "needs_improvement" },
+  ];
+  const isLoading = false;
 
   const getStatusText = (status: string): string => {
     if (!status) return 'Unknown';

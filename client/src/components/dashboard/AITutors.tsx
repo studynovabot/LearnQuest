@@ -139,7 +139,7 @@ const AITutors = () => {
                 <LockIcon size={32} />
               </div>
               <span className="font-medium text-center">{agent.name}</span>
-              <span className="text-xs text-muted-foreground mt-1">{agent.xpRequired} XP</span>
+              <span className="text-xs text-muted-foreground mt-1">Available</span>
               <Button
                 variant="outline"
                 size="sm"

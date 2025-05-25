@@ -21,8 +21,8 @@ export function useChat() {
 
   // Separate tutors into unlocked and locked
   const tutorsArray = Array.isArray(tutors) ? tutors : [];
-  const unlockedAgents = tutorsArray.filter(tutor => tutor.unlocked);
-  const lockedAgents = tutorsArray.filter(tutor => !tutor.unlocked);
+  const unlockedAgents = tutorsArray; // All tutors are available now
+  const lockedAgents: AITutor[] = []; // No locked tutors
 
   // Set the first agent as active by default if none is selected
   useEffect(() => {

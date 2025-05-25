@@ -163,16 +163,12 @@ const Settings = () => {
                 <p className="text-sm text-muted-foreground">{user?.email}</p>
               </div>
               <div>
-                <Label className="text-sm font-medium">XP Points</Label>
-                <p className="text-sm text-muted-foreground">{user?.xp || 0}</p>
+                <Label className="text-sm font-medium">Account Type</Label>
+                <p className="text-sm text-muted-foreground">{user?.isPro ? 'Pro' : 'Free'}</p>
               </div>
               <div>
-                <Label className="text-sm font-medium">Level</Label>
-                <p className="text-sm text-muted-foreground">{user?.level || 1}</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium">Streak</Label>
-                <p className="text-sm text-muted-foreground">{user?.streak || 0} days</p>
+                <Label className="text-sm font-medium">Role</Label>
+                <p className="text-sm text-muted-foreground">{user?.role || 'user'}</p>
               </div>
             </div>
           </CardContent>
