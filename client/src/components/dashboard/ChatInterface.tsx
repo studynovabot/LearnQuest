@@ -111,7 +111,7 @@ const ChatInterface = () => {
             />
             <Button
               type="submit"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 w-9 h-9 bg-primary rounded-lg flex items-center justify-center p-0"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-primary rounded-lg flex items-center justify-center p-0 touch-manipulation"
               disabled={isSending || !inputMessage.trim()}
             >
               {isSending ? (
@@ -139,7 +139,11 @@ const ChatInterface = () => {
       <CardContent>
         <div
           className="bg-background rounded-xl p-4 mb-4 overflow-y-auto flex flex-col gap-4"
-          style={{ minHeight: "400px", maxHeight: "500px" }}
+          style={{
+            minHeight: "300px",
+            maxHeight: "500px",
+            height: "calc(100vh - 400px)"
+          }}
         >
           {recentMessages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
@@ -230,7 +234,7 @@ const ChatInterface = () => {
           />
           <Button
             type="submit"
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 w-9 h-9 bg-primary rounded-lg flex items-center justify-center p-0"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-primary rounded-lg flex items-center justify-center p-0 touch-manipulation"
             disabled={isSending || !inputMessage.trim()}
           >
             {isSending ? (

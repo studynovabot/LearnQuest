@@ -176,9 +176,9 @@ const ChatAgents = () => {
             <div className="p-4">
               <FirebaseStatus />
             </div>
-            <div className="flex flex-col md:flex-row h-[calc(100vh-12rem)]">
-                {/* Sidebar with Agents - Fixed width */}
-                <div className="w-full md:w-80 lg:w-80 flex-shrink-0 border-r border-border p-4 overflow-y-auto">
+            <div className="flex flex-col md:flex-row h-[calc(100vh-12rem)] min-h-[500px]">
+                {/* Sidebar with Agents - Responsive width */}
+                <div className="w-full md:w-80 lg:w-80 flex-shrink-0 border-r md:border-r border-b md:border-b-0 border-border p-4 overflow-y-auto max-h-[200px] md:max-h-none">
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-4">Your Tutors</h3>
                     <div className="space-y-2">

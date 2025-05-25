@@ -111,6 +111,30 @@
     @apply text-blue-500 scale-110;
   }
 
+  /* Mobile-specific improvements */
+  @media (max-width: 768px) {
+    .nav-icon {
+      @apply touch-manipulation;
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .touch-manipulation {
+      touch-action: manipulation;
+    }
+
+    /* Improve mobile chat interface */
+    .mobile-chat-container {
+      height: calc(100vh - 200px);
+      min-height: 400px;
+    }
+
+    /* Better mobile input */
+    input[type="text"], textarea {
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+  }
+
   .xp-gained {
     animation: fadeUp 1s ease forwards;
   }

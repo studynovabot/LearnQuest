@@ -25,7 +25,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { icon: MessageIcon, label: "Chat", path: "/chat", active: location === "/chat" },
     { icon: TrophyIcon, label: "Tasks", path: "/tasks", active: location === "/tasks" },
     { icon: StoreIcon, label: "Store", path: "/store", active: location === "/store" },
-    { icon: CreditCardIcon, label: "Plans", path: "/subscription", active: location === "/subscription" },
+    { icon: SettingsIcon, label: "Settings", path: "/settings", active: location === "/settings" },
   ];
 
   // Check if user is logged in
@@ -83,14 +83,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       </div>
 
       {/* Mobile bottom navigation */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border p-2 z-10">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border p-3 z-10">
         <div className="flex justify-around items-center">
           {mobileNavItems.map((item, index) => (
             <Link key={index} href={item.path}>
-              <button className="nav-icon flex flex-col items-center">
+              <button className="nav-icon flex flex-col items-center p-2 min-w-[48px] min-h-[48px] justify-center">
                 <item.icon
                   className={cn("text-xl", item.active ? "text-secondary" : "")}
-                  size={24}
+                  size={22}
                 />
                 <span className={cn("text-xs mt-1", item.active ? "text-secondary" : "")}>{item.label}</span>
               </button>
