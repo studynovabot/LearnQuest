@@ -15,18 +15,18 @@ const ImageTools = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Text to Image states
   const [textPrompt, setTextPrompt] = useState('');
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  
+
   // Image to Text states
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [extractedText, setExtractedText] = useState('');
   const [aiExplanation, setAiExplanation] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  
+
   // Image to Image states
   const [sourceImage, setSourceImage] = useState<string | null>(null);
   const [imagePrompt, setImagePrompt] = useState('');
@@ -49,7 +49,7 @@ const ImageTools = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': user?.uid || 'demo-user'
+          'x-user-id': user?.id || 'demo-user'
         },
         body: JSON.stringify({
           prompt: textPrompt,
@@ -112,7 +112,7 @@ const ImageTools = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': user?.uid || 'demo-user'
+          'x-user-id': user?.id || 'demo-user'
         },
         body: JSON.stringify({
           imageData: uploadedImage,
@@ -161,7 +161,7 @@ const ImageTools = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': user?.uid || 'demo-user'
+          'x-user-id': user?.id || 'demo-user'
         },
         body: JSON.stringify({
           sourceImage: sourceImage,
@@ -248,7 +248,7 @@ const ImageTools = () => {
                   />
                 </div>
 
-                <Button 
+                <Button
                   onClick={handleTextToImage}
                   disabled={isGenerating || !textPrompt.trim()}
                   className="w-full"
@@ -274,9 +274,9 @@ const ImageTools = () => {
                   >
                     <h3 className="font-semibold mb-3">Generated Image:</h3>
                     <div className="border rounded-lg overflow-hidden">
-                      <img 
-                        src={generatedImage} 
-                        alt="Generated" 
+                      <img
+                        src={generatedImage}
+                        alt="Generated"
                         className="w-full max-w-md mx-auto block"
                       />
                     </div>
@@ -303,7 +303,7 @@ const ImageTools = () => {
                   <label className="text-sm font-medium mb-2 block">
                     Upload an image:
                   </label>
-                  <div 
+                  <div
                     className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
                     onClick={() => fileInputRef.current?.click()}
                   >
@@ -325,7 +325,7 @@ const ImageTools = () => {
                   />
                 </div>
 
-                <Button 
+                <Button
                   onClick={handleImageToText}
                   disabled={isProcessing || !uploadedImage}
                   className="w-full"
@@ -387,7 +387,7 @@ const ImageTools = () => {
                   <label className="text-sm font-medium mb-2 block">
                     Upload source image:
                   </label>
-                  <div 
+                  <div
                     className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
                     onClick={() => {
                       const input = document.createElement('input');
@@ -420,7 +420,7 @@ const ImageTools = () => {
                   />
                 </div>
 
-                <Button 
+                <Button
                   onClick={handleImageToImage}
                   disabled={isTransforming || !sourceImage || !imagePrompt.trim()}
                   className="w-full"

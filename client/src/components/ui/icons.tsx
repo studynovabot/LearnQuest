@@ -885,24 +885,6 @@ export const CalculatorIcon: React.FC<IconProps> = ({ size = 24, ...props }) => 
   </svg>
 );
 
-export const CreditCardIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <rect width="20" height="14" x="2" y="5" rx="2" />
-    <line x1="2" x2="22" y1="10" y2="10" />
-  </svg>
-);
-
 export const ZapIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -1052,7 +1034,7 @@ export const LeafIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   </svg>
 );
 
-export const BrainIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+export const DownloadIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
@@ -1065,33 +1047,9 @@ export const BrainIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
     strokeLinejoin="round"
     {...props}
   >
-    <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" />
-    <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" />
-    <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" />
-    <path d="M17.599 6.5a3 3 0 0 0 .399-1.375" />
-    <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5" />
-    <path d="M3.477 10.896a4 4 0 0 1 .585-.396" />
-    <path d="M19.938 10.5a4 4 0 0 1 .585.396" />
-    <path d="M6 18a4 4 0 0 1-1.967-.516" />
-    <path d="M19.967 17.484A4 4 0 0 1 18 18" />
-  </svg>
-);
-
-export const TrendingUpIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-    <polyline points="16 7 22 7 22 13" />
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
   </svg>
 );
 
@@ -1134,44 +1092,7 @@ export const FlexIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   </svg>
 );
 
-export const BookOpenIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-  </svg>
-);
 
-export const SparklesIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
-    <path d="M20 3v4" />
-    <path d="M22 5h-4" />
-    <path d="M4 17v2" />
-    <path d="M5 18H3" />
-  </svg>
-);
 
 export const LanguagesIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   <svg

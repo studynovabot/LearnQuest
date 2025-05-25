@@ -131,7 +131,7 @@ const PersonalizedAgent = () => {
     setRecommendations(sampleRecommendations);
     setInsights(sampleInsights);
     setOverallProgress(72);
-    
+
     // Add welcome message
     setChatHistory([
       {
@@ -162,12 +162,12 @@ const PersonalizedAgent = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': user?.uid || 'demo-user'
+          'x-user-id': user?.id || 'demo-user'
         },
         body: JSON.stringify({
           content: message,
           agentId: '15', // PersonalAI agent
-          userId: user?.uid || 'demo-user',
+          userId: user?.id || 'demo-user',
           context: {
             weakAreas,
             recommendations,
@@ -292,8 +292,8 @@ const PersonalizedAgent = () => {
                       >
                         <div className={`
                           max-w-[80%] p-3 rounded-lg
-                          ${msg.role === 'user' ? 
-                            'bg-primary text-primary-foreground' : 
+                          ${msg.role === 'user' ?
+                            'bg-primary text-primary-foreground' :
                             'bg-card border'}
                         `}>
                           <p className="text-sm">{msg.content}</p>

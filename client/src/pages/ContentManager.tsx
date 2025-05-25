@@ -52,7 +52,7 @@ const ContentManager = () => {
     try {
       const response = await fetch('/api/content-manager', {
         headers: {
-          'x-user-id': user?.uid || 'admin'
+          'x-user-id': user?.id || 'admin'
         }
       });
       if (response.ok) {
@@ -100,7 +100,7 @@ const ContentManager = () => {
       }
 
       const xhr = new XMLHttpRequest();
-      
+
       xhr.upload.addEventListener('progress', (e) => {
         if (e.lengthComputable) {
           const progress = (e.loaded / e.total) * 100;
@@ -134,7 +134,7 @@ const ContentManager = () => {
       });
 
       xhr.open('POST', '/api/content-manager/upload');
-      xhr.setRequestHeader('x-user-id', user?.uid || 'admin');
+      xhr.setRequestHeader('x-user-id', user?.id || 'admin');
       xhr.send(formData);
 
     } catch (error) {
@@ -154,7 +154,7 @@ const ContentManager = () => {
       const response = await fetch(`/api/content-manager/${contentId}`, {
         method: 'DELETE',
         headers: {
-          'x-user-id': user?.uid || 'admin'
+          'x-user-id': user?.id || 'admin'
         }
       });
 
@@ -328,7 +328,7 @@ const ContentManager = () => {
                         disabled={uploading || !selectedType || !selectedClass || !selectedSubject}
                       />
                       <label htmlFor="file-upload">
-                        <Button 
+                        <Button
                           asChild
                           disabled={uploading || !selectedType || !selectedClass || !selectedSubject}
                         >
@@ -428,7 +428,7 @@ const ContentManager = () => {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-2">
                             {getStatusIcon(file.status)}
@@ -436,7 +436,7 @@ const ContentManager = () => {
                               {file.status}
                             </Badge>
                           </div>
-                          
+
                           <div className="flex gap-2">
                             {file.downloadUrl && (
                               <Button size="sm" variant="outline" asChild>
@@ -445,8 +445,8 @@ const ContentManager = () => {
                                 </a>
                               </Button>
                             )}
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               variant="destructive"
                               onClick={() => handleDelete(file.id)}
                             >
