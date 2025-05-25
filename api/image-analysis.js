@@ -2,19 +2,136 @@
 import { handleCors } from './_utils/cors.js';
 import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
 
-// Simple OCR simulation function (in production, use Google Vision API or similar)
-function simulateOCR(imageData) {
-  // This is a simulation - in production you would use actual OCR services
-  const sampleTexts = [
-    "Solve for x: 2x + 5 = 15",
-    "What is photosynthesis?",
-    "The capital of France is Paris.",
-    "Calculate the area of a circle with radius 5 cm.",
-    "Explain the water cycle process.",
-    "Find the derivative of f(x) = x² + 3x + 2"
-  ];
-  
-  return sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
+// Real OCR function using OCR.space API
+async function performOCR(imageData) {
+  try {
+    // Use OCR.space API as primary OCR service
+    const ocrApiKey = process.env.OCR_SPACE_API_KEY || 'K85411479688957';
+
+    console.log('Using OCR.space API for text extraction...');
+
+    // Convert base64 to proper format for OCR.space
+    const base64Image = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
+
+    // Create form data manually for Node.js environment
+    const boundary = '----formdata-boundary-' + Math.random().toString(36);
+    let formData = '';
+
+    formData += `--${boundary}\r\n`;
+    formData += `Content-Disposition: form-data; name="base64Image"\r\n\r\n`;
+    formData += `data:image/png;base64,${base64Image}\r\n`;
+
+    formData += `--${boundary}\r\n`;
+    formData += `Content-Disposition: form-data; name="language"\r\n\r\n`;
+    formData += `eng\r\n`;
+
+    formData += `--${boundary}\r\n`;
+    formData += `Content-Disposition: form-data; name="isOverlayRequired"\r\n\r\n`;
+    formData += `false\r\n`;
+
+    formData += `--${boundary}\r\n`;
+    formData += `Content-Disposition: form-data; name="detectOrientation"\r\n\r\n`;
+    formData += `true\r\n`;
+
+    formData += `--${boundary}\r\n`;
+    formData += `Content-Disposition: form-data; name="scale"\r\n\r\n`;
+    formData += `true\r\n`;
+
+    formData += `--${boundary}\r\n`;
+    formData += `Content-Disposition: form-data; name="OCREngine"\r\n\r\n`;
+    formData += `2\r\n`;
+
+    formData += `--${boundary}--\r\n`;
+
+    const response = await fetch('https://api.ocr.space/parse/image', {
+      method: 'POST',
+      headers: {
+        'apikey': ocrApiKey,
+        'Content-Type': `multipart/form-data; boundary=${boundary}`
+      },
+      body: formData
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('OCR.space response:', data);
+
+      if (data.ParsedResults && data.ParsedResults[0] && data.ParsedResults[0].ParsedText) {
+        const extractedText = data.ParsedResults[0].ParsedText.trim();
+        if (extractedText && extractedText.length > 0) {
+          console.log('Successfully extracted text:', extractedText);
+          return extractedText;
+        }
+      }
+
+      if (data.ErrorMessage && data.ErrorMessage.length > 0) {
+        console.error('OCR.space error:', data.ErrorMessage);
+        throw new Error(`OCR.space error: ${data.ErrorMessage.join(', ')}`);
+      }
+    }
+
+    return 'No text detected in the image.';
+
+  } catch (error) {
+    console.error('Primary OCR error:', error);
+    // If primary OCR fails, try the backup method
+    return await backupOCR(imageData);
+  }
+}
+
+// Backup OCR method with simpler approach
+async function backupOCR(imageData) {
+  try {
+    console.log('Using backup OCR method...');
+
+    // Simple backup approach - try with different OCR engine
+    const ocrApiKey = process.env.OCR_SPACE_API_KEY || 'K85411479688957';
+    const base64Image = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
+
+    // Try with OCR Engine 1 instead of 2
+    const boundary = '----formdata-boundary-' + Math.random().toString(36);
+    let formData = '';
+
+    formData += `--${boundary}\r\n`;
+    formData += `Content-Disposition: form-data; name="base64Image"\r\n\r\n`;
+    formData += `data:image/png;base64,${base64Image}\r\n`;
+
+    formData += `--${boundary}\r\n`;
+    formData += `Content-Disposition: form-data; name="language"\r\n\r\n`;
+    formData += `eng\r\n`;
+
+    formData += `--${boundary}\r\n`;
+    formData += `Content-Disposition: form-data; name="OCREngine"\r\n\r\n`;
+    formData += `1\r\n`;
+
+    formData += `--${boundary}--\r\n`;
+
+    const response = await fetch('https://api.ocr.space/parse/image', {
+      method: 'POST',
+      headers: {
+        'apikey': ocrApiKey,
+        'Content-Type': `multipart/form-data; boundary=${boundary}`
+      },
+      body: formData
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.ParsedResults && data.ParsedResults[0] && data.ParsedResults[0].ParsedText) {
+        const extractedText = data.ParsedResults[0].ParsedText.trim();
+        if (extractedText && extractedText.length > 0) {
+          console.log('Backup OCR successful:', extractedText);
+          return extractedText;
+        }
+      }
+    }
+
+    return 'Unable to extract text from image. Please ensure the image contains clear, readable text.';
+
+  } catch (error) {
+    console.error('Backup OCR error:', error);
+    return 'Unable to extract text from image. Please ensure the image contains clear, readable text.';
+  }
 }
 
 // Generate AI explanation based on extracted text
@@ -115,9 +232,8 @@ export default function handler(req, res) {
       // Extract text from image (OCR)
       let extractedText = '';
       try {
-        // In production, you would use Google Vision API, AWS Textract, or similar
-        // For demo purposes, we'll simulate OCR
-        extractedText = simulateOCR(imageData);
+        // Use real OCR functionality
+        extractedText = await performOCR(imageData);
       } catch (ocrError) {
         console.error('OCR error:', ocrError);
         extractedText = 'Unable to extract text from image. Please ensure the image contains clear, readable text.';
@@ -126,7 +242,7 @@ export default function handler(req, res) {
       // Generate AI explanation
       const groqApiKey = process.env.GROQ_API_KEY || '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';
       let explanation = '';
-      
+
       if (extractedText && extractedText !== 'Unable to extract text from image. Please ensure the image contains clear, readable text.') {
         explanation = await generateExplanation(extractedText, groqApiKey);
       } else {
@@ -149,7 +265,7 @@ export default function handler(req, res) {
         // Update user's XP
         const userRef = db.collection('users').doc(userId);
         const userDoc = await userRef.get();
-        
+
         if (userDoc.exists) {
           const currentXP = userDoc.data().xp || 0;
           await userRef.update({
