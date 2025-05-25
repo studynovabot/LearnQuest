@@ -133,6 +133,30 @@
     input[type="text"], textarea {
       font-size: 16px; /* Prevents zoom on iOS */
     }
+
+    /* Mobile chat improvements */
+    .mobile-chat-input {
+      position: sticky;
+      bottom: 0;
+      background: hsl(var(--background));
+      z-index: 10;
+    }
+
+    /* Ensure proper viewport handling */
+    .mobile-chat-area {
+      height: calc(100vh - 180px);
+      height: calc(100dvh - 180px); /* Dynamic viewport height for mobile */
+    }
+
+    /* Safe area padding for devices with notches */
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Improve dropdown menu on mobile */
+    .mobile-dropdown {
+      max-width: calc(100vw - 2rem);
+    }
   }
 
   .xp-gained {

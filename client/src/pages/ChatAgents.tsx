@@ -26,7 +26,8 @@ import {
   GlobeIcon,
   FlexIcon,
   BookOpenIcon,
-  SparklesIcon
+  SparklesIcon,
+  ChevronDownIcon
 } from "@/components/ui/icons";
 import { useAuth } from "@/hooks/useAuth";
 import { generateAvatar, cn } from "@/lib/utils";
@@ -37,6 +38,13 @@ import FirebaseError from "@/components/firebase-error";
 import { FirebaseStatus } from "@/components/firebase/FirebaseStatus";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { TypewriterText } from "@/components/ui/TypewriterText";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const ChatAgents = () => {
   const {
@@ -59,6 +67,7 @@ const ChatAgents = () => {
   const [unlockingId, setUnlockingId] = useState<string | number | null>(null);
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -159,6 +168,55 @@ const ChatAgents = () => {
     }
   };
 
+  // Mobile Tutor Selector Component
+  const MobileTutorSelector = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="w-full justify-between mb-4 h-12"
+        >
+          <div className="flex items-center gap-3">
+            {activeAgent ? (
+              <>
+                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", getAgentColorClass(activeAgent.color))}>
+                  {getAgentIcon(activeAgent.iconName, 16)}
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm">{activeAgent.name}</p>
+                  <p className="text-xs text-muted-foreground">{activeAgent.subject}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <RobotIcon size={20} className="text-muted-foreground" />
+                <span>Select a Tutor</span>
+              </>
+            )}
+          </div>
+          <ChevronDownIcon size={16} />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-80 max-h-80 overflow-y-auto mobile-dropdown">
+        {unlockedAgents.map((agent: AITutor) => (
+          <DropdownMenuItem
+            key={agent.id}
+            onClick={() => selectAgent(agent)}
+            className="flex items-center gap-3 p-3 cursor-pointer"
+          >
+            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", getAgentColorClass(agent.color))}>
+              {getAgentIcon(agent.iconName, 16)}
+            </div>
+            <div>
+              <p className="font-medium text-sm">{agent.name}</p>
+              <p className="text-xs text-muted-foreground">{agent.subject}</p>
+            </div>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
     <>
       <Helmet>
@@ -176,9 +234,13 @@ const ChatAgents = () => {
             <div className="p-4">
               <FirebaseStatus />
             </div>
-            <div className="flex flex-col md:flex-row h-[calc(100vh-12rem)] min-h-[500px]">
-                {/* Sidebar with Agents - Responsive width */}
-                <div className="w-full md:w-80 lg:w-80 flex-shrink-0 border-r md:border-r border-b md:border-b-0 border-border p-4 overflow-y-auto max-h-[200px] md:max-h-none">
+            <div className={cn(
+              "flex min-h-[500px]",
+              isMobile ? "flex-col mobile-chat-area" : "flex-row h-[calc(100vh-12rem)]"
+            )}>
+              {/* Desktop Sidebar - Hidden on Mobile */}
+              {!isMobile && (
+                <div className="w-80 flex-shrink-0 border-r border-border p-4 overflow-y-auto">
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-4">Your Tutors</h3>
                     <div className="space-y-2">
@@ -189,75 +251,90 @@ const ChatAgents = () => {
                       ) : (
                         <>
                           {unlockedAgents.map((agent: AITutor) => (
-                          <motion.div
-                            key={agent.id}
-                            whileHover={{ x: 5 }}
-                            className={cn(
-                              "flex items-center gap-3 p-3 rounded-lg cursor-pointer",
-                              activeAgent?.id === agent.id ? "bg-primary/10 border border-primary/30" : "hover:bg-muted"
-                            )}
-                            onClick={() => selectAgent(agent)}
-                          >
-                            <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", getAgentColorClass(agent.color))}>
-                              {getAgentIcon(agent.iconName)}
-                            </div>
-                            <div>
-                              <p className="font-medium">{agent.name}</p>
-                              <p className="text-xs text-muted-foreground">{agent.subject}</p>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {lockedAgents.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4">Locked Tutors</h3>
-                    <div className="space-y-2">
-                      {lockedAgents.map((agent: AITutor) => (
-                        <div
-                          key={agent.id}
-                          className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center">
-                            <LockIcon className="text-white" size={20} />
-                          </div>
-                          <div className="flex-grow">
-                            <p className="font-medium">{agent.name}</p>
-                            <p className="text-xs text-muted-foreground">{agent.xpRequired} XP required</p>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUnlockAgent(agent)}
-                            disabled={unlockingId === agent.id || (user && agent.xpRequired ? user.xp < agent.xpRequired : false)}
-                          >
-                            {unlockingId === agent.id ? (
-                              <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-current animate-spin" />
-                            ) : (
-                              "Unlock"
-                            )}
-                          </Button>
-                        </div>
-                      ))}
+                            <motion.div
+                              key={agent.id}
+                              whileHover={{ x: 5 }}
+                              className={cn(
+                                "flex items-center gap-3 p-3 rounded-lg cursor-pointer",
+                                activeAgent?.id === agent.id ? "bg-primary/10 border border-primary/30" : "hover:bg-muted"
+                              )}
+                              onClick={() => selectAgent(agent)}
+                            >
+                              <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", getAgentColorClass(agent.color))}>
+                                {getAgentIcon(agent.iconName)}
+                              </div>
+                              <div>
+                                <p className="font-medium">{agent.name}</p>
+                                <p className="text-xs text-muted-foreground">{agent.subject}</p>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </>
+                      )}
                     </div>
                   </div>
-                )}
-              </div>
 
-              {/* Chat Area - Fixed width to prevent expansion */}
+                  {lockedAgents.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">Locked Tutors</h3>
+                      <div className="space-y-2">
+                        {lockedAgents.map((agent: AITutor) => (
+                          <div
+                            key={agent.id}
+                            className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
+                          >
+                            <div className="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center">
+                              <LockIcon className="text-white" size={20} />
+                            </div>
+                            <div className="flex-grow">
+                              <p className="font-medium">{agent.name}</p>
+                              <p className="text-xs text-muted-foreground">{agent.xpRequired} XP required</p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUnlockAgent(agent)}
+                              disabled={unlockingId === agent.id || (user && agent.xpRequired ? user.xp < agent.xpRequired : false)}
+                            >
+                              {unlockingId === agent.id ? (
+                                <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-current animate-spin" />
+                              ) : (
+                                "Unlock"
+                              )}
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Chat Area - Full width on mobile, responsive */}
               <div className="flex-1 min-w-0 flex flex-col">
-                <div className="flex-grow p-4 overflow-y-auto">
+                <div className={cn(
+                  "flex-grow overflow-y-auto",
+                  isMobile ? "p-3" : "p-4"
+                )}>
+                  {/* Mobile Tutor Selector */}
+                  {isMobile && <MobileTutorSelector />}
+
                   {activeAgent ? (
                     <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-3 p-3 bg-muted rounded-lg mb-4">
-                        <div className={cn("w-12 h-12 rounded-full flex items-center justify-center", getAgentColorClass(activeAgent.color))}>
-                          {getAgentIcon(activeAgent.iconName, 28)}
+                      {/* Agent Header - Smaller on mobile */}
+                      <div className={cn(
+                        "flex items-center gap-3 bg-muted rounded-lg mb-4",
+                        isMobile ? "p-2" : "p-3"
+                      )}>
+                        <div className={cn(
+                          "rounded-full flex items-center justify-center",
+                          getAgentColorClass(activeAgent.color),
+                          isMobile ? "w-10 h-10" : "w-12 h-12"
+                        )}>
+                          {getAgentIcon(activeAgent.iconName, isMobile ? 20 : 28)}
                         </div>
                         <div className="flex-grow">
-                          <h3 className="font-semibold text-lg">{activeAgent.name}</h3>
+                          <h3 className={cn("font-semibold", isMobile ? "text-base" : "text-lg")}>{activeAgent.name}</h3>
                           <p className="text-sm text-muted-foreground">{activeAgent.subject} specialist</p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -375,27 +452,37 @@ const ChatAgents = () => {
                 </div>
 
                 {activeAgent && (
-                  <div className="border-t border-border p-4 flex-shrink-0">
+                  <div className={cn(
+                    "border-t border-border flex-shrink-0 bg-background",
+                    isMobile ? "p-3 pb-safe mobile-chat-input" : "p-4"
+                  )}>
                     <form onSubmit={handleSubmit} className="flex gap-2 max-w-full">
                       <Input
                         type="text"
                         placeholder={`Ask ${activeAgent.name} a question...`}
-                        className="flex-1 min-w-0"
+                        className={cn(
+                          "flex-1 min-w-0 bg-muted border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50",
+                          isMobile ? "h-12 text-base" : "h-10"
+                        )}
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
                         disabled={isSending}
+                        style={{ fontSize: isMobile ? '16px' : undefined }} // Prevents zoom on iOS
                       />
                       <Button
                         type="submit"
                         disabled={isSending || !inputMessage.trim()}
-                        className="flex-shrink-0"
+                        className={cn(
+                          "flex-shrink-0 touch-manipulation",
+                          isMobile ? "h-12 w-12 p-0" : "h-10"
+                        )}
                       >
                         {isSending ? (
                           <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-current animate-spin" />
                         ) : (
                           <>
-                            Send
-                            <SendIcon className="ml-2" size={16} />
+                            {!isMobile && "Send"}
+                            <SendIcon className={cn(isMobile ? "" : "ml-2")} size={16} />
                           </>
                         )}
                       </Button>
