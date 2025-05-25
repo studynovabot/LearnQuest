@@ -59,11 +59,19 @@ const ImageTools = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setGeneratedImage(data.imageUrl);
-        toast({
-          title: "Image Generated! 🎨",
-          description: "Your image has been successfully generated.",
-        });
+        console.log('Image generation response:', data);
+
+        // Validate the imageUrl before setting it
+        if (data.imageUrl && typeof data.imageUrl === 'string' && data.imageUrl.startsWith('http')) {
+          setGeneratedImage(data.imageUrl);
+          toast({
+            title: "Image Generated! 🎨",
+            description: "Your image has been successfully generated.",
+          });
+        } else {
+          console.error('Invalid imageUrl received:', data.imageUrl);
+          throw new Error('Invalid image URL received from server');
+        }
       } else {
         throw new Error('Failed to generate image');
       }
@@ -172,11 +180,19 @@ const ImageTools = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setTransformedImage(data.imageUrl);
-        toast({
-          title: "Image Transformed! ✨",
-          description: "Your image has been successfully transformed.",
-        });
+        console.log('Image transformation response:', data);
+
+        // Validate the imageUrl before setting it
+        if (data.imageUrl && typeof data.imageUrl === 'string' && data.imageUrl.startsWith('http')) {
+          setTransformedImage(data.imageUrl);
+          toast({
+            title: "Image Transformed! ✨",
+            description: "Your image has been successfully transformed.",
+          });
+        } else {
+          console.error('Invalid imageUrl received:', data.imageUrl);
+          throw new Error('Invalid image URL received from server');
+        }
       } else {
         throw new Error('Failed to transform image');
       }
