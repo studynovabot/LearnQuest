@@ -68,13 +68,31 @@ app.get('/api/tutors', async (req, res) => {
   }
 });
 
-// Auth endpoint
+// Auth endpoints
 app.post('/api/auth', async (req, res) => {
   const handler = await loadApiFunction('auth');
   if (handler) {
     handler(req, res);
   } else {
     res.status(500).json({ error: 'Auth function not found' });
+  }
+});
+
+app.post('/api/auth/register', async (req, res) => {
+  const handler = await loadApiFunction('auth/register');
+  if (handler) {
+    handler(req, res);
+  } else {
+    res.status(500).json({ error: 'Register function not found' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  const handler = await loadApiFunction('auth/login');
+  if (handler) {
+    handler(req, res);
+  } else {
+    res.status(500).json({ error: 'Login function not found' });
   }
 });
 

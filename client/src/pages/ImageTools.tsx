@@ -151,12 +151,13 @@ const ImageTools = () => {
       }
     } catch (error) {
       console.error('Image to text error:', error);
-      // Fallback demo response
-      setExtractedText("Sample extracted text from the image. This is a demonstration of OCR functionality.");
-      setAiExplanation("This appears to be a mathematical equation or text document. The AI can help explain the concepts shown in the image and provide detailed solutions or explanations based on the content.");
+      // Show actual error instead of demo fallback
+      setExtractedText("Error: Failed to extract text from image.");
+      setAiExplanation("There was an error processing your image. Please check your internet connection and try again. If the problem persists, the image might not contain readable text or the OCR service might be temporarily unavailable.");
       toast({
-        title: "Demo Mode",
-        description: "Image analysis is in demo mode. Real OCR will be available soon!",
+        title: "OCR Error",
+        description: "Failed to extract text from image. Please try again.",
+        variant: "destructive"
       });
     } finally {
       setIsProcessing(false);

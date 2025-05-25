@@ -27,8 +27,19 @@ export default function handler(req, res) {
         return res.status(400).json({ message: 'Email and password are required' });
       }
 
-      // Determine action from URL or body
-      const authAction = action || (req.url?.includes('register') ? 'register' : 'login');
+      // Determine action from URL or body - handle both /auth and /auth/register patterns
+      let authAction = action;
+      if (!authAction) {
+        if (req.url?.includes('/register') || req.url?.includes('register')) {
+          authAction = 'register';
+        } else if (req.url?.includes('/login') || req.url?.includes('login')) {
+          authAction = 'login';
+        } else {
+          authAction = 'login'; // default to login
+        }
+      }
+
+      console.log('🎯 Determined action:', authAction);
 
       if (authAction === 'login') {
         // Handle login

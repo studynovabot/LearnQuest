@@ -112,30 +112,48 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
+      console.log('🔄 Starting login process...');
+
+      const requestBody = { email, password };
+      console.log('📤 Login request:', { email });
 
       const response = await fetch(`${config.apiUrl}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(requestBody),
       });
+
+      console.log('📥 Login response status:', response.status);
 
       if (response.ok) {
         const data = await response.json();
-        const userData = data.user;
+        console.log('✅ Login successful:', data);
 
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        console.log('User logged in successfully:', userData);
+        // Store the user data from the response
+        if (data.user) {
+          setUser(data.user);
+          localStorage.setItem('user', JSON.stringify(data.user));
+        } else {
+          setUser(data);
+          localStorage.setItem('user', JSON.stringify(data));
+        }
+
         return true;
       } else {
-        const errorData = await response.json();
-        console.error('Login failed:', errorData.message);
+        let errorMessage = 'Login failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          console.error('Failed to parse error response:', e);
+        }
+        console.error('❌ Login failed:', errorMessage);
         return false;
       }
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("❌ Login error:", error);
       return false;
     } finally {
       setLoading(false);
@@ -146,29 +164,48 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (email: string, displayName: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
+      console.log('🔄 Starting registration process...');
+
+      const requestBody = { email, displayName, password, isPro: false };
+      console.log('📤 Registration request:', { email, displayName, isPro: false });
 
       const response = await fetch(`${config.apiUrl}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, displayName, password, isPro: false }),
+        body: JSON.stringify(requestBody),
       });
+
+      console.log('📥 Registration response status:', response.status);
 
       if (response.ok) {
         const userData = await response.json();
+        console.log('✅ Registration successful:', userData);
 
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        console.log('User registered successfully:', userData);
+        // Store the user data from the response
+        if (userData.user) {
+          setUser(userData.user);
+          localStorage.setItem('user', JSON.stringify(userData.user));
+        } else {
+          setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
+        }
+
         return true;
       } else {
-        const errorData = await response.json();
-        console.error('Registration failed:', errorData.message);
+        let errorMessage = 'Registration failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          console.error('Failed to parse error response:', e);
+        }
+        console.error('❌ Registration failed:', errorMessage);
         return false;
       }
     } catch (error) {
-      console.error("Registration failed:", error);
+      console.error("❌ Registration error:", error);
       return false;
     } finally {
       setLoading(false);

@@ -17,19 +17,20 @@ export class FirebaseStorage {
 
   async createUser(userData) {
     const db = this.getFirestoreDb();
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
 
+    // Password should already be hashed by the calling function
     const user = {
-      id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: userData.id || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       email: userData.email,
-      password: hashedPassword,
+      password: userData.password, // Already hashed
       displayName: userData.displayName,
       isPro: userData.isPro || false,
       className: userData.className || '',
       board: userData.board || '',
       role: userData.role || 'user',
-      createdAt: new Date(),
-      lastLogin: new Date()
+      createdAt: userData.createdAt || new Date(),
+      lastLogin: userData.lastLogin || new Date(),
+      updatedAt: userData.updatedAt || new Date()
     };
 
     await db.collection('users').doc(user.id).set(user);
