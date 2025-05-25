@@ -64,18 +64,18 @@ export function getRelativeTime(date: Date): string {
   const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
   const now = new Date();
   const diffInDays = Math.floor((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  
+
   if (diffInDays === 0) return 'Today';
   if (diffInDays === 1) return 'Tomorrow';
   if (diffInDays > 1 && diffInDays < 7) return rtf.format(diffInDays, 'day');
-  
+
   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
 }
 
 export function getLastSevenDays(): { date: Date, day: string }[] {
   const result: { date: Date, day: string }[] = [];
   const today = new Date();
-  
+
   for (let i = 6; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
@@ -84,7 +84,7 @@ export function getLastSevenDays(): { date: Date, day: string }[] {
       day: getDayName(date)
     });
   }
-  
+
   return result;
 }
 
@@ -93,7 +93,27 @@ export function generateAvatar(name: string): string {
     .split(' ')
     .map(n => n[0])
     .join('')
-    .toUpperCase();
-    
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0F172A&color=60A5FA&size=128`;
+    .toUpperCase()
+    .slice(0, 2); // Limit to 2 characters
+
+  // Create a reliable SVG avatar instead of using external service
+  const colors = [
+    '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
+    '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
+  ];
+
+  // Generate a consistent color based on name
+  const colorIndex = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+  const backgroundColor = colors[colorIndex];
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+      <rect width="128" height="128" fill="${backgroundColor}" rx="64"/>
+      <text x="64" y="74" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white">
+        ${initials}
+      </text>
+    </svg>
+  `;
+
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
 }

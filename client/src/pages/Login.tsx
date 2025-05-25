@@ -41,7 +41,7 @@ const Login = () => {
           <Card className="border-border/40 shadow-xl">
             <CardHeader className="space-y-4 text-center">
               <div className="flex justify-center">
-                <NovaLogo size="md" />
+                <NovaLogo size="lg" />
               </div>
               <div className="space-y-1">
                 <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>

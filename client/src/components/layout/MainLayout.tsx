@@ -50,7 +50,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <header className="lg:hidden bg-card border-b border-border p-4 flex items-center justify-between">
         <Link href="/">
           <div className="flex items-center gap-3">
-            <NovaLogo size="sm" />
+            <NovaLogo size="sm" iconOnly={true} />
             <div>
               <h1 className="text-lg font-bold">Study Nova</h1>
               <p className="text-xs text-muted-foreground">Your AI Study Buddy</p>

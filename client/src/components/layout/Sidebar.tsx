@@ -29,7 +29,7 @@ const Sidebar = () => {
     <div className="hidden lg:block w-20 bg-card rounded-2xl p-4 flex flex-col items-center space-y-8 h-fit sticky top-6">
       <Link href="/">
         <div className="flex items-center justify-center w-12 h-12 cursor-pointer hover:scale-105 transition-transform">
-          <NovaLogo size="sm" />
+          <NovaLogo size="md" iconOnly={true} />
         </div>
       </Link>
 
