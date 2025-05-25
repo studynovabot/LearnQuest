@@ -27,8 +27,9 @@ export class FirebaseStorage {
       isPro: userData.isPro || false,
       xp: 0,
       streak: 0,
-      className: '',
-      board: '',
+      className: userData.className || '',
+      board: userData.board || '',
+      role: userData.role || 'user',
       avatarUrl: '',
       createdAt: new Date(),
       lastLogin: new Date()

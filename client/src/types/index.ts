@@ -13,6 +13,7 @@ export interface User {
   maxLevel?: number; // Optional for database compatibility
   className?: string; // User's class/grade
   board?: string; // Educational board (CBSE/ICSE)
+  role?: 'user' | 'admin'; // User role
   createdAt?: Date;
   updatedAt?: Date;
   lastLogin?: Date | null;
@@ -75,6 +76,63 @@ export interface StoreItem {
   unlocked: boolean;
   iconName: string;
   gradient: string[];
+}
+
+// Educational Content Types
+export interface EducationalContent {
+  id: string;
+  title: string;
+  type: 'flash-notes' | 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
+  board: string; // CBSE, ICSE, etc.
+  class: string; // 6, 7, 8, 9, 10, 11, 12
+  subject: string;
+  chapter?: string;
+  content: any; // JSON content structure
+  originalFileName?: string;
+  fileUrl?: string;
+  extractedText?: string;
+  status: 'draft' | 'processing' | 'published' | 'archived';
+  uploadedBy: string; // User ID
+  verifiedBy?: string; // Admin ID who verified
+  tags: string[];
+  difficulty?: 'easy' | 'medium' | 'hard';
+  estimatedTime?: number; // in minutes
+  views: number;
+  likes: number;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt?: Date;
+}
+
+export interface ContentUpload {
+  id: string;
+  originalFileName: string;
+  fileSize: number;
+  mimeType: string;
+  uploadPath: string;
+  downloadUrl: string;
+  type: 'flash-notes' | 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
+  board: string;
+  class: string;
+  subject: string;
+  chapter?: string;
+  status: 'uploaded' | 'processing' | 'processed' | 'failed';
+  uploadedBy: string;
+  processingLog: string[];
+  extractedContentId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ContentFilter {
+  board?: string;
+  class?: string;
+  subject?: string;
+  chapter?: string;
+  type?: string;
+  difficulty?: string;
+  status?: string;
+  search?: string;
 }
 
 export interface DailyQuote {

@@ -84,6 +84,11 @@ export default function handler(req, res) {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         console.log('👤 Creating new user...');
+
+        // Check if user should be admin
+        const adminEmails = ['thakurranveersingh505@gmail.com'];
+        const isAdmin = adminEmails.includes(email);
+
         // Create new user
         const newUser = {
           id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -100,6 +105,7 @@ export default function handler(req, res) {
           hoursStudied: 0,
           className: '',
           board: '',
+          role: isAdmin ? 'admin' : 'user',
           createdAt: new Date(),
           lastLogin: new Date(),
           updatedAt: new Date()

@@ -15,14 +15,20 @@ import { useToast } from "@/hooks/use-toast";
 interface UploadedContent {
   id: string;
   filename: string;
-  type: 'flash-notes' | 'flow-charts' | 'ncert-solutions';
+  type: 'flash-notes' | 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
+  board: string;
   class: string;
   subject: string;
   chapter?: string;
   uploadDate: string;
   fileSize: number;
-  status: 'processing' | 'completed' | 'error';
+  status: 'processing' | 'completed' | 'error' | 'draft' | 'published';
   downloadUrl?: string;
+  title?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  estimatedTime?: number;
+  tags?: string[];
+  verifiedBy?: string;
 }
 
 const ContentManager = () => {
@@ -32,16 +38,31 @@ const ContentManager = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedType, setSelectedType] = useState<string>('');
+  const [selectedBoard, setSelectedBoard] = useState<string>('');
   const [selectedClass, setSelectedClass] = useState<string>('');
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [selectedChapter, setSelectedChapter] = useState<string>('');
+  const [filterStatus, setFilterStatus] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
+  // Check if user is admin
+  const isAdmin = user?.role === 'admin' || user?.email === 'thakurranveersingh505@gmail.com';
+
+  const boards = ['CBSE', 'ICSE', 'State Board', 'IB', 'Cambridge'];
   const classes = ['6', '7', '8', '9', '10', '11', '12'];
-  const subjects = ['Mathematics', 'Science', 'English', 'History', 'Geography', 'Physics', 'Chemistry', 'Biology'];
+  const subjects = ['Mathematics', 'Science', 'English', 'History', 'Geography', 'Physics', 'Chemistry', 'Biology', 'Computer Science', 'Economics'];
   const contentTypes = [
     { value: 'flash-notes', label: 'Flash Notes' },
     { value: 'flow-charts', label: 'Flow Charts' },
-    { value: 'ncert-solutions', label: 'NCERT Solutions' }
+    { value: 'ncert-solutions', label: 'NCERT Solutions' },
+    { value: 'textbook-solutions', label: 'Textbook Solutions' }
+  ];
+  const statusOptions = [
+    { value: '', label: 'All Status' },
+    { value: 'draft', label: 'Draft' },
+    { value: 'processing', label: 'Processing' },
+    { value: 'published', label: 'Published' },
+    { value: 'archived', label: 'Archived' }
   ];
 
   useEffect(() => {
@@ -50,28 +71,55 @@ const ContentManager = () => {
 
   const fetchUploadedContent = async () => {
     try {
-      const response = await fetch('/api/content-manager', {
+      const params = new URLSearchParams();
+      if (selectedBoard) params.append('board', selectedBoard);
+      if (selectedClass) params.append('class', selectedClass);
+      if (selectedSubject) params.append('subject', selectedSubject);
+      if (selectedChapter) params.append('chapter', selectedChapter);
+      if (selectedType) params.append('type', selectedType);
+      if (filterStatus) params.append('status', filterStatus);
+      if (searchTerm) params.append('search', searchTerm);
+
+      const response = await fetch(`/api/content-manager?${params.toString()}`, {
         headers: {
-          'x-user-id': user?.id || 'admin'
+          'x-user-id': user?.id || 'admin',
+          'x-user-email': user?.email || ''
         }
       });
       if (response.ok) {
         const data = await response.json();
         setUploadedFiles(data);
+      } else {
+        console.error('Failed to fetch content:', response.statusText);
       }
     } catch (error) {
       console.error('Error fetching content:', error);
     }
   };
 
+  // Refetch when filters change
+  useEffect(() => {
+    fetchUploadedContent();
+  }, [selectedBoard, selectedClass, selectedSubject, selectedChapter, selectedType, filterStatus, searchTerm]);
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!selectedType || !selectedClass || !selectedSubject) {
+    // Check admin access
+    if (!isAdmin) {
+      toast({
+        title: "Access Denied",
+        description: "Only administrators can upload content.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!selectedType || !selectedBoard || !selectedClass || !selectedSubject) {
       toast({
         title: "Missing Information",
-        description: "Please select content type, class, and subject before uploading.",
+        description: "Please select content type, board, class, and subject before uploading.",
         variant: "destructive"
       });
       return;
@@ -93,6 +141,7 @@ const ContentManager = () => {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', selectedType);
+      formData.append('board', selectedBoard);
       formData.append('class', selectedClass);
       formData.append('subject', selectedSubject);
       if (selectedChapter) {
@@ -135,6 +184,7 @@ const ContentManager = () => {
 
       xhr.open('POST', '/api/content-manager/upload');
       xhr.setRequestHeader('x-user-id', user?.id || 'admin');
+      xhr.setRequestHeader('x-user-email', user?.email || '');
       xhr.send(formData);
 
     } catch (error) {
@@ -244,6 +294,18 @@ const ContentManager = () => {
 
           {/* Upload Tab */}
           <TabsContent value="upload">
+            {!isAdmin && (
+              <Card className="mb-6">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold text-destructive mb-2">Admin Access Required</h3>
+                    <p className="text-muted-foreground">
+                      Only administrators can upload educational content. Please contact an admin for access.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -256,7 +318,7 @@ const ContentManager = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Content Type Selection */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   <Select value={selectedType} onValueChange={setSelectedType}>
                     <SelectTrigger>
                       <SelectValue placeholder="Content Type" />
@@ -266,6 +328,17 @@ const ContentManager = () => {
                         <SelectItem key={type.value} value={type.value}>
                           {type.label}
                         </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={selectedBoard} onValueChange={setSelectedBoard}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Board" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {boards.map(board => (
+                        <SelectItem key={board} value={board}>{board}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -325,12 +398,12 @@ const ContentManager = () => {
                         onChange={handleFileUpload}
                         className="hidden"
                         id="file-upload"
-                        disabled={uploading || !selectedType || !selectedClass || !selectedSubject}
+                        disabled={uploading || !selectedType || !selectedBoard || !selectedClass || !selectedSubject || !isAdmin}
                       />
                       <label htmlFor="file-upload">
                         <Button
                           asChild
-                          disabled={uploading || !selectedType || !selectedClass || !selectedSubject}
+                          disabled={uploading || !selectedType || !selectedBoard || !selectedClass || !selectedSubject || !isAdmin}
                         >
                           <span className="cursor-pointer">Choose PDF File</span>
                         </Button>
