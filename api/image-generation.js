@@ -27,7 +27,7 @@ export default function handler(req, res) {
         return res.status(500).json({ message: 'API key not configured' });
       }
 
-      let imageUrl = null;
+      let imageUrl = '';
       let xpEarned = 0;
 
       try {
@@ -63,7 +63,7 @@ export default function handler(req, res) {
           // Note: This would require a different API endpoint that supports image-to-image
           // For now, we'll use text-to-image with a modified prompt
           const modifiedPrompt = `Transform the uploaded image: ${prompt}`;
-          
+
           const response = await fetch('https://api.together.xyz/v1/images/generations', {
             method: 'POST',
             headers: {
@@ -92,7 +92,7 @@ export default function handler(req, res) {
 
       } catch (apiError) {
         console.error('Together AI API error:', apiError);
-        
+
         // Fallback to placeholder images for demo
         if (type === 'text-to-image') {
           imageUrl = `https://via.placeholder.com/512x512/6366f1/ffffff?text=${encodeURIComponent('Generated: ' + prompt.substring(0, 20))}`;
@@ -118,7 +118,7 @@ export default function handler(req, res) {
         // Update user's XP
         const userRef = db.collection('users').doc(userId);
         const userDoc = await userRef.get();
-        
+
         if (userDoc.exists) {
           const currentXP = userDoc.data().xp || 0;
           await userRef.update({
@@ -132,6 +132,12 @@ export default function handler(req, res) {
         // Don't fail the request if database update fails
       }
 
+      // Ensure we always have a valid imageUrl
+      if (!imageUrl) {
+        imageUrl = `https://via.placeholder.com/512x512/6366f1/ffffff?text=${encodeURIComponent('Generated Image')}`;
+        xpEarned = 5;
+      }
+
       res.status(200).json({
         imageUrl,
         xpEarned,
@@ -141,7 +147,13 @@ export default function handler(req, res) {
     } catch (error) {
       console.error('Image generation error:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      res.status(500).json({ message: errorMessage });
+
+      // Return a fallback response even on error
+      res.status(200).json({
+        imageUrl: `https://via.placeholder.com/512x512/ef4444/ffffff?text=${encodeURIComponent('Error: Please try again')}`,
+        xpEarned: 0,
+        message: 'Image generation failed, showing placeholder'
+      });
     }
   });
 }
