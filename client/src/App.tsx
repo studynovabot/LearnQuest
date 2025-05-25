@@ -14,6 +14,7 @@ import TaskManagement from "@/pages/TaskManagement";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Settings from "@/pages/Settings";
+import Subscription from "@/pages/Subscription";
 import ApiTest from "@/pages/ApiTest";
 import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
@@ -65,6 +66,11 @@ function Router() {
       <Route path="/settings">
         <MainLayout>
           <Settings />
+        </MainLayout>
+      </Route>
+      <Route path="/subscription">
+        <MainLayout>
+          <Subscription />
         </MainLayout>
       </Route>
       <Route path="/api-test">

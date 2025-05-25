@@ -1,13 +1,14 @@
 import { useLocation, Link } from "wouter";
 import { cn } from "@/lib/utils";
-import { 
-  FlashlightIcon, 
-  HomeIcon, 
-  MessageIcon, 
-  ChartIcon, 
-  TrophyIcon, 
-  StoreIcon, 
-  SettingsIcon 
+import {
+  FlashlightIcon,
+  HomeIcon,
+  MessageIcon,
+  ChartIcon,
+  TrophyIcon,
+  StoreIcon,
+  CreditCardIcon,
+  SettingsIcon
 } from "@/components/ui/icons";
 
 const Sidebar = () => {
@@ -20,6 +21,7 @@ const Sidebar = () => {
     { icon: ChartIcon, path: "/leaderboard", active: location === "/leaderboard" },
     { icon: TrophyIcon, path: "/tasks", active: location === "/tasks" },
     { icon: StoreIcon, path: "/store", active: location === "/store" },
+    { icon: CreditCardIcon, path: "/subscription", active: location === "/subscription" },
   ];
 
   return (
@@ -31,7 +33,7 @@ const Sidebar = () => {
       <nav className="flex flex-col space-y-6 items-center flex-grow">
         {navItems.map((item, index) => (
           <Link key={index} href={item.path}>
-            <button 
+            <button
               className={cn(
                 "nav-icon rounded-xl p-2",
                 item.active ? "bg-muted text-secondary" : ""

@@ -6,7 +6,19 @@ import {
   SmileIcon,
   CalculatorIcon,
   LanguagesIcon,
-  LockIcon
+  LockIcon,
+  FlaskIcon,
+  BookIcon,
+  LandmarkIcon,
+  CodeIcon,
+  PaletteIcon,
+  LeafIcon,
+  BrainIcon,
+  TrendingUpIcon,
+  GlobeIcon,
+  FlexIcon,
+  BookOpenIcon,
+  SparklesIcon
 } from "@/components/ui/icons";
 import { useChat } from "@/hooks/useChat";
 import { AITutor } from "@/types";
@@ -34,18 +46,39 @@ const AITutors = () => {
       case 'smile': return <SmileIcon size={size} />;
       case 'calculator': return <CalculatorIcon size={size} />;
       case 'languages': return <LanguagesIcon size={size} />;
+      case 'flask': return <FlaskIcon size={size} />;
+      case 'book': return <BookIcon size={size} />;
+      case 'landmark': return <LandmarkIcon size={size} />;
+      case 'code': return <CodeIcon size={size} />;
+      case 'palette': return <PaletteIcon size={size} />;
+      case 'leaf': return <LeafIcon size={size} />;
+      case 'brain': return <BrainIcon size={size} />;
+      case 'trending-up': return <TrendingUpIcon size={size} />;
+      case 'globe': return <GlobeIcon size={size} />;
+      case 'flex': return <FlexIcon size={size} />;
+      case 'book-open': return <BookOpenIcon size={size} />;
+      case 'sparkles': return <SparklesIcon size={size} />;
       default: return <RobotIcon size={size} />;
     }
   };
 
   const getAgentColorClass = (color?: string) => {
     switch (color) {
-      case 'blue': return 'bg-primary';
-      case 'purple': return 'bg-secondary';
+      case 'blue': return 'bg-blue-500';
+      case 'purple': return 'bg-purple-500';
+      case 'green': return 'bg-green-500';
+      case 'orange': return 'bg-orange-500';
+      case 'amber': return 'bg-amber-500';
+      case 'cyan': return 'bg-cyan-500';
+      case 'pink': return 'bg-pink-500';
+      case 'emerald': return 'bg-emerald-500';
+      case 'indigo': return 'bg-indigo-500';
+      case 'violet': return 'bg-violet-500';
+      case 'red': return 'bg-red-500';
       case 'teal': return 'bg-teal-500';
       case 'yellow': return 'bg-yellow-500';
-      case 'red': return 'bg-red-500';
-      case 'green': return 'bg-green-500';
+      case 'slate': return 'bg-slate-500';
+      case 'rose': return 'bg-rose-500';
       default: return 'bg-primary';
     }
   };

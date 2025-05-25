@@ -14,7 +14,19 @@ import {
   SmileIcon,
   CalculatorIcon,
   LanguagesIcon,
-  LockIcon
+  LockIcon,
+  FlaskIcon,
+  BookIcon,
+  LandmarkIcon,
+  CodeIcon,
+  PaletteIcon,
+  LeafIcon,
+  BrainIcon,
+  TrendingUpIcon,
+  GlobeIcon,
+  FlexIcon,
+  BookOpenIcon,
+  SparklesIcon
 } from "@/components/ui/icons";
 import { useAuth } from "@/hooks/useAuth";
 import { generateAvatar, cn } from "@/lib/utils";
@@ -110,18 +122,39 @@ const ChatAgents = () => {
       case 'smile': return <SmileIcon size={size} />;
       case 'calculator': return <CalculatorIcon size={size} />;
       case 'languages': return <LanguagesIcon size={size} />;
+      case 'flask': return <FlaskIcon size={size} />;
+      case 'book': return <BookIcon size={size} />;
+      case 'landmark': return <LandmarkIcon size={size} />;
+      case 'code': return <CodeIcon size={size} />;
+      case 'palette': return <PaletteIcon size={size} />;
+      case 'leaf': return <LeafIcon size={size} />;
+      case 'brain': return <BrainIcon size={size} />;
+      case 'trending-up': return <TrendingUpIcon size={size} />;
+      case 'globe': return <GlobeIcon size={size} />;
+      case 'flex': return <FlexIcon size={size} />;
+      case 'book-open': return <BookOpenIcon size={size} />;
+      case 'sparkles': return <SparklesIcon size={size} />;
       default: return <RobotIcon size={size} />;
     }
   };
 
   const getAgentColorClass = (color?: string) => {
     switch (color) {
-      case 'blue': return 'bg-primary text-white';
-      case 'purple': return 'bg-secondary text-white';
-      case 'teal': return 'bg-teal-500 text-white';
-      case 'yellow': return 'bg-yellow-500 text-white';
-      case 'red': return 'bg-red-500 text-white';
+      case 'blue': return 'bg-blue-500 text-white';
+      case 'purple': return 'bg-purple-500 text-white';
       case 'green': return 'bg-green-500 text-white';
+      case 'orange': return 'bg-orange-500 text-white';
+      case 'amber': return 'bg-amber-500 text-white';
+      case 'cyan': return 'bg-cyan-500 text-white';
+      case 'pink': return 'bg-pink-500 text-white';
+      case 'emerald': return 'bg-emerald-500 text-white';
+      case 'indigo': return 'bg-indigo-500 text-white';
+      case 'violet': return 'bg-violet-500 text-white';
+      case 'red': return 'bg-red-500 text-white';
+      case 'teal': return 'bg-teal-500 text-white';
+      case 'yellow': return 'bg-yellow-500 text-black';
+      case 'slate': return 'bg-slate-500 text-white';
+      case 'rose': return 'bg-rose-500 text-white';
       default: return 'bg-primary text-white';
     }
   };
@@ -144,8 +177,8 @@ const ChatAgents = () => {
               <FirebaseStatus />
             </div>
             <div className="flex flex-col md:flex-row h-[calc(100vh-16rem)]">
-                {/* Sidebar with Agents */}
-                <div className="w-full md:w-64 lg:w-80 border-r border-border p-4 overflow-y-auto">
+                {/* Sidebar with Agents - Fixed width */}
+                <div className="w-full md:w-80 lg:w-80 flex-shrink-0 border-r border-border p-4 overflow-y-auto">
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-4">Your Tutors</h3>
                     <div className="space-y-2">
@@ -214,8 +247,8 @@ const ChatAgents = () => {
                 )}
               </div>
 
-              {/* Chat Area */}
-              <div className="flex-grow flex flex-col">
+              {/* Chat Area - Fixed width to prevent expansion */}
+              <div className="flex-1 min-w-0 flex flex-col">
                 <div className="flex-grow p-4 overflow-y-auto">
                   {activeAgent ? (
                     <div className="flex flex-col gap-4">
@@ -342,12 +375,12 @@ const ChatAgents = () => {
                 </div>
 
                 {activeAgent && (
-                  <div className="border-t border-border p-4">
-                    <form onSubmit={handleSubmit} className="flex gap-2">
+                  <div className="border-t border-border p-4 flex-shrink-0">
+                    <form onSubmit={handleSubmit} className="flex gap-2 max-w-full">
                       <Input
                         type="text"
                         placeholder={`Ask ${activeAgent.name} a question...`}
-                        className="flex-grow"
+                        className="flex-1 min-w-0"
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
                         disabled={isSending}
@@ -355,6 +388,7 @@ const ChatAgents = () => {
                       <Button
                         type="submit"
                         disabled={isSending || !inputMessage.trim()}
+                        className="flex-shrink-0"
                       >
                         {isSending ? (
                           <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-current animate-spin" />
