@@ -10,6 +10,7 @@ import {
   CreditCardIcon,
   SettingsIcon
 } from "@/components/ui/icons";
+import NovaLogo from "@/components/ui/NovaLogo";
 
 const Sidebar = () => {
   const [location] = useLocation();
@@ -26,9 +27,11 @@ const Sidebar = () => {
 
   return (
     <div className="hidden lg:block w-20 bg-card rounded-2xl p-4 flex flex-col items-center space-y-8 h-fit sticky top-6">
-      <div className="bg-primary rounded-xl p-2 flex items-center justify-center w-12 h-12">
-        <FlashlightIcon className="text-white" size={20} />
-      </div>
+      <Link href="/">
+        <div className="flex items-center justify-center w-12 h-12 cursor-pointer hover:scale-105 transition-transform">
+          <NovaLogo size="sm" />
+        </div>
+      </Link>
 
       <nav className="flex flex-col space-y-6 items-center flex-grow">
         {navItems.map((item, index) => (

@@ -8,6 +8,7 @@ import { FlashlightIcon, FireIcon, HomeIcon, MessageIcon, TrophyIcon, StoreIcon,
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
+import NovaLogo from "@/components/ui/NovaLogo";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -45,8 +46,31 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
   return (
     <div className="min-h-screen relative flex flex-col">
-      {/* Logout button (top right) */}
-      <div className="absolute top-4 right-4 z-50">
+      {/* Header with logo and logout */}
+      <header className="lg:hidden bg-card border-b border-border p-4 flex items-center justify-between">
+        <Link href="/">
+          <div className="flex items-center gap-3">
+            <NovaLogo size="sm" />
+            <div>
+              <h1 className="text-lg font-bold">Study Nova</h1>
+              <p className="text-xs text-muted-foreground">Your AI Study Buddy</p>
+            </div>
+          </div>
+        </Link>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            logout();
+            setLocation("/login");
+          }}
+        >
+          Logout
+        </Button>
+      </header>
+
+      {/* Desktop logout button (top right) */}
+      <div className="hidden lg:block absolute top-4 right-4 z-50">
         <Button
           variant="outline"
           onClick={() => {
@@ -76,7 +100,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       </div>
 
       {/* Main container */}
-      <div className="container mx-auto px-4 py-6 max-w-7xl flex-grow flex flex-col lg:flex-row gap-6 mb-16 lg:mb-0">
+      <div className="container mx-auto px-4 py-6 max-w-7xl flex-grow flex flex-col lg:flex-row gap-6 mb-16 lg:mb-0 lg:pt-6">
         {/* Left sidebar - desktop only */}
         <Sidebar />
 

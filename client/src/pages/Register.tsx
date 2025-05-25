@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Helmet } from "react-helmet";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
+import NovaLogo from "@/components/ui/NovaLogo";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -56,11 +57,16 @@ const Register = () => {
           className="w-full max-w-md"
         >
           <Card className="border-border/40 shadow-xl">
-            <CardHeader className="space-y-1 text-center">
-              <CardTitle className="text-3xl font-bold">Create an Account</CardTitle>
-              <CardDescription>
-                Enter your details to create your account
-              </CardDescription>
+            <CardHeader className="space-y-4 text-center">
+              <div className="flex justify-center">
+                <NovaLogo size="md" />
+              </div>
+              <div className="space-y-1">
+                <CardTitle className="text-3xl font-bold">Create an Account</CardTitle>
+                <CardDescription>
+                  Enter your details to join Study Nova
+                </CardDescription>
+              </div>
             </CardHeader>
             <form onSubmit={handleSubmit}>
               <CardContent className="space-y-4">
