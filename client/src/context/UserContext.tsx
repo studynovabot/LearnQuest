@@ -114,10 +114,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       console.log('🔄 Starting login process...');
 
-      const requestBody = { email, password };
+      const requestBody = { action: 'login', email, password };
       console.log('📤 Login request:', { email });
 
-      const response = await fetch(`${config.apiUrl}/auth/login`, {
+      const response = await fetch(`${config.apiUrl}/auth`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -166,10 +166,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       console.log('🔄 Starting registration process...');
 
-      const requestBody = { email, displayName, password, isPro: false };
+      const requestBody = { action: 'register', email, displayName, password, isPro: false };
       console.log('📤 Registration request:', { email, displayName, isPro: false });
 
-      const response = await fetch(`${config.apiUrl}/auth/register`, {
+      const response = await fetch(`${config.apiUrl}/auth`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

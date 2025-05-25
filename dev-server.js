@@ -78,23 +78,8 @@ app.post('/api/auth', async (req, res) => {
   }
 });
 
-app.post('/api/auth/register', async (req, res) => {
-  const handler = await loadApiFunction('auth/register');
-  if (handler) {
-    handler(req, res);
-  } else {
-    res.status(500).json({ error: 'Register function not found' });
-  }
-});
-
-app.post('/api/auth/login', async (req, res) => {
-  const handler = await loadApiFunction('auth/login');
-  if (handler) {
-    handler(req, res);
-  } else {
-    res.status(500).json({ error: 'Login function not found' });
-  }
-});
+// Note: Removed separate auth/register and auth/login endpoints
+// The main /api/auth endpoint handles both login and register
 
 // Content manager endpoint
 app.all('/api/content-manager', async (req, res) => {

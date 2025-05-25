@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,16 @@ import NovaLogo from "@/components/ui/NovaLogo";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, loading } = useAuth();
+  const { login, loading, user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+
+  // If user is already authenticated, redirect to main app
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      console.log('✅ User already authenticated, redirecting to main app');
+      setLocation("/");
+    }
+  }, [isAuthenticated, user, setLocation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

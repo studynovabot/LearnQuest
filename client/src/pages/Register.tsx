@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -16,8 +16,16 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const { register, loading } = useAuth();
+  const { register, loading, user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+
+  // If user is already authenticated, redirect to main app
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      console.log('✅ User already authenticated, redirecting to main app');
+      setLocation("/");
+    }
+  }, [isAuthenticated, user, setLocation]);
 
   const validateForm = () => {
     if (password !== confirmPassword) {
@@ -36,9 +44,21 @@ const Register = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    console.log('🔄 Starting registration process...');
     const success = await register(email, displayName, password);
+
     if (success) {
-      setLocation("/login");
+      console.log('✅ Registration successful! User should be logged in now.');
+      console.log('👤 Current user state:', { user, isAuthenticated });
+
+      // After successful registration, user is automatically logged in
+      // Add a small delay to ensure user state is updated before redirect
+      setTimeout(() => {
+        console.log('🔄 Redirecting to main app...');
+        setLocation("/");
+      }, 200);
+    } else {
+      console.log('❌ Registration failed');
     }
   };
 
