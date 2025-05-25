@@ -13,6 +13,7 @@ import flowChartsHandler from './flow-charts.js';
 import ncertSolutionsHandler from './ncert-solutions.js';
 import imageGenerationHandler from './image-generation.js';
 import imageAnalysisHandler from './image-analysis.js';
+import contentManagerHandler from './content-manager.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -41,6 +42,7 @@ app.all('/api/flow-charts', (req, res) => flowChartsHandler(req, res));
 app.all('/api/ncert-solutions', (req, res) => ncertSolutionsHandler(req, res));
 app.all('/api/image-generation', (req, res) => imageGenerationHandler(req, res));
 app.all('/api/image-analysis', (req, res) => imageAnalysisHandler(req, res));
+app.all('/api/content-manager*', (req, res) => contentManagerHandler(req, res));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

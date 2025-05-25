@@ -21,6 +21,7 @@ import FlowCharts from "@/pages/FlowCharts";
 import NCERTSolutions from "@/pages/NCERTSolutions";
 import ImageTools from "@/pages/ImageTools";
 import PersonalizedAgent from "@/pages/PersonalizedAgent";
+import ContentManager from "@/pages/ContentManager";
 import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
@@ -106,6 +107,11 @@ function Router() {
       <Route path="/personalized-agent">
         <MainLayout>
           <PersonalizedAgent />
+        </MainLayout>
+      </Route>
+      <Route path="/content-manager">
+        <MainLayout>
+          <ContentManager />
         </MainLayout>
       </Route>
       <Route>

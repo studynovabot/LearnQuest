@@ -150,38 +150,91 @@ export default function handler(req, res) {
         const { class: classNum, subject, chapter, search } = req.query;
         const userId = req.headers['x-user-id'] || 'demo-user';
 
-        let filteredSolutions = NCERT_SOLUTIONS_DATA;
+        try {
+          // Get uploaded NCERT solutions from database
+          let query = db.collection('ncert_solutions_content');
 
-        // Filter by class
-        if (classNum) {
-          filteredSolutions = filteredSolutions.filter(solution => solution.class === classNum);
-        }
+          if (classNum) {
+            query = query.where('class', '==', classNum);
+          }
+          if (subject) {
+            query = query.where('subject', '==', subject);
+          }
 
-        // Filter by subject
-        if (subject) {
-          filteredSolutions = filteredSolutions.filter(solution => solution.subject === subject);
-        }
+          const snapshot = await query.get();
+          const uploadedSolutions = [];
 
-        // Filter by chapter (partial match)
-        if (chapter) {
-          filteredSolutions = filteredSolutions.filter(solution => 
-            solution.title.toLowerCase().includes(chapter.toLowerCase())
-          );
-        }
-
-        // Search in questions and solutions
-        if (search) {
-          filteredSolutions = filteredSolutions.filter(solution => {
-            const searchLower = search.toLowerCase();
-            return solution.title.toLowerCase().includes(searchLower) ||
-                   solution.questions.some(q => 
-                     q.question.toLowerCase().includes(searchLower) ||
-                     q.solution.toLowerCase().includes(searchLower)
-                   );
+          snapshot.forEach(doc => {
+            uploadedSolutions.push({
+              id: doc.id,
+              ...doc.data()
+            });
           });
-        }
 
-        res.status(200).json(filteredSolutions);
+          // If we have uploaded content, filter and return it
+          if (uploadedSolutions.length > 0) {
+            let filteredSolutions = uploadedSolutions;
+
+            // Filter by chapter (partial match)
+            if (chapter) {
+              filteredSolutions = filteredSolutions.filter(solution =>
+                solution.title.toLowerCase().includes(chapter.toLowerCase())
+              );
+            }
+
+            // Search in questions and solutions
+            if (search) {
+              filteredSolutions = filteredSolutions.filter(solution => {
+                const searchLower = search.toLowerCase();
+                return solution.title.toLowerCase().includes(searchLower) ||
+                       solution.questions.some(q =>
+                         q.question.toLowerCase().includes(searchLower) ||
+                         q.solution.toLowerCase().includes(searchLower)
+                       );
+              });
+            }
+
+            return res.status(200).json(filteredSolutions);
+          }
+
+          // Fallback to hardcoded data
+          let filteredSolutions = NCERT_SOLUTIONS_DATA;
+
+          // Filter by class
+          if (classNum) {
+            filteredSolutions = filteredSolutions.filter(solution => solution.class === classNum);
+          }
+
+          // Filter by subject
+          if (subject) {
+            filteredSolutions = filteredSolutions.filter(solution => solution.subject === subject);
+          }
+
+          // Filter by chapter (partial match)
+          if (chapter) {
+            filteredSolutions = filteredSolutions.filter(solution =>
+              solution.title.toLowerCase().includes(chapter.toLowerCase())
+            );
+          }
+
+          // Search in questions and solutions
+          if (search) {
+            filteredSolutions = filteredSolutions.filter(solution => {
+              const searchLower = search.toLowerCase();
+              return solution.title.toLowerCase().includes(searchLower) ||
+                     solution.questions.some(q =>
+                       q.question.toLowerCase().includes(searchLower) ||
+                       q.solution.toLowerCase().includes(searchLower)
+                     );
+            });
+          }
+
+          res.status(200).json(filteredSolutions);
+
+        } catch (error) {
+          console.error('Error fetching NCERT solutions:', error);
+          res.status(500).json({ message: 'Failed to fetch NCERT solutions' });
+        }
 
       } else if (req.method === 'POST') {
         // Track solution access or study time
@@ -204,7 +257,7 @@ export default function handler(req, res) {
           });
 
           let xpEarned = 0;
-          
+
           // Award XP based on action
           switch (action) {
             case 'solution_viewed':
@@ -224,7 +277,7 @@ export default function handler(req, res) {
           if (xpEarned > 0) {
             const userRef = db.collection('users').doc(userId);
             const userDoc = await userRef.get();
-            
+
             if (userDoc.exists) {
               const currentXP = userDoc.data().xp || 0;
               await userRef.update({

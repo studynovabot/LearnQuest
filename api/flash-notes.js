@@ -139,40 +139,74 @@ export default function handler(req, res) {
         const { class: classNum, subject, chapter } = req.query;
         const userId = req.headers['x-user-id'] || 'demo-user';
 
-        // If specific filters are provided, return filtered results
-        if (classNum && subject && chapter) {
-          const classData = FLASH_NOTES_DATA[classNum];
-          if (classData && classData[subject] && classData[subject][chapter]) {
-            const flashNotes = classData[subject][chapter].map(note => ({
-              ...note,
-              class: classNum,
-              subject,
-              chapter
-            }));
-            return res.status(200).json(flashNotes);
-          } else {
-            return res.status(200).json([]);
-          }
-        }
+        try {
+          // First try to get uploaded content from database
+          let query = db.collection('flash_notes_content');
 
-        // Return all flash notes with class, subject, and chapter info
-        const allFlashNotes = [];
-        Object.entries(FLASH_NOTES_DATA).forEach(([classNum, classData]) => {
-          Object.entries(classData).forEach(([subject, subjectData]) => {
-            Object.entries(subjectData).forEach(([chapter, notes]) => {
-              notes.forEach(note => {
-                allFlashNotes.push({
-                  ...note,
-                  class: classNum,
-                  subject,
-                  chapter
+          if (classNum) {
+            query = query.where('class', '==', classNum);
+          }
+          if (subject) {
+            query = query.where('subject', '==', subject);
+          }
+          if (chapter) {
+            query = query.where('chapter', '==', chapter);
+          }
+
+          const snapshot = await query.get();
+          const uploadedFlashNotes = [];
+
+          snapshot.forEach(doc => {
+            uploadedFlashNotes.push({
+              id: doc.id,
+              ...doc.data()
+            });
+          });
+
+          // If we have uploaded content, return it
+          if (uploadedFlashNotes.length > 0) {
+            return res.status(200).json(uploadedFlashNotes);
+          }
+
+          // Fallback to hardcoded data if no uploaded content
+          if (classNum && subject && chapter) {
+            const classData = FLASH_NOTES_DATA[classNum];
+            if (classData && classData[subject] && classData[subject][chapter]) {
+              const flashNotes = classData[subject][chapter].map(note => ({
+                ...note,
+                class: classNum,
+                subject,
+                chapter
+              }));
+              return res.status(200).json(flashNotes);
+            } else {
+              return res.status(200).json([]);
+            }
+          }
+
+          // Return all flash notes with class, subject, and chapter info
+          const allFlashNotes = [];
+          Object.entries(FLASH_NOTES_DATA).forEach(([classNum, classData]) => {
+            Object.entries(classData).forEach(([subject, subjectData]) => {
+              Object.entries(subjectData).forEach(([chapter, notes]) => {
+                notes.forEach(note => {
+                  allFlashNotes.push({
+                    ...note,
+                    class: classNum,
+                    subject,
+                    chapter
+                  });
                 });
               });
             });
           });
-        });
 
-        res.status(200).json(allFlashNotes);
+          res.status(200).json(allFlashNotes);
+
+        } catch (error) {
+          console.error('Error fetching flash notes:', error);
+          res.status(500).json({ message: 'Failed to fetch flash notes' });
+        }
 
       } else if (req.method === 'POST') {
         // Track flash note study session
@@ -198,7 +232,7 @@ export default function handler(req, res) {
           if (completed) {
             const userRef = db.collection('users').doc(userId);
             const userDoc = await userRef.get();
-            
+
             if (userDoc.exists) {
               const currentXP = userDoc.data().xp || 0;
               await userRef.update({

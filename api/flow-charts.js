@@ -198,28 +198,66 @@ export default function handler(req, res) {
         const { class: classNum, subject, id } = req.query;
         const userId = req.headers['x-user-id'] || 'demo-user';
 
-        // If specific flow chart ID is requested
-        if (id) {
-          const flowChart = FLOW_CHARTS_DATA.find(fc => fc.id === id);
-          if (flowChart) {
-            return res.status(200).json(flowChart);
-          } else {
-            return res.status(404).json({ message: 'Flow chart not found' });
+        try {
+          // If specific flow chart ID is requested
+          if (id) {
+            // First check uploaded content
+            const uploadedDoc = await db.collection('flow_charts_content').doc(id).get();
+            if (uploadedDoc.exists) {
+              return res.status(200).json({ id: uploadedDoc.id, ...uploadedDoc.data() });
+            }
+
+            // Fallback to hardcoded data
+            const flowChart = FLOW_CHARTS_DATA.find(fc => fc.id === id);
+            if (flowChart) {
+              return res.status(200).json(flowChart);
+            } else {
+              return res.status(404).json({ message: 'Flow chart not found' });
+            }
           }
+
+          // Get uploaded flow charts from database
+          let query = db.collection('flow_charts_content');
+
+          if (classNum) {
+            query = query.where('class', '==', classNum);
+          }
+          if (subject) {
+            query = query.where('subject', '==', subject);
+          }
+
+          const snapshot = await query.get();
+          const uploadedFlowCharts = [];
+
+          snapshot.forEach(doc => {
+            uploadedFlowCharts.push({
+              id: doc.id,
+              ...doc.data()
+            });
+          });
+
+          // If we have uploaded content, return it
+          if (uploadedFlowCharts.length > 0) {
+            return res.status(200).json(uploadedFlowCharts);
+          }
+
+          // Fallback to hardcoded data
+          let filteredCharts = FLOW_CHARTS_DATA;
+
+          if (classNum) {
+            filteredCharts = filteredCharts.filter(chart => chart.class === classNum);
+          }
+
+          if (subject) {
+            filteredCharts = filteredCharts.filter(chart => chart.subject === subject);
+          }
+
+          res.status(200).json(filteredCharts);
+
+        } catch (error) {
+          console.error('Error fetching flow charts:', error);
+          res.status(500).json({ message: 'Failed to fetch flow charts' });
         }
-
-        // Filter flow charts based on query parameters
-        let filteredCharts = FLOW_CHARTS_DATA;
-
-        if (classNum) {
-          filteredCharts = filteredCharts.filter(chart => chart.class === classNum);
-        }
-
-        if (subject) {
-          filteredCharts = filteredCharts.filter(chart => chart.subject === subject);
-        }
-
-        res.status(200).json(filteredCharts);
 
       } else if (req.method === 'POST') {
         // Track flow chart progress or completion
@@ -242,7 +280,7 @@ export default function handler(req, res) {
           });
 
           let xpEarned = 0;
-          
+
           // Award XP based on action
           switch (action) {
             case 'step_completed':
@@ -262,7 +300,7 @@ export default function handler(req, res) {
           if (xpEarned > 0) {
             const userRef = db.collection('users').doc(userId);
             const userDoc = await userRef.get();
-            
+
             if (userDoc.exists) {
               const currentXP = userDoc.data().xp || 0;
               await userRef.update({
@@ -294,7 +332,7 @@ export default function handler(req, res) {
         try {
           // In a real implementation, you would update the user's progress in the database
           // For now, we'll just acknowledge the update
-          
+
           await db.collection('user_flow_chart_progress').doc(`${userId}_${chartId}_${stepId}`).set({
             userId,
             chartId,
