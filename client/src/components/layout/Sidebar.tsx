@@ -48,9 +48,14 @@ const Sidebar = () => {
         ))}
       </nav>
 
-      <button className="nav-icon rounded-xl p-2">
-        <SettingsIcon size={24} />
-      </button>
+      <Link href="/settings">
+        <button className={cn(
+          "nav-icon rounded-xl p-2",
+          location === "/settings" ? "bg-muted text-secondary" : ""
+        )}>
+          <SettingsIcon size={24} />
+        </button>
+      </Link>
     </div>
   );
 };

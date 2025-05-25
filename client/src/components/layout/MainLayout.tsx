@@ -114,15 +114,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       </div>
 
 
-      {/* Desktop settings icon overlay */}
-      <Link href="/settings">
-        <button
-          className="fixed bottom-8 right-8 z-50 bg-card border border-border rounded-full p-4 shadow-lg hover:bg-muted transition"
-          title="Settings"
-        >
-          <SettingsIcon size={28} />
-        </button>
-      </Link>
+
     </div>
   );
 };

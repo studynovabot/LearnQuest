@@ -19,16 +19,16 @@ const ChatInterface = () => {
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  
+
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [agentMessages]);
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || isSending) return;
-    
+
     setIsSending(true);
     try {
       await sendMessage(inputMessage);
@@ -44,12 +44,12 @@ const ChatInterface = () => {
       setIsSending(false);
     }
   };
-  
+
   // Take recent messages only (last 10)
   const recentMessages = (agentMessages || []).slice(-10);
-  
+
   // Add a welcome message if there are no messages
-  const displayMessages: ChatMessage[] = recentMessages.length > 0 
+  const displayMessages: ChatMessage[] = recentMessages.length > 0
               ? recentMessages.map(message => ({
                   ...message,
                   role: message.role === 'user' || message.role === 'assistant' ? message.role : 'assistant', // Ensure role matches expected values
@@ -62,10 +62,10 @@ const ChatInterface = () => {
                   timestamp: Date.now(),
                   // Remove userId as it's not in the ChatMessage type
                 }];
-  
+
   // Debug log for troubleshooting
   console.log('agentMessages:', agentMessages);
-  
+
   if (isLoading && agentMessages.length === 0) {
     return (
       <Card>
@@ -82,7 +82,7 @@ const ChatInterface = () => {
       </Card>
     );
   }
-  
+
   if (!isLoading && agentMessages.length === 0) {
     return (
       <Card>
@@ -94,7 +94,7 @@ const ChatInterface = () => {
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center h-60 text-muted-foreground">
+          <div className="flex flex-col items-center justify-center h-96 text-muted-foreground">
             <RobotIcon size={48} className="mb-4 text-primary opacity-50" />
             <p>Ask Nova anything about your studies!</p>
             <p className="text-sm mt-2">Start by typing your question below.</p>
@@ -109,7 +109,7 @@ const ChatInterface = () => {
               onChange={(e) => setInputMessage(e.target.value)}
               disabled={isSending}
             />
-            <Button 
+            <Button
               type="submit"
               className="absolute right-3 top-1/2 transform -translate-y-1/2 w-9 h-9 bg-primary rounded-lg flex items-center justify-center p-0"
               disabled={isSending || !inputMessage.trim()}
@@ -125,7 +125,7 @@ const ChatInterface = () => {
       </Card>
     );
   }
-  
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -135,11 +135,11 @@ const ChatInterface = () => {
           <span>History</span>
         </Button>
       </CardHeader>
-      
+
       <CardContent>
-        <div 
+        <div
           className="bg-background rounded-xl p-4 mb-4 overflow-y-auto flex flex-col gap-4"
-          style={{ minHeight: "260px", maxHeight: "260px" }}
+          style={{ minHeight: "400px", maxHeight: "500px" }}
         >
           {recentMessages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
@@ -160,23 +160,23 @@ const ChatInterface = () => {
                     message.role === "user" ? "self-end flex-row-reverse" : ""
                   )}
                 >
-                  <div 
+                  <div
                     className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                      message.role === "user" ? "bg-muted" : "bg-primary" 
+                      message.role === "user" ? "bg-muted" : "bg-primary"
                     )}
                   >
                     {message.role === "user" ? (
                       user?.avatarUrl ? (
-                        <img 
-                          src={user.avatarUrl} 
-                          alt="User avatar" 
+                        <img
+                          src={user.avatarUrl}
+                          alt="User avatar"
                           className="w-full h-full rounded-full object-cover"
                         />
                       ) : (
-                        <img 
-                          src={generateAvatar(user?.displayName || "User")} 
-                          alt="User avatar" 
+                        <img
+                          src={generateAvatar(user?.displayName || "User")}
+                          alt="User avatar"
                           className="w-full h-full rounded-full object-cover"
                         />
                       )
@@ -184,22 +184,22 @@ const ChatInterface = () => {
                       <RobotIcon className="text-white" size={16} />
                     )}
                   </div>
-                  
+
                   <div className="relative">
-                    <div 
+                    <div
                       className={cn(
                         "rounded-xl p-3",
-                        message.role === "user" 
-                          ? "bg-primary rounded-tr-none" 
+                        message.role === "user"
+                          ? "bg-primary rounded-tr-none"
                           : "bg-muted rounded-tl-none"
                       )}
                     >
                       <p className="text-sm">{message.content}</p>
                     </div>
-                    
+
                     {/* XP Award Indicator */}
                     {message.xpAwarded && message.xpAwarded > 0 && (
-                      <motion.div 
+                      <motion.div
                         className="absolute -top-4 -right-4 bg-secondary rounded-lg px-2 py-1 text-xs font-bold flex items-center gap-1 xp-gained"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -218,7 +218,7 @@ const ChatInterface = () => {
           )}
           <div ref={messagesEndRef} />
         </div>
-        
+
         <form onSubmit={handleSubmit} className="relative">
           <Input
             type="text"
@@ -228,7 +228,7 @@ const ChatInterface = () => {
             onChange={(e) => setInputMessage(e.target.value)}
             disabled={isSending}
           />
-          <Button 
+          <Button
             type="submit"
             className="absolute right-3 top-1/2 transform -translate-y-1/2 w-9 h-9 bg-primary rounded-lg flex items-center justify-center p-0"
             disabled={isSending || !inputMessage.trim()}

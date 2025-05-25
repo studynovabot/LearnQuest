@@ -176,7 +176,7 @@ const ChatAgents = () => {
             <div className="p-4">
               <FirebaseStatus />
             </div>
-            <div className="flex flex-col md:flex-row h-[calc(100vh-16rem)]">
+            <div className="flex flex-col md:flex-row h-[calc(100vh-12rem)]">
                 {/* Sidebar with Agents - Fixed width */}
                 <div className="w-full md:w-80 lg:w-80 flex-shrink-0 border-r border-border p-4 overflow-y-auto">
                   <div className="mb-6">
