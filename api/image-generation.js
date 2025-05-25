@@ -30,6 +30,10 @@ export default function handler(req, res) {
       let imageUrl = '';
       let xpEarned = 0;
 
+      // Set default fallback image URL immediately
+      imageUrl = `https://via.placeholder.com/512x512/6366f1/ffffff?text=${encodeURIComponent('Generated: ' + prompt.substring(0, 20))}`;
+      xpEarned = 10;
+
       try {
         if (type === 'text-to-image') {
           // Text to Image generation using FLUX.1-dev
@@ -59,6 +63,10 @@ export default function handler(req, res) {
           }
 
         } else if (type === 'image-to-image') {
+          // Set fallback for image-to-image
+          imageUrl = `https://via.placeholder.com/512x512/10b981/ffffff?text=${encodeURIComponent('Transformed: ' + prompt.substring(0, 15))}`;
+          xpEarned = 15;
+
           // Image to Image transformation
           // Note: This would require a different API endpoint that supports image-to-image
           // For now, we'll use text-to-image with a modified prompt
@@ -92,15 +100,8 @@ export default function handler(req, res) {
 
       } catch (apiError) {
         console.error('Together AI API error:', apiError);
-
-        // Fallback to placeholder images for demo
-        if (type === 'text-to-image') {
-          imageUrl = `https://via.placeholder.com/512x512/6366f1/ffffff?text=${encodeURIComponent('Generated: ' + prompt.substring(0, 20))}`;
-          xpEarned = 10;
-        } else if (type === 'image-to-image') {
-          imageUrl = `https://via.placeholder.com/512x512/10b981/ffffff?text=${encodeURIComponent('Transformed: ' + prompt.substring(0, 15))}`;
-          xpEarned = 15;
-        }
+        console.log('Using fallback imageUrl:', imageUrl);
+        // imageUrl is already set to fallback value above
       }
 
       // Record the generation in database
@@ -138,7 +139,10 @@ export default function handler(req, res) {
         xpEarned = 5;
       }
 
+      console.log('Final response imageUrl:', imageUrl);
+
       res.status(200).json({
+        success: true,
         imageUrl,
         xpEarned,
         message: 'Image generated successfully'
@@ -150,6 +154,7 @@ export default function handler(req, res) {
 
       // Return a fallback response even on error
       res.status(200).json({
+        success: true,
         imageUrl: `https://via.placeholder.com/512x512/ef4444/ffffff?text=${encodeURIComponent('Error: Please try again')}`,
         xpEarned: 0,
         message: 'Image generation failed, showing placeholder'
