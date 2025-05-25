@@ -3,7 +3,8 @@ import { initializeFirebase, getFirestoreDb } from './firebase.js';
 
 // Admin email addresses
 const ADMIN_EMAILS = [
-  'thakurranveersingh505@gmail.com'
+  'thakurranveersingh505@gmail.com',
+  'tradingproffical@gmail.com'
 ];
 
 export async function verifyAdminAccess(req) {
@@ -36,7 +37,7 @@ export async function verifyAdminAccess(req) {
         .where('email', '==', userEmail)
         .limit(1)
         .get();
-      
+
       if (!userQuery.empty) {
         const userDoc = userQuery.docs[0];
         user = { id: userDoc.id, ...userDoc.data() };
@@ -77,7 +78,7 @@ export function requireAdmin(handler) {
     const { isAdmin, user, error } = await verifyAdminAccess(req);
 
     if (!isAdmin) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         message: 'Admin access required',
         error: error || 'Insufficient permissions'
       });
@@ -92,11 +93,11 @@ export function requireAdmin(handler) {
 export function optionalAdmin(handler) {
   return async (req, res) => {
     const { isAdmin, user } = await verifyAdminAccess(req);
-    
+
     // Add admin status to request
     req.isAdmin = isAdmin;
     req.adminUser = isAdmin ? user : null;
-    
+
     return handler(req, res);
   };
 }

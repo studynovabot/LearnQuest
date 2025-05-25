@@ -46,7 +46,7 @@ const ContentManager = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Check if user is admin
-  const isAdmin = user?.role === 'admin' || user?.email === 'thakurranveersingh505@gmail.com';
+  const isAdmin = user?.role === 'admin' || user?.email === 'thakurranveersingh505@gmail.com' || user?.email === 'tradingproffical@gmail.com';
 
   const boards = ['CBSE', 'ICSE', 'State Board', 'IB', 'Cambridge'];
   const classes = ['6', '7', '8', '9', '10', '11', '12'];

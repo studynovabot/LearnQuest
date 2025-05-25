@@ -86,7 +86,7 @@ export default function handler(req, res) {
         console.log('👤 Creating new user...');
 
         // Check if user should be admin
-        const adminEmails = ['thakurranveersingh505@gmail.com'];
+        const adminEmails = ['thakurranveersingh505@gmail.com', 'tradingproffical@gmail.com'];
         const isAdmin = adminEmails.includes(email);
 
         // Create new user
