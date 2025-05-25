@@ -16,6 +16,11 @@ import Register from "@/pages/Register";
 import Settings from "@/pages/Settings";
 import Subscription from "@/pages/Subscription";
 import ApiTest from "@/pages/ApiTest";
+import FlashNotes from "@/pages/FlashNotes";
+import FlowCharts from "@/pages/FlowCharts";
+import NCERTSolutions from "@/pages/NCERTSolutions";
+import ImageTools from "@/pages/ImageTools";
+import PersonalizedAgent from "@/pages/PersonalizedAgent";
 import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
@@ -76,6 +81,31 @@ function Router() {
       <Route path="/api-test">
         <MainLayout>
           <ApiTest />
+        </MainLayout>
+      </Route>
+      <Route path="/flash-notes">
+        <MainLayout>
+          <FlashNotes />
+        </MainLayout>
+      </Route>
+      <Route path="/flow-charts">
+        <MainLayout>
+          <FlowCharts />
+        </MainLayout>
+      </Route>
+      <Route path="/ncert-solutions">
+        <MainLayout>
+          <NCERTSolutions />
+        </MainLayout>
+      </Route>
+      <Route path="/image-tools">
+        <MainLayout>
+          <ImageTools />
+        </MainLayout>
+      </Route>
+      <Route path="/personalized-agent">
+        <MainLayout>
+          <PersonalizedAgent />
         </MainLayout>
       </Route>
       <Route>

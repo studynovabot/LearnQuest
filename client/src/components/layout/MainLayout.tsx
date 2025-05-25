@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { generateAvatar } from "@/lib/utils";
-import { FlashlightIcon, FireIcon, HomeIcon, MessageIcon, TrophyIcon, StoreIcon, CreditCardIcon, SettingsIcon } from "@/components/ui/icons";
+import { FlashlightIcon, FireIcon, HomeIcon, MessageIcon, TrophyIcon, StoreIcon, CreditCardIcon, SettingsIcon, BookOpenIcon, ImageIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
@@ -23,9 +23,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const mobileNavItems = [
     { icon: HomeIcon, label: "Home", path: "/", active: location === "/" },
     { icon: MessageIcon, label: "Chat", path: "/chat", active: location === "/chat" },
-    { icon: TrophyIcon, label: "Tasks", path: "/tasks", active: location === "/tasks" },
-    { icon: StoreIcon, label: "Store", path: "/store", active: location === "/store" },
-    { icon: SettingsIcon, label: "Settings", path: "/settings", active: location === "/settings" },
+    { icon: FlashlightIcon, label: "Flash", path: "/flash-notes", active: location === "/flash-notes" },
+    { icon: BookOpenIcon, label: "NCERT", path: "/ncert-solutions", active: location === "/ncert-solutions" },
+    { icon: ImageIcon, label: "Images", path: "/image-tools", active: location === "/image-tools" },
   ];
 
   // Check if user is logged in

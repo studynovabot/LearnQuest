@@ -8,7 +8,12 @@ import {
   TrophyIcon,
   StoreIcon,
   CreditCardIcon,
-  SettingsIcon
+  SettingsIcon,
+  BookOpenIcon,
+  GitBranchIcon,
+  FileTextIcon,
+  ImageIcon,
+  SparklesIcon
 } from "@/components/ui/icons";
 import NovaLogo from "@/components/ui/NovaLogo";
 
@@ -19,6 +24,11 @@ const Sidebar = () => {
   const navItems = [
     { icon: HomeIcon, path: "/", active: location === "/" },
     { icon: MessageIcon, path: "/chat", active: location === "/chat" },
+    { icon: FlashlightIcon, path: "/flash-notes", active: location === "/flash-notes" },
+    { icon: GitBranchIcon, path: "/flow-charts", active: location === "/flow-charts" },
+    { icon: BookOpenIcon, path: "/ncert-solutions", active: location === "/ncert-solutions" },
+    { icon: ImageIcon, path: "/image-tools", active: location === "/image-tools" },
+    { icon: SparklesIcon, path: "/personalized-agent", active: location === "/personalized-agent" },
     { icon: ChartIcon, path: "/leaderboard", active: location === "/leaderboard" },
     { icon: TrophyIcon, path: "/tasks", active: location === "/tasks" },
     { icon: StoreIcon, path: "/store", active: location === "/store" },
