@@ -21,159 +21,92 @@ const AGENT_PROMPTS = {
   '15': 'You are PersonalAI, a personalized learning specialist. Adapt your teaching style to each student\'s unique needs and preferences. ✨'
 };
 
-// AI response generator with Groq integration and fallbacks
+// Maximum retries for API calls
+const MAX_RETRIES = 3;
+const INITIAL_TIMEOUT = 20000; // 20 seconds
+
+// Helper function to delay between retries
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// AI response generator with Groq integration and improved error handling
 async function generateAIResponse(content, agentId) {
   const agent = agentId || '1';
   const systemPrompt = AGENT_PROMPTS[agent] || AGENT_PROMPTS['1'];
 
   console.log(`🚀 generateAIResponse called for agent ${agent} with content: "${content}"`);
 
-  try {
-    // Try Groq API first
-    const groqApiKey = process.env.GROQ_API_KEY;
+  // Get API keys
+  const groqApiKey = process.env.GROQ_API_KEY || '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';
 
-    if (groqApiKey) {
-      console.log(`🔑 Groq API Key available: Yes`);
-      console.log(`🤖 Calling Groq API for agent ${agent}...`);
-
-      const groqPayload = {
-        model: 'llama-3.1-8b-instant',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content }
-        ],
-        max_tokens: 1000,
-        temperature: 0.7,
-        stream: false
-      };
-
-      console.log(`📦 Groq API request payload: ${JSON.stringify(groqPayload)}`);
-
-      const groqController = new AbortController();
-      const groqTimeoutId = setTimeout(() => groqController.abort(), 15000);
-
-      try {
-        const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${groqApiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(groqPayload),
-          signal: groqController.signal
-        });
-
-        clearTimeout(groqTimeoutId);
-        console.log(`📡 Groq API response status: ${groqResponse.status}`);
-
-        if (groqResponse.ok) {
-          const groqData = await groqResponse.json();
-          console.log(`✅ Groq API success for agent ${agent}`);
-
-          if (groqData && groqData.choices && groqData.choices[0] && groqData.choices[0].message) {
-            return {
-              content: groqData.choices[0].message.content,
-              xpAwarded: Math.floor(Math.random() * 10) + 15
-            };
-          }
-        } else {
-          const errorText = await groqResponse.text();
-          console.error(`❌ Groq API error: ${groqResponse.status} - ${errorText}`);
-        }
-      } catch (groqError) {
-        clearTimeout(groqTimeoutId);
-        console.error(`❌ Groq API fetch error:`, groqError);
-      }
-    }
-
-    // Try Together AI as fallback
-    const togetherApiKey = process.env.TOGETHER_AI_API_KEY;
-
-    if (togetherApiKey) {
-      console.log(`🔑 Together AI API Key available: Yes`);
-      console.log(`🤖 Calling Together AI for agent ${agent}...`);
-
-      const togetherPayload = {
-        model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content }
-        ],
-        max_tokens: 1000,
-        temperature: 0.7,
-        stream: false
-      };
-
-      console.log(`📦 Together AI request payload: ${JSON.stringify(togetherPayload)}`);
-
-      const togetherController = new AbortController();
-      const togetherTimeoutId = setTimeout(() => togetherController.abort(), 15000);
-
-      try {
-        const togetherResponse = await fetch('https://api.together.xyz/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${togetherApiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(togetherPayload),
-          signal: togetherController.signal
-        });
-
-        clearTimeout(togetherTimeoutId);
-        console.log(`📡 Together AI response status: ${togetherResponse.status}`);
-
-        if (togetherResponse.ok) {
-          const togetherData = await togetherResponse.json();
-          console.log(`✅ Together AI success for agent ${agent}`);
-
-          if (togetherData && togetherData.choices && togetherData.choices[0] && togetherData.choices[0].message) {
-            return {
-              content: togetherData.choices[0].message.content,
-              xpAwarded: Math.floor(Math.random() * 10) + 15
-            };
-          }
-        } else {
-          const errorText = await togetherResponse.text();
-          console.error(`❌ Together AI error: ${togetherResponse.status} - ${errorText}`);
-        }
-      } catch (togetherError) {
-        clearTimeout(togetherTimeoutId);
-        console.error(`❌ Together AI fetch error:`, togetherError);
-      }
-    }
-
-    throw new Error('Both Groq and Together AI APIs failed');
-  } catch (error) {
-    console.error(`❌ AI API error for agent ${agent}:`, error);
+  if (!groqApiKey) {
+    throw new Error('Groq API key is required');
   }
 
-  // Fallback responses remain unchanged
-  const agentResponses = {
-    '1': `🤖 Hi there! I'm Nova, your AI learning companion. I'd love to help you with "${content}". While I'm having trouble connecting to my advanced systems right now, I can still guide you through this topic step by step!`,
-    '2': `🔢 Hello! I'm MathWiz, your math expert. Let's tackle "${content}" together! Even without my full computational power, I can help you understand the mathematical concepts behind this problem.`,
-    '3': `🔬 Greetings! I'm ScienceBot, and I'm excited to explore "${content}" with you! Science is all about curiosity and discovery, so let's investigate this together!`,
-    '4': `📚 Welcome! I'm LinguaLearn, your English language guide. I'd be delighted to help you with "${content}". Language learning is a journey, and I'm here to support you every step of the way!`,
-    '5': `🏛️ Hello there! I'm HistoryWise, and I find your question about "${content}" fascinating! History is full of amazing stories and lessons that can help us understand this topic better.`,
-    '6': `💻 Hey! I'm CodeMaster, your programming mentor. Let's debug this question about "${content}" together! Coding is all about problem-solving, and I'm here to help you think like a programmer.`,
-    '7': `🎨 Hello, creative soul! I'm ArtVision, and I'm inspired by your question about "${content}". Art is about expression and exploration, so let's dive into this topic with creativity!`,
-    '8': `🌱 Hi! I'm EcoExpert, and I'm passionate about helping you understand "${content}". Our planet is amazing, and every question about the environment is a step toward better understanding our world!`,
-    '9': `🤔 Greetings, thoughtful student! I'm PhiloThink, and your question about "${content}" is exactly the kind of deep thinking that philosophy encourages. Let's explore this together!`,
-    '10': `🧠 Hello! I'm PsychoGuide, and I'm here to help you understand "${content}". The human mind is fascinating, and every question is an opportunity to learn more about how we think and feel.`,
-    '11': `📈 Hi there! I'm EconAnalyst, and I'm excited to discuss "${content}" with you. Economics is everywhere in our daily lives, so let's explore how this concept affects the world around us!`,
-    '12': `🌍 Hello, fellow explorer! I'm GeoExplorer, and your question about "${content}" takes us on a journey around our amazing world. Geography is about understanding places and connections!`,
-    '13': `💪 Hey champion! I'm MotivateMe, and I believe in you! Your question about "${content}" shows you're taking charge of your learning. That's the spirit that leads to success!`,
-    '14': `📖 Hi there, dedicated learner! I'm StudyBuddy, and I'm here to help you master "${content}". Good study habits and the right techniques can make any subject easier to understand!`,
-    '15': `✨ Hello! I'm PersonalAI, and I'm adapting my response just for you! Your question about "${content}" is unique, and I want to help you learn in the way that works best for your learning style.`
+  // Prepare the payload
+  const groqPayload = {
+    model: 'llama-3.3-70b-versatile',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: content }
+    ],
+    max_tokens: 700,
+    temperature: 0.7,
+    top_p: 0.95,
+    stream: false
   };
 
-  const fallbackResponse = agentResponses[agent] || agentResponses['1'];
-  console.log(`⚠️ Using fallback response for agent ${agent}`);
+  // Try Groq API with retries
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    console.log(`🔄 Attempt ${attempt} of ${MAX_RETRIES} for Groq API...`);
 
-  return {
-    content: fallbackResponse,
-    xpAwarded: Math.floor(Math.random() * 10) + 10
-  };
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), INITIAL_TIMEOUT * attempt);
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(groqPayload),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`✅ Groq API success for agent ${agent} on attempt ${attempt}`);
+
+        if (data?.choices?.[0]?.message?.content) {
+          return {
+            content: data.choices[0].message.content,
+            xpAwarded: Math.floor(Math.random() * 10) + 20
+          };
+        }
+      }
+
+      const errorText = await response.text();
+      console.error(`❌ Groq API error (Attempt ${attempt}): ${response.status} - ${errorText}`);
+
+      if (attempt < MAX_RETRIES) {
+        const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+        console.log(`⏳ Waiting ${backoffDelay}ms before retry...`);
+        await delay(backoffDelay);
+      }
+    } catch (error) {
+      console.error(`❌ Groq API error on attempt ${attempt}:`, error);
+
+      if (attempt < MAX_RETRIES) {
+        const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+        console.log(`⏳ Waiting ${backoffDelay}ms before retry...`);
+        await delay(backoffDelay);
+      }
+    }
+  }
+
+  throw new Error('Failed to get response from Groq API after all retries');
 }
 
 // Verify API key is working

@@ -124,81 +124,82 @@ async function backupOCR(imageData) {
   }
 }
 
+// Maximum retries for API calls
+const MAX_RETRIES = 3;
+const INITIAL_TIMEOUT = 20000; // 20 seconds
+
+// Helper function to delay between retries
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 // Generate AI explanation based on extracted text
 async function generateExplanation(extractedText, apiKey) {
-  try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
+  const payload = {
+    model: 'llama-3.3-70b-versatile',
+    messages: [
+      {
+        role: 'system',
+        content: 'You are an educational AI assistant. Analyze the text extracted from an image and provide a detailed explanation, solution, or educational context. If it\'s a math problem, solve it step by step. If it\'s a question, provide a comprehensive answer.'
       },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an educational AI assistant. Analyze the text extracted from an image and provide a detailed explanation, solution, or educational context. If it\'s a math problem, solve it step by step. If it\'s a question, provide a comprehensive answer.'
-          },
-          {
-            role: 'user',
-            content: `Please analyze and explain this text extracted from an image: "${extractedText}"`
-          }
-        ],
-        max_tokens: 500,
-        temperature: 0.7
-      })
-    });
+      {
+        role: 'user',
+        content: `Please analyze and explain this text extracted from an image: "${extractedText}"`
+      }
+    ],
+    max_tokens: 700,
+    temperature: 0.7,
+    top_p: 0.95,
+    stream: false
+  };
 
-    if (response.ok) {
-      const data = await response.json();
-      return data.choices[0].message.content;
-    } else {
-      throw new Error('AI explanation generation failed');
+  // Try Groq API with retries
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    console.log(`🔄 Attempt ${attempt} of ${MAX_RETRIES} for Groq API explanation...`);
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), INITIAL_TIMEOUT * attempt);
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`✅ Groq API explanation success on attempt ${attempt}`);
+
+        if (data?.choices?.[0]?.message?.content) {
+          return data.choices[0].message.content;
+        }
+      }
+
+      const errorText = await response.text();
+      console.error(`❌ Groq API explanation error (Attempt ${attempt}): ${response.status} - ${errorText}`);
+
+      if (attempt < MAX_RETRIES) {
+        const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+        console.log(`⏳ Waiting ${backoffDelay}ms before retry...`);
+        await delay(backoffDelay);
+      }
+    } catch (error) {
+      console.error(`❌ Groq API explanation error on attempt ${attempt}:`, error);
+
+      if (attempt < MAX_RETRIES) {
+        const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+        console.log(`⏳ Waiting ${backoffDelay}ms before retry...`);
+        await delay(backoffDelay);
+      }
     }
-  } catch (error) {
-    console.error('AI explanation error:', error);
-    return generateFallbackExplanation(extractedText);
   }
-}
 
-function generateFallbackExplanation(text) {
-  if (text.includes('x') && (text.includes('=') || text.includes('solve'))) {
-    return `This appears to be a mathematical equation. To solve equations like this:
-1. Identify the variable (usually x)
-2. Isolate the variable by performing inverse operations
-3. Check your answer by substituting back
-4. For example, if the equation is 2x + 5 = 15:
-   - Subtract 5 from both sides: 2x = 10
-   - Divide by 2: x = 5
-   - Check: 2(5) + 5 = 15 ✓`;
-  } else if (text.toLowerCase().includes('photosynthesis')) {
-    return `This question is about photosynthesis, the process by which plants make their own food:
-- Raw materials: Carbon dioxide (CO₂) + Water (H₂O) + Sunlight
-- Location: Occurs in chloroplasts of green leaves
-- Process: Chlorophyll absorbs light energy to convert CO₂ and H₂O into glucose
-- Products: Glucose (food) + Oxygen (O₂)
-- Equation: 6CO₂ + 6H₂O + Light Energy → C₆H₁₂O₆ + 6O₂
-- Importance: Provides food for plants and oxygen for all living beings`;
-  } else if (text.toLowerCase().includes('water cycle')) {
-    return `The water cycle is the continuous movement of water on Earth:
-1. Evaporation: Sun heats water bodies, converting water to vapor
-2. Transpiration: Plants release water vapor through leaves
-3. Condensation: Water vapor cools and forms clouds
-4. Precipitation: Water falls as rain, snow, or hail
-5. Collection: Water collects in rivers, lakes, and groundwater
-This cycle is essential for distributing fresh water across the planet.`;
-  } else {
-    return `Based on the extracted text, this appears to be educational content. Here's what I can help you understand:
-
-The text contains information that can be broken down and explained step by step. If this is:
-- A math problem: I can help solve it systematically
-- A science question: I can provide detailed explanations with examples
-- A language question: I can help with grammar, vocabulary, or comprehension
-- A history/geography question: I can provide context and detailed answers
-
-Feel free to ask specific questions about any part of this content for more detailed explanations!`;
-  }
+  throw new Error('Failed to get explanation from Groq API after all retries');
 }
 
 export default function handler(req, res) {
