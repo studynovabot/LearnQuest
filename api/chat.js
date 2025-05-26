@@ -7,21 +7,21 @@ const AGENT_PROMPTS = {
   '1': 'You are Nova, a friendly general AI tutor. Help with any subject using clear explanations and encouraging tone. Use emojis to make learning fun! 🤖',
   '2': 'You are MathWiz, a mathematics expert. Explain math concepts step-by-step with examples. Use mathematical notation when helpful. 🔢',
   '3': 'You are ScienceBot, a science specialist. Explain scientific concepts with real-world examples and encourage curiosity about how things work. 🔬',
-  '4': 'You are LinguaLearn, an English language expert. Help with grammar, writing, literature, and language skills with patience and clarity. 📚',
+  '4': 'You are LinguaLearn, a language expert. Help with grammar, writing, literature, and language skills with patience and clarity. 📚',
   '5': 'You are HistoryWise, a history expert. Share historical knowledge with engaging stories and help students understand cause and effect. 🏛️',
-  '6': 'You are CodeMaster, a programming mentor. Teach coding concepts with practical examples and encourage problem-solving skills. 💻',
-  '7': 'You are ArtVision, an arts guide. Inspire creativity and help students explore artistic expression and appreciation. 🎨',
-  '8': 'You are EcoExpert, an environmental science specialist. Teach about nature, sustainability, and our planet with passion. 🌱',
-  '9': 'You are PhiloThink, a philosophy guide. Encourage critical thinking and help students explore big questions about life and ethics. 🤔',
-  '10': 'You are PsychoGuide, a psychology expert. Help students understand human behavior and mental processes with empathy. 🧠',
-  '11': 'You are EconAnalyst, an economics expert. Explain economic concepts and help students understand how markets and money work. 📈',
-  '12': 'You are GeoExplorer, a geography specialist. Share knowledge about our world, cultures, and places with enthusiasm. 🌍',
-  '13': 'You are MotivateMe, a motivational coach. Inspire students, boost confidence, and help them overcome challenges. 💪',
-  '14': 'You are StudyBuddy, a study skills expert. Teach effective learning techniques and help students develop good study habits. 📖',
+  '6': 'You are GeoExplorer, a geography specialist. Share knowledge about our world, cultures, and places with enthusiasm. 🌍',
+  '7': 'You are PhysicsProf, a physics expert. Explain physics concepts with clear examples and help students understand how the universe works. ⚛️',
+  '8': 'You are ChemCoach, a chemistry expert. Help students understand chemical reactions, elements, and molecular structures with enthusiasm. 🧪',
+  '9': 'You are BioBuddy, a biology expert. Explain life sciences with passion and help students understand living organisms and ecosystems. 🧬',
+  '10': 'You are EnglishExpert, an English language and literature specialist. Help with writing, reading comprehension, and literary analysis. 📖',
+  '11': 'You are CodeMaster, a computer science expert. Teach programming concepts with practical examples and encourage problem-solving skills. 💻',
+  '12': 'You are ArtAdvisor, an arts guide. Inspire creativity and help students explore artistic expression and appreciation. 🎨',
+  '13': 'You are MusicMaestro, a music expert. Teach music theory, instruments, and appreciation with passion and creativity. 🎵',
+  '14': 'You are SportsScholar, a physical education expert. Promote fitness, sports skills, and healthy lifestyle choices. 🏃‍♂️',
   '15': 'You are PersonalAI, a personalized learning specialist. Adapt your teaching style to each student\'s unique needs and preferences. ✨'
 };
 
-// AI response generator with Groq integration
+// AI response generator with Groq integration and fallbacks
 async function generateAIResponse(content, agentId) {
   const agent = agentId || '1';
   const systemPrompt = AGENT_PROMPTS[agent] || AGENT_PROMPTS['1'];
@@ -29,19 +29,15 @@ async function generateAIResponse(content, agentId) {
   console.log(`🚀 generateAIResponse called for agent ${agent} with content: "${content}"`);
 
   try {
+    // Try Groq API first
     const groqApiKey = process.env.GROQ_API_KEY;
-    
-    if (!groqApiKey) {
-      throw new Error('Groq API key not configured');
-    }
 
-    console.log(`🔑 Groq API Key available: ${groqApiKey ? 'Yes' : 'No'}`);
+    if (groqApiKey) {
+      console.log(`🔑 Groq API Key available: Yes`);
+      console.log(`🤖 Calling Groq API for agent ${agent}...`);
 
-    // Use llama-3.3-70b-versatile for all tutors
-    console.log(`🤖 Calling Groq API for agent ${agent}...`);
-    try {
-      const payload = {
-        model: 'llama-3.3-70b-versatile',
+      const groqPayload = {
+        model: 'llama-3.1-8b-instant',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: content }
@@ -50,48 +46,106 @@ async function generateAIResponse(content, agentId) {
         temperature: 0.7,
         stream: false
       };
-      
-      console.log(`📦 Groq API request payload: ${JSON.stringify(payload)}`);
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
-      
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${groqApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload),
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      
-      console.log(`📡 Groq API response status: ${response.status}`);
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log(`✅ Groq API success for agent ${agent}`);
-        
-        if (data && data.choices && data.choices[0] && data.choices[0].message) {
-          return {
-            content: data.choices[0].message.content,
-            xpAwarded: Math.floor(Math.random() * 10) + 15
-          };
+      console.log(`📦 Groq API request payload: ${JSON.stringify(groqPayload)}`);
+
+      const groqController = new AbortController();
+      const groqTimeoutId = setTimeout(() => groqController.abort(), 15000);
+
+      try {
+        const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${groqApiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(groqPayload),
+          signal: groqController.signal
+        });
+
+        clearTimeout(groqTimeoutId);
+        console.log(`📡 Groq API response status: ${groqResponse.status}`);
+
+        if (groqResponse.ok) {
+          const groqData = await groqResponse.json();
+          console.log(`✅ Groq API success for agent ${agent}`);
+
+          if (groqData && groqData.choices && groqData.choices[0] && groqData.choices[0].message) {
+            return {
+              content: groqData.choices[0].message.content,
+              xpAwarded: Math.floor(Math.random() * 10) + 15
+            };
+          }
+        } else {
+          const errorText = await groqResponse.text();
+          console.error(`❌ Groq API error: ${groqResponse.status} - ${errorText}`);
         }
-      } else {
-        const errorText = await response.text();
-        console.error(`❌ Groq API error: ${response.status} - ${errorText}`);
-      }
-    } catch (fetchError) {
-      console.error(`❌ Groq API fetch error:`, fetchError);
-      if (fetchError.name === 'AbortError') {
-        console.error('⏱️ Groq API request timed out after 15 seconds');
+      } catch (groqError) {
+        clearTimeout(groqTimeoutId);
+        console.error(`❌ Groq API fetch error:`, groqError);
       }
     }
+
+    // Try Together AI as fallback
+    const togetherApiKey = process.env.TOGETHER_AI_API_KEY;
+
+    if (togetherApiKey) {
+      console.log(`🔑 Together AI API Key available: Yes`);
+      console.log(`🤖 Calling Together AI for agent ${agent}...`);
+
+      const togetherPayload = {
+        model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: content }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7,
+        stream: false
+      };
+
+      console.log(`📦 Together AI request payload: ${JSON.stringify(togetherPayload)}`);
+
+      const togetherController = new AbortController();
+      const togetherTimeoutId = setTimeout(() => togetherController.abort(), 15000);
+
+      try {
+        const togetherResponse = await fetch('https://api.together.xyz/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${togetherApiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(togetherPayload),
+          signal: togetherController.signal
+        });
+
+        clearTimeout(togetherTimeoutId);
+        console.log(`📡 Together AI response status: ${togetherResponse.status}`);
+
+        if (togetherResponse.ok) {
+          const togetherData = await togetherResponse.json();
+          console.log(`✅ Together AI success for agent ${agent}`);
+
+          if (togetherData && togetherData.choices && togetherData.choices[0] && togetherData.choices[0].message) {
+            return {
+              content: togetherData.choices[0].message.content,
+              xpAwarded: Math.floor(Math.random() * 10) + 15
+            };
+          }
+        } else {
+          const errorText = await togetherResponse.text();
+          console.error(`❌ Together AI error: ${togetherResponse.status} - ${errorText}`);
+        }
+      } catch (togetherError) {
+        clearTimeout(togetherTimeoutId);
+        console.error(`❌ Together AI fetch error:`, togetherError);
+      }
+    }
+
+    throw new Error('Both Groq and Together AI APIs failed');
   } catch (error) {
-    console.error(`AI API error for agent ${agent}:`, error);
+    console.error(`❌ AI API error for agent ${agent}:`, error);
   }
 
   // Fallback responses remain unchanged
@@ -125,18 +179,18 @@ async function generateAIResponse(content, agentId) {
 // Verify API key is working
 async function verifyApiKey() {
   const groqApiKey = process.env.GROQ_API_KEY;
-  
+
   const results = {
     groq: { working: false, error: null }
   };
-  
+
   try {
     const response = await fetch('https://api.groq.com/openai/v1/models', {
       headers: {
         'Authorization': `Bearer ${groqApiKey}`
       }
     });
-    
+
     results.groq.working = response.ok;
     if (!response.ok) {
       const text = await response.text();
@@ -145,7 +199,7 @@ async function verifyApiKey() {
   } catch (error) {
     results.groq.error = error.message;
   }
-  
+
   return results;
 }
 
@@ -159,7 +213,7 @@ export default function handler(req, res) {
       // Verify API key first
       const apiStatus = await verifyApiKey();
       console.log('API Status Check:', apiStatus);
-      
+
       // Initialize Firebase
       initializeFirebase();
       const db = getFirestoreDb();
@@ -217,17 +271,17 @@ function getSubjectFromAgent(agentId) {
     '1': 'General', // Nova
     '2': 'Mathematics', // MathWiz
     '3': 'Science', // ScienceBot
-    '4': 'English', // LinguaLearn
+    '4': 'Languages', // LinguaLearn
     '5': 'History', // HistoryWise
-    '6': 'Computer Science', // CodeMaster
-    '7': 'Art', // ArtVision
-    '8': 'Environmental Science', // EcoExpert
-    '9': 'Philosophy', // PhiloThink
-    '10': 'Psychology', // PsychoGuide
-    '11': 'Economics', // EconAnalyst
-    '12': 'Geography', // GeoExplorer
-    '13': 'Motivation', // MotivateMe
-    '14': 'Study Skills', // StudyBuddy
+    '6': 'Geography', // GeoExplorer
+    '7': 'Physics', // PhysicsProf
+    '8': 'Chemistry', // ChemCoach
+    '9': 'Biology', // BioBuddy
+    '10': 'English', // EnglishExpert
+    '11': 'Computer Science', // CodeMaster
+    '12': 'Arts', // ArtAdvisor
+    '13': 'Music', // MusicMaestro
+    '14': 'Physical Education', // SportsScholar
     '15': 'Personalized Learning' // PersonalAI
   };
 
