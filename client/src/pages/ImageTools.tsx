@@ -73,7 +73,7 @@ const ImageTools = () => {
           console.log('Generated image state should now be:', data.imageUrl);
           toast({
             title: "Image Generated! 🎨",
-            description: "Your image has been successfully generated.",
+            description: "Your image has been successfully generated with Starry AI.",
           });
         } else {
           console.error('Invalid imageUrl received:', data.imageUrl);
@@ -90,8 +90,9 @@ const ImageTools = () => {
       // Fallback with placeholder
       setGeneratedImage('https://via.placeholder.com/512x512/6366f1/ffffff?text=Generated+Image');
       toast({
-        title: "Demo Mode",
-        description: "Image generation is in demo mode. Real generation will be available soon!",
+        title: "Generation Error",
+        description: "Failed to generate image. Please try again or check your prompt.",
+        variant: "destructive"
       });
     } finally {
       setIsGenerating(false);
@@ -198,7 +199,7 @@ const ImageTools = () => {
           setTransformedImage(data.imageUrl);
           toast({
             title: "Image Transformed! ✨",
-            description: "Your image has been successfully transformed.",
+            description: "Your image has been successfully transformed with Starry AI.",
           });
         } else {
           console.error('Invalid imageUrl received:', data.imageUrl);
@@ -212,8 +213,9 @@ const ImageTools = () => {
       // Fallback with placeholder
       setTransformedImage('https://via.placeholder.com/512x512/10b981/ffffff?text=Transformed+Image');
       toast({
-        title: "Demo Mode",
-        description: "Image transformation is in demo mode. Real transformation will be available soon!",
+        title: "Transformation Error",
+        description: "Failed to transform image. Please try again or check your prompt.",
+        variant: "destructive"
       });
     } finally {
       setIsTransforming(false);
@@ -239,7 +241,7 @@ const ImageTools = () => {
             <h1 className="text-3xl font-bold">AI Image Tools</h1>
           </div>
           <p className="text-muted-foreground">
-            Generate, analyze, and transform images with AI-powered tools
+            Generate, analyze, and transform images with Starry AI and advanced OCR technology
           </p>
         </motion.div>
 
@@ -259,7 +261,7 @@ const ImageTools = () => {
                   Text to Image Generation
                 </CardTitle>
                 <p className="text-muted-foreground">
-                  Generate images from text descriptions using AI
+                  Generate high-quality images from text descriptions using Starry AI
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -283,7 +285,7 @@ const ImageTools = () => {
                   {isGenerating ? (
                     <>
                       <LoaderIcon size={16} className="mr-2 animate-spin" />
-                      Generating...
+                      Generating with Starry AI...
                     </>
                   ) : (
                     <>
@@ -412,7 +414,7 @@ const ImageTools = () => {
                   Image to Image Transformation
                 </CardTitle>
                 <p className="text-muted-foreground">
-                  Transform images based on text prompts
+                  Transform images based on text prompts using Starry AI
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -461,7 +463,7 @@ const ImageTools = () => {
                   {isTransforming ? (
                     <>
                       <LoaderIcon size={16} className="mr-2 animate-spin" />
-                      Transforming...
+                      Transforming with Starry AI...
                     </>
                   ) : (
                     <>
