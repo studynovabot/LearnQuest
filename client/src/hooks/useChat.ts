@@ -74,7 +74,10 @@ export function useChat() {
           try {
             console.log(`Sending chat message to API (attempt ${retryCount + 1}/${maxRetries + 1})`);
 
-            const response = await apiRequest("POST", "/api/chat", {
+            console.log(`Making API request to /api/chat with agent ID: ${activeAgent?.id || '1'}`);
+            
+            // Add a timestamp to prevent caching
+            const response = await apiRequest("POST", `/api/chat?t=${Date.now()}`, {
               content,
               agentId: activeAgent?.id || '1', // Default to the first agent if none is selected
               userId: user?.id, // Pass user ID for performance tracking
