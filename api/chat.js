@@ -30,8 +30,8 @@ async function generateAIResponse(content, agentId) {
 
   try {
     // Use updated API keys that are known to be working
-    const groqApiKey = process.env.GROQ_API_KEY || 'gsk_VGJnTnZLMmZuZ3FYaHA56NvqEz2pg6h2dVenFzwu';
-    const togetherApiKey = process.env.TOGETHER_API_KEY || '7d11fa278a2b0b729dcda437ef07b8b0f14e1fc2ee7';
+    const groqApiKey = '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';
+    const togetherApiKey = 'tgp_v1_yFrvJxVO3yzNPiosWhOZYeg0_BjLlBQDruWAiwSi5bs';
     
     // Log the first few characters of the keys for debugging (don't log full keys for security)
     console.log(`Groq API Key (first 10 chars): ${groqApiKey.substring(0, 10)}...`);
@@ -39,13 +39,13 @@ async function generateAIResponse(content, agentId) {
 
     console.log(`🔑 API Keys available - Groq: ${groqApiKey ? 'Yes' : 'No'}, Together: ${togetherApiKey ? 'Yes' : 'No'}`);
 
-    // Nova (agent 1) uses Groq with llama-3.3-70b-versatile, other agents use Together AI
-    if (groqApiKey) {
+    // Nova (agent 1) uses Groq with llama-3-70b-8192, other agents use Together AI
+    if (groqApiKey && agent === '1') {
       console.log(`🤖 Calling Groq API for agent ${agent}...`);
       try {
-        // Create request payload with llama-3.3-70b-versatile model
+        // Create request payload with llama-3-70b-8192 model
         const payload = {
-          model: 'llama-3.3-70b-versatile',  // Using llama-3.3-70b-versatile model
+          model: 'llama-3-70b-8192',  // Groq's supported model
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: content }
@@ -102,9 +102,9 @@ async function generateAIResponse(content, agentId) {
       }
     }
 
-    // Use Together AI for agents 2-15 with llama-3.3-70b-versatile model
+    // Use Together AI for agents 2-15 with meta-llama/Llama-3-70b-chat-hf model
     if (togetherApiKey && agent !== '1') {
-      const model = 'llama-3.3-70b-versatile'; // Using llama-3.3-70b-versatile model
+      const model = 'meta-llama/Llama-3-70b-chat-hf'; // Together's supported model
       console.log(`🤖 Calling Together AI for agent ${agent} with model ${model}...`);
       
       try {
