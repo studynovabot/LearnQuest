@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>StudyNova AI Tutor Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background-color: #e6ffe6; }
+        .error { background-color: #ffe6e6; }
+        pre { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>StudyNova AI Tutor Test</h1>
+    <div id="results"></div>
+
+    <script>
+        const testQuestions = {
+            '1': 'What is gravity?', // Nova - General
+            '2': 'Explain Pythagorean theorem', // MathWiz
+            '3': 'What is photosynthesis?', // ScienceBot
+            '4': 'What is a metaphor?', // LinguaLearn
+            '5': 'What caused World War 1?', // HistoryWise
+            '6': 'What are tectonic plates?', // GeoExplorer
+            '7': 'Explain Newton\'s first law', // PhysicsProf
+            '8': 'What is an atom?', // ChemCoach
+            '9': 'What is DNA?', // BioBuddy
+            '10': 'What is a verb?', // EnglishExpert
+            '11': 'What is an algorithm?', // CodeMaster
+            '12': 'What is impressionism?', // ArtAdvisor
+            '13': 'What is harmony in music?', // MusicMaestro
+            '14': 'What is aerobic exercise?', // SportsScholar
+            '15': 'How does memory work?' // PersonalAI
+        };
+
+        const resultsDiv = document.getElementById('results');
+
+        async function testTutor(agentId, question) {
+            try {
+                const response = await fetch('https://studynovaai.vercel.app/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-id': 'test-user'
+                    },
+                    body: JSON.stringify({
+                        content: question,
+                        agentId: agentId
+                    })
+                });
+
+                const data = await response.json();
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `result ${response.ok ? 'success' : 'error'}`;
+                resultDiv.innerHTML = `
+                    <h3>Tutor ${agentId} Test</h3>
+                    <p><strong>Question:</strong> ${question}</p>
+                    <p><strong>Status:</strong> ${response.status} ${response.ok ? '✅' : '❌'}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                resultsDiv.appendChild(resultDiv);
+
+                return data;
+            } catch (error) {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <h3>Tutor ${agentId} Test</h3>
+                    <p><strong>Question:</strong> ${question}</p>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+                resultsDiv.appendChild(resultDiv);
+                return null;
+            }
+        }
+
+        async function runTests() {
+            for (const [agentId, question] of Object.entries(testQuestions)) {
+                await testTutor(agentId, question);
+                // Add a small delay between requests to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
+
+        // Start the tests
+        runTests();
+    </script>
+</body>
+</html> 

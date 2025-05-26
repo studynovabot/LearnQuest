@@ -2,6 +2,27 @@
 import { handleCors } from './_utils/cors.js';
 import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
 
+// Export test endpoint for development environment
+export const testEndpoint = process.env.NODE_ENV === 'development' ? async (req, res) => {
+  try {
+    const results = await testTutorResponses();
+    return res.status(200).json({
+      success: true,
+      results,
+      summary: {
+        total: results.length,
+        successful: results.filter(r => r.success).length,
+        realResponses: results.filter(r => r.success && r.isRealResponse).length
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+} : null;
+
 // Agent-specific system prompts for all 15 AI tutors
 const AGENT_PROMPTS = {
   '1': 'You are Nova, a friendly general AI tutor. Provide clear, concise, and accurate explanations in about 100 words. Use scientific terminology appropriately and maintain an encouraging tone. 🤖',
@@ -31,7 +52,7 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 // Verify Groq API connection
 async function verifyGroqAPI(apiKey) {
   try {
-    const response = await fetch('https://api.groq.com/v1/models', {
+    const response = await fetch('https://api.groq.com/openai/v1/models', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -54,53 +75,67 @@ async function verifyGroqAPI(apiKey) {
   }
 }
 
-// AI response generator with Groq integration and improved error handling
+// AI response generator with Groq integration and Together AI fallback
 async function generateAIResponse(content, agentId) {
   const agent = agentId || '1';
   const systemPrompt = AGENT_PROMPTS[agent] || AGENT_PROMPTS['1'];
 
   console.log(`🚀 generateAIResponse called for agent ${agent} with content: "${content}"`);
 
-  // Get and verify API key
-  const groqApiKey = process.env.GROQ_API_KEY || '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';
-  
-  // Verify API connection first
-  const apiStatus = await verifyGroqAPI(groqApiKey);
-  if (!apiStatus.success) {
-    console.error('❌ Groq API verification failed:', apiStatus.error);
-    throw new Error(`Groq API verification failed: ${apiStatus.error}`);
-  }
+  // Get API keys
+  const groqApiKey = process.env.GROQ_API_KEY || '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';
+  const togetherApiKey = process.env.TOGETHER_AI_API_KEY || 'tgp_v1_yFrvJxVO3yzNPiosWhOZYeg0_BjLlBQDruWAiwSi5bs';
 
+  // Try Groq API first, then fallback to Together AI
+  try {
+    console.log('🔍 Trying Groq API...');
+    return await tryGroqAPI(content, systemPrompt, groqApiKey);
+  } catch (groqError) {
+    console.log('⚠️ Groq API failed, trying Together AI fallback...', groqError.message);
+    try {
+      return await tryTogetherAPI(content, systemPrompt, togetherApiKey);
+    } catch (togetherError) {
+      console.error('❌ Both APIs failed');
+      // Return a helpful fallback response
+      return {
+        content: `I'm having trouble connecting to the AI service right now. This might be a temporary issue. Please try again in a moment. If the problem persists, the service might be experiencing high demand.`,
+        xpAwarded: 5,
+        model: 'fallback'
+      };
+    }
+  }
+}
+
+// Try Groq API with current models
+async function tryGroqAPI(content, systemPrompt, apiKey) {
   // Validate content
   if (!content || typeof content !== 'string') {
-    console.error('❌ Invalid content provided:', content);
     throw new Error('Valid content is required');
   }
 
   const trimmedContent = content.trim();
   if (trimmedContent.length === 0) {
-    console.error('❌ Empty content after trimming');
     throw new Error('Content cannot be empty');
   }
 
-  // Prepare the payload with fallback models
-  const models = ['llama2-70b-4096', 'mixtral-8x7b-32768', 'llama2-70b'];
+  // Current working Groq models
+  const models = ['llama-3.1-8b-instant', 'llama3-70b-8192', 'llama3-8b-8192', 'gemma2-9b-it'];
   let lastError = null;
 
-  // Try each model in sequence
+  // Try each model
   for (const model of models) {
-    console.log(`🔄 Trying model: ${model}`);
-    
-    const groqPayload = {
+    console.log(`🔄 Trying Groq model: ${model}`);
+
+    const payload = {
       model: model,
       messages: [
-        { 
-          role: 'system', 
-          content: `${systemPrompt}\n\nImportant instructions:\n1. Provide accurate and scientific explanations\n2. Keep responses to about 100 words\n3. Use proper terminology\n4. Be clear and concise\n5. Focus on factual information` 
+        {
+          role: 'system',
+          content: `${systemPrompt}\n\nImportant instructions:\n1. Provide accurate and scientific explanations\n2. Keep responses to about 100 words\n3. Use proper terminology\n4. Be clear and concise\n5. Focus on factual information`
         },
-        { 
-          role: 'user', 
-          content: `${trimmedContent}. Please explain this in about 100 words, focusing on accuracy and clarity.` 
+        {
+          role: 'user',
+          content: `${trimmedContent}. Please explain this in about 100 words, focusing on accuracy and clarity.`
         }
       ],
       max_tokens: 500,
@@ -109,57 +144,23 @@ async function generateAIResponse(content, agentId) {
       stream: false
     };
 
-    // Try Groq API with retries
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      console.log(`🔄 Attempt ${attempt} of ${MAX_RETRIES} for Groq API with model ${model}...`);
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
 
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-          console.log(`⏱️ Request timeout on attempt ${attempt}`);
-        }, INITIAL_TIMEOUT * attempt);
-
-        const response = await fetch('https://api.groq.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${groqApiKey}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(groqPayload),
-          signal: controller.signal
-        });
-
-        clearTimeout(timeoutId);
-
-        const responseText = await response.text();
-        console.log(`📡 Groq API response status: ${response.status}`);
-        console.log(`📡 Groq API response text:`, responseText);
-
-        if (response.ok) {
-          let data;
-          try {
-            data = JSON.parse(responseText);
-          } catch (parseError) {
-            console.error('❌ Failed to parse Groq API response:', parseError);
-            throw new Error(`Invalid JSON response: ${responseText}`);
-          }
-
-          if (data?.choices?.[0]?.message?.content) {
+      if (response.ok) {
+        const data = await response.json();
+        if (data?.choices?.[0]?.message?.content) {
+          const responseContent = data.choices[0].message.content.trim();
+          if (responseContent.length > 0) {
             console.log(`✅ Groq API success with model ${model}`);
-            
-            const responseContent = data.choices[0].message.content.trim();
-            if (responseContent.length === 0) {
-              throw new Error('Empty response from Groq API');
-            }
-
-            // Validate response length
-            const wordCount = responseContent.split(/\s+/).length;
-            if (wordCount < 50 || wordCount > 150) {
-              console.log(`⚠️ Response length not ideal: ${wordCount} words`);
-            }
-
             return {
               content: responseContent,
               xpAwarded: Math.floor(Math.random() * 10) + 20,
@@ -167,35 +168,66 @@ async function generateAIResponse(content, agentId) {
             };
           }
         }
-
-        lastError = new Error(`HTTP error! status: ${response.status} - ${responseText}`);
-        
-        if (attempt < MAX_RETRIES) {
-          const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
-          console.log(`⏳ Waiting ${backoffDelay}ms before retry...`);
-          await delay(backoffDelay);
-        }
-      } catch (error) {
-        lastError = error;
-        console.error(`❌ Groq API error with model ${model} on attempt ${attempt}:`, error.message);
-
-        if (error.name === 'AbortError') {
-          console.error('⏱️ Request timed out');
-        }
-
-        if (attempt < MAX_RETRIES) {
-          const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
-          console.log(`⏳ Waiting ${backoffDelay}ms before retry...`);
-          await delay(backoffDelay);
-        }
+      } else {
+        const errorText = await response.text();
+        lastError = new Error(`HTTP ${response.status}: ${errorText}`);
+        console.log(`❌ Groq model ${model} failed:`, lastError.message);
       }
+    } catch (error) {
+      lastError = error;
+      console.log(`❌ Groq model ${model} error:`, error.message);
     }
   }
 
-  // If we get here, all models and retries failed
-  console.error('❌ All models and retry attempts failed. Last error:', lastError);
-  throw new Error(`Failed to get response from Groq API with any model: ${lastError.message}`);
+  throw lastError || new Error('All Groq models failed');
 }
+
+// Try Together AI as fallback
+async function tryTogetherAPI(content, systemPrompt, apiKey) {
+  console.log('🔄 Trying Together AI...');
+
+  const payload = {
+    model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free',
+    messages: [
+      {
+        role: 'system',
+        content: systemPrompt
+      },
+      {
+        role: 'user',
+        content: content
+      }
+    ],
+    max_tokens: 500,
+    temperature: 0.3
+  };
+
+  const response = await fetch('https://api.together.xyz/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    if (data?.choices?.[0]?.message?.content) {
+      console.log('✅ Together AI success');
+      return {
+        content: data.choices[0].message.content.trim(),
+        xpAwarded: Math.floor(Math.random() * 10) + 20,
+        model: 'together-ai'
+      };
+    }
+  }
+
+  const errorText = await response.text();
+  throw new Error(`Together AI failed: ${response.status} - ${errorText}`);
+}
+
+
 
 // Verify API key is working
 async function verifyApiKey() {
@@ -227,10 +259,10 @@ async function verifyApiKey() {
 export default function handler(req, res) {
   return handleCors(req, res, async (req, res) => {
     console.log('🚀 Chat API called with method:', req.method);
-    
+
     if (req.method !== 'POST') {
       console.log('❌ Method not allowed:', req.method);
-      return res.status(405).json({ 
+      return res.status(405).json({
         error: true,
         message: 'Method not allowed',
         details: `${req.method} is not supported, use POST`
@@ -239,36 +271,21 @@ export default function handler(req, res) {
 
     try {
       console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
-      
+
       const { content, agentId, userId } = req.body;
       const actualUserId = userId || req.headers['x-user-id'] || 'demo-user';
 
       // Validate request body
       if (!content) {
         console.log('❌ No content provided in request');
-        return res.status(400).json({ 
+        return res.status(400).json({
           error: true,
           message: 'No content provided',
           details: 'The content field is required in the request body'
         });
       }
 
-      // Get and verify API key
-      const groqApiKey = process.env.GROQ_API_KEY || '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';
-      
-      // Verify API connection first
-      console.log('🔍 Verifying Groq API connection...');
-      const apiStatus = await verifyGroqAPI(groqApiKey);
-      if (!apiStatus.success) {
-        console.error('❌ API verification failed:', apiStatus.error);
-        return res.status(503).json({
-          error: true,
-          message: 'AI service unavailable',
-          details: apiStatus.error,
-          errorType: 'API_VERIFICATION_ERROR'
-        });
-      }
-      console.log('✅ API verification successful');
+      // Skip API verification - let the generateAIResponse function handle fallbacks
 
       console.log(`🤖 Processing request for agent ${agentId} with content: "${content}"`);
 
@@ -329,7 +346,7 @@ export default function handler(req, res) {
 
       } catch (aiError) {
         console.error('❌ AI response generation error:', aiError);
-        return res.status(500).json({ 
+        return res.status(500).json({
           error: true,
           message: 'Failed to generate AI response',
           details: aiError.message,
@@ -339,7 +356,7 @@ export default function handler(req, res) {
 
     } catch (error) {
       console.error('💥 Unexpected error:', error);
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: true,
         message: 'An unexpected error occurred',
         details: error.message,
@@ -461,4 +478,107 @@ function getPerformanceStatus(accuracy) {
   if (accuracy >= 70) return 'good';
   if (accuracy >= 50) return 'average';
   return 'needs_improvement';
+}
+
+// Test function to verify tutor responses
+async function testTutorResponses() {
+  const testQuestions = {
+    '1': 'What is gravity?', // Nova - General
+    '2': 'Explain Pythagorean theorem', // MathWiz
+    '3': 'What is photosynthesis?', // ScienceBot
+    '4': 'What is a metaphor?', // LinguaLearn
+    '5': 'What caused World War 1?', // HistoryWise
+    '6': 'What are tectonic plates?', // GeoExplorer
+    '7': 'Explain Newton\'s first law', // PhysicsProf
+    '8': 'What is an atom?', // ChemCoach
+    '9': 'What is DNA?', // BioBuddy
+    '10': 'What is a verb?', // EnglishExpert
+    '11': 'What is an algorithm?', // CodeMaster
+    '12': 'What is impressionism?', // ArtAdvisor
+    '13': 'What is harmony in music?', // MusicMaestro
+    '14': 'What is aerobic exercise?', // SportsScholar
+    '15': 'How does memory work?', // PersonalAI
+  };
+
+  console.log('🧪 Starting tutor response tests...');
+  const results = [];
+
+  for (const [agentId, question] of Object.entries(testQuestions)) {
+    try {
+      console.log(`\n🔍 Testing Tutor ${agentId} with question: "${question}"`);
+      const response = await generateAIResponse(question, agentId);
+
+      // Analyze response
+      const wordCount = response.content.split(/\s+/).length;
+      const hasSubjectTerms = checkSubjectSpecificTerms(response.content, agentId);
+      const isGeneric = checkForGenericResponse(response.content);
+
+      results.push({
+        agentId,
+        success: true,
+        model: response.model,
+        wordCount,
+        isRealResponse: hasSubjectTerms && !isGeneric,
+        content: response.content
+      });
+
+      console.log(`✅ Tutor ${agentId} response:
+        Model used: ${response.model}
+        Word count: ${wordCount}
+        Subject-specific: ${hasSubjectTerms ? 'Yes' : 'No'}
+        Generic response: ${isGeneric ? 'Yes' : 'No'}
+        Content: ${response.content.substring(0, 100)}...`);
+
+    } catch (error) {
+      console.error(`❌ Error testing tutor ${agentId}:`, error.message);
+      results.push({
+        agentId,
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  return results;
+}
+
+// Helper function to check for subject-specific terminology
+function checkSubjectSpecificTerms(content, agentId) {
+  const subjectTerms = {
+    '1': ['understand', 'explain', 'concept'], // General terms for Nova
+    '2': ['mathematics', 'equation', 'theorem', 'formula'],
+    '3': ['scientific', 'experiment', 'observation'],
+    '4': ['language', 'meaning', 'expression'],
+    '5': ['historical', 'period', 'event'],
+    '6': ['geographical', 'region', 'formation'],
+    '7': ['physics', 'force', 'energy'],
+    '8': ['chemical', 'reaction', 'molecule'],
+    '9': ['biological', 'cell', 'organism'],
+    '10': ['grammar', 'sentence', 'language'],
+    '11': ['code', 'program', 'function'],
+    '12': ['artistic', 'style', 'composition'],
+    '13': ['musical', 'note', 'rhythm'],
+    '14': ['exercise', 'fitness', 'training'],
+    '15': ['learning', 'understanding', 'knowledge']
+  };
+
+  const terms = subjectTerms[agentId] || [];
+  return terms.some(term => content.toLowerCase().includes(term.toLowerCase()));
+}
+
+// Helper function to check for generic/fallback responses
+function checkForGenericResponse(content) {
+  const genericPhrases = [
+    'I apologize',
+    'I am unable to',
+    'I cannot',
+    'error occurred',
+    'failed to',
+    'try again',
+    'something went wrong'
+  ];
+
+  return genericPhrases.some(phrase =>
+    content.toLowerCase().includes(phrase.toLowerCase())
+  );
 }
