@@ -35,11 +35,18 @@ async function generateAIResponse(content, agentId) {
 
   console.log(`🚀 generateAIResponse called for agent ${agent} with content: "${content}"`);
 
-  // Get API keys
+  // Get API key
   const groqApiKey = process.env.GROQ_API_KEY || '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';
 
   if (!groqApiKey) {
+    console.error('❌ No Groq API key available');
     throw new Error('Groq API key is required');
+  }
+
+  // Validate content
+  if (!content || typeof content !== 'string' || content.trim().length === 0) {
+    console.error('❌ Invalid content provided:', content);
+    throw new Error('Valid content is required');
   }
 
   // Prepare the payload
@@ -47,13 +54,15 @@ async function generateAIResponse(content, agentId) {
     model: 'llama-3.3-70b-versatile',
     messages: [
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: content }
+      { role: 'user', content: content.trim() }
     ],
     max_tokens: 700,
     temperature: 0.7,
     top_p: 0.95,
     stream: false
   };
+
+  console.log('📦 Groq API payload:', JSON.stringify(groqPayload));
 
   // Try Groq API with retries
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -75,20 +84,32 @@ async function generateAIResponse(content, agentId) {
 
       clearTimeout(timeoutId);
 
+      const responseText = await response.text();
+      console.log(`📡 Groq API response status: ${response.status}`);
+      console.log(`📡 Groq API response text:`, responseText);
+
       if (response.ok) {
-        const data = await response.json();
-        console.log(`✅ Groq API success for agent ${agent} on attempt ${attempt}`);
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('❌ Failed to parse Groq API response:', parseError);
+          throw new Error('Invalid response from Groq API');
+        }
 
         if (data?.choices?.[0]?.message?.content) {
+          console.log(`✅ Groq API success for agent ${agent} on attempt ${attempt}`);
           return {
             content: data.choices[0].message.content,
             xpAwarded: Math.floor(Math.random() * 10) + 20
           };
+        } else {
+          console.error('❌ Groq API response missing required fields:', data);
+          throw new Error('Invalid response structure from Groq API');
         }
       }
 
-      const errorText = await response.text();
-      console.error(`❌ Groq API error (Attempt ${attempt}): ${response.status} - ${errorText}`);
+      console.error(`❌ Groq API error (Attempt ${attempt}): ${response.status} - ${responseText}`);
 
       if (attempt < MAX_RETRIES) {
         const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
@@ -97,6 +118,10 @@ async function generateAIResponse(content, agentId) {
       }
     } catch (error) {
       console.error(`❌ Groq API error on attempt ${attempt}:`, error);
+
+      if (error.name === 'AbortError') {
+        console.error('⏱️ Request timed out');
+      }
 
       if (attempt < MAX_RETRIES) {
         const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
@@ -138,62 +163,96 @@ async function verifyApiKey() {
 
 export default function handler(req, res) {
   return handleCors(req, res, async (req, res) => {
+    console.log('🚀 Chat API called with method:', req.method);
+    
     if (req.method !== 'POST') {
+      console.log('❌ Method not allowed:', req.method);
       return res.status(405).json({ message: 'Method not allowed' });
     }
 
     try {
-      // Verify API key first
-      const apiStatus = await verifyApiKey();
-      console.log('API Status Check:', apiStatus);
-
-      // Initialize Firebase
-      initializeFirebase();
-      const db = getFirestoreDb();
-
+      console.log('📦 Request body:', JSON.stringify(req.body));
+      
       const { content, agentId, userId } = req.body;
       const actualUserId = userId || req.headers['x-user-id'] || 'demo-user';
 
       if (!content) {
+        console.log('❌ No content provided in request');
         return res.status(400).json({ message: 'No content provided' });
       }
 
-      // Generate AI response
-      const { content: responseContent, xpAwarded } = await generateAIResponse(content, agentId);
+      console.log(`🤖 Generating response for agent ${agentId} with content: "${content}"`);
 
-      // Track user interaction for performance calculation
+      // Initialize Firebase
       try {
-        const subject = getSubjectFromAgent(agentId);
-        await trackUserInteraction(db, {
-          userId: actualUserId,
-          subject: subject,
-          action: 'chat_interaction',
-          agentId: agentId || '1',
-          difficulty: 'medium',
-          correct: true,
-          timeSpent: 0,
-          xpEarned: xpAwarded
-        });
-      } catch (trackingError) {
-        console.error('Error tracking user interaction:', trackingError);
+        initializeFirebase();
+      } catch (firebaseError) {
+        console.error('Firebase initialization error:', firebaseError);
+        // Continue without Firebase if it fails
       }
 
-      // Create response object
-      const assistantResponse = {
-        id: `assistant-${Date.now()}`,
-        content: responseContent,
-        role: 'assistant',
-        createdAt: new Date(),
-        userId: 'system',
-        agentId: agentId || '1',
-        xpAwarded
-      };
+      // Get Firestore instance only if Firebase initialized successfully
+      let db;
+      try {
+        db = getFirestoreDb();
+      } catch (dbError) {
+        console.error('Firestore connection error:', dbError);
+        // Continue without DB if it fails
+      }
 
-      res.status(200).json(assistantResponse);
+      // Generate AI response
+      try {
+        const { content: responseContent, xpAwarded } = await generateAIResponse(content, agentId);
+        console.log('✅ AI response generated successfully');
+
+        // Track user interaction for performance calculation
+        if (db) {
+          try {
+            const subject = getSubjectFromAgent(agentId);
+            await trackUserInteraction(db, {
+              userId: actualUserId,
+              subject: subject,
+              action: 'chat_interaction',
+              agentId: agentId || '1',
+              difficulty: 'medium',
+              correct: true,
+              timeSpent: 0,
+              xpEarned: xpAwarded
+            });
+          } catch (trackingError) {
+            console.error('Error tracking user interaction:', trackingError);
+            // Continue even if tracking fails
+          }
+        }
+
+        // Create response object
+        const assistantResponse = {
+          id: `assistant-${Date.now()}`,
+          content: responseContent,
+          role: 'assistant',
+          createdAt: new Date().toISOString(),
+          userId: 'system',
+          agentId: agentId || '1',
+          xpAwarded
+        };
+
+        console.log('📤 Sending response:', JSON.stringify(assistantResponse));
+        return res.status(200).json(assistantResponse);
+
+      } catch (aiError) {
+        console.error('AI response generation error:', aiError);
+        return res.status(500).json({ 
+          message: 'Failed to generate AI response',
+          error: aiError.message
+        });
+      }
+
     } catch (error) {
-      console.error('Chat error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      res.status(400).json({ message: errorMessage });
+      console.error('💥 Chat error:', error);
+      return res.status(500).json({ 
+        message: 'An unexpected error occurred',
+        error: error.message
+      });
     }
   });
 }
