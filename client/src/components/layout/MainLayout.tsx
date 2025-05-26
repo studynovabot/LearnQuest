@@ -107,14 +107,22 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             {mobileNavItems.map((item, index) => (
               <Link key={index} href={item.path}>
                 <button className={cn(
-                  "mobile-nav-item flex flex-col items-center justify-center",
-                  item.active ? "text-secondary bg-secondary/10" : "text-muted-foreground"
+                  "mobile-nav-item flex flex-col items-center justify-center transition-colors",
+                  item.active
+                    ? "text-primary bg-primary/10 border border-primary/20"
+                    : "text-muted-foreground hover:text-primary"
                 )}>
                   <item.icon
-                    className="mb-1"
+                    className={cn(
+                      "mb-1 transition-colors",
+                      item.active ? "text-primary" : ""
+                    )}
                     size={24}
                   />
-                  <span className="text-xs font-medium">{item.label}</span>
+                  <span className={cn(
+                    "text-xs font-medium transition-colors",
+                    item.active ? "text-primary" : ""
+                  )}>{item.label}</span>
                 </button>
               </Link>
             ))}

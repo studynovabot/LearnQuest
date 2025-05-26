@@ -349,7 +349,7 @@ const ChatAgents = () => {
                           <p className={cn("text-muted-foreground max-w-md mx-auto mb-6", isMobile ? "mobile-body" : "")}>
                             Ask questions about {activeAgent.subject?.toLowerCase()} and get personalized help with your studies.
                           </p>
-                          <div className="inline-flex items-center bg-secondary/10 rounded-full px-3 py-1 text-xs text-secondary border border-secondary/20">
+                          <div className="inline-flex items-center bg-primary/10 rounded-full px-3 py-1 text-xs text-primary border border-primary/20">
                             {Number(activeAgent.id) === 1 ? (
                               "Powered by Groq's Llama-3.3-70B-Versatile"
                             ) : Number(activeAgent.id) >= 2 && Number(activeAgent.id) <= 4 ? (

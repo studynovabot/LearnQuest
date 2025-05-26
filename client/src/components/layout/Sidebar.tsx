@@ -43,8 +43,10 @@ const Sidebar = () => {
           <Link key={index} href={item.path}>
             <button
               className={cn(
-                "nav-icon rounded-xl p-2",
-                item.active ? "bg-muted text-secondary" : ""
+                "nav-icon rounded-xl p-2 transition-colors",
+                item.active
+                  ? "bg-primary/10 text-primary border border-primary/20"
+                  : "text-foreground hover:text-primary"
               )}
             >
               <item.icon size={24} />
@@ -55,8 +57,10 @@ const Sidebar = () => {
 
       <Link href="/settings">
         <button className={cn(
-          "nav-icon rounded-xl p-2",
-          location === "/settings" ? "bg-muted text-secondary" : ""
+          "nav-icon rounded-xl p-2 transition-colors",
+          location === "/settings"
+            ? "bg-primary/10 text-primary border border-primary/20"
+            : "text-foreground hover:text-primary"
         )}>
           <SettingsIcon size={24} />
         </button>

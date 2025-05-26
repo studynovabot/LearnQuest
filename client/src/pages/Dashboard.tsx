@@ -35,7 +35,7 @@ const Dashboard = () => {
           <div className="relative z-10 flex flex-col md:flex-row justify-between gap-6">
             <div className="md:w-2/3">
               <h2 className="font-display text-3xl font-bold mb-2">
-                Ace Your Exams with AI, <span className="text-secondary">{user?.displayName?.split(' ')[0] || 'Student'}!</span>
+                Ace Your Exams with AI, <span className="text-primary">{user?.displayName?.split(' ')[0] || 'Student'}!</span>
               </h2>
               <p className="text-muted-foreground mb-4">Access AI tutors, educational content, and personalized learning tools.</p>
 

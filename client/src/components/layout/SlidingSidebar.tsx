@@ -63,15 +63,24 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
                   className={cn(
                     "w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors",
                     "group relative",
-                    location === item.path ? "bg-muted text-secondary" : ""
+                    location === item.path
+                      ? "bg-primary/10 text-primary border border-primary/20"
+                      : "text-foreground hover:text-primary"
                   )}
                 >
-                  <item.icon size={22} className="flex-shrink-0" />
+                  <item.icon
+                    size={22}
+                    className={cn(
+                      "flex-shrink-0 transition-colors",
+                      location === item.path ? "text-primary" : ""
+                    )}
+                  />
 
                   {/* Label - visible on hover */}
                   <span className={cn(
                     "text-base font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-                    "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs"
+                    "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs",
+                    location === item.path ? "text-primary" : ""
                   )}>
                     {item.label}
                   </span>

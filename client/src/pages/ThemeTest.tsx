@@ -109,11 +109,34 @@ const ThemeTest = () => {
             <CardDescription>Readability test</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p className="text-foreground">Primary text (foreground)</p>
-            <p className="text-muted-foreground">Muted text</p>
-            <p className="text-primary">Primary colored text</p>
-            <p className="text-secondary">Secondary colored text</p>
-            <p className="text-destructive">Destructive colored text</p>
+            <p className="text-foreground">Primary text (foreground) ✅</p>
+            <p className="text-muted-foreground">Muted text ✅</p>
+            <p className="text-primary">Primary colored text ✅</p>
+            <p className="text-secondary">Secondary colored text ⚠️ (Fixed in components)</p>
+            <p className="text-destructive">Destructive colored text ✅</p>
+          </CardContent>
+        </Card>
+
+        {/* Navigation Test Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Navigation Visibility</CardTitle>
+            <CardDescription>Testing active navigation states</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="space-y-2">
+              <p className="font-semibold">Fixed Components:</p>
+              <ul className="text-sm space-y-1">
+                <li>✅ SlidingSidebar active states</li>
+                <li>✅ MainLayout mobile navigation</li>
+                <li>✅ Sidebar desktop navigation</li>
+                <li>✅ Dashboard user name display</li>
+                <li>✅ ChatAgents badge text</li>
+              </ul>
+            </div>
+            <div className="p-3 bg-primary/10 text-primary border border-primary/20 rounded">
+              Active navigation style preview
+            </div>
           </CardContent>
         </Card>
 
