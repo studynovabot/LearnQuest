@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useLocation, Link } from "wouter";
 import { cn } from "@/lib/utils";
 import NovaLogo from "@/components/ui/NovaLogo";
 import {
   HomeIcon, MessageIcon, FlashlightIcon, BookOpenIcon,
-  ImageIcon, SparklesIcon, UploadIcon, CreditCardIcon, HamburgerIcon
+  ImageIcon, SparklesIcon, UploadIcon, CreditCardIcon
 } from "@/components/ui/icons";
 
 interface SlidingSidebarProps {
@@ -13,7 +13,6 @@ interface SlidingSidebarProps {
 
 const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
   const [location] = useLocation();
-  const [isExpanded, setIsExpanded] = useState(false);
 
   // Navigation items with full names
   const navItems = [
@@ -27,69 +26,26 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
     { icon: CreditCardIcon, label: "Subscription", path: "/subscription" },
   ];
 
-  // Close sidebar when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const sidebar = document.getElementById('sliding-sidebar');
-      const target = event.target as Node;
-
-      if (isExpanded && sidebar && !sidebar.contains(target)) {
-        setIsExpanded(false);
-      }
-    };
-
-    if (isExpanded) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isExpanded]);
-
-  // Close sidebar on route change
-  useEffect(() => {
-    setIsExpanded(false);
-  }, [location]);
-
   return (
     <>
-      {/* Overlay */}
-      {isExpanded && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setIsExpanded(false)}
-        />
-      )}
-
       {/* Sliding Sidebar */}
       <div
         id="sliding-sidebar"
         className={cn(
           "fixed left-0 top-0 h-full bg-card border-r border-border z-50 transition-all duration-300 ease-in-out",
           "flex flex-col shadow-lg group",
-          isExpanded ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-          isExpanded ? "w-64" : "w-20",
-          "lg:w-20 lg:hover:w-64",
+          "w-20 hover:w-64",
           className
         )}
       >
-        {/* Header with hamburger and logo */}
+        {/* Header with logo only */}
         <div className="flex items-center p-4 border-b border-border">
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="p-2 rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary lg:hidden"
-          >
-            <HamburgerIcon size={24} />
-          </button>
-
-          {/* Logo - always visible on desktop, visible when expanded on mobile */}
-          <div className={cn(
-            "flex items-center gap-3 transition-all duration-300",
-            isExpanded ? "opacity-100 ml-2" : "opacity-0 lg:opacity-100",
-            "lg:ml-0"
-          )}>
+          {/* Logo - always visible */}
+          <div className="flex items-center gap-3 transition-all duration-300">
             <NovaLogo size="sm" iconOnly={true} />
             <div className={cn(
               "transition-all duration-300 overflow-hidden",
-              isExpanded ? "opacity-100 max-w-xs" : "opacity-0 max-w-0 lg:group-hover:opacity-100 lg:group-hover:max-w-xs"
+              "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs"
             )}>
               <h1 className="text-lg font-bold whitespace-nowrap">Nova AI</h1>
               <p className="text-xs text-muted-foreground whitespace-nowrap">Your AI Study Buddy</p>
@@ -111,47 +67,24 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
                 >
                   <item.icon size={22} className="flex-shrink-0" />
 
-                  {/* Label - visible when expanded or on desktop hover */}
+                  {/* Label - visible on hover */}
                   <span className={cn(
                     "text-base font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-                    isExpanded ? "opacity-100 max-w-xs" : "opacity-0 max-w-0",
-                    "lg:group-hover:opacity-100 lg:group-hover:max-w-xs"
+                    "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs"
                   )}>
                     {item.label}
                   </span>
-
-                  {/* Tooltip for collapsed state on desktop only */}
-                  {!isExpanded && (
-                    <div className={cn(
-                      "absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-sm rounded-md shadow-md z-50",
-                      "opacity-0 pointer-events-none transition-opacity duration-200",
-                      "lg:group-hover:opacity-100 lg:group-hover:pointer-events-auto"
-                    )}>
-                      {item.label}
-                    </div>
-                  )}
                 </button>
               </Link>
             ))}
           </div>
         </nav>
 
-        {/* Hamburger button for desktop (bottom of sidebar) */}
-        <div className="hidden lg:block p-4 border-t border-border">
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="w-full p-2 rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <HamburgerIcon size={24} />
-          </button>
-        </div>
+
       </div>
 
       {/* Spacer for desktop layout */}
-      <div className={cn(
-        "hidden lg:block transition-all duration-300",
-        isExpanded ? "w-64" : "w-20"
-      )} />
+      <div className="w-20" />
     </>
   );
 };
