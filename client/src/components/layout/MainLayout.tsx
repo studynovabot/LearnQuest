@@ -4,11 +4,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { generateAvatar } from "@/lib/utils";
-import { FlashlightIcon, FireIcon, HomeIcon, MessageIcon, TrophyIcon, StoreIcon, CreditCardIcon, SettingsIcon, BookOpenIcon, ImageIcon } from "@/components/ui/icons";
+import { FlashlightIcon, FireIcon, HomeIcon, MessageIcon, TrophyIcon, StoreIcon, CreditCardIcon, SettingsIcon, BookOpenIcon, ImageIcon, HamburgerIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
 import NovaLogo from "@/components/ui/NovaLogo";
+import { Drawer, DrawerTrigger, DrawerContent } from "@/components/ui/drawer";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -26,6 +27,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { icon: FlashlightIcon, label: "Flash", path: "/flash-notes", active: location === "/flash-notes" },
     { icon: BookOpenIcon, label: "NCERT", path: "/ncert-solutions", active: location === "/ncert-solutions" },
     { icon: ImageIcon, label: "Images", path: "/image-tools", active: location === "/image-tools" },
+  ];
+
+  const navItems = [
+    { icon: HomeIcon, label: "Home", path: "/" },
+    { icon: MessageIcon, label: "Chat", path: "/chat" },
+    { icon: FlashlightIcon, label: "Flash Notes", path: "/flash-notes" },
+    { icon: BookOpenIcon, label: "NCERT Solutions", path: "/ncert-solutions" },
+    { icon: ImageIcon, label: "Image Tools", path: "/image-tools" },
   ];
 
   // Check if user is logged in
@@ -46,6 +55,32 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
   return (
     <div className="min-h-screen relative flex flex-col">
+      {/* Hamburger menu always visible */}
+      <Drawer>
+        <div className="absolute top-4 left-4 z-50">
+          <DrawerTrigger asChild>
+            <button className="p-2 rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary">
+              <HamburgerIcon size={28} />
+            </button>
+          </DrawerTrigger>
+        </div>
+        <DrawerContent className="w-64 max-w-full h-full fixed left-0 top-0 bg-card shadow-lg flex flex-col p-4 z-[100]">
+          <div className="flex flex-col gap-4 mt-8">
+            {navItems.map((item, idx) => (
+              <Link key={idx} href={item.path}>
+                <button className={cn(
+                  "flex items-center gap-3 w-full text-left p-3 rounded-lg hover:bg-muted transition",
+                  location === item.path ? "bg-muted text-secondary" : ""
+                )}>
+                  <item.icon size={22} />
+                  <span className="text-base font-medium">{item.label}</span>
+                </button>
+              </Link>
+            ))}
+          </div>
+        </DrawerContent>
+      </Drawer>
+
       {/* Header with logo and logout */}
       <header className="lg:hidden bg-card border-b border-border p-4 flex items-center justify-between">
         <Link href="/">
@@ -112,8 +147,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         {/* Profile/Settings Modal */}
         {showProfileModal && <ProfileSettingsModal onClose={() => setShowProfileModal(false)} />}
       </div>
-
-
 
     </div>
   );

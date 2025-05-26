@@ -1092,8 +1092,6 @@ export const FlexIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   </svg>
 );
 
-
-
 export const LanguagesIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -1149,5 +1147,24 @@ export const ChevronDownIcon: React.FC<IconProps> = ({ size = 24, ...props }) =>
     {...props}
   >
     <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+export const HamburgerIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <line x1="4" y1="6" x2="20" y2="6" />
+    <line x1="4" y1="12" x2="20" y2="12" />
+    <line x1="4" y1="18" x2="20" y2="18" />
   </svg>
 );
