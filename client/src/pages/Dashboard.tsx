@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet';
 import SubjectOverview from "@/components/dashboard/SubjectOverview";
 import AITutors from "@/components/dashboard/AITutors";
 import NovaLogo from "@/components/ui/NovaLogo";
+import WelcomeMessage from "@/components/dashboard/WelcomeMessage";
 import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 
@@ -39,23 +40,7 @@ const Dashboard = () => {
               </h2>
               <p className="text-muted-foreground mb-4">Access AI tutors, educational content, and personalized learning tools.</p>
 
-              <div className="bg-muted rounded-xl p-4 flex items-start gap-4 max-w-md">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" fill="currentColor" />
-                    </svg>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-primary font-semibold mb-1">
-                    Welcome back, {user?.displayName?.split(' ')[0] || 'Student'}!
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Explore AI tutors and educational content to enhance your learning experience.
-                  </p>
-                </div>
-              </div>
+              <WelcomeMessage user={user} />
             </div>
 
             <div className="flex items-center justify-center md:w-1/3">

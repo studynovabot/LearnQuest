@@ -71,6 +71,19 @@ export class FirebaseStorage {
     return updatedDoc.data();
   }
 
+  async updateUserLastLogin(userId) {
+    const db = this.getFirestoreDb();
+    const userRef = db.collection('users').doc(userId);
+
+    await userRef.update({
+      lastLogin: new Date(),
+      updatedAt: new Date()
+    });
+
+    const updatedDoc = await userRef.get();
+    return updatedDoc.data();
+  }
+
   async getAllTutors() {
     const db = this.getFirestoreDb();
     const snapshot = await db.collection('tutors').get();

@@ -131,14 +131,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const data = await response.json();
         console.log('✅ Login successful:', data);
 
-        // Store the user data from the response
-        if (data.user) {
-          setUser(data.user);
-          localStorage.setItem('user', JSON.stringify(data.user));
-        } else {
-          setUser(data);
-          localStorage.setItem('user', JSON.stringify(data));
-        }
+        // Store the user data from the response with first login flag
+        const userWithFirstLogin = {
+          ...(data.user || data),
+          isFirstLogin: data.isFirstLogin || false
+        };
+
+        setUser(userWithFirstLogin);
+        localStorage.setItem('user', JSON.stringify(userWithFirstLogin));
 
         return true;
       } else {
@@ -183,14 +183,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const userData = await response.json();
         console.log('✅ Registration successful:', userData);
 
-        // Store the user data from the response
-        if (userData.user) {
-          setUser(userData.user);
-          localStorage.setItem('user', JSON.stringify(userData.user));
-        } else {
-          setUser(userData);
-          localStorage.setItem('user', JSON.stringify(userData));
-        }
+        // Store the user data from the response with first login flag
+        const userWithFirstLogin = {
+          ...(userData.user || userData),
+          isFirstLogin: userData.isFirstLogin || true // Registration is always first login
+        };
+
+        setUser(userWithFirstLogin);
+        localStorage.setItem('user', JSON.stringify(userWithFirstLogin));
 
         return true;
       } else {

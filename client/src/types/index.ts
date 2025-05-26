@@ -9,6 +9,7 @@ export interface User {
   createdAt?: Date;
   updatedAt?: Date;
   lastLogin?: Date | null;
+  isFirstLogin?: boolean; // Track if this is the user's first login session
 }
 
 export interface Subject {

@@ -60,19 +60,41 @@ export default function handler(req, res) {
           return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        console.log('✅ Password valid, adding login XP...');
+        console.log('✅ Password valid, checking if first login...');
+
+        // Check if this is the user's first login (within 5 minutes of account creation)
+        const createdAt = new Date(user.createdAt);
+        const lastLogin = user.lastLogin ? new Date(user.lastLogin) : null;
+        const now = new Date();
+        const timeSinceCreation = now.getTime() - createdAt.getTime();
+        const isFirstLogin = !lastLogin || timeSinceCreation < (5 * 60 * 1000); // 5 minutes
+
+        console.log('🕐 First login check:', {
+          createdAt: createdAt.toISOString(),
+          lastLogin: lastLogin?.toISOString(),
+          timeSinceCreation: timeSinceCreation / 1000 / 60,
+          isFirstLogin
+        });
+
+        // Update lastLogin timestamp
+        await storage.updateUserLastLogin(user.id);
+
         // Add login XP reward
         const loginXP = user.isPro ? 30 : 15;
         const updatedUser = await storage.addUserXP(user.id, loginXP);
 
-        // Don't return the password
-        const { password: _, ...userWithoutPassword } = updatedUser;
+        // Don't return the password and add first login flag
+        const { password: _, ...userWithoutPassword } = {
+          ...updatedUser,
+          isFirstLogin
+        };
 
-        console.log('✅ Login successful for user:', userWithoutPassword.id);
+        console.log('✅ Login successful for user:', userWithoutPassword.id, 'First login:', isFirstLogin);
         return res.status(200).json({
           user: userWithoutPassword,
           loginReward: loginXP,
-          streakUpdated: false
+          streakUpdated: false,
+          isFirstLogin
         });
 
       } else if (authAction === 'register') {
@@ -118,13 +140,17 @@ export default function handler(req, res) {
         console.log('💾 Saving user to storage...');
         const savedUser = await storage.createUser(newUser);
 
-        // Don't return the password
-        const { password: _, ...userWithoutPassword } = savedUser;
+        // Don't return the password and mark as first login
+        const { password: _, ...userWithoutPassword } = {
+          ...savedUser,
+          isFirstLogin: true
+        };
 
         console.log('✅ Registration successful for user:', userWithoutPassword.id);
         return res.status(201).json({
           user: userWithoutPassword,
-          welcomeBonus: 100
+          welcomeBonus: 100,
+          isFirstLogin: true
         });
 
       } else {
