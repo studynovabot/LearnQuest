@@ -3,8 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 // AI API configuration
-const GROQ_API_KEY = process.env.GROQ_API_KEY || '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';
-const TOGETHER_API_KEY = process.env.TOGETHER_API_KEY || '386f94fa38882002186da7d11fa278a2b0b729dcda437ef07b8b0f14e1fc2ee7';
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 // Extract text from PDF (simplified - in production you'd use a proper PDF parser)
 export async function extractTextFromPDF(filePath) {
@@ -34,15 +33,15 @@ export async function processEducationalContent(extractedText, type, board, clas
   try {
     const prompt = generateProcessingPrompt(extractedText, type, board, classNum, subject, chapter);
     
-    // Use Together AI for content processing
-    const response = await fetch('https://api.together.xyz/v1/chat/completions', {
+    // Use Groq for content processing
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${TOGETHER_API_KEY}`,
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free',
+        model: 'llama-3.3-70b-versatile',
         messages: [
           {
             role: 'system',

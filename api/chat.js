@@ -21,7 +21,7 @@ const AGENT_PROMPTS = {
   '15': 'You are PersonalAI, a personalized learning specialist. Adapt your teaching style to each student\'s unique needs and preferences. ✨'
 };
 
-// AI response generator with Groq and Together AI integration
+// AI response generator with Groq integration
 async function generateAIResponse(content, agentId) {
   const agent = agentId || '1';
   const systemPrompt = AGENT_PROMPTS[agent] || AGENT_PROMPTS['1'];
@@ -29,148 +29,72 @@ async function generateAIResponse(content, agentId) {
   console.log(`🚀 generateAIResponse called for agent ${agent} with content: "${content}"`);
 
   try {
-    // Use updated API keys that are known to be working
-    const groqApiKey = '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';
-    const togetherApiKey = 'tgp_v1_yFrvJxVO3yzNPiosWhOZYeg0_BjLlBQDruWAiwSi5bs';
+    const groqApiKey = process.env.GROQ_API_KEY;
     
-    // Log the first few characters of the keys for debugging (don't log full keys for security)
-    console.log(`Groq API Key (first 10 chars): ${groqApiKey.substring(0, 10)}...`);
-    console.log(`Together API Key (first 10 chars): ${togetherApiKey.substring(0, 10)}...`);
-
-    console.log(`🔑 API Keys available - Groq: ${groqApiKey ? 'Yes' : 'No'}, Together: ${togetherApiKey ? 'Yes' : 'No'}`);
-
-    // Nova (agent 1) uses Groq with llama-3-70b-8192, other agents use Together AI
-    if (groqApiKey && agent === '1') {
-      console.log(`🤖 Calling Groq API for agent ${agent}...`);
-      try {
-        // Create request payload with llama-3-70b-8192 model
-        const payload = {
-          model: 'llama-3-70b-8192',  // Groq's supported model
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: content }
-          ],
-          max_tokens: 1000,  // Increased token limit for more detailed responses
-          temperature: 0.7,
-          stream: false
-        };
-        
-        console.log(`📦 Groq API request payload: ${JSON.stringify(payload)}`);
-        
-        // Set timeout for fetch request
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // Increased timeout to 15 seconds
-        
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${groqApiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload),
-          signal: controller.signal
-        })
-        
-        clearTimeout(timeoutId);
-        
-        console.log(`📡 Groq API response status: ${response.status}`);
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log(`✅ Groq API success for agent ${agent}`);
-          
-          if (data && data.choices && data.choices[0] && data.choices[0].message) {
-            return {
-              content: data.choices[0].message.content,
-              xpAwarded: Math.floor(Math.random() * 10) + 15 // 15-25 XP for AI responses
-            };
-          } else {
-            console.error(`❌ Groq API returned unexpected data structure:`, data);
-            throw new Error('Unexpected response format from Groq API');
-          }
-        } else {
-          const errorText = await response.text();
-          console.error(`❌ Groq API error: ${response.status} - ${errorText}`);
-          throw new Error(`Groq API error: ${response.status} - ${errorText}`);
-        }
-      } catch (fetchError) {
-        console.error(`❌ Groq API fetch error:`, fetchError);
-        if (fetchError.name === 'AbortError') {
-          console.error('⏱️ Groq API request timed out after 15 seconds');
-        }
-        throw fetchError; // Re-throw to trigger fallback
-      }
+    if (!groqApiKey) {
+      throw new Error('Groq API key not configured');
     }
 
-    // Use Together AI for agents 2-15 with meta-llama/Llama-3-70b-chat-hf model
-    if (togetherApiKey && agent !== '1') {
-      const model = 'meta-llama/Llama-3-70b-chat-hf'; // Together's supported model
-      console.log(`🤖 Calling Together AI for agent ${agent} with model ${model}...`);
+    console.log(`🔑 Groq API Key available: ${groqApiKey ? 'Yes' : 'No'}`);
+
+    // Use llama-3.3-70b-versatile for all tutors
+    console.log(`🤖 Calling Groq API for agent ${agent}...`);
+    try {
+      const payload = {
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: content }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7,
+        stream: false
+      };
       
-      try {
-        // Create request payload
-        const payload = {
-          model: model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: content }
-          ],
-          max_tokens: 1000,  // Increased token limit for more detailed responses
-          temperature: 0.7,
-          stream: false
-        };
-        
-        console.log(`📦 Together AI request payload: ${JSON.stringify(payload)}`);
-        
-        // Set timeout for fetch request
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // Increased timeout to 15 seconds
-        
-        const response = await fetch('https://api.together.xyz/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${togetherApiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload),
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
+      console.log(`📦 Groq API request payload: ${JSON.stringify(payload)}`);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      console.log(`📡 Groq API response status: ${response.status}`);
 
-        console.log(`📡 Together AI response status: ${response.status}`);
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log(`✅ Together AI success for agent ${agent}`);
-          
-          if (data && data.choices && data.choices[0] && data.choices[0].message) {
-            return {
-              content: data.choices[0].message.content,
-              xpAwarded: Math.floor(Math.random() * 10) + 15 // 15-25 XP for AI responses
-            };
-          } else {
-            console.error(`❌ Together AI returned unexpected data structure:`, data);
-            // Continue to fallback
-          }
-        } else {
-          const errorText = await response.text();
-          console.error(`❌ Together AI error: ${response.status} - ${errorText}`);
-          // Continue to fallback
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`✅ Groq API success for agent ${agent}`);
+        
+        if (data && data.choices && data.choices[0] && data.choices[0].message) {
+          return {
+            content: data.choices[0].message.content,
+            xpAwarded: Math.floor(Math.random() * 10) + 15
+          };
         }
-      } catch (fetchError) {
-        console.error(`❌ Together AI fetch error:`, fetchError);
-        if (fetchError.name === 'AbortError') {
-          console.error('⏱️ Together AI request timed out after 15 seconds');
-        }
-        // Continue to fallback
+      } else {
+        const errorText = await response.text();
+        console.error(`❌ Groq API error: ${response.status} - ${errorText}`);
+      }
+    } catch (fetchError) {
+      console.error(`❌ Groq API fetch error:`, fetchError);
+      if (fetchError.name === 'AbortError') {
+        console.error('⏱️ Groq API request timed out after 15 seconds');
       }
     }
   } catch (error) {
     console.error(`AI API error for agent ${agent}:`, error);
   }
 
-  // Agent-specific fallback responses
+  // Fallback responses remain unchanged
   const agentResponses = {
     '1': `🤖 Hi there! I'm Nova, your AI learning companion. I'd love to help you with "${content}". While I'm having trouble connecting to my advanced systems right now, I can still guide you through this topic step by step!`,
     '2': `🔢 Hello! I'm MathWiz, your math expert. Let's tackle "${content}" together! Even without my full computational power, I can help you understand the mathematical concepts behind this problem.`,
@@ -189,27 +113,23 @@ async function generateAIResponse(content, agentId) {
     '15': `✨ Hello! I'm PersonalAI, and I'm adapting my response just for you! Your question about "${content}" is unique, and I want to help you learn in the way that works best for your learning style.`
   };
 
-  // Log the fallback response for debugging
   const fallbackResponse = agentResponses[agent] || agentResponses['1'];
   console.log(`⚠️ Using fallback response for agent ${agent}`);
 
   return {
     content: fallbackResponse,
-    xpAwarded: Math.floor(Math.random() * 10) + 10 // Random XP between 10-20
+    xpAwarded: Math.floor(Math.random() * 10) + 10
   };
 }
 
-// Verify API keys are working
-async function verifyApiKeys() {
-  const groqApiKey = process.env.GROQ_API_KEY || 'gsk_VGJnTnZLMmZuZ3FYaHA56NvqEz2pg6h2dVenFzwu';
-  const togetherApiKey = process.env.TOGETHER_API_KEY || '7d11fa278a2b0b729dcda437ef07b8b0f14e1fc2ee7';
+// Verify API key is working
+async function verifyApiKey() {
+  const groqApiKey = process.env.GROQ_API_KEY;
   
   const results = {
-    groq: { working: false, error: null },
-    together: { working: false, error: null }
+    groq: { working: false, error: null }
   };
   
-  // Test Groq API
   try {
     const response = await fetch('https://api.groq.com/openai/v1/models', {
       headers: {
@@ -226,23 +146,6 @@ async function verifyApiKeys() {
     results.groq.error = error.message;
   }
   
-  // Test Together AI
-  try {
-    const response = await fetch('https://api.together.xyz/v1/models', {
-      headers: {
-        'Authorization': `Bearer ${togetherApiKey}`
-      }
-    });
-    
-    results.together.working = response.ok;
-    if (!response.ok) {
-      const text = await response.text();
-      results.together.error = `Status ${response.status}: ${text}`;
-    }
-  } catch (error) {
-    results.together.error = error.message;
-  }
-  
   return results;
 }
 
@@ -253,8 +156,8 @@ export default function handler(req, res) {
     }
 
     try {
-      // Verify API keys first
-      const apiStatus = await verifyApiKeys();
+      // Verify API key first
+      const apiStatus = await verifyApiKey();
       console.log('API Status Check:', apiStatus);
       
       // Initialize Firebase
@@ -280,13 +183,12 @@ export default function handler(req, res) {
           action: 'chat_interaction',
           agentId: agentId || '1',
           difficulty: 'medium',
-          correct: true, // Chat interactions are considered positive engagement
+          correct: true,
           timeSpent: 0,
           xpEarned: xpAwarded
         });
       } catch (trackingError) {
         console.error('Error tracking user interaction:', trackingError);
-        // Don't fail the chat if tracking fails
       }
 
       // Create response object

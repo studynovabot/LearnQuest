@@ -151,5 +151,5 @@ app.listen(PORT, () => {
   console.log(`🚀 Development server running on http://localhost:${PORT}`);
   console.log(`📡 API endpoints available at http://localhost:${PORT}/api/*`);
   console.log(`🔧 CORS enabled for frontend development`);
-  console.log(`🔑 Environment variables loaded: GROQ_API_KEY=${process.env.GROQ_API_KEY ? 'Set' : 'Not set'}, TOGETHER_AI_API_KEY=${process.env.TOGETHER_AI_API_KEY ? 'Set' : 'Not set'}`);
+  console.log(`🔑 Environment variables loaded: GROQ_API_KEY=${process.env.GROQ_API_KEY ? 'Set' : 'Not set'}`);
 });

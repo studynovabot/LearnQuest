@@ -336,11 +336,17 @@ const ChatAgents = () => {
                           </p>
                           <div className="inline-flex items-center bg-secondary/10 rounded-full px-3 py-1 text-xs text-secondary border border-secondary/20">
                             {Number(activeAgent.id) === 1 ? (
-                              "Powered by Groq's llama-3.3-70b-versatile"
+                              "Powered by Groq's Llama-3.3-70B-Versatile"
                             ) : Number(activeAgent.id) >= 2 && Number(activeAgent.id) <= 4 ? (
-                              "Powered by Together AI's Mixtral-8x7B"
+                              "Powered by Groq's Llama-3.3-70B-Versatile"
+                            ) : Number(activeAgent.id) >= 5 && Number(activeAgent.id) <= 7 ? (
+                              "Powered by Groq's Llama-3.3-70B-Versatile"
+                            ) : Number(activeAgent.id) >= 8 && Number(activeAgent.id) <= 10 ? (
+                              "Powered by Groq's Llama-3.3-70B-Versatile"
+                            ) : Number(activeAgent.id) >= 11 && Number(activeAgent.id) <= 13 ? (
+                              "Powered by Groq's Llama-3.3-70B-Versatile"
                             ) : (
-                              "Powered by Together AI's Gemma-7B"
+                              "Powered by Groq's Llama-3.3-70B-Versatile"
                             )}
                           </div>
                         </div>

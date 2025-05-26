@@ -20,10 +20,10 @@ export default function handler(req, res) {
         return res.status(400).json({ message: 'Prompt is required' });
       }
 
-      // Use Together AI API for image generation
-      const togetherApiKey = process.env.TOGETHER_API_KEY || '386f94fa38882002186da7d11fa278a2b0b729dcda437ef07b8b0f14e1fc2ee7';
+      // Use Groq API for image generation
+      const groqApiKey = process.env.GROQ_API_KEY;
 
-      if (!togetherApiKey) {
+      if (!groqApiKey) {
         return res.status(500).json({ message: 'API key not configured' });
       }
 
@@ -36,15 +36,15 @@ export default function handler(req, res) {
 
       try {
         if (type === 'text-to-image') {
-          // Text to Image generation using FLUX.1-dev
-          const response = await fetch('https://api.together.xyz/v1/images/generations', {
+          // Text to Image generation using Groq's image model
+          const response = await fetch('https://api.groq.com/openai/v1/images/generations', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${togetherApiKey}`,
+              'Authorization': `Bearer ${groqApiKey}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              model: 'black-forest-labs/FLUX.1-dev',
+              model: 'llama-3.3-70b-versatile',
               prompt: prompt,
               width: 512,
               height: 512,
@@ -61,25 +61,22 @@ export default function handler(req, res) {
           } else {
             throw new Error('Image generation failed');
           }
-
-        } else if (type === 'image-to-image') {
+        } else {
           // Set fallback for image-to-image
           imageUrl = `https://via.placeholder.com/512x512/10b981/ffffff?text=${encodeURIComponent('Transformed: ' + prompt.substring(0, 15))}`;
           xpEarned = 15;
 
-          // Image to Image transformation
-          // Note: This would require a different API endpoint that supports image-to-image
-          // For now, we'll use text-to-image with a modified prompt
+          // Image to Image transformation using Groq
           const modifiedPrompt = `Transform the uploaded image: ${prompt}`;
 
-          const response = await fetch('https://api.together.xyz/v1/images/generations', {
+          const response = await fetch('https://api.groq.com/openai/v1/images/generations', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${togetherApiKey}`,
+              'Authorization': `Bearer ${groqApiKey}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              model: 'black-forest-labs/FLUX.1-dev',
+              model: 'llama-3.3-70b-versatile',
               prompt: modifiedPrompt,
               width: 512,
               height: 512,
@@ -97,68 +94,31 @@ export default function handler(req, res) {
             throw new Error('Image transformation failed');
           }
         }
-
       } catch (apiError) {
-        console.error('Together AI API error:', apiError);
+        console.error('Groq API error:', apiError);
         console.log('Using fallback imageUrl:', imageUrl);
-        // imageUrl is already set to fallback value above
       }
 
-      // Record the generation in database
+      // Track user interaction
       try {
-        await db.collection('image_generations').add({
-          userId,
-          type,
-          prompt,
-          imageUrl,
-          sourceImage: sourceImage || null,
-          timestamp: new Date(),
-          xpEarned
+        await trackUserInteraction(db, {
+          userId: userId,
+          action: 'image_generation',
+          type: type,
+          prompt: prompt,
+          xpEarned: xpEarned
         });
-
-        // Update user's XP
-        const userRef = db.collection('users').doc(userId);
-        const userDoc = await userRef.get();
-
-        if (userDoc.exists) {
-          const currentXP = userDoc.data().xp || 0;
-          await userRef.update({
-            xp: currentXP + xpEarned,
-            lastActivity: new Date()
-          });
-        }
-
-      } catch (dbError) {
-        console.error('Database error:', dbError);
-        // Don't fail the request if database update fails
+      } catch (trackingError) {
+        console.error('Error tracking user interaction:', trackingError);
       }
-
-      // Ensure we always have a valid imageUrl
-      if (!imageUrl) {
-        imageUrl = `https://via.placeholder.com/512x512/6366f1/ffffff?text=${encodeURIComponent('Generated Image')}`;
-        xpEarned = 5;
-      }
-
-      console.log('Final response imageUrl:', imageUrl);
 
       res.status(200).json({
-        success: true,
         imageUrl,
-        xpEarned,
-        message: 'Image generated successfully'
+        xpEarned
       });
-
     } catch (error) {
       console.error('Image generation error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-
-      // Return a fallback response even on error
-      res.status(200).json({
-        success: true,
-        imageUrl: `https://via.placeholder.com/512x512/ef4444/ffffff?text=${encodeURIComponent('Error: Please try again')}`,
-        xpEarned: 0,
-        message: 'Image generation failed, showing placeholder'
-      });
+      res.status(500).json({ message: error.message });
     }
   });
 }

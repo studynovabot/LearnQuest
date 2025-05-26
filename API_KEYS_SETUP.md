@@ -4,12 +4,11 @@ This document provides instructions for setting up the required API keys for the
 
 ## Required API Keys
 
-The application requires the following API keys:
+The application requires the following API key:
 
-1. **Groq API Key** - Used for the main AI tutor
-2. **TogetherAI API Key** - Used for specialized subject tutors
+1. **Groq API Key** - Used for all AI tutors
 
-## How to Obtain API Keys
+## How to Obtain API Key
 
 ### Groq API Key
 
@@ -19,22 +18,13 @@ The application requires the following API keys:
 4. Create a new API key
 5. Copy the API key
 
-### TogetherAI API Key
-
-1. Visit [Together AI's website](https://www.together.ai/)
-2. Sign up for an account or log in
-3. Navigate to the API section in your dashboard
-4. Create a new API key
-5. Copy the API key
-
-## Setting Up API Keys in the Application
+## Setting Up API Key in the Application
 
 1. Open the `.env` file in the root directory of the project
-2. Update the following lines with your actual API keys:
+2. Update the following line with your actual API key:
 
 ```
 GROQ_API_KEY=your_groq_api_key_here
-TOGETHER_AI_API_KEY=your_together_ai_api_key_here
 ```
 
 3. Save the file
@@ -44,29 +34,18 @@ TOGETHER_AI_API_KEY=your_together_ai_api_key_here
 
 If you encounter API authorization errors:
 
-1. Verify that your API keys are correctly copied into the `.env` file
-2. Check that your API keys are active and have not expired
-3. Ensure you have sufficient credits or quota on your API accounts
-4. Check the API endpoints in the `.env` file are correct:
+1. Verify that your API key is correctly copied into the `.env` file
+2. Check that your API key is active and has not expired
+3. Ensure you have sufficient credits or quota on your API account
+4. Check the API endpoint in the `.env` file is correct:
 
 ```
 GROQ_API_URL=https://api.groq.com/openai/v1/chat/completions
-TOGETHER_AI_API_URL=https://api.together.xyz/v1/completions
 ```
 
 ### Model Availability Issues
 
-If you encounter errors about models not being available:
-
-1. The application is configured to use `togethercomputer/llama-2-7b-chat` which should be available without a dedicated endpoint
-2. If you want to use other models like `google/gemma-7b-it` or `NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO`, you'll need to:
-   - Visit the TogetherAI dashboard
-   - Go to the Models section
-   - Find the model you want to use
-   - Create a dedicated endpoint for that model
-   - Start the endpoint (this may incur additional costs)
-
-3. After creating a dedicated endpoint, you can update the models in `server/ai/index.ts`
+The application is configured to use `llama-3.3-70b-versatile` which is available through Groq's API. This model provides excellent performance for all tutor types.
 
 ## Firebase Index Setup
 
