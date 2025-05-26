@@ -302,19 +302,16 @@ const ImageTools = () => {
                     className="mt-6"
                   >
                     <h3 className="font-semibold mb-3">Generated Image:</h3>
-                    <div className="border rounded-lg overflow-hidden bg-white p-4">
+                    <div className="border rounded-lg overflow-hidden bg-transparent">
                       <img
                         src={generatedImage}
                         alt="Generated"
-                        className="w-full max-w-md mx-auto block"
+                        className="w-full max-w-md mx-auto block rounded-lg"
                         onLoad={() => console.log('Image loaded successfully:', generatedImage)}
                         onError={(e) => console.error('Image failed to load:', e, generatedImage)}
-                        style={{ minHeight: '200px', backgroundColor: '#f3f4f6' }}
+                        style={{ minHeight: '200px' }}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Image URL: {generatedImage}
-                    </p>
                   </motion.div>
                 )}
               </CardContent>
@@ -483,11 +480,15 @@ const ImageTools = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm text-muted-foreground mb-2">Original:</p>
-                        <img src={sourceImage} alt="Original" className="w-full rounded border" />
+                        <div className="bg-transparent rounded-lg overflow-hidden">
+                          <img src={sourceImage} alt="Original" className="w-full rounded-lg" />
+                        </div>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground mb-2">Transformed:</p>
-                        <img src={transformedImage} alt="Transformed" className="w-full rounded border" />
+                        <div className="bg-transparent rounded-lg overflow-hidden">
+                          <img src={transformedImage} alt="Transformed" className="w-full rounded-lg" />
+                        </div>
                       </div>
                     </div>
                   </motion.div>
