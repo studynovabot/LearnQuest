@@ -158,42 +158,42 @@ const ChatAgents = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="w-full justify-between mb-4 h-12"
+          className="mobile-agent-selector w-full justify-between mobile-touch-feedback"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {activeAgent ? (
               <>
-                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", getAgentColorClass(activeAgent.color))}>
-                  {getAgentIcon(activeAgent.iconName, 16)}
+                <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", getAgentColorClass(activeAgent.color))}>
+                  {getAgentIcon(activeAgent.iconName, 20)}
                 </div>
                 <div className="text-left">
-                  <p className="font-medium text-sm">{activeAgent.name}</p>
-                  <p className="text-xs text-muted-foreground">{activeAgent.subject}</p>
+                  <p className="font-semibold text-base">{activeAgent.name}</p>
+                  <p className="mobile-caption">{activeAgent.subject}</p>
                 </div>
               </>
             ) : (
               <>
-                <RobotIcon size={20} className="text-muted-foreground" />
-                <span>Select a Tutor</span>
+                <RobotIcon size={24} className="text-muted-foreground" />
+                <span className="mobile-body">Select a Tutor</span>
               </>
             )}
           </div>
-          <ChevronDownIcon size={16} />
+          <ChevronDownIcon size={20} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80 max-h-80 overflow-y-auto mobile-dropdown">
+      <DropdownMenuContent className="mobile-dropdown">
         {unlockedAgents.map((agent: AITutor) => (
           <DropdownMenuItem
             key={agent.id}
             onClick={() => selectAgent(agent)}
-            className="flex items-center gap-3 p-3 cursor-pointer"
+            className="mobile-dropdown-item flex items-center gap-4 cursor-pointer"
           >
-            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", getAgentColorClass(agent.color))}>
-              {getAgentIcon(agent.iconName, 16)}
+            <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", getAgentColorClass(agent.color))}>
+              {getAgentIcon(agent.iconName, 20)}
             </div>
             <div>
-              <p className="font-medium text-sm">{agent.name}</p>
-              <p className="text-xs text-muted-foreground">{agent.subject}</p>
+              <p className="font-semibold text-base">{agent.name}</p>
+              <p className="mobile-caption">{agent.subject}</p>
             </div>
           </DropdownMenuItem>
         ))}
@@ -208,10 +208,22 @@ const ChatAgents = () => {
         <meta name="description" content="Chat with specialized AI tutors for different subjects. Get help with math, languages, sciences and more through our AI-powered learning assistants." />
       </Helmet>
 
-      <div className="flex flex-col gap-6">
-        <Card className="overflow-hidden">
-          <CardHeader className="bg-card">
-            <CardTitle className="text-2xl font-bold">Nova AI Tutors</CardTitle>
+      <div className={cn(
+        "flex flex-col gap-6",
+        isMobile ? "mobile-fade-in" : ""
+      )}>
+        <Card className={cn(
+          "overflow-hidden",
+          isMobile ? "mobile-card-shadow" : ""
+        )}>
+          <CardHeader className={cn(
+            "bg-card",
+            isMobile ? "mobile-padding-md" : ""
+          )}>
+            <CardTitle className={cn(
+              "font-bold",
+              isMobile ? "mobile-title" : "text-2xl"
+            )}>Nova AI Tutors</CardTitle>
           </CardHeader>
 
           <CardContent className="p-0">
@@ -219,8 +231,8 @@ const ChatAgents = () => {
               <FirebaseStatus />
             </div>
             <div className={cn(
-              "flex min-h-[500px]",
-              isMobile ? "flex-col mobile-chat-area" : "flex-row h-[calc(100vh-12rem)]"
+              "flex",
+              isMobile ? "flex-col mobile-chat-area min-h-[600px]" : "flex-row h-[calc(100vh-12rem)] min-h-[500px]"
             )}>
               {/* Desktop Sidebar - Hidden on Mobile */}
               {!isMobile && (
@@ -297,41 +309,44 @@ const ChatAgents = () => {
               {/* Chat Area - Full width on mobile, responsive */}
               <div className="flex-1 min-w-0 flex flex-col">
                 <div className={cn(
-                  "flex-grow overflow-y-auto",
-                  isMobile ? "p-3" : "p-4"
+                  "flex-grow overflow-y-auto mobile-scroll-area",
+                  isMobile ? "mobile-padding-md mobile-scroll mobile-text-select" : "p-4"
                 )}>
                   {/* Mobile Tutor Selector */}
                   {isMobile && <MobileTutorSelector />}
 
                   {activeAgent ? (
                     <div className="flex flex-col gap-4">
-                      {/* Agent Header - Smaller on mobile */}
+                      {/* Agent Header - Enhanced mobile spacing */}
                       <div className={cn(
-                        "flex items-center gap-3 bg-muted rounded-lg mb-4",
-                        isMobile ? "p-2" : "p-3"
+                        "flex items-center gap-4 bg-muted rounded-lg mobile-spacing-md",
+                        isMobile ? "mobile-padding-md" : "p-3"
                       )}>
                         <div className={cn(
                           "rounded-full flex items-center justify-center",
                           getAgentColorClass(activeAgent.color),
-                          isMobile ? "w-10 h-10" : "w-12 h-12"
+                          isMobile ? "w-12 h-12" : "w-12 h-12"
                         )}>
-                          {getAgentIcon(activeAgent.iconName, isMobile ? 20 : 28)}
+                          {getAgentIcon(activeAgent.iconName, isMobile ? 24 : 28)}
                         </div>
                         <div className="flex-grow">
-                          <h3 className={cn("font-semibold", isMobile ? "text-base" : "text-lg")}>{activeAgent.name}</h3>
-                          <p className="text-sm text-muted-foreground">{activeAgent.subject} specialist</p>
+                          <h3 className={cn("font-semibold", isMobile ? "mobile-subtitle" : "text-lg")}>{activeAgent.name}</h3>
+                          <p className={cn("text-muted-foreground", isMobile ? "mobile-caption" : "text-sm")}>{activeAgent.subject} specialist</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-                          <span className="text-xs text-green-500">AI Enabled</span>
+                          <span className={cn("text-green-500", isMobile ? "mobile-caption" : "text-xs")}>AI Enabled</span>
                         </div>
                       </div>
 
                       {agentMessages.length === 0 ? (
-                        <div className="text-center py-12">
-                          <RobotIcon size={48} className="mx-auto mb-4 text-primary opacity-50" />
-                          <h3 className="text-xl font-semibold mb-2">Start chatting with {activeAgent.name}</h3>
-                          <p className="text-muted-foreground max-w-md mx-auto mb-4">
+                        <div className={cn(
+                          "text-center",
+                          isMobile ? "py-16 mobile-padding-md" : "py-12"
+                        )}>
+                          <RobotIcon size={isMobile ? 56 : 48} className="mx-auto mb-6 text-primary opacity-50" />
+                          <h3 className={cn("font-semibold mb-4", isMobile ? "mobile-title" : "text-xl")}>Start chatting with {activeAgent.name}</h3>
+                          <p className={cn("text-muted-foreground max-w-md mx-auto mb-6", isMobile ? "mobile-body" : "")}>
                             Ask questions about {activeAgent.subject?.toLowerCase()} and get personalized help with your studies.
                           </p>
                           <div className="inline-flex items-center bg-secondary/10 rounded-full px-3 py-1 text-xs text-secondary border border-secondary/20">
@@ -359,14 +374,16 @@ const ChatAgents = () => {
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.3 }}
                               className={cn(
-                                "flex gap-3 max-w-[85%]",
-                                message.role === "user" ? "self-end flex-row-reverse ml-auto" : ""
+                                "flex gap-4 mobile-message-container",
+                                message.role === "user" ? "self-end flex-row-reverse ml-auto" : "",
+                                isMobile ? "max-w-[90%]" : "max-w-[85%]"
                               )}
                             >
                               <div
                                 className={cn(
-                                  "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                                  message.role === "user" ? "bg-muted" : getAgentColorClass(activeAgent.color)
+                                  "rounded-full flex items-center justify-center flex-shrink-0",
+                                  message.role === "user" ? "bg-muted" : getAgentColorClass(activeAgent.color),
+                                  isMobile ? "w-10 h-10" : "w-8 h-8"
                                 )}
                               >
                                 {message.role === "user" ? (
@@ -376,32 +393,31 @@ const ChatAgents = () => {
                                     className="w-full h-full rounded-full object-cover"
                                   />
                                 ) : (
-                                  getAgentIcon(activeAgent.iconName, 16)
+                                  getAgentIcon(activeAgent.iconName, isMobile ? 20 : 16)
                                 )}
                               </div>
 
                               <div className="relative">
                                 <div
                                   className={cn(
-                                    "rounded-xl p-3",
+                                    "mobile-message-bubble",
                                     message.role === "user"
-                                      ? "bg-primary rounded-tr-none"
-                                      : "bg-muted rounded-tl-none"
+                                      ? "bg-primary rounded-tr-none text-primary-foreground"
+                                      : "bg-muted rounded-tl-none",
+                                    !isMobile && "rounded-xl p-3"
                                   )}
                                 >
                                   {message.role === "assistant" ? (
                                     <TypewriterText
                                       text={message.content}
                                       speed={20}
-                                      className="text-sm"
+                                      className={cn(isMobile ? "mobile-body" : "text-sm")}
                                       onComplete={() => setTypingMessageId(null)}
                                     />
                                   ) : (
-                                    <p className="text-sm">{message.content}</p>
+                                    <p className={cn(isMobile ? "mobile-body" : "text-sm")}>{message.content}</p>
                                   )}
                                 </div>
-
-
                               </div>
                             </motion.div>
                           ))}
@@ -410,10 +426,13 @@ const ChatAgents = () => {
                       <div ref={messagesEndRef} />
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-center">
-                      <RobotIcon size={64} className="text-muted-foreground mb-6" />
-                      <h2 className="text-2xl font-bold mb-2">Select an AI Tutor</h2>
-                      <p className="text-muted-foreground max-w-md">
+                    <div className={cn(
+                      "flex flex-col items-center justify-center h-full text-center",
+                      isMobile ? "mobile-padding-lg py-20" : ""
+                    )}>
+                      <RobotIcon size={isMobile ? 72 : 64} className="text-muted-foreground mb-8" />
+                      <h2 className={cn("font-bold mb-4", isMobile ? "mobile-title" : "text-2xl")}>Select an AI Tutor</h2>
+                      <p className={cn("text-muted-foreground max-w-md", isMobile ? "mobile-body" : "")}>
                         Choose from your available tutors to get specialized help with different subjects
                       </p>
                     </div>
@@ -423,15 +442,18 @@ const ChatAgents = () => {
                 {activeAgent && (
                   <div className={cn(
                     "border-t border-border flex-shrink-0 bg-background",
-                    isMobile ? "p-3 pb-safe mobile-chat-input" : "p-4"
+                    isMobile ? "mobile-chat-input" : "p-4"
                   )}>
-                    <form onSubmit={handleSubmit} className="flex gap-2 max-w-full">
+                    <form onSubmit={handleSubmit} className={cn(
+                      "flex gap-3 max-w-full",
+                      isMobile ? "items-end" : ""
+                    )}>
                       <Input
                         type="text"
                         placeholder={`Ask ${activeAgent.name} a question...`}
                         className={cn(
-                          "flex-1 min-w-0 bg-muted border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50",
-                          isMobile ? "h-12 text-base" : "h-10"
+                          "flex-1 min-w-0 bg-muted border-border focus:outline-none focus:ring-2 focus:ring-primary/50",
+                          isMobile ? "mobile-button rounded-2xl" : "h-10 rounded-xl"
                         )}
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
@@ -443,15 +465,15 @@ const ChatAgents = () => {
                         disabled={isSending || !inputMessage.trim()}
                         className={cn(
                           "flex-shrink-0 touch-manipulation",
-                          isMobile ? "h-12 w-12 p-0" : "h-10"
+                          isMobile ? "mobile-button-large rounded-2xl w-14 mobile-touch-feedback" : "h-10"
                         )}
                       >
                         {isSending ? (
-                          <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-current animate-spin" />
+                          <div className="h-5 w-5 rounded-full border-2 border-t-transparent border-current animate-spin" />
                         ) : (
                           <>
                             {!isMobile && "Send"}
-                            <SendIcon className={cn(isMobile ? "" : "ml-2")} size={16} />
+                            <SendIcon className={cn(isMobile ? "" : "ml-2")} size={isMobile ? 20 : 16} />
                           </>
                         )}
                       </Button>

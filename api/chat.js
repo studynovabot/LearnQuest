@@ -4,29 +4,55 @@ import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
 
 // Agent-specific system prompts for all 15 AI tutors
 const AGENT_PROMPTS = {
-  '1': 'You are Nova, a friendly general AI tutor. Help with any subject using clear explanations and encouraging tone. Use emojis to make learning fun! 🤖',
-  '2': 'You are MathWiz, a mathematics expert. Explain math concepts step-by-step with examples. Use mathematical notation when helpful. 🔢',
-  '3': 'You are ScienceBot, a science specialist. Explain scientific concepts with real-world examples and encourage curiosity about how things work. 🔬',
-  '4': 'You are LinguaLearn, a language expert. Help with grammar, writing, literature, and language skills with patience and clarity. 📚',
-  '5': 'You are HistoryWise, a history expert. Share historical knowledge with engaging stories and help students understand cause and effect. 🏛️',
-  '6': 'You are GeoExplorer, a geography specialist. Share knowledge about our world, cultures, and places with enthusiasm. 🌍',
-  '7': 'You are PhysicsProf, a physics expert. Explain physics concepts with clear examples and help students understand how the universe works. ⚛️',
-  '8': 'You are ChemCoach, a chemistry expert. Help students understand chemical reactions, elements, and molecular structures with enthusiasm. 🧪',
-  '9': 'You are BioBuddy, a biology expert. Explain life sciences with passion and help students understand living organisms and ecosystems. 🧬',
-  '10': 'You are EnglishExpert, an English language and literature specialist. Help with writing, reading comprehension, and literary analysis. 📖',
-  '11': 'You are CodeMaster, a computer science expert. Teach programming concepts with practical examples and encourage problem-solving skills. 💻',
-  '12': 'You are ArtAdvisor, an arts guide. Inspire creativity and help students explore artistic expression and appreciation. 🎨',
-  '13': 'You are MusicMaestro, a music expert. Teach music theory, instruments, and appreciation with passion and creativity. 🎵',
-  '14': 'You are SportsScholar, a physical education expert. Promote fitness, sports skills, and healthy lifestyle choices. 🏃‍♂️',
-  '15': 'You are PersonalAI, a personalized learning specialist. Adapt your teaching style to each student\'s unique needs and preferences. ✨'
+  '1': 'You are Nova, a friendly general AI tutor. Provide clear, concise, and accurate explanations in about 100 words. Use scientific terminology appropriately and maintain an encouraging tone. 🤖',
+  '2': 'You are MathWiz, a mathematics expert. Explain concepts in about 100 words with precise mathematical terminology and clear examples. Focus on accuracy and clarity. 🔢',
+  '3': 'You are ScienceBot, a science specialist. Provide accurate scientific explanations in about 100 words. Use proper terminology and real-world examples. Focus on clarity and precision. 🔬',
+  '4': 'You are LinguaLearn, a language expert. Explain concepts in about 100 words with clear language and proper terminology. Maintain clarity and precision. 📚',
+  '5': 'You are HistoryWise, a history expert. Provide concise historical explanations in about 100 words. Focus on accuracy and context. 🏛️',
+  '6': 'You are GeoExplorer, a geography specialist. Give clear geographical explanations in about 100 words. Use proper terminology and maintain accuracy. 🌍',
+  '7': 'You are PhysicsProf, a physics expert. Explain physics concepts in about 100 words with scientific precision. Use proper terminology and clear examples. ⚛️',
+  '8': 'You are ChemCoach, a chemistry expert. Provide chemical explanations in about 100 words with scientific accuracy. Use proper terminology and clear examples. 🧪',
+  '9': 'You are BioBuddy, a biology expert. Give biological explanations in about 100 words with scientific precision. Use proper terminology and clear examples. 🧬',
+  '10': 'You are EnglishExpert, an English language specialist. Explain concepts in about 100 words with proper grammar and clear examples. 📖',
+  '11': 'You are CodeMaster, a computer science expert. Provide technical explanations in about 100 words with proper terminology and clear examples. 💻',
+  '12': 'You are ArtAdvisor, an arts guide. Give artistic explanations in about 100 words with proper terminology and clear examples. 🎨',
+  '13': 'You are MusicMaestro, a music expert. Explain musical concepts in about 100 words with proper terminology and clear examples. 🎵',
+  '14': 'You are SportsScholar, a physical education expert. Provide sports and fitness explanations in about 100 words with proper terminology. 🏃‍♂️',
+  '15': 'You are PersonalAI, a personalized learning specialist. Give clear explanations in about 100 words, adapting to the student\'s level while maintaining accuracy. ✨'
 };
 
 // Maximum retries for API calls
 const MAX_RETRIES = 3;
-const INITIAL_TIMEOUT = 20000; // 20 seconds
+const INITIAL_TIMEOUT = 30000; // 30 seconds
 
 // Helper function to delay between retries
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Verify Groq API connection
+async function verifyGroqAPI(apiKey) {
+  try {
+    const response = await fetch('https://api.groq.com/v1/models', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('✅ Groq API connection successful. Available models:', data);
+      return { success: true, models: data };
+    } else {
+      const error = await response.text();
+      console.error('❌ Groq API connection failed:', error);
+      return { success: false, error };
+    }
+  } catch (error) {
+    console.error('❌ Groq API verification error:', error);
+    return { success: false, error: error.message };
+  }
+}
 
 // AI response generator with Groq integration and improved error handling
 async function generateAIResponse(content, agentId) {
@@ -35,103 +61,140 @@ async function generateAIResponse(content, agentId) {
 
   console.log(`🚀 generateAIResponse called for agent ${agent} with content: "${content}"`);
 
-  // Get API key
+  // Get and verify API key
   const groqApiKey = process.env.GROQ_API_KEY || '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';
-
-  if (!groqApiKey) {
-    console.error('❌ No Groq API key available');
-    throw new Error('Groq API key is required');
+  
+  // Verify API connection first
+  const apiStatus = await verifyGroqAPI(groqApiKey);
+  if (!apiStatus.success) {
+    console.error('❌ Groq API verification failed:', apiStatus.error);
+    throw new Error(`Groq API verification failed: ${apiStatus.error}`);
   }
 
   // Validate content
-  if (!content || typeof content !== 'string' || content.trim().length === 0) {
+  if (!content || typeof content !== 'string') {
     console.error('❌ Invalid content provided:', content);
     throw new Error('Valid content is required');
   }
 
-  // Prepare the payload
-  const groqPayload = {
-    model: 'llama-3.3-70b-versatile',
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: content.trim() }
-    ],
-    max_tokens: 700,
-    temperature: 0.7,
-    top_p: 0.95,
-    stream: false
-  };
+  const trimmedContent = content.trim();
+  if (trimmedContent.length === 0) {
+    console.error('❌ Empty content after trimming');
+    throw new Error('Content cannot be empty');
+  }
 
-  console.log('📦 Groq API payload:', JSON.stringify(groqPayload));
+  // Prepare the payload with fallback models
+  const models = ['llama2-70b-4096', 'mixtral-8x7b-32768', 'llama2-70b'];
+  let lastError = null;
 
-  // Try Groq API with retries
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    console.log(`🔄 Attempt ${attempt} of ${MAX_RETRIES} for Groq API...`);
-
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), INITIAL_TIMEOUT * attempt);
-
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${groqApiKey}`,
-          'Content-Type': 'application/json'
+  // Try each model in sequence
+  for (const model of models) {
+    console.log(`🔄 Trying model: ${model}`);
+    
+    const groqPayload = {
+      model: model,
+      messages: [
+        { 
+          role: 'system', 
+          content: `${systemPrompt}\n\nImportant instructions:\n1. Provide accurate and scientific explanations\n2. Keep responses to about 100 words\n3. Use proper terminology\n4. Be clear and concise\n5. Focus on factual information` 
         },
-        body: JSON.stringify(groqPayload),
-        signal: controller.signal
-      });
+        { 
+          role: 'user', 
+          content: `${trimmedContent}. Please explain this in about 100 words, focusing on accuracy and clarity.` 
+        }
+      ],
+      max_tokens: 500,
+      temperature: 0.3,
+      top_p: 0.95,
+      stream: false
+    };
 
-      clearTimeout(timeoutId);
+    // Try Groq API with retries
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      console.log(`🔄 Attempt ${attempt} of ${MAX_RETRIES} for Groq API with model ${model}...`);
 
-      const responseText = await response.text();
-      console.log(`📡 Groq API response status: ${response.status}`);
-      console.log(`📡 Groq API response text:`, responseText);
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+          console.log(`⏱️ Request timeout on attempt ${attempt}`);
+        }, INITIAL_TIMEOUT * attempt);
 
-      if (response.ok) {
-        let data;
-        try {
-          data = JSON.parse(responseText);
-        } catch (parseError) {
-          console.error('❌ Failed to parse Groq API response:', parseError);
-          throw new Error('Invalid response from Groq API');
+        const response = await fetch('https://api.groq.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${groqApiKey}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(groqPayload),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        const responseText = await response.text();
+        console.log(`📡 Groq API response status: ${response.status}`);
+        console.log(`📡 Groq API response text:`, responseText);
+
+        if (response.ok) {
+          let data;
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('❌ Failed to parse Groq API response:', parseError);
+            throw new Error(`Invalid JSON response: ${responseText}`);
+          }
+
+          if (data?.choices?.[0]?.message?.content) {
+            console.log(`✅ Groq API success with model ${model}`);
+            
+            const responseContent = data.choices[0].message.content.trim();
+            if (responseContent.length === 0) {
+              throw new Error('Empty response from Groq API');
+            }
+
+            // Validate response length
+            const wordCount = responseContent.split(/\s+/).length;
+            if (wordCount < 50 || wordCount > 150) {
+              console.log(`⚠️ Response length not ideal: ${wordCount} words`);
+            }
+
+            return {
+              content: responseContent,
+              xpAwarded: Math.floor(Math.random() * 10) + 20,
+              model: model
+            };
+          }
         }
 
-        if (data?.choices?.[0]?.message?.content) {
-          console.log(`✅ Groq API success for agent ${agent} on attempt ${attempt}`);
-          return {
-            content: data.choices[0].message.content,
-            xpAwarded: Math.floor(Math.random() * 10) + 20
-          };
-        } else {
-          console.error('❌ Groq API response missing required fields:', data);
-          throw new Error('Invalid response structure from Groq API');
+        lastError = new Error(`HTTP error! status: ${response.status} - ${responseText}`);
+        
+        if (attempt < MAX_RETRIES) {
+          const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+          console.log(`⏳ Waiting ${backoffDelay}ms before retry...`);
+          await delay(backoffDelay);
         }
-      }
+      } catch (error) {
+        lastError = error;
+        console.error(`❌ Groq API error with model ${model} on attempt ${attempt}:`, error.message);
 
-      console.error(`❌ Groq API error (Attempt ${attempt}): ${response.status} - ${responseText}`);
+        if (error.name === 'AbortError') {
+          console.error('⏱️ Request timed out');
+        }
 
-      if (attempt < MAX_RETRIES) {
-        const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
-        console.log(`⏳ Waiting ${backoffDelay}ms before retry...`);
-        await delay(backoffDelay);
-      }
-    } catch (error) {
-      console.error(`❌ Groq API error on attempt ${attempt}:`, error);
-
-      if (error.name === 'AbortError') {
-        console.error('⏱️ Request timed out');
-      }
-
-      if (attempt < MAX_RETRIES) {
-        const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
-        console.log(`⏳ Waiting ${backoffDelay}ms before retry...`);
-        await delay(backoffDelay);
+        if (attempt < MAX_RETRIES) {
+          const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+          console.log(`⏳ Waiting ${backoffDelay}ms before retry...`);
+          await delay(backoffDelay);
+        }
       }
     }
   }
 
-  throw new Error('Failed to get response from Groq API after all retries');
+  // If we get here, all models and retries failed
+  console.error('❌ All models and retry attempts failed. Last error:', lastError);
+  throw new Error(`Failed to get response from Groq API with any model: ${lastError.message}`);
 }
 
 // Verify API key is working
@@ -167,45 +230,66 @@ export default function handler(req, res) {
     
     if (req.method !== 'POST') {
       console.log('❌ Method not allowed:', req.method);
-      return res.status(405).json({ message: 'Method not allowed' });
+      return res.status(405).json({ 
+        error: true,
+        message: 'Method not allowed',
+        details: `${req.method} is not supported, use POST`
+      });
     }
 
     try {
-      console.log('📦 Request body:', JSON.stringify(req.body));
+      console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
       
       const { content, agentId, userId } = req.body;
       const actualUserId = userId || req.headers['x-user-id'] || 'demo-user';
 
+      // Validate request body
       if (!content) {
         console.log('❌ No content provided in request');
-        return res.status(400).json({ message: 'No content provided' });
+        return res.status(400).json({ 
+          error: true,
+          message: 'No content provided',
+          details: 'The content field is required in the request body'
+        });
       }
 
-      console.log(`🤖 Generating response for agent ${agentId} with content: "${content}"`);
+      // Get and verify API key
+      const groqApiKey = process.env.GROQ_API_KEY || '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';
+      
+      // Verify API connection first
+      console.log('🔍 Verifying Groq API connection...');
+      const apiStatus = await verifyGroqAPI(groqApiKey);
+      if (!apiStatus.success) {
+        console.error('❌ API verification failed:', apiStatus.error);
+        return res.status(503).json({
+          error: true,
+          message: 'AI service unavailable',
+          details: apiStatus.error,
+          errorType: 'API_VERIFICATION_ERROR'
+        });
+      }
+      console.log('✅ API verification successful');
 
-      // Initialize Firebase
+      console.log(`🤖 Processing request for agent ${agentId} with content: "${content}"`);
+
+      // Initialize Firebase (but don't fail if it errors)
+      let db = null;
       try {
         initializeFirebase();
-      } catch (firebaseError) {
-        console.error('Firebase initialization error:', firebaseError);
-        // Continue without Firebase if it fails
-      }
-
-      // Get Firestore instance only if Firebase initialized successfully
-      let db;
-      try {
         db = getFirestoreDb();
-      } catch (dbError) {
-        console.error('Firestore connection error:', dbError);
-        // Continue without DB if it fails
+        console.log('✅ Firebase initialized successfully');
+      } catch (firebaseError) {
+        console.error('⚠️ Firebase initialization error:', firebaseError);
+        // Continue without Firebase
       }
 
       // Generate AI response
       try {
-        const { content: responseContent, xpAwarded } = await generateAIResponse(content, agentId);
-        console.log('✅ AI response generated successfully');
+        console.log('🎯 Generating AI response...');
+        const { content: responseContent, xpAwarded, model } = await generateAIResponse(content, agentId);
+        console.log(`✅ AI response generated successfully using model: ${model}`);
 
-        // Track user interaction for performance calculation
+        // Track user interaction (but don't fail if it errors)
         if (db) {
           try {
             const subject = getSubjectFromAgent(agentId);
@@ -217,10 +301,12 @@ export default function handler(req, res) {
               difficulty: 'medium',
               correct: true,
               timeSpent: 0,
-              xpEarned: xpAwarded
+              xpEarned: xpAwarded,
+              model: model
             });
+            console.log('✅ User interaction tracked successfully');
           } catch (trackingError) {
-            console.error('Error tracking user interaction:', trackingError);
+            console.error('⚠️ Error tracking user interaction:', trackingError);
             // Continue even if tracking fails
           }
         }
@@ -233,25 +319,31 @@ export default function handler(req, res) {
           createdAt: new Date().toISOString(),
           userId: 'system',
           agentId: agentId || '1',
-          xpAwarded
+          xpAwarded,
+          model,
+          error: false
         };
 
-        console.log('📤 Sending response:', JSON.stringify(assistantResponse));
+        console.log('📤 Sending response:', JSON.stringify(assistantResponse, null, 2));
         return res.status(200).json(assistantResponse);
 
       } catch (aiError) {
-        console.error('AI response generation error:', aiError);
+        console.error('❌ AI response generation error:', aiError);
         return res.status(500).json({ 
+          error: true,
           message: 'Failed to generate AI response',
-          error: aiError.message
+          details: aiError.message,
+          errorType: 'AI_GENERATION_ERROR'
         });
       }
 
     } catch (error) {
-      console.error('💥 Chat error:', error);
+      console.error('💥 Unexpected error:', error);
       return res.status(500).json({ 
+        error: true,
         message: 'An unexpected error occurred',
-        error: error.message
+        details: error.message,
+        errorType: 'UNEXPECTED_ERROR'
       });
     }
   });

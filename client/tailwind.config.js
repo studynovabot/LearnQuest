@@ -9,11 +9,22 @@ export default {
     "../shared/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
+    screens: {
+      'xs': '475px',
+      ...defaultTheme.screens,
+    },
     borderRadius: {
       ...defaultTheme.borderRadius,
       lg: "var(--radius)",
       md: "calc(var(--radius) - 2px)",
       sm: "calc(var(--radius) - 4px)",
+    },
+    spacing: {
+      ...defaultTheme.spacing,
+      'safe-top': 'env(safe-area-inset-top)',
+      'safe-bottom': 'env(safe-area-inset-bottom)',
+      'safe-left': 'env(safe-area-inset-left)',
+      'safe-right': 'env(safe-area-inset-right)',
     },
     extend: {
       colors: {

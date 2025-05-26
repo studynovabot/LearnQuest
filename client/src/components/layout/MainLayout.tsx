@@ -61,19 +61,19 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       {/* Main content area */}
       <div className="flex-1 flex flex-col">
         {/* Header with logout - mobile only */}
-        <header className="lg:hidden bg-card border-b border-border p-4 flex items-center justify-between">
+        <header className="lg:hidden bg-card border-b border-border mobile-header pt-safe flex items-center justify-between">
           <Link href="/">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <NovaLogo size="sm" iconOnly={true} />
               <div>
-                <h1 className="text-lg font-bold">Nova AI</h1>
-                <p className="text-xs text-muted-foreground">Your AI Study Buddy</p>
+                <h1 className="mobile-subtitle">Nova AI</h1>
+                <p className="mobile-caption">Your AI Study Buddy</p>
               </div>
             </div>
           </Link>
           <Button
             variant="outline"
-            size="sm"
+            className="mobile-button"
             onClick={() => {
               logout();
               setLocation("/login");
@@ -97,16 +97,19 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         </div>
 
         {/* Mobile bottom navigation */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border p-3 z-10">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 mobile-nav z-10">
           <div className="flex justify-around items-center">
             {mobileNavItems.map((item, index) => (
               <Link key={index} href={item.path}>
-                <button className="nav-icon flex flex-col items-center p-2 min-w-[48px] min-h-[48px] justify-center">
+                <button className={cn(
+                  "mobile-nav-item flex flex-col items-center justify-center",
+                  item.active ? "text-secondary bg-secondary/10" : "text-muted-foreground"
+                )}>
                   <item.icon
-                    className={cn("text-xl", item.active ? "text-secondary" : "")}
-                    size={22}
+                    className="mb-1"
+                    size={24}
                   />
-                  <span className={cn("text-xs mt-1", item.active ? "text-secondary" : "")}>{item.label}</span>
+                  <span className="text-xs font-medium">{item.label}</span>
                 </button>
               </Link>
             ))}
@@ -114,7 +117,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         </div>
 
         {/* Main content container */}
-        <div className="flex-1 container mx-auto px-4 py-6 max-w-7xl mb-16 lg:mb-0">
+        <div className={cn(
+          "flex-1 container mx-auto max-w-7xl",
+          "lg:px-4 lg:py-6 lg:mb-0", // Desktop styling
+          "mobile-content" // Mobile styling with proper spacing
+        )}>
           {/* Main content */}
           <div className="flex-grow flex flex-col gap-6">
             {children}
