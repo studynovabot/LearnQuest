@@ -4,9 +4,11 @@ export function setCorsHeaders(res, origin = null) {
   const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:3004',
+    'http://localhost:5000',
     'http://localhost:5173',
     'https://learn-quest-chi.vercel.app',
-    'https://studynova.vercel.app'
+    'https://studynova.vercel.app',
+    'https://learnquest.vercel.app'
   ];
 
   const requestOrigin = origin || 'http://localhost:3004';

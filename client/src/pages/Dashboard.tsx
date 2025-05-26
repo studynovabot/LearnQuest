@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet';
 import SubjectOverview from "@/components/dashboard/SubjectOverview";
 import AITutors from "@/components/dashboard/AITutors";
-import ChatInterface from "@/components/dashboard/ChatInterface";
 import NovaLogo from "@/components/ui/NovaLogo";
 import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
@@ -73,11 +72,6 @@ const Dashboard = () => {
         {/* AI Tutors Section */}
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
           <AITutors />
-        </motion.div>
-
-        {/* Chat Interface */}
-        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
-          <ChatInterface />
         </motion.div>
       </motion.div>
     </>

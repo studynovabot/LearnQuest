@@ -35,7 +35,7 @@ async function generateAIResponse(content, agentId) {
 
     console.log(`🔑 API Keys available - Groq: ${groqApiKey ? 'Yes' : 'No'}, Together: ${togetherApiKey ? 'Yes' : 'No'}`);
 
-    // All agents use Groq with llama-3.1-8b-instant (temporary fix until Together AI key is valid)
+    // Nova (agent 1) uses Groq with llama-3.1-8b-instant, other agents use Together AI
     if (groqApiKey) {
       console.log(`🤖 Calling Groq API for agent ${agent}...`);
       try {
@@ -75,12 +75,49 @@ async function generateAIResponse(content, agentId) {
       }
     }
 
-    // Together AI section temporarily disabled - using Groq for all agents
-    // if (togetherApiKey) {
-    //   const model = agent === '1' ? 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free' : 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free';
-    //   console.log(`🤖 Calling Together AI for agent ${agent} with model ${model}...`);
-    //   // ... Together AI code commented out
-    // }
+    // Use Together AI for agents 2-15
+    if (togetherApiKey && agent !== '1') {
+      const model = 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free';
+      console.log(`🤖 Calling Together AI for agent ${agent} with model ${model}...`);
+      
+      try {
+        const response = await fetch('https://api.together.xyz/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${togetherApiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: content }
+            ],
+            max_tokens: 500,
+            temperature: 0.7,
+            stream: false
+          })
+        });
+
+        console.log(`📡 Together AI response status: ${response.status}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`✅ Together AI success for agent ${agent}`);
+          return {
+            content: data.choices[0].message.content,
+            xpAwarded: Math.floor(Math.random() * 10) + 15 // 15-25 XP for AI responses
+          };
+        } else {
+          const errorText = await response.text();
+          console.error(`❌ Together AI error: ${response.status} - ${errorText}`);
+          // Fall through to Groq as backup
+        }
+      } catch (fetchError) {
+        console.error(`❌ Together AI fetch error:`, fetchError);
+        // Fall through to Groq as backup
+      }
+    }
   } catch (error) {
     console.error(`AI API error for agent ${agent}:`, error);
   }
@@ -104,7 +141,9 @@ async function generateAIResponse(content, agentId) {
     '15': `✨ Hello! I'm PersonalAI, and I'm adapting my response just for you! Your question about "${content}" is unique, and I want to help you learn in the way that works best for your learning style.`
   };
 
+  // Log the fallback response for debugging
   const fallbackResponse = agentResponses[agent] || agentResponses['1'];
+  console.log(`⚠️ Using fallback response for agent ${agent}`);
 
   return {
     content: fallbackResponse,

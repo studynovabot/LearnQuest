@@ -35,6 +35,7 @@ export function useChat() {
     if (isSubmitting || !content.trim()) return;
     try {
       setIsSubmitting(true);
+      console.log(`Sending message to ${activeAgent?.name || 'unknown agent'} (ID: ${activeAgent?.id || 'unknown'})`);
 
       // Add the user's message to local state
       const userMessage: ChatMessage = {
