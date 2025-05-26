@@ -19,6 +19,7 @@ import NCERTSolutions from "@/pages/NCERTSolutions";
 import ImageTools from "@/pages/ImageTools";
 import PersonalizedAgent from "@/pages/PersonalizedAgent";
 import ContentManager from "@/pages/ContentManager";
+import ThemeTest from "@/pages/ThemeTest";
 import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
@@ -96,6 +97,11 @@ function Router() {
           <ContentManager />
         </MainLayout>
       </Route>
+      <Route path="/theme-test">
+        <MainLayout>
+          <ThemeTest />
+        </MainLayout>
+      </Route>
       <Route>
         <NotFound />
       </Route>
@@ -113,7 +119,12 @@ function InnerApp() {
   }, [status]);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark">
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem={true}
+      disableTransitionOnChange={false}
+    >
       <UserProvider>
         <TooltipProvider>
           <Toaster />

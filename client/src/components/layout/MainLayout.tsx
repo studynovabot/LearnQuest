@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
 import NovaLogo from "@/components/ui/NovaLogo";
+import { ThemeToggle, ThemeToggleCompact } from "@/components/ui/theme-toggle";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -71,20 +72,24 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               </div>
             </div>
           </Link>
-          <Button
-            variant="outline"
-            className="mobile-button"
-            onClick={() => {
-              logout();
-              setLocation("/login");
-            }}
-          >
-            Logout
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggleCompact />
+            <Button
+              variant="outline"
+              className="mobile-button"
+              onClick={() => {
+                logout();
+                setLocation("/login");
+              }}
+            >
+              Logout
+            </Button>
+          </div>
         </header>
 
-        {/* Desktop logout button (top right) */}
-        <div className="hidden lg:block absolute top-4 right-4 z-50">
+        {/* Desktop controls (top right) */}
+        <div className="hidden lg:flex absolute top-4 right-4 z-50 items-center gap-3">
+          <ThemeToggle size="default" variant="outline" />
           <Button
             variant="outline"
             onClick={() => {

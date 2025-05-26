@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation, Link } from "wouter";
 import { cn } from "@/lib/utils";
 import NovaLogo from "@/components/ui/NovaLogo";
+import { ThemeToggleCompact } from "@/components/ui/theme-toggle";
 import {
   HomeIcon, MessageIcon, FlashlightIcon, BookOpenIcon,
   ImageIcon, SparklesIcon, UploadIcon, CreditCardIcon
@@ -79,6 +80,19 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
             ))}
           </div>
         </nav>
+
+        {/* Theme Toggle at bottom */}
+        <div className="p-4 border-t border-border">
+          <div className="flex items-center gap-3">
+            <ThemeToggleCompact className="flex-shrink-0" />
+            <span className={cn(
+              "text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
+              "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs"
+            )}>
+              Toggle Theme
+            </span>
+          </div>
+        </div>
 
 
       </div>
