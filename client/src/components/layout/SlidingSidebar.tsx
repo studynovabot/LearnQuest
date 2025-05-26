@@ -120,15 +120,16 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
                     {item.label}
                   </span>
 
-                  {/* Tooltip for collapsed state on desktop */}
-                  <div className={cn(
-                    "absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-sm rounded-md shadow-md z-50",
-                    "opacity-0 pointer-events-none transition-opacity duration-200",
-                    "lg:group-hover:opacity-100 lg:group-hover:pointer-events-auto",
-                    isExpanded && "lg:opacity-0 lg:pointer-events-none"
-                  )}>
-                    {item.label}
-                  </div>
+                  {/* Tooltip for collapsed state on desktop only */}
+                  {!isExpanded && (
+                    <div className={cn(
+                      "absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-sm rounded-md shadow-md z-50",
+                      "opacity-0 pointer-events-none transition-opacity duration-200",
+                      "lg:group-hover:opacity-100 lg:group-hover:pointer-events-auto"
+                    )}>
+                      {item.label}
+                    </div>
+                  )}
                 </button>
               </Link>
             ))}
