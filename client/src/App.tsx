@@ -24,8 +24,8 @@ import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { useEffect } from "react";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/react";
+// import { Analytics } from "@vercel/analytics/react";
+// import { SpeedInsights } from "@vercel/speed-insights/react";
 
 function Router() {
   const [location] = useLocation();
@@ -141,8 +141,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <InnerApp />
-      <Analytics />
-      <SpeedInsights />
+      {/* <Analytics />
+      <SpeedInsights /> */}
     </QueryClientProvider>
   );
 }

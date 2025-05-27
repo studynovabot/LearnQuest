@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { track } from '@vercel/analytics';
+// import { track } from '@vercel/analytics';
 
 // Define the gtag function to match the one from Google Analytics
 declare global {
@@ -38,16 +38,16 @@ export function useAnalytics() {
       });
     }
 
-    // Track with Vercel Analytics
-    try {
-      track(action, {
-        category,
-        label,
-        value,
-      });
-    } catch (error) {
-      console.warn('Vercel Analytics tracking failed:', error);
-    }
+    // Track with Vercel Analytics (temporarily disabled for deployment)
+    // try {
+    //   track(action, {
+    //     category,
+    //     label,
+    //     value,
+    //   });
+    // } catch (error) {
+    //   console.warn('Vercel Analytics tracking failed:', error);
+    // }
 
     console.log(`[Analytics] Event: ${action} (${category}${label ? ` - ${label}` : ''}${value ? ` - ${value}` : ''})`);
   }, []);
