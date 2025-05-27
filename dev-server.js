@@ -131,6 +131,16 @@ app.all('/api/image-generation', async (req, res) => {
   }
 });
 
+// Test image generation endpoint
+app.all('/api/test-image', async (req, res) => {
+  const handler = await loadApiFunction('test-image');
+  if (handler) {
+    handler(req, res);
+  } else {
+    res.status(500).json({ error: 'Test image function not found' });
+  }
+});
+
 // NCERT solutions endpoint
 app.all('/api/ncert-solutions', async (req, res) => {
   const handler = await loadApiFunction('ncert-solutions');

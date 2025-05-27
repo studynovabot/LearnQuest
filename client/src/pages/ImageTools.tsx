@@ -38,6 +38,43 @@ const ImageTools = () => {
   const [transformedImage, setTransformedImage] = useState<string | null>(null);
   const [isTransforming, setIsTransforming] = useState(false);
 
+  const handleTestImage = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/test-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': user?.id || 'demo-user'
+        },
+        body: JSON.stringify({
+          prompt: textPrompt || 'test image'
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Test image response:', data);
+        setGeneratedImage(data.imageUrl);
+        toast({
+          title: "Test Image Generated! 🎨",
+          description: "Test image loaded successfully.",
+        });
+      } else {
+        throw new Error('Failed to generate test image');
+      }
+    } catch (error) {
+      console.error('Test image error:', error);
+      toast({
+        title: "Test Failed",
+        description: "Could not generate test image.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleTextToImage = async () => {
     if (!textPrompt.trim()) {
       toast({
@@ -73,7 +110,7 @@ const ImageTools = () => {
           console.log('Generated image state should now be:', data.imageUrl);
           toast({
             title: "Image Generated! 🎨",
-            description: "Your image has been successfully generated with Starry AI.",
+            description: "Your image has been successfully generated.",
           });
         } else {
           console.error('Invalid imageUrl received:', data.imageUrl);
@@ -82,17 +119,19 @@ const ImageTools = () => {
           throw new Error('Invalid image URL received from server');
         }
       } else {
-        console.error('Response not ok:', response.status, response.statusText);
-        throw new Error('Failed to generate image');
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('Response not ok:', response.status, response.statusText, errorData);
+        throw new Error(errorData.message || 'Failed to generate image');
       }
     } catch (error) {
       console.error('Text to image error:', error);
-      // Fallback with placeholder
-      setGeneratedImage('https://via.placeholder.com/512x512/6366f1/ffffff?text=Generated+Image');
+      // Use a better fallback image
+      const fallbackImage = `https://picsum.photos/512/512?random=${Date.now()}`;
+      setGeneratedImage(fallbackImage);
       toast({
-        title: "Generation Error",
-        description: "Failed to generate image. Please try again or check your prompt.",
-        variant: "destructive"
+        title: "Using Demo Image",
+        description: "Generated a demo image for testing. The AI service may be temporarily unavailable.",
+        variant: "default"
       });
     } finally {
       setIsGenerating(false);
@@ -277,23 +316,44 @@ const ImageTools = () => {
                   />
                 </div>
 
-                <Button
-                  onClick={handleTextToImage}
-                  disabled={isGenerating || !textPrompt.trim()}
-                  className="w-full"
-                >
-                  {isGenerating ? (
-                    <>
-                      <LoaderIcon size={16} className="mr-2 animate-spin" />
-                      Generating with Starry AI...
-                    </>
-                  ) : (
-                    <>
-                      <WandIcon size={16} className="mr-2" />
-                      Generate Image
-                    </>
-                  )}
-                </Button>
+                <div className="space-y-3">
+                  <Button
+                    onClick={handleTextToImage}
+                    disabled={isGenerating || !textPrompt.trim()}
+                    className="w-full"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <LoaderIcon size={16} className="mr-2 animate-spin" />
+                        Generating with Starry AI...
+                      </>
+                    ) : (
+                      <>
+                        <WandIcon size={16} className="mr-2" />
+                        Generate Image
+                      </>
+                    )}
+                  </Button>
+
+                  <Button
+                    onClick={handleTestImage}
+                    disabled={isGenerating}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <LoaderIcon size={16} className="mr-2 animate-spin" />
+                        Testing...
+                      </>
+                    ) : (
+                      <>
+                        <ImageIcon size={16} className="mr-2" />
+                        Test Image Generation
+                      </>
+                    )}
+                  </Button>
+                </div>
 
                 {generatedImage && (
                   <motion.div
@@ -302,14 +362,25 @@ const ImageTools = () => {
                     className="mt-6"
                   >
                     <h3 className="font-semibold mb-3">Generated Image:</h3>
-                    <div className="border rounded-lg overflow-hidden bg-transparent">
+                    <div className="rounded-lg overflow-hidden bg-transparent">
                       <img
                         src={generatedImage}
                         alt="Generated"
-                        className="w-full max-w-md mx-auto block rounded-lg"
+                        className="w-full max-w-md mx-auto block rounded-lg shadow-lg"
                         onLoad={() => console.log('Image loaded successfully:', generatedImage)}
-                        onError={(e) => console.error('Image failed to load:', e, generatedImage)}
-                        style={{ minHeight: '200px' }}
+                        onError={(e) => {
+                          console.error('Image failed to load:', e, generatedImage);
+                          // Try to reload the image with a cache-busting parameter
+                          const imgElement = e.target as HTMLImageElement;
+                          if (imgElement && !imgElement.src.includes('?cache=')) {
+                            imgElement.src = `${generatedImage}?cache=${Date.now()}`;
+                          }
+                        }}
+                        style={{
+                          minHeight: '200px',
+                          objectFit: 'contain',
+                          backgroundColor: 'transparent'
+                        }}
                       />
                     </div>
                   </motion.div>

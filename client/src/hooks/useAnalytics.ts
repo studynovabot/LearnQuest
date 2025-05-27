@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { track } from '@vercel/analytics';
 
 // Define the gtag function to match the one from Google Analytics
 declare global {
@@ -28,14 +29,27 @@ export function useAnalytics() {
    * Track a user event
    */
   const trackEvent = useCallback((action: string, category: string, label?: string, value?: number) => {
+    // Track with Google Analytics (if available)
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', action, {
         event_category: category,
         event_label: label,
         value: value,
       });
-      console.log(`[Analytics] Event: ${action} (${category}${label ? ` - ${label}` : ''}${value ? ` - ${value}` : ''})`);
     }
+
+    // Track with Vercel Analytics
+    try {
+      track(action, {
+        category,
+        label,
+        value,
+      });
+    } catch (error) {
+      console.warn('Vercel Analytics tracking failed:', error);
+    }
+
+    console.log(`[Analytics] Event: ${action} (${category}${label ? ` - ${label}` : ''}${value ? ` - ${value}` : ''})`);
   }, []);
 
   /**
