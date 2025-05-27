@@ -1,7 +1,5 @@
 // Storage utilities for Vercel serverless functions
 import { getFirestoreDb } from './firebase.js';
-import { FieldValue } from 'firebase-admin/firestore';
-import bcrypt from 'bcryptjs';
 
 export class FirebaseStorage {
   constructor() {
@@ -20,7 +18,7 @@ export class FirebaseStorage {
 
     // Password should already be hashed by the calling function
     const user = {
-      id: userData.id || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: userData.id || `user_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       email: userData.email,
       password: userData.password, // Already hashed
       displayName: userData.displayName,
@@ -59,29 +57,28 @@ export class FirebaseStorage {
     return doc.data();
   }
 
-  async addUserXP(userId, xpAmount) {
-    const db = this.getFirestoreDb();
-    const userRef = db.collection('users').doc(userId);
-
-    await userRef.update({
-      xp: FieldValue.increment(xpAmount)
-    });
-
-    const updatedDoc = await userRef.get();
-    return updatedDoc.data();
-  }
-
   async updateUserLastLogin(userId) {
     const db = this.getFirestoreDb();
     const userRef = db.collection('users').doc(userId);
 
-    await userRef.update({
-      lastLogin: new Date(),
-      updatedAt: new Date()
-    });
+    try {
+      await userRef.update({
+        lastLogin: new Date(),
+        updatedAt: new Date()
+      });
 
-    const updatedDoc = await userRef.get();
-    return updatedDoc.data();
+      const updatedDoc = await userRef.get();
+      if (!updatedDoc.exists) {
+        throw new Error('User not found after update');
+      }
+
+      return updatedDoc.data();
+    } catch (error) {
+      console.error('❌ Error updating user last login:', error);
+      // Return the original user data if update fails
+      const userDoc = await userRef.get();
+      return userDoc.exists ? userDoc.data() : null;
+    }
   }
 
   async getAllTutors() {

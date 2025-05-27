@@ -63,25 +63,49 @@ export default function handler(req, res) {
         console.log('✅ Password valid, checking if first login...');
 
         // Check if this is the user's first login (within 5 minutes of account creation)
-        const createdAt = new Date(user.createdAt);
-        const lastLogin = user.lastLogin ? new Date(user.lastLogin) : null;
-        const now = new Date();
-        const timeSinceCreation = now.getTime() - createdAt.getTime();
-        const isFirstLogin = !lastLogin || timeSinceCreation < (5 * 60 * 1000); // 5 minutes
+        let createdAt, lastLogin, isFirstLogin;
 
-        console.log('🕐 First login check:', {
-          createdAt: createdAt.toISOString(),
-          lastLogin: lastLogin?.toISOString(),
-          timeSinceCreation: timeSinceCreation / 1000 / 60,
-          isFirstLogin
-        });
+        try {
+          // Handle different date formats from Firestore
+          if (user.createdAt && user.createdAt.toDate) {
+            // Firestore Timestamp
+            createdAt = user.createdAt.toDate();
+          } else if (user.createdAt) {
+            // String or Date object
+            createdAt = new Date(user.createdAt);
+          } else {
+            // Fallback to current time
+            createdAt = new Date();
+          }
+
+          if (user.lastLogin && user.lastLogin.toDate) {
+            // Firestore Timestamp
+            lastLogin = user.lastLogin.toDate();
+          } else if (user.lastLogin) {
+            // String or Date object
+            lastLogin = new Date(user.lastLogin);
+          } else {
+            lastLogin = null;
+          }
+
+          const now = new Date();
+          const timeSinceCreation = now.getTime() - createdAt.getTime();
+          isFirstLogin = !lastLogin || timeSinceCreation < (5 * 60 * 1000); // 5 minutes
+
+          console.log('🕐 First login check:', {
+            createdAt: createdAt.toISOString(),
+            lastLogin: lastLogin?.toISOString(),
+            timeSinceCreation: timeSinceCreation / 1000 / 60,
+            isFirstLogin
+          });
+        } catch (dateError) {
+          console.error('❌ Date parsing error:', dateError);
+          // Fallback: assume it's not first login
+          isFirstLogin = false;
+        }
 
         // Update lastLogin timestamp
-        await storage.updateUserLastLogin(user.id);
-
-        // Add login XP reward
-        const loginXP = user.isPro ? 30 : 15;
-        const updatedUser = await storage.addUserXP(user.id, loginXP);
+        const updatedUser = await storage.updateUserLastLogin(user.id);
 
         // Don't return the password and add first login flag
         const { password: _, ...userWithoutPassword } = {
@@ -92,8 +116,6 @@ export default function handler(req, res) {
         console.log('✅ Login successful for user:', userWithoutPassword.id, 'First login:', isFirstLogin);
         return res.status(200).json({
           user: userWithoutPassword,
-          loginReward: loginXP,
-          streakUpdated: false,
           isFirstLogin
         });
 
@@ -124,7 +146,7 @@ export default function handler(req, res) {
 
         // Create new user
         const newUser = {
-          id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `user_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
           email,
           password: hashedPassword,
           displayName,
@@ -149,7 +171,6 @@ export default function handler(req, res) {
         console.log('✅ Registration successful for user:', userWithoutPassword.id);
         return res.status(201).json({
           user: userWithoutPassword,
-          welcomeBonus: 100,
           isFirstLogin: true
         });
 
