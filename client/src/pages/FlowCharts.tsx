@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle, PremiumCardDescription } from "@/components/ui/premium-card";
+import { PremiumSelect } from "@/components/ui/premium-form";
+import { GradientButton, GlassButton } from "@/components/ui/premium-button";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { GitBranchIcon, ArrowRightIcon, CheckCircleIcon, PlayIcon } from "@/components/ui/icons";
+import { GitBranchIcon, ArrowRightIcon, CheckCircleIcon, PlayIcon, SparklesIcon, XIcon, ChevronLeftIcon, ChevronRightIcon, SkipForwardIcon } from "@/components/ui/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface FlowChartStep {
   id: string;
@@ -44,7 +48,7 @@ const FlowCharts = () => {
   // Sample data
   const classes = ['6', '7', '8', '9', '10', '11', '12'];
   const subjects = ['Mathematics', 'Science', 'English', 'History', 'Geography', 'Physics', 'Chemistry', 'Biology'];
-  
+
   const sampleFlowCharts: FlowChart[] = [
     {
       id: '1',
@@ -208,19 +212,40 @@ const FlowCharts = () => {
       </Helmet>
 
       <div className="space-y-6">
-        {/* Header */}
+        {/* Premium Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <GitBranchIcon size={32} className="text-primary" />
-            <h1 className="text-3xl font-bold">Flow Charts</h1>
-          </div>
-          <p className="text-muted-foreground">
-            Interactive step-by-step visual learning for complex concepts
-          </p>
+          <motion.div
+            className="flex items-center justify-center gap-4 mb-6"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="p-3 gradient-primary rounded-2xl shadow-glow">
+              <GitBranchIcon className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+                Flow Charts
+              </h1>
+              <p className="text-muted-foreground text-lg mt-1">
+                Interactive step-by-step visual learning for complex concepts
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full"
+          >
+            <SparklesIcon size={16} className="text-green-500" />
+            <span className="text-sm font-medium text-green-500">Visual Learning Made Easy</span>
+          </motion.div>
         </motion.div>
 
         {/* Flow Chart Study Modal */}
@@ -255,8 +280,8 @@ const FlowCharts = () => {
                         <motion.div
                           className={`
                             relative p-4 rounded-lg border-2 min-w-[200px] text-center
-                            ${index === currentStepIndex ? 'border-primary bg-primary/10' : 
-                              step.isCompleted ? 'border-green-500 bg-green-500/10' : 
+                            ${index === currentStepIndex ? 'border-primary bg-primary/10' :
+                              step.isCompleted ? 'border-green-500 bg-green-500/10' :
                               'border-muted bg-muted/50'}
                           `}
                           animate={{
@@ -274,7 +299,7 @@ const FlowCharts = () => {
                           </div>
                           <h3 className="font-semibold text-sm">{step.title}</h3>
                         </motion.div>
-                        
+
                         {index < currentChart.steps.length - 1 && (
                           <ArrowRightIcon size={20} className="mx-2 text-muted-foreground" />
                         )}
@@ -298,23 +323,23 @@ const FlowCharts = () => {
 
                 {/* Navigation */}
                 <div className="flex gap-3">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={goToPreviousStep}
                     disabled={currentStepIndex === 0}
                   >
                     Previous
                   </Button>
-                  
-                  <Button 
+
+                  <Button
                     onClick={completeStep}
                     className="flex-1"
                   >
                     {currentStepIndex === currentChart.steps.length - 1 ? 'Complete Flow Chart' : 'Next Step'}
                   </Button>
-                  
-                  <Button 
-                    variant="outline" 
+
+                  <Button
+                    variant="outline"
                     onClick={goToNextStep}
                     disabled={currentStepIndex === currentChart.steps.length - 1}
                   >
@@ -355,8 +380,8 @@ const FlowCharts = () => {
                 </SelectContent>
               </Select>
 
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setSelectedClass('');
                   setSelectedSubject('');
@@ -396,7 +421,7 @@ const FlowCharts = () => {
                   <p className="text-sm text-muted-foreground mb-4">
                     {chart.description}
                   </p>
-                  
+
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-sm text-muted-foreground">
                       {chart.steps.length} steps
@@ -406,7 +431,7 @@ const FlowCharts = () => {
                     </span>
                   </div>
 
-                  <Button 
+                  <Button
                     onClick={() => startFlowChart(chart)}
                     className="w-full"
                     disabled={isStudying}

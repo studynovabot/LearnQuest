@@ -10,7 +10,7 @@ interface PremiumChatBubbleProps {
   isUser?: boolean;
   timestamp?: string;
   isTyping?: boolean;
-  avatar?: string;
+  avatar?: string | React.ReactNode;
   className?: string;
 }
 
@@ -67,7 +67,13 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
           className="flex-shrink-0"
         >
           <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center shadow-glow">
-            <RobotIcon size={16} className="text-white" />
+            {typeof avatar === 'string' ? (
+              <img src={avatar} alt="AI" className="w-full h-full rounded-full" />
+            ) : avatar ? (
+              <div className="text-white">{avatar}</div>
+            ) : (
+              <RobotIcon size={16} className="text-white" />
+            )}
           </div>
         </motion.div>
       )}
@@ -137,7 +143,13 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
           className="flex-shrink-0"
         >
           <div className="w-8 h-8 rounded-full gradient-secondary flex items-center justify-center shadow-glow-orange">
-            <UserIcon size={16} className="text-white" />
+            {typeof avatar === 'string' ? (
+              <img src={avatar} alt="User" className="w-full h-full rounded-full" />
+            ) : avatar ? (
+              <div className="text-white">{avatar}</div>
+            ) : (
+              <UserIcon size={16} className="text-white" />
+            )}
           </div>
         </motion.div>
       )}

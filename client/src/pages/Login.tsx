@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle, PremiumCardDescription } from "@/components/ui/premium-card";
+import { PremiumInput } from "@/components/ui/premium-form";
+import { GradientButton } from "@/components/ui/premium-button";
 import { Helmet } from "react-helmet";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
@@ -39,68 +42,79 @@ const Login = () => {
         <meta name="description" content="Log in to your Nova AI account to continue your learning journey." />
       </Helmet>
 
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-background/80">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background/95 to-primary/5">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full max-w-md"
         >
-          <Card className="border-border/40 shadow-xl">
-            <CardHeader className="space-y-4 text-center">
-              <div className="flex justify-center">
+          <PremiumCard variant="glass" glow={true} className="shadow-premium-lg">
+            <PremiumCardHeader className="space-y-6 text-center">
+              <motion.div
+                className="flex justify-center"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, duration: 0.5, type: "spring" }}
+              >
                 <NovaLogo size="lg" />
-              </div>
-              <div className="space-y-1">
-                <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
-                <CardDescription>
+              </motion.div>
+              <div className="space-y-2">
+                <PremiumCardTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+                  Welcome Back
+                </PremiumCardTitle>
+                <PremiumCardDescription className="text-base">
                   Enter your credentials to access your Nova AI account
-                </CardDescription>
+                </PremiumCardDescription>
               </div>
-            </CardHeader>
+            </PremiumCardHeader>
             <form onSubmit={handleSubmit}>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
+              <PremiumCardContent className="space-y-6">
+                <PremiumInput
+                  label="Email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  variant="glass"
+                />
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password" className="text-sm font-medium">Password</Label>
                     <Link href="/forgot-password" className="text-sm text-primary hover:underline">
                       Forgot password?
                     </Link>
                   </div>
-                  <Input
-                    id="password"
+                  <PremiumInput
                     type="password"
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    variant="glass"
                   />
                 </div>
-              </CardContent>
-              <CardFooter className="flex flex-col space-y-4">
-                <Button type="submit" className="w-full" disabled={loading}>
+
+                <GradientButton
+                  type="submit"
+                  className="w-full shadow-glow"
+                  disabled={loading}
+                  size="lg"
+                  gradient="primary"
+                >
                   {loading ? "Logging in..." : "Login"}
-                </Button>
+                </GradientButton>
+
                 <div className="text-center text-sm">
                   Don't have an account?{" "}
-                  <Link href="/register" className="text-primary hover:underline">
+                  <Link href="/register" className="text-primary hover:underline font-medium">
                     Register
                   </Link>
                 </div>
-              </CardFooter>
+              </PremiumCardContent>
             </form>
-          </Card>
+          </PremiumCard>
         </motion.div>
       </div>
     </>

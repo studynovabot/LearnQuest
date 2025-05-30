@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle, PremiumCardDescription } from "@/components/ui/premium-card";
+import { PremiumSelect } from "@/components/ui/premium-form";
+import { GradientButton, GlassButton } from "@/components/ui/premium-button";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { FlashlightIcon, ClockIcon, BookOpenIcon, CheckCircleIcon } from "@/components/ui/icons";
+import { FlashlightIcon, ClockIcon, BookOpenIcon, CheckCircleIcon, SparklesIcon, PlayIcon, PauseIcon } from "@/components/ui/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface FlashNote {
   id: string;
@@ -38,7 +42,7 @@ const FlashNotes = () => {
   // Sample data - replace with API calls
   const classes = ['6', '7', '8', '9', '10', '11', '12'];
   const subjects = ['Mathematics', 'Science', 'English', 'History', 'Geography', 'Physics', 'Chemistry', 'Biology'];
-  
+
   const sampleFlashNotes: FlashNote[] = [
     {
       id: '1',
@@ -143,188 +147,297 @@ const FlashNotes = () => {
       </Helmet>
 
       <div className="space-y-6">
-        {/* Header */}
+        {/* Premium Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <FlashlightIcon size={32} className="text-primary" />
-            <h1 className="text-3xl font-bold">Flash Notes</h1>
-          </div>
-          <p className="text-muted-foreground">
-            Quick 10-15 minute revision notes for efficient studying
-          </p>
+          <motion.div
+            className="flex items-center justify-center gap-4 mb-6"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="p-3 gradient-primary rounded-2xl shadow-glow">
+              <FlashlightIcon className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+                Flash Notes
+              </h1>
+              <p className="text-muted-foreground text-lg mt-1">
+                Quick 10-15 minute revision notes for efficient studying
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full"
+          >
+            <SparklesIcon size={16} className="text-blue-500" />
+            <span className="text-sm font-medium text-blue-500">AI-Enhanced Quick Revision</span>
+          </motion.div>
         </motion.div>
 
-        {/* Study Session Modal */}
+        {/* Premium Study Session Modal */}
         <AnimatePresence>
           {isStudying && currentNote && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
             >
               <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-card rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold">{currentNote.title}</h2>
-                  <div className="flex items-center gap-2">
-                    <ClockIcon size={20} />
-                    <span className="text-lg font-mono">{formatTime(timeRemaining)}</span>
-                  </div>
-                </div>
+                <PremiumCard variant="glass" className="max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-premium">
+                  <PremiumCardHeader>
+                    <div className="flex items-center justify-between">
+                      <PremiumCardTitle className="text-2xl flex items-center gap-3">
+                        <div className="p-2 bg-blue-500/20 rounded-lg">
+                          <FlashlightIcon size={24} className="text-blue-500" />
+                        </div>
+                        {currentNote.title}
+                      </PremiumCardTitle>
+                      <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg border border-primary/20">
+                        <ClockIcon size={20} className="text-primary" />
+                        <span className="text-lg font-mono text-primary">{formatTime(timeRemaining)}</span>
+                      </div>
+                    </div>
+                  </PremiumCardHeader>
 
-                <Progress value={progress} className="mb-6" />
+                  <PremiumCardContent className="space-y-6">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Study Progress</span>
+                        <span className="font-semibold">{Math.round(progress)}%</span>
+                      </div>
+                      <div className="relative">
+                        <Progress value={progress} className="h-3" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full"
+                             style={{ width: `${progress}%` }} />
+                      </div>
+                    </div>
 
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">{currentNote.content}</p>
-                  
-                  <div>
-                    <h3 className="font-semibold mb-2">Key Points:</h3>
-                    <ul className="space-y-2">
-                      {currentNote.keyPoints.map((point, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <CheckCircleIcon size={16} className="text-green-500 mt-1 flex-shrink-0" />
-                          <span>{point}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                    <PremiumCard variant="glass" className="p-4 bg-muted/20">
+                      <p className="text-muted-foreground leading-relaxed">{currentNote.content}</p>
+                    </PremiumCard>
 
-                <div className="flex gap-3 mt-6">
-                  <Button onClick={completeStudySession} className="flex-1">
-                    Complete Session
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setIsStudying(false)}
-                    className="flex-1"
-                  >
-                    Pause
-                  </Button>
-                </div>
+                    <div>
+                      <h3 className="font-semibold mb-3 flex items-center gap-2">
+                        <SparklesIcon size={18} className="text-primary" />
+                        Key Points:
+                      </h3>
+                      <div className="space-y-3">
+                        {currentNote.keyPoints.map((point, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-start gap-3 p-3 bg-green-500/5 border border-green-500/20 rounded-lg"
+                          >
+                            <CheckCircleIcon size={16} className="text-green-500 mt-1 flex-shrink-0" />
+                            <span className="text-sm">{point}</span>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <GradientButton
+                        gradient="primary"
+                        onClick={completeStudySession}
+                        className="flex-1"
+                        size="lg"
+                      >
+                        <CheckCircleIcon size={18} className="mr-2" />
+                        Complete Session
+                      </GradientButton>
+                      <GlassButton
+                        onClick={() => setIsStudying(false)}
+                        className="flex-1"
+                        size="lg"
+                      >
+                        <PauseIcon size={18} className="mr-2" />
+                        Pause
+                      </GlassButton>
+                    </div>
+                  </PremiumCardContent>
+                </PremiumCard>
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Filters */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Find Flash Notes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Select value={selectedClass} onValueChange={setSelectedClass}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Class" />
-                </SelectTrigger>
-                <SelectContent>
-                  {classes.map(cls => (
-                    <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        {/* Premium Filters */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <PremiumCard variant="glass" glow={true}>
+            <PremiumCardHeader>
+              <PremiumCardTitle className="flex items-center gap-3 text-xl">
+                <div className="p-2 bg-purple-500/20 rounded-lg">
+                  <BookOpenIcon size={20} className="text-purple-500" />
+                </div>
+                Find Flash Notes
+              </PremiumCardTitle>
+              <PremiumCardDescription>
+                Filter by class and subject to find the perfect study material
+              </PremiumCardDescription>
+            </PremiumCardHeader>
+            <PremiumCardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <PremiumSelect
+                  label="Class"
+                  value={selectedClass}
+                  onChange={(e) => setSelectedClass(e.target.value)}
+                  options={[
+                    { value: "", label: "All Classes" },
+                    ...classes.map(cls => ({ value: cls, label: `Class ${cls}` }))
+                  ]}
+                  variant="glass"
+                />
 
-              <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Subject" />
-                </SelectTrigger>
-                <SelectContent>
-                  {subjects.map(subject => (
-                    <SelectItem key={subject} value={subject}>{subject}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <PremiumSelect
+                  label="Subject"
+                  value={selectedSubject}
+                  onChange={(e) => setSelectedSubject(e.target.value)}
+                  options={[
+                    { value: "", label: "All Subjects" },
+                    ...subjects.map(subject => ({ value: subject, label: subject }))
+                  ]}
+                  variant="glass"
+                />
 
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
+                <div className="flex items-end">
+                  <GlassButton
+                    onClick={() => {
+                      setSelectedClass('');
+                      setSelectedSubject('');
+                      setSelectedChapter('');
+                    }}
+                    className="w-full"
+                  >
+                    Clear Filters
+                  </GlassButton>
+                </div>
+              </div>
+            </PremiumCardContent>
+          </PremiumCard>
+        </motion.div>
+
+        {/* Premium Flash Notes Grid */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {filteredNotes.map((note, index) => (
+            <motion.div
+              key={note.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="h-full"
+            >
+              <PremiumCard variant="glass" className="h-full hover:shadow-premium transition-all duration-300">
+                <PremiumCardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <PremiumCardTitle className="text-lg flex items-center gap-2">
+                        <FlashlightIcon size={18} className="text-primary" />
+                        {note.title}
+                      </PremiumCardTitle>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="px-2 py-1 bg-primary/10 rounded-md text-xs">Class {note.class}</span>
+                        <span className="px-2 py-1 bg-blue-500/10 rounded-md text-xs">{note.subject}</span>
+                      </div>
+                    </div>
+                    <Badge className={cn(
+                      "capitalize",
+                      note.difficulty === 'easy' && "bg-green-500/20 text-green-500 border-green-500/20",
+                      note.difficulty === 'medium' && "bg-yellow-500/20 text-yellow-500 border-yellow-500/20",
+                      note.difficulty === 'hard' && "bg-red-500/20 text-red-500 border-red-500/20"
+                    )}>
+                      {note.difficulty}
+                    </Badge>
+                  </div>
+                </PremiumCardHeader>
+                <PremiumCardContent>
+                  <PremiumCard variant="glass" className="p-3 mb-4 bg-muted/20">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {note.content}
+                    </p>
+                  </PremiumCard>
+
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2 px-2 py-1 bg-blue-500/10 rounded-md">
+                      <ClockIcon size={14} className="text-blue-500" />
+                      <span className="text-xs text-blue-500 font-medium">{note.estimatedTime} min</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-2 py-1 bg-purple-500/10 rounded-md">
+                      <BookOpenIcon size={14} className="text-purple-500" />
+                      <span className="text-xs text-purple-500 font-medium">{note.chapter}</span>
+                    </div>
+                  </div>
+
+                  <GradientButton
+                    gradient="primary"
+                    onClick={() => startStudySession(note)}
+                    className="w-full shadow-glow"
+                    disabled={isStudying}
+                    size="lg"
+                  >
+                    <PlayIcon size={16} className="mr-2" />
+                    {isStudying ? 'Session Active' : 'Start Studying'}
+                  </GradientButton>
+                </PremiumCardContent>
+              </PremiumCard>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {filteredNotes.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <PremiumCard variant="glass" className="text-center py-12">
+              <PremiumCardContent>
+                <div className="p-4 bg-muted/20 rounded-full w-fit mx-auto mb-6">
+                  <FlashlightIcon size={48} className="text-muted-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">No Flash Notes Found</h3>
+                <p className="text-muted-foreground mb-6">
+                  Try adjusting your filters or check back later for new content.
+                </p>
+                <GlassButton
                   onClick={() => {
                     setSelectedClass('');
                     setSelectedSubject('');
                     setSelectedChapter('');
                   }}
-                  className="flex-1"
                 >
-                  Clear Filters
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Flash Notes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredNotes.map((note) => (
-            <motion.div
-              key={note.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -5 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Card className="h-full hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-lg">{note.title}</CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        Class {note.class} • {note.subject}
-                      </p>
-                    </div>
-                    <Badge className={getDifficultyColor(note.difficulty)}>
-                      {note.difficulty}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {note.content}
-                  </p>
-                  
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <ClockIcon size={16} />
-                      <span>{note.estimatedTime} min</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <BookOpenIcon size={16} />
-                      <span>{note.chapter}</span>
-                    </div>
-                  </div>
-
-                  <Button 
-                    onClick={() => startStudySession(note)}
-                    className="w-full"
-                    disabled={isStudying}
-                  >
-                    Start Studying
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-
-        {filteredNotes.length === 0 && (
-          <Card>
-            <CardContent className="text-center py-12">
-              <FlashlightIcon size={48} className="mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No Flash Notes Found</h3>
-              <p className="text-muted-foreground">
-                Try adjusting your filters or check back later for new content.
-              </p>
-            </CardContent>
-          </Card>
+                  <SparklesIcon size={16} className="mr-2" />
+                  Reset Filters
+                </GlassButton>
+              </PremiumCardContent>
+            </PremiumCard>
+          </motion.div>
         )}
       </div>
     </>

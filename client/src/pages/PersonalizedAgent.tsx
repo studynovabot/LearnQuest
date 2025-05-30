@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle, PremiumCardDescription } from "@/components/ui/premium-card";
+import { PremiumChatBubble } from "@/components/ui/premium-chat";
+import { PremiumInput } from "@/components/ui/premium-form";
+import { GradientButton, GlassButton } from "@/components/ui/premium-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SparklesIcon, BrainIcon, TrendingUpIcon, AlertTriangleIcon, MessageIcon, TargetIcon } from "@/components/ui/icons";
+import { SparklesIcon, BrainIcon, TrendingUpIcon, AlertTriangleIcon, MessageIcon, TargetIcon, SendIcon, UserIcon } from "@/components/ui/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface WeakArea {
   subject: string;
@@ -225,42 +230,80 @@ const PersonalizedAgent = () => {
       </Helmet>
 
       <div className="space-y-6">
-        {/* Header */}
+        {/* Premium Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <SparklesIcon size={32} className="text-primary" />
-            <h1 className="text-3xl font-bold">Your Personal AI Assistant</h1>
-          </div>
-          <p className="text-muted-foreground">
-            Tailored guidance based on your unique learning patterns and performance
-          </p>
-        </motion.div>
-
-        {/* Overall Progress */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUpIcon size={24} />
-              Overall Learning Progress
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Current Performance</span>
-                <span className="font-semibold">{overallProgress}%</span>
-              </div>
-              <Progress value={overallProgress} className="h-3" />
-              <p className="text-sm text-muted-foreground">
-                You're performing well! Focus on weak areas to reach your next milestone.
+          <motion.div
+            className="flex items-center justify-center gap-4 mb-6"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="p-3 gradient-primary rounded-2xl shadow-glow">
+              <SparklesIcon className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+                Personal AI Assistant
+              </h1>
+              <p className="text-muted-foreground text-lg mt-1">
+                Tailored guidance based on your unique learning patterns
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full"
+          >
+            <BrainIcon size={16} className="text-purple-500" />
+            <span className="text-sm font-medium text-purple-500">AI-Powered Personalization</span>
+          </motion.div>
+        </motion.div>
+
+        {/* Premium Overall Progress */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <PremiumCard variant="glass" glow={true}>
+            <PremiumCardHeader>
+              <PremiumCardTitle className="flex items-center gap-3 text-xl">
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <TrendingUpIcon size={24} className="text-green-500" />
+                </div>
+                Overall Learning Progress
+              </PremiumCardTitle>
+              <PremiumCardDescription>
+                Track your academic performance across all subjects
+              </PremiumCardDescription>
+            </PremiumCardHeader>
+            <PremiumCardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between text-sm">
+                  <span>Current Performance</span>
+                  <span className="font-semibold text-lg">{overallProgress}%</span>
+                </div>
+                <div className="relative">
+                  <Progress value={overallProgress} className="h-4" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-full"
+                       style={{ width: `${overallProgress}%` }} />
+                </div>
+                <PremiumCard variant="glass" className="p-3 bg-green-500/5 border-green-500/20">
+                  <p className="text-sm text-muted-foreground">
+                    🎉 You're performing excellently! Focus on weak areas to reach your next milestone.
+                  </p>
+                </PremiumCard>
+              </div>
+            </PremiumCardContent>
+          </PremiumCard>
+        </motion.div>
 
         <Tabs defaultValue="chat" className="space-y-6">
           <TabsList className="grid grid-cols-4 w-full max-w-2xl mx-auto">
@@ -270,178 +313,270 @@ const PersonalizedAgent = () => {
             <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
           </TabsList>
 
-          {/* AI Chat */}
+          {/* Premium AI Chat */}
           <TabsContent value="chat">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageIcon size={24} />
-                  Chat with Your Personal AI
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Chat History */}
-                  <div className="h-96 overflow-y-auto space-y-4 p-4 border rounded-lg bg-muted/20">
-                    {chatHistory.map((msg) => (
-                      <motion.div
-                        key={msg.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div className={`
-                          max-w-[80%] p-3 rounded-lg
-                          ${msg.role === 'user' ?
-                            'bg-primary text-primary-foreground' :
-                            'bg-card border'}
-                        `}>
-                          <p className="text-sm">{msg.content}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                    {isLoading && (
-                      <div className="flex justify-start">
-                        <div className="bg-card border p-3 rounded-lg">
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <PremiumCard variant="glass" glow={true}>
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-3 text-xl">
+                    <div className="p-2 bg-blue-500/20 rounded-lg">
+                      <MessageIcon size={24} className="text-blue-500" />
+                    </div>
+                    Chat with Your Personal AI
+                  </PremiumCardTitle>
+                  <PremiumCardDescription>
+                    Get personalized study advice based on your learning patterns
+                  </PremiumCardDescription>
+                </PremiumCardHeader>
+                <PremiumCardContent>
+                  <div className="space-y-4">
+                    {/* Premium Chat History */}
+                    <PremiumCard variant="glass" className="h-96 overflow-y-auto p-4 bg-muted/10">
+                      <div className="space-y-4">
+                        {chatHistory.map((msg) => (
+                          <motion.div
+                            key={msg.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                          >
+                            <PremiumChatBubble
+                              message={msg.content}
+                              isUser={msg.role === 'user'}
+                              timestamp={msg.timestamp}
+                              avatar={msg.role === 'user' ? <UserIcon size={16} /> : <SparklesIcon size={16} />}
+                            />
+                          </motion.div>
+                        ))}
+                        {isLoading && (
+                          <div className="flex justify-start">
+                            <PremiumChatBubble
+                              message=""
+                              isUser={false}
+                              isTyping={true}
+                              avatar={<SparklesIcon size={16} />}
+                            />
                           </div>
-                        </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    </PremiumCard>
 
-                  {/* Message Input */}
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Ask about your studies, get personalized advice..."
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                      disabled={isLoading}
-                    />
-                    <Button onClick={sendMessage} disabled={isLoading || !message.trim()}>
-                      Send
-                    </Button>
+                    {/* Premium Message Input */}
+                    <div className="flex gap-3">
+                      <PremiumInput
+                        placeholder="Ask about your studies, get personalized advice..."
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                        disabled={isLoading}
+                        variant="glass"
+                        className="flex-1"
+                      />
+                      <GradientButton
+                        gradient="primary"
+                        onClick={sendMessage}
+                        disabled={isLoading || !message.trim()}
+                        className="shadow-glow"
+                      >
+                        <SendIcon size={16} />
+                      </GradientButton>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </PremiumCardContent>
+              </PremiumCard>
+            </motion.div>
           </TabsContent>
 
-          {/* Insights */}
+          {/* Premium Insights */}
           <TabsContent value="insights">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
               {insights.map((insight, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -4, scale: 1.02 }}
                 >
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="flex items-center gap-2 text-lg">
-                        {getInsightIcon(insight.type)}
+                  <PremiumCard variant="glass" className="h-full hover:shadow-premium transition-all duration-300">
+                    <PremiumCardHeader className="pb-3">
+                      <PremiumCardTitle className="flex items-center gap-3 text-lg">
+                        <div className={cn(
+                          "p-2 rounded-lg",
+                          insight.type === 'strength' && "bg-green-500/20",
+                          insight.type === 'weakness' && "bg-red-500/20",
+                          insight.type === 'improvement' && "bg-blue-500/20",
+                          insight.type === 'goal' && "bg-purple-500/20"
+                        )}>
+                          {getInsightIcon(insight.type)}
+                        </div>
                         {insight.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        {insight.description}
-                      </p>
+                      </PremiumCardTitle>
+                    </PremiumCardHeader>
+                    <PremiumCardContent>
+                      <PremiumCard variant="glass" className="p-3 mb-4 bg-muted/20">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {insight.description}
+                        </p>
+                      </PremiumCard>
                       {insight.actionable && (
-                        <Badge variant="outline" className="text-xs">
-                          Actionable
+                        <Badge className="bg-primary/20 text-primary border-primary/20">
+                          ⚡ Actionable Insight
                         </Badge>
                       )}
-                    </CardContent>
-                  </Card>
+                    </PremiumCardContent>
+                  </PremiumCard>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </TabsContent>
 
-          {/* Weak Areas */}
+          {/* Premium Weak Areas */}
           <TabsContent value="weak-areas">
-            <div className="space-y-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="space-y-6"
+            >
               {weakAreas.map((area, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
+                  whileHover={{ x: 4 }}
                 >
-                  <Card>
-                    <CardHeader>
+                  <PremiumCard variant="glass" className="hover:shadow-premium transition-all duration-300">
+                    <PremiumCardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">{area.subject} - {area.topic}</CardTitle>
-                        <Badge variant="destructive">{area.accuracy}% accuracy</Badge>
+                        <PremiumCardTitle className="text-lg flex items-center gap-3">
+                          <div className="p-2 bg-red-500/20 rounded-lg">
+                            <AlertTriangleIcon size={20} className="text-red-500" />
+                          </div>
+                          {area.subject} - {area.topic}
+                        </PremiumCardTitle>
+                        <Badge className="bg-red-500/20 text-red-500 border-red-500/20">
+                          {area.accuracy}% accuracy
+                        </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground">Last attempt: {area.lastAttempt}</p>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
+                    </PremiumCardHeader>
+                    <PremiumCardContent>
+                      <div className="space-y-4">
                         <div>
-                          <h4 className="font-medium mb-2">Recommended Actions:</h4>
-                          <ul className="space-y-1">
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            <TargetIcon size={16} className="text-primary" />
+                            Recommended Actions:
+                          </h4>
+                          <div className="space-y-2">
                             {area.recommendedActions.map((action, actionIndex) => (
-                              <li key={actionIndex} className="text-sm text-muted-foreground flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                                {action}
-                              </li>
+                              <motion.div
+                                key={actionIndex}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: actionIndex * 0.1 }}
+                                className="flex items-center gap-3 p-2 bg-blue-500/5 border border-blue-500/20 rounded-lg"
+                              >
+                                <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
+                                <span className="text-sm text-muted-foreground">{action}</span>
+                              </motion.div>
                             ))}
-                          </ul>
+                          </div>
                         </div>
-                        <Button size="sm" className="w-full">
+                        <GradientButton
+                          gradient="primary"
+                          size="lg"
+                          className="w-full shadow-glow"
+                        >
+                          <TrendingUpIcon size={16} className="mr-2" />
                           Start Improvement Plan
-                        </Button>
+                        </GradientButton>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </PremiumCardContent>
+                  </PremiumCard>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </TabsContent>
 
-          {/* Recommendations */}
+          {/* Premium Recommendations */}
           <TabsContent value="recommendations">
-            <div className="space-y-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="space-y-6"
+            >
               {recommendations.map((rec, index) => (
                 <motion.div
                   key={rec.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -4, scale: 1.01 }}
                 >
-                  <Card>
-                    <CardHeader>
+                  <PremiumCard variant="glass" className="hover:shadow-premium transition-all duration-300">
+                    <PremiumCardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">{rec.title}</CardTitle>
+                        <PremiumCardTitle className="text-lg flex items-center gap-3">
+                          <div className={cn(
+                            "p-2 rounded-lg",
+                            rec.priority === 'high' && "bg-red-500/20",
+                            rec.priority === 'medium' && "bg-yellow-500/20",
+                            rec.priority === 'low' && "bg-green-500/20"
+                          )}>
+                            <SparklesIcon size={20} className={cn(
+                              rec.priority === 'high' && "text-red-500",
+                              rec.priority === 'medium' && "text-yellow-500",
+                              rec.priority === 'low' && "text-green-500"
+                            )} />
+                          </div>
+                          {rec.title}
+                        </PremiumCardTitle>
                         <div className="flex items-center gap-2">
-                          <Badge className={getPriorityColor(rec.priority)}>
-                            {rec.priority}
+                          <Badge className={cn(
+                            "capitalize",
+                            rec.priority === 'high' && "bg-red-500/20 text-red-500 border-red-500/20",
+                            rec.priority === 'medium' && "bg-yellow-500/20 text-yellow-500 border-yellow-500/20",
+                            rec.priority === 'low' && "bg-green-500/20 text-green-500 border-green-500/20"
+                          )}>
+                            {rec.priority} priority
                           </Badge>
-                          <Badge variant="outline">
+                          <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/20">
                             {rec.estimatedTime} min
                           </Badge>
                         </div>
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {rec.description}
-                      </p>
-                      <Button size="sm" className="w-full">
+                    </PremiumCardHeader>
+                    <PremiumCardContent>
+                      <PremiumCard variant="glass" className="p-3 mb-4 bg-muted/20">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {rec.description}
+                        </p>
+                      </PremiumCard>
+                      <GradientButton
+                        gradient={rec.priority === 'high' ? 'red' : rec.priority === 'medium' ? 'yellow' : 'green'}
+                        size="lg"
+                        className="w-full shadow-glow"
+                      >
+                        <BrainIcon size={16} className="mr-2" />
                         Start {rec.type === 'practice' ? 'Practice' : rec.type === 'review' ? 'Review' : 'Learning'}
-                      </Button>
-                    </CardContent>
-                  </Card>
+                      </GradientButton>
+                    </PremiumCardContent>
+                  </PremiumCard>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </TabsContent>
         </Tabs>
       </div>

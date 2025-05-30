@@ -48,24 +48,24 @@ export interface PremiumButtonProps
   asChild?: boolean;
   animate?: boolean;
   shimmer?: boolean;
-  gradient?: "primary" | "secondary" | "success" | "purple" | "blue" | "green" | "orange";
+  gradient?: "primary" | "secondary" | "success" | "purple" | "blue" | "green" | "orange" | "red" | "yellow";
 }
 
 const PremiumButton = React.forwardRef<HTMLButtonElement, PremiumButtonProps>(
-  ({ 
-    className, 
-    variant, 
-    size, 
+  ({
+    className,
+    variant,
+    size,
     glow,
-    asChild = false, 
+    asChild = false,
     animate = true,
     shimmer = false,
     gradient,
     children,
-    ...props 
+    ...props
   }, ref) => {
     const Comp = asChild ? Slot : "button";
-    
+
     const gradientClass = gradient ? `gradient-${gradient}` : "";
     const shimmerClass = shimmer ? "animate-shimmer" : "";
 
@@ -84,7 +84,7 @@ const PremiumButton = React.forwardRef<HTMLButtonElement, PremiumButtonProps>(
         {(variant === "gradient" || shimmer) && (
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out" />
         )}
-        
+
         {/* Content */}
         <span className="relative z-10 flex items-center gap-2">
           {children}
@@ -118,7 +118,7 @@ PremiumButton.displayName = "PremiumButton";
 
 // Specialized premium button variants
 interface GradientButtonProps extends Omit<PremiumButtonProps, 'variant'> {
-  gradient?: "primary" | "secondary" | "success" | "purple" | "blue" | "green" | "orange";
+  gradient?: "primary" | "secondary" | "success" | "purple" | "blue" | "green" | "orange" | "red" | "yellow";
 }
 
 const GradientButton = React.forwardRef<HTMLButtonElement, GradientButtonProps>(
@@ -166,10 +166,10 @@ const GlowButton = React.forwardRef<HTMLButtonElement, GlowButtonProps>(
 
 GlowButton.displayName = "GlowButton";
 
-export { 
-  PremiumButton, 
-  GradientButton, 
-  GlassButton, 
+export {
+  PremiumButton,
+  GradientButton,
+  GlassButton,
   GlowButton,
-  premiumButtonVariants 
+  premiumButtonVariants
 };
