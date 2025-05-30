@@ -1210,3 +1210,112 @@ export const HamburgerIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
     <line x1="4" y1="18" x2="20" y2="18" />
   </svg>
 );
+
+export const XIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M18 6 6 18" />
+    <path d="m6 6 12 12" />
+  </svg>
+);
+
+export const EyeOffIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+    <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+    <line x1="2" y1="2" x2="22" y2="22" />
+  </svg>
+);
+
+export const FileIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+  </svg>
+);
+
+export const ShieldIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+  </svg>
+);
+
+export const BarChartIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <line x1="12" y1="20" x2="12" y2="10" />
+    <line x1="18" y1="20" x2="18" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="16" />
+  </svg>
+);
+
+export const FolderIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
+  </svg>
+);

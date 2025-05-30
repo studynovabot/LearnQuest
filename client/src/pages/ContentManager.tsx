@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "@/components/ui/premium-card";
+import { PremiumUpload, PremiumFilePreview, PremiumProgressBar } from "@/components/ui/premium-upload";
+import { PremiumSelect } from "@/components/ui/premium-form";
+import { GradientButton, GlassButton } from "@/components/ui/premium-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { UploadIcon, FileTextIcon, TrashIcon, DownloadIcon, CheckCircleIcon, LoaderIcon } from "@/components/ui/icons";
-import { motion } from "framer-motion";
+import { UploadIcon, FileTextIcon, TrashIcon, DownloadIcon, CheckCircleIcon, LoaderIcon, SparklesIcon } from "@/components/ui/icons";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 

@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "@/components/ui/premium-card";
+import { PremiumChatBubble, PremiumChatInput, PremiumChatContainer } from "@/components/ui/premium-chat";
+import { GradientButton, GlassButton } from "@/components/ui/premium-button";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -133,22 +136,22 @@ const ChatAgents = () => {
 
   const getAgentColorClass = (color?: string) => {
     switch (color) {
-      case 'blue': return 'bg-blue-500 text-white';
-      case 'purple': return 'bg-purple-500 text-white';
-      case 'green': return 'bg-green-500 text-white';
-      case 'orange': return 'bg-orange-500 text-white';
-      case 'amber': return 'bg-amber-500 text-white';
-      case 'cyan': return 'bg-cyan-500 text-white';
-      case 'pink': return 'bg-pink-500 text-white';
-      case 'emerald': return 'bg-emerald-500 text-white';
-      case 'indigo': return 'bg-indigo-500 text-white';
-      case 'violet': return 'bg-violet-500 text-white';
-      case 'red': return 'bg-red-500 text-white';
-      case 'teal': return 'bg-teal-500 text-white';
-      case 'yellow': return 'bg-yellow-500 text-black';
-      case 'slate': return 'bg-slate-500 text-white';
-      case 'rose': return 'bg-rose-500 text-white';
-      default: return 'bg-primary text-white';
+      case 'blue': return 'gradient-blue text-white shadow-glow-blue';
+      case 'purple': return 'gradient-purple text-white shadow-glow';
+      case 'green': return 'gradient-green text-white shadow-glow-green';
+      case 'orange': return 'gradient-orange text-white shadow-glow-orange';
+      case 'amber': return 'gradient-warning text-white shadow-glow-orange';
+      case 'cyan': return 'gradient-success text-white shadow-glow-blue';
+      case 'pink': return 'gradient-secondary text-white shadow-glow';
+      case 'emerald': return 'gradient-green text-white shadow-glow-green';
+      case 'indigo': return 'gradient-purple text-white shadow-glow';
+      case 'violet': return 'gradient-purple text-white shadow-glow';
+      case 'red': return 'gradient-secondary text-white shadow-glow';
+      case 'teal': return 'gradient-success text-white shadow-glow-blue';
+      case 'yellow': return 'gradient-warning text-white shadow-glow-orange';
+      case 'slate': return 'gradient-primary text-white shadow-glow';
+      case 'rose': return 'gradient-secondary text-white shadow-glow';
+      default: return 'gradient-primary text-white shadow-glow';
     }
   };
 
@@ -212,21 +215,21 @@ const ChatAgents = () => {
         "flex flex-col gap-6",
         isMobile ? "mobile-fade-in" : ""
       )}>
-        <Card className={cn(
-          "overflow-hidden",
-          isMobile ? "mobile-card-shadow" : ""
-        )}>
-          <CardHeader className={cn(
-            "bg-card",
+        <PremiumCard
+          variant="glass-strong"
+          glow={true}
+          className="overflow-hidden"
+        >
+          <PremiumCardHeader className={cn(
             isMobile ? "mobile-padding-md" : ""
           )}>
-            <CardTitle className={cn(
-              "font-bold",
-              isMobile ? "mobile-title" : "text-2xl"
-            )}>Nova AI Tutors</CardTitle>
-          </CardHeader>
+            <PremiumCardTitle className={cn(
+              "bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent",
+              isMobile ? "mobile-title" : "text-3xl"
+            )}>Nova AI Tutors</PremiumCardTitle>
+          </PremiumCardHeader>
 
-          <CardContent className="p-0">
+          <PremiumCardContent className="p-0">
             <div className="p-4">
               <FirebaseStatus />
             </div>
@@ -234,35 +237,59 @@ const ChatAgents = () => {
               "flex",
               isMobile ? "flex-col mobile-chat-area min-h-[600px]" : "flex-row h-[calc(100vh-12rem)] min-h-[500px]"
             )}>
-              {/* Desktop Sidebar - Hidden on Mobile */}
+              {/* Premium Desktop Sidebar - Hidden on Mobile */}
               {!isMobile && (
-                <div className="w-80 flex-shrink-0 border-r border-border p-4 overflow-y-auto">
+                <div className="w-80 flex-shrink-0 border-r border-glass-border p-4 overflow-y-auto glass-card-strong">
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-4">Your Tutors</h3>
+                    <h3 className="text-lg font-semibold mb-4 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">Your Tutors</h3>
                     <div className="space-y-2">
                       {isLoading ? (
                         Array(4).fill(0).map((_, i) => (
-                          <Skeleton key={i} className="h-16 w-full" />
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                          >
+                            <Skeleton className="h-16 w-full glass-card" />
+                          </motion.div>
                         ))
                       ) : (
                         <>
-                          {unlockedAgents.map((agent: AITutor) => (
+                          {unlockedAgents.map((agent: AITutor, index: number) => (
                             <motion.div
                               key={agent.id}
-                              whileHover={{ x: 5 }}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              whileHover={{ x: 5, scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
                               className={cn(
-                                "flex items-center gap-3 p-3 rounded-lg cursor-pointer",
-                                activeAgent?.id === agent.id ? "bg-primary/10 border border-primary/30" : "hover:bg-muted"
+                                "flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300",
+                                "glass-card hover:shadow-premium",
+                                activeAgent?.id === agent.id
+                                  ? "bg-primary/20 border border-primary/30 shadow-glow"
+                                  : "hover:bg-white/5"
                               )}
                               onClick={() => selectAgent(agent)}
                             >
-                              <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", getAgentColorClass(agent.color))}>
+                              <div className={cn(
+                                "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300",
+                                getAgentColorClass(agent.color)
+                              )}>
                                 {getAgentIcon(agent.iconName)}
                               </div>
-                              <div>
+                              <div className="flex-1">
                                 <p className="font-medium">{agent.name}</p>
                                 <p className="text-xs text-muted-foreground">{agent.subject}</p>
                               </div>
+                              {activeAgent?.id === agent.id && (
+                                <motion.div
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="w-2 h-2 rounded-full bg-primary animate-pulse"
+                                />
+                              )}
                             </motion.div>
                           ))}
                         </>
@@ -366,62 +393,21 @@ const ChatAgents = () => {
                           </div>
                         </div>
                       ) : (
-                        <AnimatePresence>
-                          {agentMessages.map((message: ChatMessage) => (
-                            <motion.div
-                              key={message.id}
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.3 }}
-                              className={cn(
-                                "flex gap-4 mobile-message-container",
-                                message.role === "user" ? "self-end flex-row-reverse ml-auto" : "",
-                                isMobile ? "max-w-[90%]" : "max-w-[85%]"
-                              )}
-                            >
-                              <div
+                        <div className="space-y-4">
+                          <AnimatePresence>
+                            {agentMessages.map((message: ChatMessage, index: number) => (
+                              <PremiumChatBubble
+                                key={message.id}
+                                message={message.content}
+                                isUser={message.role === "user"}
+                                timestamp={new Date(message.timestamp || Date.now()).toLocaleTimeString()}
                                 className={cn(
-                                  "rounded-full flex items-center justify-center flex-shrink-0",
-                                  message.role === "user" ? "bg-muted" : getAgentColorClass(activeAgent.color),
-                                  isMobile ? "w-10 h-10" : "w-8 h-8"
+                                  isMobile ? "max-w-[90%]" : "max-w-[85%]"
                                 )}
-                              >
-                                {message.role === "user" ? (
-                                  <img
-                                    src={generateAvatar(user?.displayName || "User")}
-                                    alt="User avatar"
-                                    className="w-full h-full rounded-full object-cover"
-                                  />
-                                ) : (
-                                  getAgentIcon(activeAgent.iconName, isMobile ? 20 : 16)
-                                )}
-                              </div>
-
-                              <div className="relative">
-                                <div
-                                  className={cn(
-                                    "mobile-message-bubble",
-                                    message.role === "user"
-                                      ? "bg-primary rounded-tr-none text-primary-foreground"
-                                      : "bg-muted rounded-tl-none",
-                                    !isMobile && "rounded-xl p-3"
-                                  )}
-                                >
-                                  {message.role === "assistant" ? (
-                                    <TypewriterText
-                                      text={message.content}
-                                      speed={20}
-                                      className={cn(isMobile ? "mobile-body" : "text-sm")}
-                                      onComplete={() => setTypingMessageId(null)}
-                                    />
-                                  ) : (
-                                    <p className={cn(isMobile ? "mobile-body" : "text-sm")}>{message.content}</p>
-                                  )}
-                                </div>
-                              </div>
-                            </motion.div>
-                          ))}
-                        </AnimatePresence>
+                              />
+                            ))}
+                          </AnimatePresence>
+                        </div>
                       )}
                       <div ref={messagesEndRef} />
                     </div>
@@ -441,49 +427,28 @@ const ChatAgents = () => {
 
                 {activeAgent && (
                   <div className={cn(
-                    "border-t border-border flex-shrink-0 bg-background",
+                    "border-t border-glass-border flex-shrink-0",
                     isMobile ? "mobile-chat-input" : "p-4"
                   )}>
-                    <form onSubmit={handleSubmit} className={cn(
-                      "flex gap-3 max-w-full",
-                      isMobile ? "items-end" : ""
-                    )}>
-                      <Input
-                        type="text"
-                        placeholder={`Ask ${activeAgent.name} a question...`}
-                        className={cn(
-                          "flex-1 min-w-0 bg-muted border-border focus:outline-none focus:ring-2 focus:ring-primary/50",
-                          isMobile ? "mobile-button rounded-2xl" : "h-10 rounded-xl"
-                        )}
-                        value={inputMessage}
-                        onChange={(e) => setInputMessage(e.target.value)}
-                        disabled={isSending}
-                        style={{ fontSize: isMobile ? '16px' : undefined }} // Prevents zoom on iOS
-                      />
-                      <Button
-                        type="submit"
-                        disabled={isSending || !inputMessage.trim()}
-                        className={cn(
-                          "flex-shrink-0 touch-manipulation",
-                          isMobile ? "mobile-button-large rounded-2xl w-14 mobile-touch-feedback" : "h-10"
-                        )}
-                      >
-                        {isSending ? (
-                          <div className="h-5 w-5 rounded-full border-2 border-t-transparent border-current animate-spin" />
-                        ) : (
-                          <>
-                            {!isMobile && "Send"}
-                            <SendIcon className={cn(isMobile ? "" : "ml-2")} size={isMobile ? 20 : 16} />
-                          </>
-                        )}
-                      </Button>
-                    </form>
+                    <PremiumChatInput
+                      value={inputMessage}
+                      onChange={setInputMessage}
+                      onSubmit={() => {
+                        const form = new Event('submit');
+                        handleSubmit(form as any);
+                      }}
+                      placeholder={`Ask ${activeAgent.name} a question...`}
+                      disabled={isSending}
+                      className={cn(
+                        isMobile ? "mobile-padding-md" : ""
+                      )}
+                    />
                   </div>
                 )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </PremiumCardContent>
+        </PremiumCard>
       </div>
     </>
   );

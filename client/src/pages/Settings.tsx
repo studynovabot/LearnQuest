@@ -4,12 +4,17 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle, PremiumCardDescription } from '@/components/ui/premium-card';
+import { PremiumInput, PremiumSelect } from '@/components/ui/premium-form';
+import { GradientButton } from '@/components/ui/premium-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Save, User, GraduationCap, Settings as SettingsIcon } from 'lucide-react';
+import { UserIcon, SettingsIcon, ShieldIcon, CrownIcon } from '@/components/ui/icons';
+import { Save, GraduationCap } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const Settings = () => {
   const { user, refreshUser } = useAuth();
@@ -68,117 +73,181 @@ const Settings = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <SettingsIcon className="h-6 w-6 text-primary" />
+        <motion.div
+          className="flex items-center gap-4 mb-8"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <div className="p-3 gradient-primary rounded-2xl shadow-glow">
+            <SettingsIcon className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Settings</h1>
-            <p className="text-muted-foreground">Manage your profile and preferences</p>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+              Settings
+            </h1>
+            <p className="text-muted-foreground text-lg">Manage your profile and preferences</p>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Profile Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Profile Information
-            </CardTitle>
-            <CardDescription>
-              Update your display name and personal information
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="displayName">Display Name</Label>
-              <Input
-                id="displayName"
+        {/* Premium Profile Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <PremiumCard variant="glass" glow={true}>
+            <PremiumCardHeader>
+              <PremiumCardTitle className="flex items-center gap-3 text-2xl">
+                <div className="p-2 bg-blue-500/20 rounded-lg">
+                  <UserIcon className="h-6 w-6 text-blue-500" />
+                </div>
+                Profile Information
+              </PremiumCardTitle>
+              <PremiumCardDescription className="text-base">
+                Update your display name and personal information
+              </PremiumCardDescription>
+            </PremiumCardHeader>
+            <PremiumCardContent className="space-y-6">
+              <PremiumInput
+                label="Display Name"
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                 placeholder="Enter your display name"
+                variant="glass"
+                icon={<UserIcon size={18} />}
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground ml-1">
                 This name will be shown on the leaderboard and in chat
               </p>
-            </div>
-          </CardContent>
-        </Card>
+            </PremiumCardContent>
+          </PremiumCard>
+        </motion.div>
 
-        {/* Academic Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5" />
-              Academic Information
-            </CardTitle>
-            <CardDescription>
-              Set your class and educational board
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="className">Class</Label>
-              <Input
-                id="className"
+        {/* Premium Academic Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <PremiumCard variant="glass" glow={true}>
+            <PremiumCardHeader>
+              <PremiumCardTitle className="flex items-center gap-3 text-2xl">
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <GraduationCap className="h-6 w-6 text-green-500" />
+                </div>
+                Academic Information
+              </PremiumCardTitle>
+              <PremiumCardDescription className="text-base">
+                Set your class and educational board for personalized content
+              </PremiumCardDescription>
+            </PremiumCardHeader>
+            <PremiumCardContent className="space-y-6">
+              <PremiumInput
+                label="Class"
                 value={formData.className}
                 onChange={(e) => setFormData({ ...formData, className: e.target.value })}
                 placeholder="e.g., 10th Grade, Class XII"
+                variant="glass"
+                icon={<GraduationCap size={18} />}
               />
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="board">Educational Board</Label>
-              <Select
+              <PremiumSelect
+                label="Educational Board"
                 value={formData.board}
-                onValueChange={(value) => setFormData({ ...formData, board: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select your board" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="CBSE">CBSE</SelectItem>
-                  <SelectItem value="ICSE">ICSE</SelectItem>
-                  <SelectItem value="State Board">State Board</SelectItem>
-                  <SelectItem value="IB">International Baccalaureate (IB)</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+                onChange={(e) => setFormData({ ...formData, board: e.target.value })}
+                options={[
+                  { value: "CBSE", label: "CBSE" },
+                  { value: "ICSE", label: "ICSE" },
+                  { value: "State Board", label: "State Board" },
+                  { value: "IB", label: "International Baccalaureate (IB)" },
+                  { value: "Other", label: "Other" }
+                ]}
+                variant="glass"
+              />
+            </PremiumCardContent>
+          </PremiumCard>
+        </motion.div>
 
-        {/* Account Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>
-              Your account details and statistics
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium">Username</Label>
-                <p className="text-sm text-muted-foreground">{user?.email}</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium">Account Type</Label>
-                <p className="text-sm text-muted-foreground">{user?.isPro ? 'Pro' : 'Free'}</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium">Role</Label>
-                <p className="text-sm text-muted-foreground">{user?.role || 'user'}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Premium Account Information */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <PremiumCard variant="glass" glow={true}>
+            <PremiumCardHeader>
+              <PremiumCardTitle className="flex items-center gap-3 text-2xl">
+                <div className="p-2 bg-purple-500/20 rounded-lg">
+                  <ShieldIcon className="h-6 w-6 text-purple-500" />
+                </div>
+                Account Information
+              </PremiumCardTitle>
+              <PremiumCardDescription className="text-base">
+                Your account details and statistics
+              </PremiumCardDescription>
+            </PremiumCardHeader>
+            <PremiumCardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <motion.div
+                  className="glass-card p-4 rounded-xl"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <UserIcon className="h-5 w-5 text-blue-500" />
+                    <Label className="text-sm font-semibold">Username</Label>
+                  </div>
+                  <p className="text-foreground font-medium">{user?.email}</p>
+                </motion.div>
 
-        <Separator />
+                <motion.div
+                  className="glass-card p-4 rounded-xl"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <CrownIcon className="h-5 w-5 text-yellow-500" />
+                    <Label className="text-sm font-semibold">Account Type</Label>
+                  </div>
+                  <p className={cn(
+                    "font-medium",
+                    user?.isPro ? "text-yellow-500" : "text-muted-foreground"
+                  )}>
+                    {user?.isPro ? 'Pro' : 'Free'}
+                  </p>
+                </motion.div>
 
-        {/* Save Button */}
-        <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={isLoading} className="min-w-[120px]">
+                <motion.div
+                  className="glass-card p-4 rounded-xl"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <ShieldIcon className="h-5 w-5 text-green-500" />
+                    <Label className="text-sm font-semibold">Role</Label>
+                  </div>
+                  <p className="text-foreground font-medium capitalize">{user?.role || 'user'}</p>
+                </motion.div>
+              </div>
+            </PremiumCardContent>
+          </PremiumCard>
+        </motion.div>
+
+        {/* Premium Save Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="flex justify-end pt-4"
+        >
+          <GradientButton
+            gradient="primary"
+            size="lg"
+            onClick={handleSave}
+            disabled={isLoading}
+            className="min-w-[160px] shadow-glow"
+          >
             {isLoading ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -186,12 +255,12 @@ const Settings = () => {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Save className="h-4 w-4" />
+                <Save className="h-5 w-5" />
                 Save Changes
               </div>
             )}
-          </Button>
-        </div>
+          </GradientButton>
+        </motion.div>
       </motion.div>
     </>
   );

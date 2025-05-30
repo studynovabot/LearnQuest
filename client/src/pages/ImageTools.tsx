@@ -1,13 +1,17 @@
 import React, { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "@/components/ui/premium-card";
+import { PremiumUpload, PremiumFilePreview, PremiumProgressBar } from "@/components/ui/premium-upload";
+import { PremiumTextarea } from "@/components/ui/premium-form";
+import { GradientButton, GlassButton } from "@/components/ui/premium-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ImageIcon, UploadIcon, WandIcon, EyeIcon, LoaderIcon } from "@/components/ui/icons";
-import { motion } from "framer-motion";
+import { ImageIcon, UploadIcon, WandIcon, EyeIcon, LoaderIcon, SparklesIcon } from "@/components/ui/icons";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -269,19 +273,54 @@ const ImageTools = () => {
       </Helmet>
 
       <div className="space-y-6">
-        {/* Header */}
+        {/* Premium Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center"
+          className="text-center mb-8"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <ImageIcon size={32} className="text-primary" />
-            <h1 className="text-3xl font-bold">AI Image Tools</h1>
-          </div>
-          <p className="text-muted-foreground">
+          <motion.div
+            className="flex items-center justify-center gap-4 mb-6"
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <div className="p-4 gradient-primary rounded-2xl shadow-glow animate-float">
+              <ImageIcon size={40} className="text-white" />
+            </div>
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+              AI Image Tools
+            </h1>
+          </motion.div>
+          <motion.p
+            className="text-muted-foreground text-lg max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
             Generate, analyze, and transform images with Starry AI and advanced OCR technology
-          </p>
+          </motion.p>
+
+          {/* Feature badges */}
+          <motion.div
+            className="flex flex-wrap justify-center gap-3 mt-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            <Badge variant="secondary" className="glass-card px-4 py-2">
+              <SparklesIcon size={16} className="mr-2" />
+              Starry AI Powered
+            </Badge>
+            <Badge variant="secondary" className="glass-card px-4 py-2">
+              <EyeIcon size={16} className="mr-2" />
+              Advanced OCR
+            </Badge>
+            <Badge variant="secondary" className="glass-card px-4 py-2">
+              <WandIcon size={16} className="mr-2" />
+              Image Transformation
+            </Badge>
+          </motion.div>
         </motion.div>
 
         <Tabs defaultValue="text-to-image" className="space-y-6">
@@ -291,281 +330,422 @@ const ImageTools = () => {
             <TabsTrigger value="image-to-image">Image to Image</TabsTrigger>
           </TabsList>
 
-          {/* Text to Image */}
+          {/* Premium Text to Image */}
           <TabsContent value="text-to-image">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <WandIcon size={24} />
-                  Text to Image Generation
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  Generate high-quality images from text descriptions using Starry AI
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Describe the image you want to generate:
-                  </label>
-                  <Textarea
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <PremiumCard variant="glass" glow={true}>
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-3 text-2xl">
+                    <div className="p-2 bg-purple-500/20 rounded-lg">
+                      <WandIcon size={24} className="text-purple-500" />
+                    </div>
+                    Text to Image Generation
+                  </PremiumCardTitle>
+                  <p className="text-muted-foreground text-base">
+                    Generate high-quality images from text descriptions using Starry AI
+                  </p>
+                </PremiumCardHeader>
+                <PremiumCardContent className="space-y-6">
+                  <PremiumTextarea
+                    label="Describe the image you want to generate"
                     placeholder="e.g., A detailed diagram of the water cycle with labels, educational style"
                     value={textPrompt}
                     onChange={(e) => setTextPrompt(e.target.value)}
-                    rows={3}
+                    rows={4}
+                    variant="glass"
                   />
-                </div>
 
-                <div className="space-y-3">
-                  <Button
-                    onClick={handleTextToImage}
-                    disabled={isGenerating || !textPrompt.trim()}
-                    className="w-full"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <LoaderIcon size={16} className="mr-2 animate-spin" />
-                        Generating with Starry AI...
-                      </>
-                    ) : (
-                      <>
-                        <WandIcon size={16} className="mr-2" />
-                        Generate Image
-                      </>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <GradientButton
+                      gradient="primary"
+                      onClick={handleTextToImage}
+                      disabled={isGenerating || !textPrompt.trim()}
+                      size="lg"
+                      className="shadow-glow"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <LoaderIcon size={18} className="mr-2 animate-spin" />
+                          Generating with Starry AI...
+                        </>
+                      ) : (
+                        <>
+                          <WandIcon size={18} className="mr-2" />
+                          Generate Image
+                        </>
+                      )}
+                    </GradientButton>
+
+                    <GlassButton
+                      onClick={handleTestImage}
+                      disabled={isGenerating}
+                      size="lg"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <LoaderIcon size={18} className="mr-2 animate-spin" />
+                          Testing...
+                        </>
+                      ) : (
+                        <>
+                          <ImageIcon size={18} className="mr-2" />
+                          Test Generation
+                        </>
+                      )}
+                    </GlassButton>
+                  </div>
+
+                  <AnimatePresence>
+                    {generatedImage && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className="mt-8"
+                      >
+                        <h3 className="font-semibold mb-4 text-lg flex items-center gap-2">
+                          <SparklesIcon size={20} className="text-primary" />
+                          Generated Image:
+                        </h3>
+                        <PremiumCard variant="glass" className="p-4 overflow-hidden">
+                          <div className="relative group">
+                            <motion.img
+                              src={generatedImage}
+                              alt="Generated"
+                              className="w-full max-w-lg mx-auto block rounded-xl shadow-premium"
+                              onLoad={() => console.log('Image loaded successfully:', generatedImage)}
+                              onError={(e) => {
+                                console.error('Image failed to load:', e, generatedImage);
+                                const imgElement = e.target as HTMLImageElement;
+                                if (imgElement && !imgElement.src.includes('?cache=')) {
+                                  imgElement.src = `${generatedImage}?cache=${Date.now()}`;
+                                }
+                              }}
+                              style={{
+                                minHeight: '200px',
+                                objectFit: 'contain',
+                                backgroundColor: 'transparent'
+                              }}
+                              whileHover={{ scale: 1.02 }}
+                              transition={{ duration: 0.3 }}
+                            />
+
+                            {/* Overlay with download button */}
+                            <motion.div
+                              className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              initial={false}
+                            >
+                              <GlassButton
+                                onClick={() => {
+                                  const link = document.createElement('a');
+                                  link.href = generatedImage;
+                                  link.download = 'generated-image.png';
+                                  link.click();
+                                }}
+                                className="shadow-glow"
+                              >
+                                <UploadIcon size={18} className="mr-2" />
+                                Download
+                              </GlassButton>
+                            </motion.div>
+                          </div>
+                        </PremiumCard>
+                      </motion.div>
                     )}
-                  </Button>
-
-                  <Button
-                    onClick={handleTestImage}
-                    disabled={isGenerating}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <LoaderIcon size={16} className="mr-2 animate-spin" />
-                        Testing...
-                      </>
-                    ) : (
-                      <>
-                        <ImageIcon size={16} className="mr-2" />
-                        Test Image Generation
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                {generatedImage && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mt-6"
-                  >
-                    <h3 className="font-semibold mb-3">Generated Image:</h3>
-                    <div className="rounded-lg overflow-hidden bg-transparent">
-                      <img
-                        src={generatedImage}
-                        alt="Generated"
-                        className="w-full max-w-md mx-auto block rounded-lg shadow-lg"
-                        onLoad={() => console.log('Image loaded successfully:', generatedImage)}
-                        onError={(e) => {
-                          console.error('Image failed to load:', e, generatedImage);
-                          // Try to reload the image with a cache-busting parameter
-                          const imgElement = e.target as HTMLImageElement;
-                          if (imgElement && !imgElement.src.includes('?cache=')) {
-                            imgElement.src = `${generatedImage}?cache=${Date.now()}`;
-                          }
-                        }}
-                        style={{
-                          minHeight: '200px',
-                          objectFit: 'contain',
-                          backgroundColor: 'transparent'
-                        }}
-                      />
-                    </div>
-                  </motion.div>
-                )}
-              </CardContent>
-            </Card>
+                  </AnimatePresence>
+                </PremiumCardContent>
+              </PremiumCard>
+            </motion.div>
           </TabsContent>
 
-          {/* Image to Text (OCR) */}
+          {/* Premium Image to Text (OCR) */}
           <TabsContent value="image-to-text">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <EyeIcon size={24} />
-                  Image to Text Analysis
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  Extract text from images and get AI explanations
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Upload an image:
-                  </label>
-                  <div
-                    className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    {uploadedImage ? (
-                      <img src={uploadedImage} alt="Uploaded" className="max-w-full max-h-64 mx-auto rounded" />
-                    ) : (
-                      <div>
-                        <UploadIcon size={48} className="mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">Click to upload an image</p>
-                      </div>
-                    )}
-                  </div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(e, 'ocr')}
-                    className="hidden"
-                  />
-                </div>
-
-                <Button
-                  onClick={handleImageToText}
-                  disabled={isProcessing || !uploadedImage}
-                  className="w-full"
-                >
-                  {isProcessing ? (
-                    <>
-                      <LoaderIcon size={16} className="mr-2 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <EyeIcon size={16} className="mr-2" />
-                      Analyze Image
-                    </>
-                  )}
-                </Button>
-
-                {extractedText && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-4"
-                  >
-                    <div>
-                      <h3 className="font-semibold mb-2">Extracted Text:</h3>
-                      <div className="bg-muted/50 p-4 rounded-lg">
-                        <p className="text-sm font-mono">{extractedText}</p>
-                      </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <PremiumCard variant="glass" glow={true}>
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-3 text-2xl">
+                    <div className="p-2 bg-blue-500/20 rounded-lg">
+                      <EyeIcon size={24} className="text-blue-500" />
                     </div>
-
-                    {aiExplanation && (
-                      <div>
-                        <h3 className="font-semibold mb-2">AI Explanation:</h3>
-                        <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-                          <p className="text-sm">{aiExplanation}</p>
+                    Image to Text Analysis
+                  </PremiumCardTitle>
+                  <p className="text-muted-foreground text-base">
+                    Extract text from images and get AI explanations with advanced OCR
+                  </p>
+                </PremiumCardHeader>
+                <PremiumCardContent className="space-y-6">
+                  {!uploadedImage ? (
+                    <PremiumUpload
+                      onFileSelect={(files) => {
+                        const file = files[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (e) => {
+                            setUploadedImage(e.target?.result as string);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      accept="image/*"
+                      variant="image"
+                      maxSize={10}
+                      className="mb-6"
+                    />
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="relative"
+                    >
+                      <PremiumCard variant="glass" className="p-4">
+                        <div className="relative group">
+                          <img
+                            src={uploadedImage}
+                            alt="Uploaded"
+                            className="max-w-full max-h-64 mx-auto rounded-xl shadow-premium"
+                          />
+                          <motion.button
+                            className="absolute top-2 right-2 p-2 bg-red-500/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => setUploadedImage(null)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            ×
+                          </motion.button>
                         </div>
-                      </div>
+                      </PremiumCard>
+                    </motion.div>
+                  )}
+
+                  <GradientButton
+                    gradient="blue"
+                    onClick={handleImageToText}
+                    disabled={isProcessing || !uploadedImage}
+                    size="lg"
+                    className="w-full shadow-glow-blue"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <LoaderIcon size={18} className="mr-2 animate-spin" />
+                        Analyzing with OCR...
+                      </>
+                    ) : (
+                      <>
+                        <EyeIcon size={18} className="mr-2" />
+                        Analyze Image
+                      </>
                     )}
-                  </motion.div>
-                )}
-              </CardContent>
-            </Card>
+                  </GradientButton>
+
+                  <AnimatePresence>
+                    {extractedText && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="space-y-6 mt-8"
+                      >
+                        <div>
+                          <h3 className="font-semibold mb-4 text-lg flex items-center gap-2">
+                            <EyeIcon size={20} className="text-blue-500" />
+                            Extracted Text:
+                          </h3>
+                          <PremiumCard variant="glass" className="p-4">
+                            <div className="glass-card p-4 rounded-xl bg-muted/20">
+                              <p className="text-sm font-mono leading-relaxed">{extractedText}</p>
+                            </div>
+                          </PremiumCard>
+                        </div>
+
+                        {aiExplanation && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                          >
+                            <h3 className="font-semibold mb-4 text-lg flex items-center gap-2">
+                              <SparklesIcon size={20} className="text-primary" />
+                              AI Explanation:
+                            </h3>
+                            <PremiumCard variant="glass" className="p-4">
+                              <div className="glass-card p-4 rounded-xl bg-primary/5 border border-primary/20">
+                                <p className="text-sm leading-relaxed">{aiExplanation}</p>
+                              </div>
+                            </PremiumCard>
+                          </motion.div>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </PremiumCardContent>
+              </PremiumCard>
+            </motion.div>
           </TabsContent>
 
-          {/* Image to Image */}
+          {/* Premium Image to Image */}
           <TabsContent value="image-to-image">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ImageIcon size={24} />
-                  Image to Image Transformation
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  Transform images based on text prompts using Starry AI
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Upload source image:
-                  </label>
-                  <div
-                    className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
-                    onClick={() => {
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.accept = 'image/*';
-                      input.onchange = (e) => handleImageUpload(e as any, 'transform');
-                      input.click();
-                    }}
-                  >
-                    {sourceImage ? (
-                      <img src={sourceImage} alt="Source" className="max-w-full max-h-64 mx-auto rounded" />
-                    ) : (
-                      <div>
-                        <UploadIcon size={48} className="mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">Click to upload source image</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <PremiumCard variant="glass" glow={true}>
+                <PremiumCardHeader>
+                  <PremiumCardTitle className="flex items-center gap-3 text-2xl">
+                    <div className="p-2 bg-green-500/20 rounded-lg">
+                      <ImageIcon size={24} className="text-green-500" />
+                    </div>
+                    Image to Image Transformation
+                  </PremiumCardTitle>
+                  <p className="text-muted-foreground text-base">
+                    Transform images based on text prompts using Starry AI
+                  </p>
+                </PremiumCardHeader>
+                <PremiumCardContent className="space-y-6">
+                  {!sourceImage ? (
+                    <PremiumUpload
+                      onFileSelect={(files) => {
+                        const file = files[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (e) => {
+                            setSourceImage(e.target?.result as string);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      accept="image/*"
+                      variant="image"
+                      maxSize={10}
+                      className="mb-6"
+                    />
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="relative"
+                    >
+                      <PremiumCard variant="glass" className="p-4">
+                        <div className="relative group">
+                          <img
+                            src={sourceImage}
+                            alt="Source"
+                            className="max-w-full max-h-64 mx-auto rounded-xl shadow-premium"
+                          />
+                          <motion.button
+                            className="absolute top-2 right-2 p-2 bg-red-500/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => setSourceImage(null)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            ×
+                          </motion.button>
+                        </div>
+                      </PremiumCard>
+                    </motion.div>
+                  )}
 
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Transformation prompt:
-                  </label>
-                  <Textarea
+                  <PremiumTextarea
+                    label="Transformation prompt"
                     placeholder="e.g., Convert this diagram to a colorful, cartoon style"
                     value={imagePrompt}
                     onChange={(e) => setImagePrompt(e.target.value)}
-                    rows={2}
+                    rows={3}
+                    variant="glass"
                   />
-                </div>
 
-                <Button
-                  onClick={handleImageToImage}
-                  disabled={isTransforming || !sourceImage || !imagePrompt.trim()}
-                  className="w-full"
-                >
-                  {isTransforming ? (
-                    <>
-                      <LoaderIcon size={16} className="mr-2 animate-spin" />
-                      Transforming with Starry AI...
-                    </>
-                  ) : (
-                    <>
-                      <WandIcon size={16} className="mr-2" />
-                      Transform Image
-                    </>
-                  )}
-                </Button>
-
-                {transformedImage && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mt-6"
+                  <GradientButton
+                    gradient="green"
+                    onClick={handleImageToImage}
+                    disabled={isTransforming || !sourceImage || !imagePrompt.trim()}
+                    size="lg"
+                    className="w-full shadow-glow-green"
                   >
-                    <h3 className="font-semibold mb-3">Transformed Image:</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-2">Original:</p>
-                        <div className="bg-transparent rounded-lg overflow-hidden">
-                          <img src={sourceImage} alt="Original" className="w-full rounded-lg" />
+                    {isTransforming ? (
+                      <>
+                        <LoaderIcon size={18} className="mr-2 animate-spin" />
+                        Transforming with Starry AI...
+                      </>
+                    ) : (
+                      <>
+                        <WandIcon size={18} className="mr-2" />
+                        Transform Image
+                      </>
+                    )}
+                  </GradientButton>
+
+                  <AnimatePresence>
+                    {transformedImage && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className="mt-8"
+                      >
+                        <h3 className="font-semibold mb-4 text-lg flex items-center gap-2">
+                          <SparklesIcon size={20} className="text-green-500" />
+                          Transformation Results:
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <PremiumCard variant="glass" className="p-4">
+                            <p className="text-sm font-medium text-muted-foreground mb-3">Original:</p>
+                            <div className="relative group">
+                              <img
+                                src={sourceImage}
+                                alt="Original"
+                                className="w-full rounded-xl shadow-premium"
+                              />
+                            </div>
+                          </PremiumCard>
+
+                          <PremiumCard variant="glass" className="p-4">
+                            <p className="text-sm font-medium text-muted-foreground mb-3">Transformed:</p>
+                            <div className="relative group">
+                              <motion.img
+                                src={transformedImage}
+                                alt="Transformed"
+                                className="w-full rounded-xl shadow-premium"
+                                whileHover={{ scale: 1.02 }}
+                                transition={{ duration: 0.3 }}
+                              />
+
+                              {/* Overlay with download button */}
+                              <motion.div
+                                className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                initial={false}
+                              >
+                                <GlassButton
+                                  onClick={() => {
+                                    const link = document.createElement('a');
+                                    link.href = transformedImage;
+                                    link.download = 'transformed-image.png';
+                                    link.click();
+                                  }}
+                                  className="shadow-glow"
+                                >
+                                  <UploadIcon size={18} className="mr-2" />
+                                  Download
+                                </GlassButton>
+                              </motion.div>
+                            </div>
+                          </PremiumCard>
                         </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-2">Transformed:</p>
-                        <div className="bg-transparent rounded-lg overflow-hidden">
-                          <img src={transformedImage} alt="Transformed" className="w-full rounded-lg" />
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </CardContent>
-            </Card>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </PremiumCardContent>
+              </PremiumCard>
+            </motion.div>
           </TabsContent>
         </Tabs>
       </div>
