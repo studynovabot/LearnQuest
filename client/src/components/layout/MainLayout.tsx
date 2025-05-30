@@ -11,6 +11,7 @@ import { useState } from "react";
 import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
 import NovaLogo from "@/components/ui/NovaLogo";
 import { ThemeToggle, ThemeToggleCompact } from "@/components/ui/theme-toggle";
+import { FloatingNav } from "@/components/ui/floating-nav";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -142,6 +143,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
           {/* Profile/Settings Modal */}
           {showProfileModal && <ProfileSettingsModal onClose={() => setShowProfileModal(false)} />}
+        </div>
+
+        {/* Premium Floating Navigation for Mobile */}
+        <div className="lg:hidden">
+          <FloatingNav variant="bottom" />
         </div>
       </div>
     </div>

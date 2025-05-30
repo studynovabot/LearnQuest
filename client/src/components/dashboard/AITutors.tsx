@@ -1,4 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "@/components/ui/premium-card";
+import { GradientButton, GlassButton } from "@/components/ui/premium-button";
 import {
   RobotIcon,
   UserIcon,
@@ -29,6 +31,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
+import { motion } from "framer-motion";
 
 const AITutors = () => {
   const { agents, unlockedAgents, lockedAgents, isLoading } = useChat();
@@ -64,22 +67,31 @@ const AITutors = () => {
 
   const getAgentColorClass = (color?: string) => {
     switch (color) {
-      case 'blue': return 'bg-blue-500';
-      case 'purple': return 'bg-purple-500';
-      case 'green': return 'bg-green-500';
-      case 'orange': return 'bg-orange-500';
-      case 'amber': return 'bg-amber-500';
-      case 'cyan': return 'bg-cyan-500';
-      case 'pink': return 'bg-pink-500';
-      case 'emerald': return 'bg-emerald-500';
-      case 'indigo': return 'bg-indigo-500';
-      case 'violet': return 'bg-violet-500';
-      case 'red': return 'bg-red-500';
-      case 'teal': return 'bg-teal-500';
-      case 'yellow': return 'bg-yellow-500';
-      case 'slate': return 'bg-slate-500';
-      case 'rose': return 'bg-rose-500';
-      default: return 'bg-primary';
+      case 'blue': return 'gradient-blue';
+      case 'purple': return 'gradient-purple';
+      case 'green': return 'gradient-green';
+      case 'orange': return 'gradient-orange';
+      case 'amber': return 'gradient-warning';
+      case 'cyan': return 'gradient-success';
+      case 'pink': return 'gradient-secondary';
+      case 'emerald': return 'gradient-green';
+      case 'indigo': return 'gradient-purple';
+      case 'violet': return 'gradient-purple';
+      case 'red': return 'gradient-secondary';
+      case 'teal': return 'gradient-success';
+      case 'yellow': return 'gradient-warning';
+      case 'slate': return 'gradient-primary';
+      case 'rose': return 'gradient-secondary';
+      default: return 'gradient-primary';
+    }
+  };
+
+  const getGlowClass = (color?: string) => {
+    switch (color) {
+      case 'blue': return 'glow-blue';
+      case 'green': return 'glow-green';
+      case 'orange': return 'glow-orange';
+      default: return 'glow';
     }
   };
 
@@ -93,67 +105,116 @@ const AITutors = () => {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>
+      <PremiumCard variant="glass" glow={true}>
+        <PremiumCardHeader>
+          <PremiumCardTitle>
             <Skeleton className="h-6 w-24" />
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </PremiumCardTitle>
+        </PremiumCardHeader>
+        <PremiumCardContent>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="bg-muted rounded-xl p-4 flex flex-col items-center">
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.1 }}
+                className="glass-card rounded-xl p-4 flex flex-col items-center"
+              >
                 <Skeleton className="w-16 h-16 rounded-full mb-3" />
                 <Skeleton className="h-4 w-16" />
-              </div>
+              </motion.div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </PremiumCardContent>
+      </PremiumCard>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold">AI Tutors</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <PremiumCard variant="glass" glow={true} className="overflow-hidden">
+      <PremiumCardHeader>
+        <PremiumCardTitle className="text-2xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+          AI Tutors
+        </PremiumCardTitle>
+      </PremiumCardHeader>
+      <PremiumCardContent>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {/* Unlocked Agents */}
-          {unlockedAgents.map((agent: AITutor) => (
-            <Link key={agent.id} href="/chat">
-              <div className="agent-card bg-card rounded-xl p-4 flex flex-col items-center cursor-pointer transition duration-300">
-                <div className={cn("w-16 h-16 rounded-full mb-3 flex items-center justify-center overflow-hidden", getAgentColorClass(agent.color))}>
-                  {getAgentIcon(agent.iconName, 32)}
+          {unlockedAgents.map((agent: AITutor, index: number) => (
+            <motion.div
+              key={agent.id}
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: index * 0.1, duration: 0.3 }}
+              whileHover={{ y: -4, scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Link href="/chat">
+                <div className={cn(
+                  "premium-card p-4 flex flex-col items-center cursor-pointer",
+                  "hover:shadow-premium-lg transition-all duration-300",
+                  getGlowClass(agent.color)
+                )}>
+                  {/* Animated background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-primary/5 opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+
+                  {/* Icon container with gradient */}
+                  <div className={cn(
+                    "w-16 h-16 rounded-full mb-3 flex items-center justify-center overflow-hidden relative",
+                    "shadow-premium hover:shadow-glow transition-all duration-300",
+                    getAgentColorClass(agent.color)
+                  )}>
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
+                    <div className="relative z-10 text-white">
+                      {getAgentIcon(agent.iconName, 32)}
+                    </div>
+                  </div>
+
+                  <span className="font-semibold text-center relative z-10 text-sm leading-tight">
+                    {agent.name}
+                  </span>
                 </div>
-                <span className="font-medium text-center">{agent.name}</span>
-              </div>
-            </Link>
+              </Link>
+            </motion.div>
           ))}
 
           {/* Locked Agents */}
-          {lockedAgents.map((agent: AITutor) => (
-            <div key={agent.id} className="agent-card bg-card rounded-xl p-4 flex flex-col items-center transition duration-300 opacity-70">
-              <div className="w-16 h-16 rounded-full bg-gray-500 mb-3 flex items-center justify-center overflow-hidden">
-                <LockIcon size={32} />
+          {lockedAgents.map((agent: AITutor, index: number) => (
+            <motion.div
+              key={agent.id}
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: (unlockedAgents.length + index) * 0.1, duration: 0.3 }}
+              className="relative"
+            >
+              <div className="premium-card p-4 flex flex-col items-center transition-all duration-300 opacity-60 hover:opacity-80">
+                {/* Locked overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/10 rounded-2xl backdrop-blur-sm"></div>
+
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 mb-3 flex items-center justify-center overflow-hidden shadow-premium relative z-10">
+                  <LockIcon size={32} className="text-white" />
+                </div>
+
+                <span className="font-semibold text-center relative z-10 text-sm leading-tight mb-1">
+                  {agent.name}
+                </span>
+                <span className="text-xs text-muted-foreground mb-2 relative z-10">Available</span>
+
+                <GlassButton
+                  size="sm"
+                  onClick={() => handleUnlockAgent(agent)}
+                  disabled={true}
+                  className="relative z-10"
+                >
+                  Unlock
+                </GlassButton>
               </div>
-              <span className="font-medium text-center">{agent.name}</span>
-              <span className="text-xs text-muted-foreground mt-1">Available</span>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2"
-                onClick={() => handleUnlockAgent(agent)}
-                disabled={true}
-              >
-                Unlock
-              </Button>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </PremiumCardContent>
+    </PremiumCard>
   );
 };
 
