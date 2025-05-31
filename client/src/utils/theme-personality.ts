@@ -223,10 +223,44 @@ export function getThemePersonalityStyles(personality: ThemePersonality): ThemeP
 export function applyThemePersonality(personality: ThemePersonality): void {
   const classes = getThemePersonalityClasses(personality);
   const styles = getThemePersonalityStyles(personality);
-  
-  // Apply classes to body
-  document.body.className = document.body.className
-    .replace(/theme-\w+-\w+/g, '') // Remove existing theme personality classes
+
+  // Remove only specific theme personality classes to avoid breaking layout
+  const personalityClassesToRemove = [
+    // Typography classes
+    /\btext-rendering-\w+\b/g,
+    /\bfont-weight-\w+\b/g,
+    /\bletter-spacing-\w+\b/g,
+    /\bline-height-\w+\b/g,
+
+    // Layout classes
+    /\btheme-radius-\w+\b/g,
+    /\btheme-spacing-\w+\b/g,
+    /\btheme-density-\w+\b/g,
+    /\btheme-cards-\w+\b/g,
+
+    // Effects classes
+    /\btheme-glass-\w+\b/g,
+    /\btheme-shadows-\w+\b/g,
+    /\btheme-animations-\w+\b/g,
+    /\btheme-transitions-\w+\b/g,
+
+    // Atmosphere classes
+    /\btheme-bg-\w+\b/g,
+    /\btheme-ambient-\w+\b/g,
+    /\btheme-cursor-\w+\b/g,
+    /\btheme-feedback-\w+\b/g
+  ];
+
+  // Apply classes to body safely
+  let bodyClassName = document.body.className;
+  personalityClassesToRemove.forEach(regex => {
+    bodyClassName = bodyClassName.replace(regex, '');
+  });
+
+  // Clean up extra spaces and add new classes
+  document.body.className = bodyClassName
+    .replace(/\s+/g, ' ')
+    .trim()
     .concat(` ${classes.combined}`);
 
   // Apply CSS custom properties to root

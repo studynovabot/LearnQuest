@@ -55,8 +55,9 @@ export function useAdvancedTheme() {
       },
       () => {
         // Add theme class to body for additional styling
+        // Only remove theme-specific classes, not all theme-related classes
         document.body.className = document.body.className
-          .replace(/theme-\w+/g, '')
+          .replace(/\btheme-(?:default|ocean-blue|forest-green|sunset-orange|purple-galaxy|minimalist-gray)\b/g, '')
           .concat(` theme-${selectedTheme}`);
       },
       () => {
@@ -99,29 +100,55 @@ export function useAdvancedTheme() {
       return;
     }
 
-    // Start performance monitoring
-    themePerformanceMonitor.startTransition();
+    try {
+      // Start performance monitoring
+      themePerformanceMonitor.startTransition();
 
-    setIsTransitioning(true);
+      setIsTransitioning(true);
 
-    // Add transition class to body
-    document.body.classList.add('theme-transitioning');
+      // Add transition class to body
+      document.body.classList.add('theme-transitioning');
 
-    // Small delay to ensure smooth transition
-    await new Promise(resolve => setTimeout(resolve, 50));
+      // Validate current layout state before theme change
+      const sidebarElement = document.getElementById('sliding-sidebar');
+      const sidebarVisible = sidebarElement && window.getComputedStyle(sidebarElement).display !== 'none';
 
-    setSelectedTheme(themeId);
-    localStorage.setItem(THEME_STORAGE_KEY, themeId);
+      // Small delay to ensure smooth transition
+      await new Promise(resolve => setTimeout(resolve, 50));
 
-    // Remove transition class after animation with optimized duration
-    const transitionDuration = PERFORMANCE_CONFIG.THEME_TRANSITION_DURATION;
-    setTimeout(() => {
+      setSelectedTheme(themeId);
+      localStorage.setItem(THEME_STORAGE_KEY, themeId);
+
+      // Remove transition class after animation with optimized duration
+      const transitionDuration = PERFORMANCE_CONFIG.THEME_TRANSITION_DURATION;
+      setTimeout(() => {
+        try {
+          document.body.classList.remove('theme-transitioning');
+          setIsTransitioning(false);
+
+          // Validate layout state after theme change
+          const sidebarAfter = document.getElementById('sliding-sidebar');
+          if (sidebarVisible && sidebarAfter && window.getComputedStyle(sidebarAfter).display === 'none') {
+            console.warn('Sidebar visibility lost during theme change, restoring...');
+            sidebarAfter.style.display = 'flex';
+          }
+
+          // End performance monitoring
+          themePerformanceMonitor.endTransition();
+        } catch (error) {
+          console.error('Error during theme transition cleanup:', error);
+          // Force cleanup in case of error
+          document.body.classList.remove('theme-transitioning');
+          setIsTransitioning(false);
+        }
+      }, transitionDuration);
+    } catch (error) {
+      console.error('Error during theme change:', error);
+      // Cleanup on error
       document.body.classList.remove('theme-transitioning');
       setIsTransitioning(false);
-
-      // End performance monitoring
       themePerformanceMonitor.endTransition();
-    }, transitionDuration);
+    }
   }, []);
 
   const getCurrentTheme = useCallback((): ThemeConfig => {
