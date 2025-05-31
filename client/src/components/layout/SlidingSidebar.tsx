@@ -31,9 +31,10 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
   return (
     <div
       className={cn(
-        "sliding-sidebar group w-20 hover:w-64 transition-all duration-300 ease-in-out",
-        "glass-card-strong border-r border-glass-border-strong",
-        "overflow-hidden flex flex-col",
+        "sliding-sidebar group fixed left-0 top-0 h-screen z-50",
+        "w-20 hover:w-64 transition-all duration-300 ease-in-out",
+        "bg-card/95 backdrop-blur-xl border-r border-border",
+        "overflow-hidden flex flex-col shadow-lg",
         className
       )}
     >
@@ -44,7 +45,7 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
           <NovaLogo size="sm" iconOnly={true} />
           <div className={cn(
             "transition-all duration-300 overflow-hidden",
-            "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs"
+            "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-[200px]"
           )}>
             <h1 className="text-lg font-bold whitespace-nowrap">Nova AI</h1>
             <p className="text-xs text-muted-foreground whitespace-nowrap">Your AI Study Buddy</p>
@@ -77,7 +78,8 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
                 {/* Label - visible on hover */}
                 <span className={cn(
                   "text-base font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-                  "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs",
+                  "opacity-0 max-w-0",
+                  "group-hover:opacity-100 group-hover:max-w-[200px]",
                   location === item.path ? "text-primary" : ""
                 )}>
                   {item.label}
@@ -94,7 +96,7 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
           <ThemeToggleCompact className="flex-shrink-0" />
           <span className={cn(
             "text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-            "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs"
+            "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-[200px]"
           )}>
             Toggle Theme
           </span>
