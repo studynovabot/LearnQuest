@@ -3,8 +3,7 @@ import SlidingSidebar from "./SlidingSidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { generateAvatar } from "@/lib/utils";
-import { FlashlightIcon, FireIcon, HomeIcon, MessageIcon, TrophyIcon, StoreIcon, CreditCardIcon, SettingsIcon, BookOpenIcon, ImageIcon, HamburgerIcon } from "@/components/ui/icons";
+
 import { cn } from "@/lib/utils";
 import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
 import NovaLogo from "@/components/ui/NovaLogo";
@@ -33,23 +32,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Mobile navigation items
-  const mobileNavItems = [
-    { icon: HomeIcon, label: "Home", path: "/", active: location === "/" },
-    { icon: MessageIcon, label: "Chat", path: "/chat", active: location === "/chat" },
-    { icon: FlashlightIcon, label: "Flash", path: "/flash-notes", active: location === "/flash-notes" },
-    { icon: BookOpenIcon, label: "NCERT", path: "/ncert-solutions", active: location === "/ncert-solutions" },
-    { icon: ImageIcon, label: "Images", path: "/image-tools", active: location === "/image-tools" },
-  ];
-
-  const navItems = [
-    { icon: HomeIcon, label: "Home", path: "/" },
-    { icon: MessageIcon, label: "Chat", path: "/chat" },
-    { icon: FlashlightIcon, label: "Flash Notes", path: "/flash-notes" },
-    { icon: BookOpenIcon, label: "NCERT Solutions", path: "/ncert-solutions" },
-    { icon: ImageIcon, label: "Image Tools", path: "/image-tools" },
-  ];
-
   // Check if user is logged in
   if (!user) {
     return (
@@ -67,31 +49,75 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-blue-500 p-8">
-      <div className="bg-white p-4 rounded">
-        <h1 className="text-2xl font-bold mb-4">Layout Debug Test</h1>
-        <p>Screen width: {typeof window !== 'undefined' ? window.innerWidth : 'unknown'}</p>
-        <p>Is mobile: {isMobile ? 'Yes' : 'No'}</p>
-        <p>User: {user?.displayName || 'Unknown'}</p>
+    <div className="min-h-screen relative flex">
+      {/* Desktop Sliding Sidebar - only visible on desktop */}
+      {!isMobile && <SlidingSidebar />}
 
-        {/* Test SlidingSidebar rendering */}
-        <div className="mt-4">
-          <h2 className="text-lg font-semibold">SlidingSidebar Test:</h2>
-          {!isMobile ? (
-            <div>
-              <p>Should render SlidingSidebar (desktop mode)</p>
-              <SlidingSidebar />
+      {/* Main content area */}
+      <div className={cn(
+        "flex-1 flex flex-col",
+        !isMobile && "ml-20" // Add left margin for sidebar on desktop
+      )}>
+        {/* Header with logout - mobile only */}
+        {isMobile && (
+          <header className="bg-card border-b border-border mobile-header pt-safe flex items-center justify-between">
+          <Link href="/">
+            <div className="flex items-center gap-4">
+              <NovaLogo size="sm" iconOnly={true} />
+              <div>
+                <h1 className="mobile-subtitle">Nova AI</h1>
+                <p className="mobile-caption">Your AI Study Buddy</p>
+              </div>
             </div>
-          ) : (
-            <p>SlidingSidebar hidden (mobile mode)</p>
-          )}
+          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggleCompact />
+            <Button
+              variant="outline"
+              className="mobile-button"
+              onClick={() => {
+                logout();
+                setLocation("/login");
+              }}
+            >
+              Logout
+            </Button>
+          </div>
+        </header>
+        )}
+
+        {/* Desktop controls (top right) */}
+        {!isMobile && (
+          <div className="absolute top-4 right-4 z-50 flex items-center gap-3">
+            <ThemeToggle size="default" variant="outline" />
+            <Button
+              variant="outline"
+              onClick={() => {
+                logout();
+                setLocation("/login");
+              }}
+            >
+              Logout
+            </Button>
+          </div>
+        )}
+
+        {/* Main content container */}
+        <div className={cn(
+          "flex-1 container mx-auto max-w-7xl",
+          !isMobile ? "px-4 py-6 mb-0" : "mobile-content" // Responsive styling
+        )}>
+          {/* Main content */}
+          <div className="flex-grow flex flex-col gap-6">
+            {children}
+          </div>
+
+          {/* Profile/Settings Modal */}
+          {showProfileModal && <ProfileSettingsModal onClose={() => setShowProfileModal(false)} />}
         </div>
 
-        {/* Original content */}
-        <div className="mt-8 bg-gray-100 p-4 rounded">
-          <h3 className="font-semibold mb-2">Original Content:</h3>
-          {children}
-        </div>
+        {/* Premium Floating Navigation for Mobile - replaces bottom nav */}
+        {isMobile && <FloatingNav variant="bottom" />}
       </div>
     </div>
   );
