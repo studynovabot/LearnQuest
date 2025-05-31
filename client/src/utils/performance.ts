@@ -36,11 +36,11 @@ export function supportsBackdropFilter(): boolean {
   
   const testElement = document.createElement('div');
   testElement.style.backdropFilter = 'blur(1px)';
-  testElement.style.webkitBackdropFilter = 'blur(1px)';
-  
+  (testElement.style as any).webkitBackdropFilter = 'blur(1px)';
+
   return !!(
     testElement.style.backdropFilter ||
-    testElement.style.webkitBackdropFilter
+    (testElement.style as any).webkitBackdropFilter
   );
 }
 

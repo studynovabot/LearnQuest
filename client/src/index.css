@@ -229,6 +229,110 @@
     z-index: -1;
   }
 
+  /* Theme Personality System - Background Patterns */
+  .theme-bg-none::before {
+    display: none;
+  }
+
+  .theme-bg-dots::before {
+    background-image: radial-gradient(circle, rgba(var(--primary), 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    animation: none;
+  }
+
+  .theme-bg-grid::before {
+    background-image:
+      linear-gradient(rgba(var(--primary), 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--primary), 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    animation: none;
+  }
+
+  .theme-bg-waves::before {
+    background-image:
+      radial-gradient(ellipse at top, rgba(var(--primary), 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom, rgba(var(--secondary), 0.1) 0%, transparent 50%);
+    animation: float 15s ease-in-out infinite;
+  }
+
+  .theme-bg-particles::before {
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(var(--primary), 0.15) 2px, transparent 2px),
+      radial-gradient(circle at 80% 80%, rgba(var(--secondary), 0.15) 1px, transparent 1px),
+      radial-gradient(circle at 40% 60%, rgba(var(--accent), 0.1) 1px, transparent 1px);
+    background-size: 50px 50px, 30px 30px, 70px 70px;
+    animation: float 25s ease-in-out infinite;
+  }
+
+  /* Theme Personality System - Ambient Animations */
+  .theme-ambient-none::before {
+    animation: none !important;
+  }
+
+  .theme-ambient-subtle::before {
+    animation-duration: 30s;
+    animation-timing-function: ease-in-out;
+  }
+
+  .theme-ambient-gentle::before {
+    animation-duration: 20s;
+    animation-timing-function: ease-in-out;
+  }
+
+  .theme-ambient-active::before {
+    animation-duration: 10s;
+    animation-timing-function: ease-in-out;
+  }
+
+  /* Theme Personality System - Cursor Styles */
+  .theme-cursor-default {
+    cursor: default;
+  }
+
+  .theme-cursor-precise {
+    cursor: crosshair;
+  }
+
+  .theme-cursor-creative {
+    cursor: pointer;
+  }
+
+  .theme-cursor-playful {
+    cursor: grab;
+  }
+
+  .theme-cursor-playful:active {
+    cursor: grabbing;
+  }
+
+  /* Theme Personality System - Interaction Feedback */
+  .theme-feedback-minimal button:hover,
+  .theme-feedback-minimal .cursor-pointer:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .theme-feedback-standard button:hover,
+  .theme-feedback-standard .cursor-pointer:hover {
+    transform: translateY(-1px);
+  }
+
+  .theme-feedback-enhanced button:hover,
+  .theme-feedback-enhanced .cursor-pointer:hover {
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .theme-feedback-immersive button:hover,
+  .theme-feedback-immersive .cursor-pointer:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: var(--shadow-premium-lg);
+  }
+
+  .theme-feedback-immersive button:active,
+  .theme-feedback-immersive .cursor-pointer:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+
   /* Smooth theme transitions for specific elements */
   .theme-transition {
     transition: all 200ms ease-in-out;
@@ -271,6 +375,127 @@
 
   body.theme-minimalist-gray {
     --theme-accent: #6b7280;
+  }
+
+  /* Theme Personality System - Typography */
+  .text-rendering-crisp {
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .text-rendering-smooth {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+  }
+
+  .text-rendering-geometric {
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Theme Personality System - Border Radius */
+  .theme-radius-sharp * {
+    border-radius: 0 !important;
+  }
+
+  .theme-radius-rounded * {
+    border-radius: 0.5rem !important;
+  }
+
+  .theme-radius-pill * {
+    border-radius: 9999px !important;
+  }
+
+  /* Override specific elements for radius */
+  .theme-radius-sharp .glass-card,
+  .theme-radius-sharp .premium-card,
+  .theme-radius-sharp .btn-premium {
+    border-radius: 0.25rem !important;
+  }
+
+  .theme-radius-rounded .glass-card,
+  .theme-radius-rounded .premium-card,
+  .theme-radius-rounded .btn-premium {
+    border-radius: 0.75rem !important;
+  }
+
+  .theme-radius-pill .glass-card,
+  .theme-radius-pill .premium-card {
+    border-radius: 1.5rem !important;
+  }
+
+  .theme-radius-pill .btn-premium {
+    border-radius: 9999px !important;
+  }
+
+  /* Theme Personality System - Spacing */
+  .theme-spacing-compact {
+    --spacing-multiplier: 0.75;
+  }
+
+  .theme-spacing-compact * {
+    padding: calc(var(--spacing-multiplier, 1) * 0.75rem);
+    margin: calc(var(--spacing-multiplier, 1) * 0.5rem);
+  }
+
+  .theme-spacing-normal {
+    --spacing-multiplier: 1;
+  }
+
+  .theme-spacing-spacious {
+    --spacing-multiplier: 1.5;
+  }
+
+  .theme-spacing-spacious * {
+    padding: calc(var(--spacing-multiplier, 1) * 1.5rem);
+    margin: calc(var(--spacing-multiplier, 1) * 1rem);
+  }
+
+  /* Theme Personality System - Density */
+  .theme-density-dense {
+    line-height: 1.2;
+  }
+
+  .theme-density-dense .glass-card,
+  .theme-density-dense .premium-card {
+    padding: 0.75rem;
+  }
+
+  .theme-density-normal {
+    line-height: 1.5;
+  }
+
+  .theme-density-airy {
+    line-height: 1.8;
+  }
+
+  .theme-density-airy .glass-card,
+  .theme-density-airy .premium-card {
+    padding: 2rem;
+  }
+
+  /* Theme Personality System - Card Styles */
+  .theme-cards-flat .glass-card,
+  .theme-cards-flat .premium-card {
+    box-shadow: none;
+    border: 1px solid var(--border);
+    background: var(--card);
+  }
+
+  .theme-cards-elevated .glass-card,
+  .theme-cards-elevated .premium-card {
+    box-shadow: var(--shadow-premium);
+    transform: translateY(0);
+  }
+
+  .theme-cards-floating .glass-card,
+  .theme-cards-floating .premium-card {
+    box-shadow: var(--shadow-premium-lg);
+    transform: translateY(-4px);
   }
 
   /* Responsive glassmorphism optimizations */
@@ -373,6 +598,53 @@
     border: 1px solid var(--glass-border-strong);
     box-shadow: var(--glass-shadow-strong);
     transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Theme Personality System - Glassmorphism Intensity */
+  .theme-glass-subtle .glass-card,
+  .theme-glass-subtle .glass-card-strong {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .theme-glass-medium .glass-card {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+  }
+
+  .theme-glass-intense .glass-card,
+  .theme-glass-intense .glass-card-strong {
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    background: var(--glass-bg-strong);
+    border: 2px solid var(--glass-border-strong);
+  }
+
+  /* Theme Personality System - Shadow Styles */
+  .theme-shadows-minimal * {
+    box-shadow: none !important;
+  }
+
+  .theme-shadows-soft .glass-card,
+  .theme-shadows-soft .premium-card,
+  .theme-shadows-soft .btn-premium {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .theme-shadows-dramatic .glass-card,
+  .theme-shadows-dramatic .premium-card,
+  .theme-shadows-dramatic .btn-premium {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .theme-shadows-glow .glass-card,
+  .theme-shadows-glow .premium-card,
+  .theme-shadows-glow .btn-premium {
+    box-shadow: var(--shadow-glow);
   }
 
   /* Glass Border Classes */
@@ -928,6 +1200,42 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-accent;
   opacity: 0.8;
+}
+
+/* Theme Personality System - Animation Styles */
+.theme-animations-minimal * {
+  animation: none !important;
+  transition: none !important;
+}
+
+.theme-animations-smooth * {
+  transition: all 200ms ease-out;
+}
+
+.theme-animations-playful * {
+  transition: all 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.theme-animations-dynamic * {
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Theme Personality System - Transition Styles */
+.theme-transitions-instant * {
+  transition-duration: 0ms !important;
+}
+
+.theme-transitions-quick * {
+  transition-duration: 150ms !important;
+}
+
+.theme-transitions-smooth * {
+  transition-duration: 300ms !important;
+}
+
+.theme-transitions-flowing * {
+  transition-duration: 500ms !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Premium Animations */

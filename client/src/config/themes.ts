@@ -1,8 +1,36 @@
+export interface ThemePersonality {
+  typography: {
+    fontWeight: 'light' | 'normal' | 'medium' | 'semibold' | 'bold';
+    letterSpacing: 'tight' | 'normal' | 'wide';
+    lineHeight: 'tight' | 'normal' | 'relaxed';
+    textRendering: 'crisp' | 'smooth' | 'geometric';
+  };
+  layout: {
+    borderRadius: 'sharp' | 'rounded' | 'pill';
+    spacing: 'compact' | 'normal' | 'spacious';
+    density: 'dense' | 'normal' | 'airy';
+    cardStyle: 'flat' | 'elevated' | 'floating';
+  };
+  effects: {
+    glassmorphism: 'subtle' | 'medium' | 'intense';
+    shadows: 'minimal' | 'soft' | 'dramatic' | 'glow';
+    animations: 'minimal' | 'smooth' | 'playful' | 'dynamic';
+    transitions: 'instant' | 'quick' | 'smooth' | 'flowing';
+  };
+  atmosphere: {
+    backgroundPattern: 'none' | 'dots' | 'grid' | 'waves' | 'particles';
+    ambientAnimation: 'none' | 'subtle' | 'gentle' | 'active';
+    cursorStyle: 'default' | 'precise' | 'creative' | 'playful';
+    interactionFeedback: 'minimal' | 'standard' | 'enhanced' | 'immersive';
+  };
+}
+
 export interface ThemeConfig {
   id: string;
   name: string;
   description: string;
   icon: string;
+  personality: ThemePersonality;
   preview: {
     primary: string;
     secondary: string;
@@ -21,6 +49,32 @@ export const themes: ThemeConfig[] = [
     name: 'Default',
     description: 'Classic LearnQuest theme with purple accents',
     icon: '🎓',
+    personality: {
+      typography: {
+        fontWeight: 'medium',
+        letterSpacing: 'normal',
+        lineHeight: 'normal',
+        textRendering: 'smooth'
+      },
+      layout: {
+        borderRadius: 'rounded',
+        spacing: 'normal',
+        density: 'normal',
+        cardStyle: 'elevated'
+      },
+      effects: {
+        glassmorphism: 'medium',
+        shadows: 'soft',
+        animations: 'smooth',
+        transitions: 'smooth'
+      },
+      atmosphere: {
+        backgroundPattern: 'dots',
+        ambientAnimation: 'subtle',
+        cursorStyle: 'default',
+        interactionFeedback: 'standard'
+      }
+    },
     preview: {
       primary: '#667eea',
       secondary: '#764ba2',
@@ -63,6 +117,32 @@ export const themes: ThemeConfig[] = [
     name: 'Ocean Blue',
     description: 'Calming blue gradients for focused studying',
     icon: '🌊',
+    personality: {
+      typography: {
+        fontWeight: 'normal',
+        letterSpacing: 'normal',
+        lineHeight: 'relaxed',
+        textRendering: 'smooth'
+      },
+      layout: {
+        borderRadius: 'pill',
+        spacing: 'spacious',
+        density: 'airy',
+        cardStyle: 'floating'
+      },
+      effects: {
+        glassmorphism: 'intense',
+        shadows: 'soft',
+        animations: 'smooth',
+        transitions: 'flowing'
+      },
+      atmosphere: {
+        backgroundPattern: 'waves',
+        ambientAnimation: 'gentle',
+        cursorStyle: 'default',
+        interactionFeedback: 'enhanced'
+      }
+    },
     preview: {
       primary: '#3b82f6',
       secondary: '#1e40af',
@@ -105,6 +185,32 @@ export const themes: ThemeConfig[] = [
     name: 'Forest Green',
     description: 'Nature-inspired greens for a refreshing feel',
     icon: '🌲',
+    personality: {
+      typography: {
+        fontWeight: 'medium',
+        letterSpacing: 'normal',
+        lineHeight: 'relaxed',
+        textRendering: 'crisp'
+      },
+      layout: {
+        borderRadius: 'rounded',
+        spacing: 'normal',
+        density: 'normal',
+        cardStyle: 'elevated'
+      },
+      effects: {
+        glassmorphism: 'medium',
+        shadows: 'soft',
+        animations: 'smooth',
+        transitions: 'smooth'
+      },
+      atmosphere: {
+        backgroundPattern: 'none',
+        ambientAnimation: 'subtle',
+        cursorStyle: 'default',
+        interactionFeedback: 'standard'
+      }
+    },
     preview: {
       primary: '#10b981',
       secondary: '#059669',
@@ -147,6 +253,32 @@ export const themes: ThemeConfig[] = [
     name: 'Sunset Orange',
     description: 'Warm oranges and yellows for motivation',
     icon: '🌅',
+    personality: {
+      typography: {
+        fontWeight: 'semibold',
+        letterSpacing: 'normal',
+        lineHeight: 'normal',
+        textRendering: 'crisp'
+      },
+      layout: {
+        borderRadius: 'sharp',
+        spacing: 'compact',
+        density: 'dense',
+        cardStyle: 'flat'
+      },
+      effects: {
+        glassmorphism: 'subtle',
+        shadows: 'dramatic',
+        animations: 'dynamic',
+        transitions: 'quick'
+      },
+      atmosphere: {
+        backgroundPattern: 'grid',
+        ambientAnimation: 'active',
+        cursorStyle: 'precise',
+        interactionFeedback: 'immersive'
+      }
+    },
     preview: {
       primary: '#f59e0b',
       secondary: '#d97706',
@@ -189,6 +321,32 @@ export const themes: ThemeConfig[] = [
     name: 'Purple Galaxy',
     description: 'Deep purples and cosmic themes for creativity',
     icon: '🌌',
+    personality: {
+      typography: {
+        fontWeight: 'bold',
+        letterSpacing: 'wide',
+        lineHeight: 'tight',
+        textRendering: 'geometric'
+      },
+      layout: {
+        borderRadius: 'pill',
+        spacing: 'spacious',
+        density: 'airy',
+        cardStyle: 'floating'
+      },
+      effects: {
+        glassmorphism: 'intense',
+        shadows: 'glow',
+        animations: 'playful',
+        transitions: 'flowing'
+      },
+      atmosphere: {
+        backgroundPattern: 'particles',
+        ambientAnimation: 'active',
+        cursorStyle: 'creative',
+        interactionFeedback: 'immersive'
+      }
+    },
     preview: {
       primary: '#8b5cf6',
       secondary: '#7c3aed',
@@ -231,6 +389,32 @@ export const themes: ThemeConfig[] = [
     name: 'Minimalist Gray',
     description: 'Clean, distraction-free monochrome design',
     icon: '⚪',
+    personality: {
+      typography: {
+        fontWeight: 'light',
+        letterSpacing: 'tight',
+        lineHeight: 'tight',
+        textRendering: 'crisp'
+      },
+      layout: {
+        borderRadius: 'sharp',
+        spacing: 'spacious',
+        density: 'airy',
+        cardStyle: 'flat'
+      },
+      effects: {
+        glassmorphism: 'subtle',
+        shadows: 'minimal',
+        animations: 'minimal',
+        transitions: 'instant'
+      },
+      atmosphere: {
+        backgroundPattern: 'none',
+        ambientAnimation: 'none',
+        cursorStyle: 'precise',
+        interactionFeedback: 'minimal'
+      }
+    },
     preview: {
       primary: '#6b7280',
       secondary: '#4b5563',

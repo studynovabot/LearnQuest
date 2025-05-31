@@ -5,18 +5,19 @@ import { ThemeSelector } from "@/components/ui/theme-selector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PaletteIcon, RefreshCwIcon, SparklesIcon, InfoIcon } from "@/components/ui/icons";
+import { ThemeAwareCard, ThemeAwareButton, ThemeAwareText } from "@/components/ui/theme-aware-card";
+import { PaletteIcon, RefreshCwIcon, SparklesIcon, InfoIcon, EyeIcon, ZapIcon, LayersIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 
 const Themes = () => {
-  const { 
-    themeConfig, 
-    selectedTheme, 
-    resetToDefault, 
+  const {
+    themeConfig,
+    selectedTheme,
+    resetToDefault,
     isTransitioning,
     isDark,
     isLight,
-    isSystem 
+    isSystem
   } = useAdvancedTheme();
 
   const containerVariants = {
@@ -60,7 +61,7 @@ const Themes = () => {
               </p>
             </div>
           </div>
-          
+
           {/* Current Theme Info */}
           <motion.div
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full"
@@ -85,38 +86,153 @@ const Themes = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                Choose from our carefully crafted themes designed specifically for students and educational platforms. 
-                Each theme maintains excellent readability and accessibility while providing a unique visual experience.
+                Experience comprehensive visual transformations that go far beyond simple color changes.
+                Each theme provides a unique personality with distinct typography, layouts, animations, and atmospheric elements.
               </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div className="space-y-2">
                   <h4 className="font-semibold flex items-center gap-2">
-                    <SparklesIcon className="h-4 w-4 text-primary" />
-                    Features
+                    <EyeIcon className="h-4 w-4 text-primary" />
+                    Visual Identity
                   </h4>
                   <ul className="space-y-1 text-muted-foreground">
-                    <li>• Glassmorphism effects preserved</li>
-                    <li>• Smooth theme transitions</li>
-                    <li>• Dark/Light mode support</li>
-                    <li>• Accessibility optimized</li>
+                    <li>• Unique typography styles</li>
+                    <li>• Custom border radius patterns</li>
+                    <li>• Theme-specific spacing</li>
+                    <li>• Varied glassmorphism intensity</li>
                   </ul>
                 </div>
-                
+
                 <div className="space-y-2">
-                  <h4 className="font-semibold">Theme Persistence</h4>
-                  <p className="text-muted-foreground">
-                    Your theme preference is automatically saved and will be restored when you return to LearnQuest.
-                  </p>
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <ZapIcon className="h-4 w-4 text-primary" />
+                    Interactions
+                  </h4>
+                  <ul className="space-y-1 text-muted-foreground">
+                    <li>• Custom animation speeds</li>
+                    <li>• Unique transition curves</li>
+                    <li>• Theme-specific hover effects</li>
+                    <li>• Varied interaction feedback</li>
+                  </ul>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <LayersIcon className="h-4 w-4 text-primary" />
+                    Atmosphere
+                  </h4>
+                  <ul className="space-y-1 text-muted-foreground">
+                    <li>• Background patterns</li>
+                    <li>• Ambient animations</li>
+                    <li>• Custom shadow styles</li>
+                    <li>• Theme-aware components</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
           </Card>
         </motion.div>
 
+        {/* Current Theme Personality */}
+        {themeConfig?.personality && (
+          <motion.div variants={itemVariants}>
+            <ThemeAwareCard variant="glass" className="border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <span className="text-2xl">{themeConfig.icon}</span>
+                  {themeConfig.name} Personality
+                </CardTitle>
+                <CardDescription>
+                  Discover the unique characteristics of your selected theme
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Typography */}
+                  <div className="space-y-2">
+                    <ThemeAwareText variant="subtitle" className="text-primary">Typography</ThemeAwareText>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Weight:</span>
+                        <Badge variant="outline">{themeConfig.personality.typography.fontWeight}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Spacing:</span>
+                        <Badge variant="outline">{themeConfig.personality.typography.letterSpacing}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Height:</span>
+                        <Badge variant="outline">{themeConfig.personality.typography.lineHeight}</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Layout */}
+                  <div className="space-y-2">
+                    <ThemeAwareText variant="subtitle" className="text-primary">Layout</ThemeAwareText>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Radius:</span>
+                        <Badge variant="outline">{themeConfig.personality.layout.borderRadius}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Spacing:</span>
+                        <Badge variant="outline">{themeConfig.personality.layout.spacing}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Density:</span>
+                        <Badge variant="outline">{themeConfig.personality.layout.density}</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Effects */}
+                  <div className="space-y-2">
+                    <ThemeAwareText variant="subtitle" className="text-primary">Effects</ThemeAwareText>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Glass:</span>
+                        <Badge variant="outline">{themeConfig.personality.effects.glassmorphism}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Shadows:</span>
+                        <Badge variant="outline">{themeConfig.personality.effects.shadows}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Animations:</span>
+                        <Badge variant="outline">{themeConfig.personality.effects.animations}</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Atmosphere */}
+                  <div className="space-y-2">
+                    <ThemeAwareText variant="subtitle" className="text-primary">Atmosphere</ThemeAwareText>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Pattern:</span>
+                        <Badge variant="outline">{themeConfig.personality.atmosphere.backgroundPattern}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Animation:</span>
+                        <Badge variant="outline">{themeConfig.personality.atmosphere.ambientAnimation}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Feedback:</span>
+                        <Badge variant="outline">{themeConfig.personality.atmosphere.interactionFeedback}</Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </ThemeAwareCard>
+          </motion.div>
+        )}
+
         {/* Theme Selector */}
         <motion.div variants={itemVariants}>
-          <ThemeSelector 
+          <ThemeSelector
             className={cn(
               "transition-opacity duration-300",
               isTransitioning && "opacity-50 pointer-events-none"
@@ -152,53 +268,97 @@ const Themes = () => {
 
         {/* Theme Preview Section */}
         <motion.div variants={itemVariants}>
-          <Card className="glass-card">
+          <ThemeAwareCard variant="glass">
             <CardHeader>
               <CardTitle className="text-lg">Live Preview</CardTitle>
               <CardDescription>
-                See how your selected theme looks across different components
+                Experience your selected theme's personality across different components
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Sample UI Elements */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="space-y-6">
+              {/* Theme-Aware Components */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {/* Sample Card */}
-                <div className="glass-card p-4 rounded-xl">
-                  <h3 className="font-semibold mb-2">Sample Card</h3>
-                  <p className="text-muted-foreground text-sm mb-3">
-                    This is how cards will look with your selected theme.
-                  </p>
-                  <Button size="sm" className="w-full">
-                    Primary Button
-                  </Button>
-                </div>
+                <ThemeAwareCard variant="glass" className="p-4">
+                  <ThemeAwareText variant="subtitle" className="mb-2">Theme-Aware Card</ThemeAwareText>
+                  <ThemeAwareText variant="body" className="text-muted-foreground mb-3">
+                    This card adapts to your theme's personality with custom spacing, borders, and effects.
+                  </ThemeAwareText>
+                  <ThemeAwareButton variant="primary" size="sm" className="w-full">
+                    Interactive Button
+                  </ThemeAwareButton>
+                </ThemeAwareCard>
 
-                {/* Sample Navigation */}
-                <div className="glass-card p-4 rounded-xl">
-                  <h3 className="font-semibold mb-2">Navigation Preview</h3>
+                {/* Typography Showcase */}
+                <ThemeAwareCard variant="glass" className="p-4">
+                  <ThemeAwareText variant="subtitle" className="mb-2">Typography</ThemeAwareText>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-lg">
-                      <div className="w-4 h-4 bg-primary rounded"></div>
-                      <span className="text-sm">Active Item</span>
+                    <ThemeAwareText variant="title" as="h3">Title Text</ThemeAwareText>
+                    <ThemeAwareText variant="subtitle">Subtitle Text</ThemeAwareText>
+                    <ThemeAwareText variant="body">Body text with theme-specific font weight and spacing.</ThemeAwareText>
+                    <ThemeAwareText variant="caption">Caption text for details</ThemeAwareText>
+                  </div>
+                </ThemeAwareCard>
+
+                {/* Interactive Elements */}
+                <ThemeAwareCard variant="glass" className="p-4">
+                  <ThemeAwareText variant="subtitle" className="mb-3">Interactions</ThemeAwareText>
+                  <div className="space-y-3">
+                    <ThemeAwareButton variant="primary" className="w-full">
+                      Primary Action
+                    </ThemeAwareButton>
+                    <ThemeAwareButton variant="secondary" className="w-full">
+                      Secondary Action
+                    </ThemeAwareButton>
+                    <ThemeAwareButton variant="ghost" className="w-full">
+                      Ghost Button
+                    </ThemeAwareButton>
+                  </div>
+                </ThemeAwareCard>
+              </div>
+
+              {/* Gradient and Effects Preview */}
+              <div className="space-y-4">
+                <ThemeAwareText variant="subtitle">Visual Effects</ThemeAwareText>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Gradients */}
+                  <div className="space-y-2">
+                    <ThemeAwareText variant="caption">Theme Gradients</ThemeAwareText>
+                    <div className="flex gap-2 h-12 rounded-lg overflow-hidden">
+                      <div className="flex-1 gradient-primary"></div>
+                      <div className="flex-1 gradient-secondary"></div>
                     </div>
-                    <div className="flex items-center gap-2 p-2 hover:bg-accent rounded-lg transition-colors">
-                      <div className="w-4 h-4 bg-muted rounded"></div>
-                      <span className="text-sm">Inactive Item</span>
+                  </div>
+
+                  {/* Glassmorphism Intensity */}
+                  <div className="space-y-2">
+                    <ThemeAwareText variant="caption">Glassmorphism Levels</ThemeAwareText>
+                    <div className="flex gap-2 h-12">
+                      <div className="flex-1 theme-glass-subtle bg-primary/10 rounded border border-primary/20 flex items-center justify-center">
+                        <span className="text-xs font-medium">Subtle</span>
+                      </div>
+                      <div className="flex-1 theme-glass-medium bg-primary/10 rounded border border-primary/20 flex items-center justify-center">
+                        <span className="text-xs font-medium">Medium</span>
+                      </div>
+                      <div className="flex-1 theme-glass-intense bg-primary/10 rounded border border-primary/20 flex items-center justify-center">
+                        <span className="text-xs font-medium">Intense</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Gradient Preview */}
-              <div className="space-y-2">
-                <h4 className="font-semibold text-sm">Gradient Preview</h4>
-                <div className="flex gap-2 h-12 rounded-lg overflow-hidden">
-                  <div className="flex-1 gradient-primary"></div>
-                  <div className="flex-1 gradient-secondary"></div>
-                </div>
+              {/* Personality Demonstration */}
+              <div className="p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/10">
+                <ThemeAwareText variant="subtitle" className="mb-2">Theme Personality in Action</ThemeAwareText>
+                <ThemeAwareText variant="body" className="text-muted-foreground">
+                  Notice how this theme's unique personality affects every aspect of the interface - from typography rendering
+                  to animation speeds, border radius styles, and interaction feedback. Each theme creates a completely
+                  different visual and interactive experience.
+                </ThemeAwareText>
               </div>
             </CardContent>
-          </Card>
+          </ThemeAwareCard>
         </motion.div>
       </div>
     </motion.div>

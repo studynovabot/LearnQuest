@@ -381,8 +381,9 @@ export class ProductionDeploymentChecker {
     return recommendations;
   }
   
-  generateReport(): string {
-    return this.runDeploymentChecks().then(report => {
+  async generateReport(): Promise<string> {
+    const report = await this.runDeploymentChecks();
+    {
       let output = `# Production Deployment Report\n\n`;
       output += `**Timestamp:** ${report.timestamp}\n`;
       output += `**Overall Status:** ${report.overallStatus.toUpperCase()}\n`;
@@ -403,9 +404,9 @@ export class ProductionDeploymentChecker {
           output += `${rec}\n`;
         });
       }
-      
+
       return output;
-    });
+    }
   }
 }
 

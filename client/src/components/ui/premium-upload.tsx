@@ -319,7 +319,7 @@ const getThemeAwareUploadBorderClasses = (theme: string): string => {
   }
 };
 
-const getThemeAwareButtonGradient = (theme: string): string => {
+const getThemeAwareButtonGradient = (theme: string): "primary" | "secondary" | "success" | "purple" | "blue" | "green" | "orange" | "red" | "yellow" => {
   switch (theme) {
     case 'ocean-blue':
       return 'blue';
@@ -330,7 +330,7 @@ const getThemeAwareButtonGradient = (theme: string): string => {
     case 'purple-galaxy':
       return 'purple';
     case 'minimalist-gray':
-      return 'gray';
+      return 'secondary';
     default:
       return 'primary';
   }

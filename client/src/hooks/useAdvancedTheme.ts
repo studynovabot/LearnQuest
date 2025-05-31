@@ -7,6 +7,7 @@ import {
   batchDOMUpdates,
   PERFORMANCE_CONFIG
 } from "@/utils/performance";
+import { applyThemePersonality } from "@/utils/theme-personality";
 
 const THEME_STORAGE_KEY = 'learnquest-selected-theme';
 const THEME_MODE_STORAGE_KEY = 'learnquest-theme-mode';
@@ -57,6 +58,13 @@ export function useAdvancedTheme() {
         document.body.className = document.body.className
           .replace(/theme-\w+/g, '')
           .concat(` theme-${selectedTheme}`);
+      },
+      () => {
+        // Apply theme personality
+        const themeConfig = getThemeById(selectedTheme);
+        if (themeConfig?.personality) {
+          applyThemePersonality(themeConfig.personality);
+        }
       }
     ]);
 

@@ -88,7 +88,7 @@ export class ThemeIntegrationTester {
     const startTime = performance.now();
     const issues: string[] = [];
     let passed = true;
-    
+
     try {
       switch (component) {
         case 'chat-interface':
@@ -120,8 +120,8 @@ export class ThemeIntegrationTester {
       issues.push(`Component test failed: ${error}`);
       passed = false;
     }
-    
-    const performance = performance.now() - startTime;
+
+    const performanceTime = performance.now() - startTime;
     passed = passed && issues.length === 0;
     
     return {
@@ -129,7 +129,7 @@ export class ThemeIntegrationTester {
       theme: themeId,
       passed,
       issues,
-      performance
+      performance: performanceTime
     };
   }
   
@@ -142,7 +142,7 @@ export class ThemeIntegrationTester {
     const computedStyle = getComputedStyle(testBubble);
     
     // Check glassmorphism effects
-    if (!computedStyle.backdropFilter && !computedStyle.webkitBackdropFilter) {
+    if (!computedStyle.backdropFilter && !(computedStyle as any).webkitBackdropFilter) {
       issues.push('Glassmorphism effects not applied');
     }
     
@@ -249,7 +249,7 @@ export class ThemeIntegrationTester {
     const computedStyle = getComputedStyle(testNav);
     
     // Check glassmorphism
-    if (!computedStyle.backdropFilter && !computedStyle.webkitBackdropFilter) {
+    if (!computedStyle.backdropFilter && !(computedStyle as any).webkitBackdropFilter) {
       issues.push('Navigation glassmorphism not applied');
     }
     
@@ -265,7 +265,7 @@ export class ThemeIntegrationTester {
     const computedStyle = getComputedStyle(testForm);
     
     // Check strong glassmorphism
-    if (!computedStyle.backdropFilter && !computedStyle.webkitBackdropFilter) {
+    if (!computedStyle.backdropFilter && !(computedStyle as any).webkitBackdropFilter) {
       issues.push('Settings form glassmorphism not applied');
     }
     

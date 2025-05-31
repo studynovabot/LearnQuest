@@ -169,7 +169,7 @@ export class MobileResponsivenessAuditor {
       // Simulate glassmorphism stress test
       glassElements.forEach(element => {
         const computedStyle = getComputedStyle(element);
-        const backdropFilter = computedStyle.backdropFilter || computedStyle.webkitBackdropFilter;
+        const backdropFilter = computedStyle.backdropFilter || (computedStyle as any).webkitBackdropFilter;
         
         if (backdropFilter && backdropFilter !== 'none') {
           // Check if blur value is optimized for mobile
@@ -255,7 +255,7 @@ export class MobileResponsivenessAuditor {
       const computedStyle = getComputedStyle(element);
       
       // Check for momentum scrolling on iOS
-      if (this.isMobile && !computedStyle.webkitOverflowScrolling) {
+      if (this.isMobile && !(computedStyle as any).webkitOverflowScrolling) {
         issues.push('Missing momentum scrolling for smooth iOS experience');
         score -= 10;
         recommendations.push('Add -webkit-overflow-scrolling: touch for iOS');
@@ -444,10 +444,10 @@ export class MobileResponsivenessAuditor {
       .flatMap(result => result.issues);
   }
   
-  generateReport(): string {
-    const report = this.runMobileAudit();
-    
-    return report.then(data => {
+  async generateReport(): Promise<string> {
+    const data = await this.runMobileAudit();
+
+    {
       let output = `# Mobile Responsiveness Audit Report\n\n`;
       output += `**Device Type:** ${data.deviceType}\n`;
       output += `**Screen Size:** ${data.screenSize}\n`;
@@ -482,9 +482,9 @@ export class MobileResponsivenessAuditor {
         }
         output += '\n';
       });
-      
+
       return output;
-    });
+    }
   }
 }
 
