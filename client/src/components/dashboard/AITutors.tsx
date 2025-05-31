@@ -144,11 +144,11 @@ const AITutors = () => {
           {unlockedAgents.map((agent: AITutor, index: number) => (
             <motion.div
               key={agent.id}
-              initial={{ opacity: 0, y: 20, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: index * 0.1, duration: 0.3 }}
-              whileHover={{ y: -4, scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.2 }}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
             >
               <Link href="/chat">
                 <div className={cn(
@@ -183,12 +183,12 @@ const AITutors = () => {
           {lockedAgents.map((agent: AITutor, index: number) => (
             <motion.div
               key={agent.id}
-              initial={{ opacity: 0, y: 20, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: (unlockedAgents.length + index) * 0.1, duration: 0.3 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: (unlockedAgents.length + index) * 0.05, duration: 0.2 }}
               className="relative"
             >
-              <div className="premium-card p-4 flex flex-col items-center transition-all duration-300 opacity-60 hover:opacity-80">
+              <div className="premium-card p-4 flex flex-col items-center transition-opacity duration-200 opacity-60 hover:opacity-75">
                 {/* Locked overlay */}
                 <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/10 rounded-2xl backdrop-blur-sm"></div>
 

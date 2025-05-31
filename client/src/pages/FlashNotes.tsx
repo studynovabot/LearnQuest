@@ -349,11 +349,11 @@ const FlashNotes = () => {
               key={note.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -8, scale: 1.02 }}
+              transition={{ delay: index * 0.05 }}
+              whileHover={{ y: -3 }}
               className="h-full"
             >
-              <PremiumCard variant="glass" className="h-full hover:shadow-premium transition-all duration-300">
+              <PremiumCard variant="glass" className="h-full hover:shadow-premium transition-shadow duration-200">
                 <PremiumCardHeader>
                   <div className="flex items-start justify-between">
                     <div>

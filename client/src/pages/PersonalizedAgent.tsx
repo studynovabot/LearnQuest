@@ -416,10 +416,10 @@ const PersonalizedAgent = () => {
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -4, scale: 1.02 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -2 }}
                 >
-                  <PremiumCard variant="glass" className="h-full hover:shadow-premium transition-all duration-300">
+                  <PremiumCard variant="glass" className="h-full hover:shadow-premium transition-shadow duration-200">
                     <PremiumCardHeader className="pb-3">
                       <PremiumCardTitle className="flex items-center gap-3 text-lg">
                         <div className={cn(
@@ -465,10 +465,9 @@ const PersonalizedAgent = () => {
                   key={index}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ x: 4 }}
+                  transition={{ delay: index * 0.05 }}
                 >
-                  <PremiumCard variant="glass" className="hover:shadow-premium transition-all duration-300">
+                  <PremiumCard variant="glass" className="hover:shadow-premium transition-shadow duration-200">
                     <PremiumCardHeader>
                       <div className="flex items-center justify-between">
                         <PremiumCardTitle className="text-lg flex items-center gap-3">
@@ -534,10 +533,10 @@ const PersonalizedAgent = () => {
                   key={rec.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -4, scale: 1.01 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -2 }}
                 >
-                  <PremiumCard variant="glass" className="hover:shadow-premium transition-all duration-300">
+                  <PremiumCard variant="glass" className="hover:shadow-premium transition-shadow duration-200">
                     <PremiumCardHeader>
                       <div className="flex items-center justify-between">
                         <PremiumCardTitle className="text-lg flex items-center gap-3">

@@ -26,7 +26,7 @@ const PremiumProgress: React.FC<PremiumProgressProps> = ({
   label
 }) => {
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
-  
+
   const sizeClasses = {
     sm: "h-2",
     md: "h-3",
@@ -63,7 +63,7 @@ const PremiumProgress: React.FC<PremiumProgressProps> = ({
 
   const getProgressClasses = () => {
     const baseClasses = "h-full rounded-full transition-all duration-500 ease-out";
-    
+
     switch (variant) {
       case "gradient":
         return cn(
@@ -94,7 +94,7 @@ const PremiumProgress: React.FC<PremiumProgressProps> = ({
           )}
         </div>
       )}
-      
+
       <div className={cn(
         "w-full glass-card rounded-full overflow-hidden",
         sizeClasses[size]
@@ -103,25 +103,15 @@ const PremiumProgress: React.FC<PremiumProgressProps> = ({
           className={getProgressClasses()}
           initial={{ width: 0 }}
           animate={{ width: animated ? `${percentage}%` : `${percentage}%` }}
-          transition={{ 
+          transition={{
             duration: animated ? 1.5 : 0,
             ease: "easeOut",
             delay: animated ? 0.2 : 0
           }}
         >
-          {/* Shimmer effect for gradient variant */}
+          {/* Simplified shimmer effect for gradient variant */}
           {variant === "gradient" && (
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-              initial={{ x: "-100%" }}
-              animate={{ x: "100%" }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 3,
-                ease: "easeInOut"
-              }}
-            />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-50" />
           )}
         </motion.div>
       </div>
@@ -181,7 +171,7 @@ const PremiumCircularProgress: React.FC<PremiumCircularProgressProps> = ({
           fill="none"
           className="text-muted/20"
         />
-        
+
         {/* Progress circle */}
         <motion.circle
           cx={size / 2}
@@ -204,7 +194,7 @@ const PremiumCircularProgress: React.FC<PremiumCircularProgressProps> = ({
           }}
         />
       </svg>
-      
+
       {showValue && (
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
@@ -246,9 +236,9 @@ const PremiumProgressCard: React.FC<PremiumProgressCardProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2, scale: 1.02 }}
+      whileHover={{ y: -1 }}
       className={cn(
-        "glass-card p-6 rounded-2xl hover:shadow-premium transition-all duration-300",
+        "glass-card p-6 rounded-2xl hover:shadow-premium transition-shadow duration-200",
         className
       )}
     >

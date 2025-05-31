@@ -399,30 +399,53 @@
   }
 
   .premium-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-premium-lg);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-premium);
   }
 
   /* Enhanced Agent Cards */
   .agent-card {
-    @apply premium-card flex flex-col items-center transition-all duration-300;
+    @apply premium-card flex flex-col items-center transition-transform duration-200;
     border-radius: 1.5rem;
   }
 
   .agent-card:hover {
-    transform: translateY(-6px) scale(1.02);
-    @apply glow;
+    transform: translateY(-3px);
+  }
+
+  /* Performance optimized hover classes */
+  .hover-lift {
+    transition: transform 0.2s ease-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  .hover-scale {
+    transition: transform 0.15s ease-out;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  .hover-shadow {
+    transition: box-shadow 0.2s ease-out;
+  }
+
+  .hover-shadow:hover {
+    box-shadow: var(--shadow-premium);
   }
 
   /* Premium Navigation */
   .nav-icon {
-    @apply transition-all duration-300 ease-out;
+    @apply transition-colors duration-200;
     position: relative;
   }
 
   .nav-icon:hover {
-    @apply text-primary scale-110;
-    filter: drop-shadow(0 0 8px rgba(124, 58, 237, 0.4));
+    @apply text-primary;
   }
 
   .nav-icon::after {
@@ -433,7 +456,7 @@
     background: var(--gradient-primary);
     opacity: 0;
     z-index: -1;
-    transition: opacity 300ms ease;
+    transition: opacity 200ms ease;
   }
 
   .nav-icon:hover::after {
@@ -854,7 +877,7 @@
     transform: scale(1);
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.02);
   }
 }
 

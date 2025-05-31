@@ -43,7 +43,7 @@ const NCERTSolutions = () => {
   // Sample data
   const classes = ['6', '7', '8', '9', '10', '11', '12'];
   const subjects = ['Mathematics', 'Science', 'English', 'History', 'Geography', 'Physics', 'Chemistry', 'Biology'];
-  
+
   const sampleChapters: NCERTChapter[] = [
     {
       id: '1',
@@ -98,13 +98,13 @@ const NCERTSolutions = () => {
   const filteredChapters = chapters.filter(chapter => {
     const matchesClass = !selectedClass || chapter.class === selectedClass;
     const matchesSubject = !selectedSubject || chapter.subject === selectedSubject;
-    const matchesSearch = !searchQuery || 
+    const matchesSearch = !searchQuery ||
       chapter.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      chapter.questions.some(q => 
+      chapter.questions.some(q =>
         q.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
         q.solution.toLowerCase().includes(searchQuery.toLowerCase())
       );
-    
+
     return matchesClass && matchesSubject && matchesSearch;
   });
 
@@ -183,8 +183,8 @@ const NCERTSolutions = () => {
                 />
               </div>
 
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setSelectedClass('');
                   setSelectedSubject('');
@@ -210,11 +210,10 @@ const NCERTSolutions = () => {
                   {filteredChapters.map((chapter) => (
                     <motion.div
                       key={chapter.id}
-                      whileHover={{ x: 5 }}
                       className={`
-                        p-3 rounded-lg cursor-pointer border transition-colors
-                        ${selectedChapter?.id === chapter.id ? 
-                          'bg-primary/10 border-primary' : 
+                        p-3 rounded-lg cursor-pointer border transition-colors duration-200
+                        ${selectedChapter?.id === chapter.id ?
+                          'bg-primary/10 border-primary' :
                           'hover:bg-muted border-transparent'}
                       `}
                       onClick={() => handleChapterSelect(chapter)}
@@ -293,7 +292,7 @@ const NCERTSolutions = () => {
                                 {question.solution}
                               </pre>
                             </div>
-                            
+
                             <div className="mt-4">
                               <h5 className="font-medium mb-2">Key Concepts:</h5>
                               <div className="flex flex-wrap gap-2">

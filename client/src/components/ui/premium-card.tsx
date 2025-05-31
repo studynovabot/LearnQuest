@@ -13,19 +13,19 @@ interface PremiumCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const PremiumCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(
-  ({ 
-    className, 
-    variant = "default", 
+  ({
+    className,
+    variant = "default",
     gradient,
     glow = false,
     glowColor = "default",
     animate = true,
     hover = true,
-    children, 
-    ...props 
+    children,
+    ...props
   }, ref) => {
     const baseClasses = "rounded-2xl transition-all duration-300 ease-out";
-    
+
     const variantClasses = {
       default: "bg-card border border-border shadow-premium",
       glass: "glass-card",
@@ -59,7 +59,7 @@ const PremiumCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(
         {variant !== "default" && (
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
         )}
-        
+
         {/* Content */}
         <div className="relative z-10">
           {children}
@@ -80,7 +80,7 @@ const PremiumCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          whileHover={hover ? { y: -4, scale: 1.02 } : undefined}
+          whileHover={hover ? { y: -2 } : undefined}
           className="w-full"
         >
           {cardContent}
