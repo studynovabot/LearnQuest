@@ -57,11 +57,16 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
   return (
     <div className="min-h-screen relative flex">
-      {/* New Sliding Sidebar */}
-      <SlidingSidebar />
+      {/* Desktop Sliding Sidebar - only visible on desktop */}
+      <div className="hidden lg:block">
+        <SlidingSidebar />
+      </div>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col">
+      <div className={cn(
+        "flex-1 flex flex-col",
+        "lg:ml-20" // Add left margin for sidebar on desktop
+      )}>
         {/* Header with logout - mobile only */}
         <header className="lg:hidden bg-card border-b border-border mobile-header pt-safe flex items-center justify-between">
           <Link href="/">
@@ -102,34 +107,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           </Button>
         </div>
 
-        {/* Mobile bottom navigation */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 mobile-nav z-10">
-          <div className="flex justify-around items-center">
-            {mobileNavItems.map((item, index) => (
-              <Link key={index} href={item.path}>
-                <button className={cn(
-                  "mobile-nav-item flex flex-col items-center justify-center transition-colors",
-                  item.active
-                    ? "text-primary bg-primary/10 border border-primary/20"
-                    : "text-muted-foreground hover:text-primary"
-                )}>
-                  <item.icon
-                    className={cn(
-                      "mb-1 transition-colors",
-                      item.active ? "text-primary" : ""
-                    )}
-                    size={24}
-                  />
-                  <span className={cn(
-                    "text-xs font-medium transition-colors",
-                    item.active ? "text-primary" : ""
-                  )}>{item.label}</span>
-                </button>
-              </Link>
-            ))}
-          </div>
-        </div>
-
         {/* Main content container */}
         <div className={cn(
           "flex-1 container mx-auto max-w-7xl",
@@ -145,7 +122,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           {showProfileModal && <ProfileSettingsModal onClose={() => setShowProfileModal(false)} />}
         </div>
 
-        {/* Premium Floating Navigation for Mobile */}
+        {/* Premium Floating Navigation for Mobile - replaces bottom nav */}
         <div className="lg:hidden">
           <FloatingNav variant="bottom" />
         </div>

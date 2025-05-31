@@ -29,87 +29,79 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
   ];
 
   return (
-    <>
-      {/* Sliding Sidebar */}
-      <div
-        id="sliding-sidebar"
-        className={cn(
-          "fixed left-0 top-0 h-full bg-card border-r border-border z-50 transition-all duration-300 ease-in-out",
-          "flex flex-col shadow-lg group",
-          "w-20 hover:w-64",
-          className
-        )}
-      >
-        {/* Header with logo only */}
-        <div className="flex items-center p-4 border-b border-border">
-          {/* Logo - always visible */}
-          <div className="flex items-center gap-3 transition-all duration-300">
-            <NovaLogo size="sm" iconOnly={true} />
-            <div className={cn(
-              "transition-all duration-300 overflow-hidden",
-              "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs"
-            )}>
-              <h1 className="text-lg font-bold whitespace-nowrap">Nova AI</h1>
-              <p className="text-xs text-muted-foreground whitespace-nowrap">Your AI Study Buddy</p>
-            </div>
+    <div
+      id="sliding-sidebar"
+      className={cn(
+        "fixed left-0 top-0 h-full bg-card border-r border-border z-50 transition-all duration-300 ease-in-out",
+        "flex flex-col shadow-lg group",
+        "w-20 hover:w-64",
+        className
+      )}
+    >
+      {/* Header with logo only */}
+      <div className="flex items-center p-4 border-b border-border">
+        {/* Logo - always visible */}
+        <div className="flex items-center gap-3 transition-all duration-300">
+          <NovaLogo size="sm" iconOnly={true} />
+          <div className={cn(
+            "transition-all duration-300 overflow-hidden",
+            "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs"
+          )}>
+            <h1 className="text-lg font-bold whitespace-nowrap">Nova AI</h1>
+            <p className="text-xs text-muted-foreground whitespace-nowrap">Your AI Study Buddy</p>
           </div>
         </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <div className="space-y-2">
-            {navItems.map((item, index) => (
-              <Link key={index} href={item.path}>
-                <button
-                  className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors",
-                    "group relative",
-                    location === item.path
-                      ? "bg-primary/10 text-primary border border-primary/20"
-                      : "text-foreground hover:text-primary"
-                  )}
-                >
-                  <item.icon
-                    size={22}
-                    className={cn(
-                      "flex-shrink-0 transition-colors",
-                      location === item.path ? "text-primary" : ""
-                    )}
-                  />
-
-                  {/* Label - visible on hover */}
-                  <span className={cn(
-                    "text-base font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-                    "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs",
-                    location === item.path ? "text-primary" : ""
-                  )}>
-                    {item.label}
-                  </span>
-                </button>
-              </Link>
-            ))}
-          </div>
-        </nav>
-
-        {/* Theme Toggle at bottom */}
-        <div className="p-4 border-t border-border">
-          <div className="flex items-center gap-3">
-            <ThemeToggleCompact className="flex-shrink-0" />
-            <span className={cn(
-              "text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-              "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs"
-            )}>
-              Toggle Theme
-            </span>
-          </div>
-        </div>
-
-
       </div>
 
-      {/* Spacer for desktop layout */}
-      <div className="w-20" />
-    </>
+      {/* Navigation */}
+      <nav className="flex-1 p-4">
+        <div className="space-y-2">
+          {navItems.map((item, index) => (
+            <Link key={index} href={item.path}>
+              <button
+                className={cn(
+                  "w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors",
+                  "group relative",
+                  location === item.path
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-foreground hover:text-primary"
+                )}
+              >
+                <item.icon
+                  size={22}
+                  className={cn(
+                    "flex-shrink-0 transition-colors",
+                    location === item.path ? "text-primary" : ""
+                  )}
+                />
+
+                {/* Label - visible on hover */}
+                <span className={cn(
+                  "text-base font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
+                  "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs",
+                  location === item.path ? "text-primary" : ""
+                )}>
+                  {item.label}
+                </span>
+              </button>
+            </Link>
+          ))}
+        </div>
+      </nav>
+
+      {/* Theme Toggle at bottom */}
+      <div className="p-4 border-t border-border">
+        <div className="flex items-center gap-3">
+          <ThemeToggleCompact className="flex-shrink-0" />
+          <span className={cn(
+            "text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
+            "opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs"
+          )}>
+            Toggle Theme
+          </span>
+        </div>
+      </div>
+    </div>
   );
 };
 
