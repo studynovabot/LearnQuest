@@ -112,13 +112,13 @@ function Router() {
 }
 
 function InnerApp() {
-  // Use the health check hook to verify backend connection
-  const { status } = useHealthCheck();
+  // Temporarily disable health check to isolate null errors
+  // const { status } = useHealthCheck();
 
   // Log the backend connection status
-  useEffect(() => {
-    console.log('Backend connection status:', status);
-  }, [status]);
+  // useEffect(() => {
+  //   console.log('Backend connection status:', status);
+  // }, [status]);
 
   return (
     <ThemeProvider

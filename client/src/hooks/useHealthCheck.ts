@@ -115,7 +115,7 @@ export function useHealthCheck() {
             retryCount++;
             console.log(`Retrying health check (${retryCount}/${maxRetries})...`);
             // Wait before retrying (exponential backoff)
-            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount - 1)));
+            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount - 1))).catch(() => {});
           } else {
             // If all retries failed, try a fallback approach
             try {
@@ -162,6 +162,13 @@ export function useHealthCheck() {
           }
         }
       }
+    } catch (globalError) {
+      console.error('Global health check error:', globalError);
+      setStatus({
+        status: 'error',
+        message: 'Health check failed due to unexpected error',
+        timestamp: new Date().toISOString(),
+      });
     } finally {
       setIsChecking(false);
     }
@@ -169,7 +176,13 @@ export function useHealthCheck() {
 
   // Run health check on component mount - always use real backend
   useEffect(() => {
-    checkHealth();
+    try {
+      checkHealth().catch((error) => {
+        console.error('Health check initialization error:', error);
+      });
+    } catch (error) {
+      console.error('Health check useEffect error:', error);
+    }
   }, []);
 
   return {

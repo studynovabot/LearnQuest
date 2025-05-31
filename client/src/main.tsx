@@ -5,12 +5,27 @@ import "./index.css";
 
 // Add global error handling
 window.addEventListener('error', (event) => {
-  console.error('Global error caught:', event.error);
+  console.error('Global error caught:', {
+    error: event.error,
+    message: event.message,
+    filename: event.filename,
+    lineno: event.lineno,
+    colno: event.colno,
+    stack: event.error?.stack
+  });
+  // Prevent the error from being logged multiple times
+  event.preventDefault();
 });
 
 // Add unhandled promise rejection handling
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('Unhandled promise rejection:', event.reason);
+  console.error('Unhandled promise rejection:', {
+    reason: event.reason,
+    promise: event.promise,
+    stack: event.reason?.stack
+  });
+  // Prevent the error from being logged to console again
+  event.preventDefault();
 });
 
 console.log('Starting application...');

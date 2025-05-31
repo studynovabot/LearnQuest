@@ -27,27 +27,38 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Try to get user from localStorage
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
+          try {
+            const parsedUser = JSON.parse(storedUser);
 
-          // Check if this is an old mock user that needs to be replaced
-          if (parsedUser.id === 'user-123' || parsedUser.id.startsWith('demo-user') || parsedUser.id.startsWith('mock-') || parsedUser.id.startsWith('fallback-')) {
-            console.log('Found old mock user, clearing...');
+            // Check if this is an old mock user that needs to be replaced
+            if (parsedUser.id === 'user-123' || parsedUser.id.startsWith('demo-user') || parsedUser.id.startsWith('mock-') || parsedUser.id.startsWith('fallback-')) {
+              console.log('Found old mock user, clearing...');
+              localStorage.removeItem('user');
+              setUser(null);
+            } else {
+              setUser(parsedUser);
+              console.log('User loaded from localStorage:', parsedUser);
+            }
+          } catch (parseError) {
+            console.error('Failed to parse stored user data:', parseError);
             localStorage.removeItem('user');
             setUser(null);
-          } else {
-            setUser(parsedUser);
-            console.log('User loaded from localStorage:', parsedUser);
           }
         } else {
-          // In development, try to auto-login with your credentials
-          if (import.meta.env.DEV) {
-            console.log('Development mode - attempting auto-login...');
-            await createDeveloperUser();
-          } else {
-            // In production, no auto-login - user must register/login manually
-            console.log('Production mode - user must login manually');
+          // Temporarily disable auto-login to isolate null errors
+          // if (import.meta.env.DEV) {
+          //   console.log('Development mode - attempting auto-login...');
+          //   try {
+          //     await createDeveloperUser();
+          //   } catch (devError) {
+          //     console.error('Developer auto-login failed:', devError);
+          //     setUser(null);
+          //   }
+          // } else {
+            // No auto-login - user must register/login manually
+            console.log('No auto-login - user must login manually');
             setUser(null);
-          }
+          // }
         }
       } catch (error) {
         console.error("Authentication check failed:", error);
@@ -57,7 +68,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     };
 
-    checkAuth();
+    checkAuth().catch((error) => {
+      console.error('checkAuth promise rejection:', error);
+      setLoading(false);
+    });
   }, []);
 
   // Create developer user for local development only
@@ -123,12 +137,18 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
+      }).catch((fetchError) => {
+        console.error('Login fetch error:', fetchError);
+        throw new Error(`Network error: ${fetchError.message}`);
       });
 
       console.log('📥 Login response status:', response.status);
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json().catch((jsonError) => {
+          console.error('Login response JSON parse error:', jsonError);
+          throw new Error('Invalid response format');
+        });
         console.log('✅ Login successful:', data);
 
         // Store the user data from the response with first login flag
@@ -175,12 +195,18 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
+      }).catch((fetchError) => {
+        console.error('Register fetch error:', fetchError);
+        throw new Error(`Network error: ${fetchError.message}`);
       });
 
       console.log('📥 Registration response status:', response.status);
 
       if (response.ok) {
-        const userData = await response.json();
+        const userData = await response.json().catch((jsonError) => {
+          console.error('Register response JSON parse error:', jsonError);
+          throw new Error('Invalid response format');
+        });
         console.log('✅ Registration successful:', userData);
 
         // Store the user data from the response with first login flag
@@ -228,7 +254,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // For now, just use the stored user
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (parseError) {
+          console.error('Failed to parse stored user data in refresh:', parseError);
+          localStorage.removeItem('user');
+          setUser(null);
+        }
       }
     } catch (error) {
       console.error("Failed to refresh user:", error);

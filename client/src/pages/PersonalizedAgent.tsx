@@ -180,10 +180,16 @@ const PersonalizedAgent = () => {
             overallProgress
           }
         })
+      }).catch((fetchError) => {
+        console.error('PersonalizedAgent fetch error:', fetchError);
+        throw new Error(`Network error: ${fetchError.message}`);
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json().catch((jsonError) => {
+          console.error('PersonalizedAgent response JSON parse error:', jsonError);
+          return { content: 'Sorry, I encountered an error parsing the response. Please try again.' };
+        });
         const assistantResponse = {
           id: Date.now().toString() + '-assistant',
           role: 'assistant',
