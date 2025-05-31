@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PremiumCard } from "./premium-card";
 import { GradientButton, GlassButton } from "./premium-button";
 import { SendIcon, RobotIcon, UserIcon } from "./icons";
+import { useAdvancedTheme } from "@/hooks/useAdvancedTheme";
 
 interface PremiumChatBubbleProps {
   message: string;
@@ -24,8 +25,9 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
 }) => {
   const [displayedText, setDisplayedText] = React.useState("");
   const [isComplete, setIsComplete] = React.useState(false);
+  const { themeConfig, selectedTheme } = useAdvancedTheme();
 
-  // Typewriter effect for AI messages
+  // Enhanced typewriter effect with theme-aware timing
   React.useEffect(() => {
     if (isUser || isTyping) {
       setDisplayedText(message);
@@ -33,7 +35,12 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
       return;
     }
 
+    setDisplayedText("");
+    setIsComplete(false);
+
     let index = 0;
+    const typingSpeed = selectedTheme === 'minimalist-gray' ? 20 : 30; // Faster for minimalist theme
+
     const timer = setInterval(() => {
       if (index < message.length) {
         setDisplayedText(message.slice(0, index + 1));
@@ -42,10 +49,10 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
         setIsComplete(true);
         clearInterval(timer);
       }
-    }, 30);
+    }, typingSpeed);
 
     return () => clearInterval(timer);
-  }, [message, isUser, isTyping]);
+  }, [message, isUser, isTyping, selectedTheme]);
 
   return (
     <motion.div
@@ -92,9 +99,10 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
           className={cn(
             "px-4 py-3 rounded-2xl relative overflow-hidden",
             "backdrop-blur-md border transition-all duration-300",
+            "theme-transition", // Add theme transition class
             isUser
-              ? "bg-primary/20 border-primary/30 text-primary-foreground ml-auto gradient-primary text-white shadow-glow"
-              : "glass-card-strong hover:shadow-premium"
+              ? getThemeAwareUserBubbleClasses(selectedTheme)
+              : getThemeAwareAIBubbleClasses(selectedTheme)
           )}
         >
           {/* Shimmer effect for user messages */}
@@ -195,6 +203,7 @@ const PremiumChatInput: React.FC<PremiumChatInputProps> = ({
   className
 }) => {
   const [isFocused, setIsFocused] = React.useState(false);
+  const { selectedTheme } = useAdvancedTheme();
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -232,11 +241,11 @@ const PremiumChatInput: React.FC<PremiumChatInputProps> = ({
                 className={cn(
                   "w-full resize-none rounded-xl px-4 py-3 pr-12",
                   "glass-card border-glass-border-strong",
-                  "focus:outline-none focus:ring-2 focus:ring-primary/50",
+                  "focus:outline-none focus:ring-2",
                   "placeholder:text-muted-foreground",
-                  "transition-all duration-300",
+                  "transition-all duration-300 theme-transition",
                   "text-sm leading-relaxed",
-                  isFocused && "shadow-glow"
+                  getThemeAwareInputClasses(selectedTheme, isFocused)
                 )}
                 style={{ minHeight: '48px', maxHeight: '120px' }}
               />
@@ -291,6 +300,64 @@ const PremiumChatContainer: React.FC<PremiumChatContainerProps> = ({
     {children}
   </PremiumCard>
 );
+
+// Theme-aware styling functions
+const getThemeAwareUserBubbleClasses = (theme: string): string => {
+  const baseClasses = "ml-auto text-white shadow-glow";
+
+  switch (theme) {
+    case 'ocean-blue':
+      return `${baseClasses} bg-gradient-to-r from-blue-500 to-blue-600 border-blue-400/30`;
+    case 'forest-green':
+      return `${baseClasses} bg-gradient-to-r from-green-500 to-green-600 border-green-400/30`;
+    case 'sunset-orange':
+      return `${baseClasses} bg-gradient-to-r from-orange-500 to-orange-600 border-orange-400/30`;
+    case 'purple-galaxy':
+      return `${baseClasses} bg-gradient-to-r from-purple-500 to-purple-600 border-purple-400/30`;
+    case 'minimalist-gray':
+      return `${baseClasses} bg-gradient-to-r from-gray-600 to-gray-700 border-gray-500/30`;
+    default:
+      return `${baseClasses} bg-gradient-to-r from-primary to-primary/90 border-primary/30`;
+  }
+};
+
+const getThemeAwareAIBubbleClasses = (theme: string): string => {
+  const baseClasses = "glass-card-strong hover:shadow-premium";
+
+  switch (theme) {
+    case 'ocean-blue':
+      return `${baseClasses} bg-blue-500/10 border-blue-400/20 hover:border-blue-400/40`;
+    case 'forest-green':
+      return `${baseClasses} bg-green-500/10 border-green-400/20 hover:border-green-400/40`;
+    case 'sunset-orange':
+      return `${baseClasses} bg-orange-500/10 border-orange-400/20 hover:border-orange-400/40`;
+    case 'purple-galaxy':
+      return `${baseClasses} bg-purple-500/10 border-purple-400/20 hover:border-purple-400/40`;
+    case 'minimalist-gray':
+      return `${baseClasses} bg-gray-500/10 border-gray-400/20 hover:border-gray-400/40`;
+    default:
+      return baseClasses;
+  }
+};
+
+const getThemeAwareInputClasses = (theme: string, isFocused: boolean): string => {
+  const focusClasses = isFocused ? "shadow-glow" : "";
+
+  switch (theme) {
+    case 'ocean-blue':
+      return `focus:ring-blue-500/50 ${focusClasses}`;
+    case 'forest-green':
+      return `focus:ring-green-500/50 ${focusClasses}`;
+    case 'sunset-orange':
+      return `focus:ring-orange-500/50 ${focusClasses}`;
+    case 'purple-galaxy':
+      return `focus:ring-purple-500/50 ${focusClasses}`;
+    case 'minimalist-gray':
+      return `focus:ring-gray-500/50 ${focusClasses}`;
+    default:
+      return `focus:ring-primary/50 ${focusClasses}`;
+  }
+};
 
 export {
   PremiumChatBubble,

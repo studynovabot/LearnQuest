@@ -2,6 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { EyeIcon, EyeOffIcon } from "./icons";
+import { useAdvancedTheme } from "@/hooks/useAdvancedTheme";
 
 interface PremiumInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -12,19 +13,20 @@ interface PremiumInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
-  ({ 
-    className, 
-    type = "text", 
-    label, 
-    error, 
-    icon, 
+  ({
+    className,
+    type = "text",
+    label,
+    error,
+    icon,
     variant = "glass",
     floatingLabel = true,
-    ...props 
+    ...props
   }, ref) => {
     const [isFocused, setIsFocused] = React.useState(false);
     const [hasValue, setHasValue] = React.useState(false);
     const [showPassword, setShowPassword] = React.useState(false);
+    const { selectedTheme } = useAdvancedTheme();
 
     React.useEffect(() => {
       setHasValue(!!props.value || !!props.defaultValue);
@@ -33,10 +35,13 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
     const isPasswordType = type === "password";
     const inputType = isPasswordType && showPassword ? "text" : type;
 
-    const variantClasses = {
-      default: "bg-background border border-input",
-      glass: "glass-card border-glass-border-strong",
-      gradient: "bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20"
+    const getThemeAwareVariantClasses = () => {
+      const baseClasses = {
+        default: "bg-background border border-input",
+        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(selectedTheme)}`,
+        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(selectedTheme)} border ${getThemeAwareBorderColor(selectedTheme)}`
+      };
+      return baseClasses;
     };
 
     return (
@@ -54,13 +59,14 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
             ref={ref}
             type={inputType}
             className={cn(
-              "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300",
-              "focus:outline-none focus:ring-2 focus:ring-primary/50",
+              "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300 theme-transition",
+              "focus:outline-none focus:ring-2",
               "placeholder:text-muted-foreground",
-              variantClasses[variant],
+              getThemeAwareVariantClasses()[variant],
               icon && "pl-10",
               (isPasswordType || floatingLabel) && "pr-10",
-              isFocused && variant === "glass" && "shadow-glow",
+              isFocused && variant === "glass" && getThemeAwareFocusGlow(selectedTheme),
+              getThemeAwareFocusRing(selectedTheme),
               error && "border-red-500 focus:ring-red-500/50"
             )}
             onFocus={(e) => {
@@ -148,26 +154,30 @@ interface PremiumSelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 }
 
 const PremiumSelect = React.forwardRef<HTMLSelectElement, PremiumSelectProps>(
-  ({ 
-    className, 
-    label, 
-    error, 
-    options, 
+  ({
+    className,
+    label,
+    error,
+    options,
     variant = "glass",
     floatingLabel = true,
-    ...props 
+    ...props
   }, ref) => {
     const [isFocused, setIsFocused] = React.useState(false);
     const [hasValue, setHasValue] = React.useState(false);
+    const { selectedTheme } = useAdvancedTheme();
 
     React.useEffect(() => {
       setHasValue(!!props.value || !!props.defaultValue);
     }, [props.value, props.defaultValue]);
 
-    const variantClasses = {
-      default: "bg-background border border-input",
-      glass: "glass-card border-glass-border-strong",
-      gradient: "bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20"
+    const getThemeAwareSelectVariantClasses = () => {
+      const baseClasses = {
+        default: "bg-background border border-input",
+        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(selectedTheme)}`,
+        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(selectedTheme)} border ${getThemeAwareBorderColor(selectedTheme)}`
+      };
+      return baseClasses;
     };
 
     return (
@@ -176,11 +186,12 @@ const PremiumSelect = React.forwardRef<HTMLSelectElement, PremiumSelectProps>(
           <motion.select
             ref={ref}
             className={cn(
-              "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300",
-              "focus:outline-none focus:ring-2 focus:ring-primary/50",
+              "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300 theme-transition",
+              "focus:outline-none focus:ring-2",
               "appearance-none cursor-pointer",
-              variantClasses[variant],
-              isFocused && variant === "glass" && "shadow-glow",
+              getThemeAwareSelectVariantClasses()[variant],
+              isFocused && variant === "glass" && getThemeAwareFocusGlow(selectedTheme),
+              getThemeAwareFocusRing(selectedTheme),
               error && "border-red-500 focus:ring-red-500/50"
             )}
             onFocus={(e) => {
@@ -261,25 +272,29 @@ interface PremiumTextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 }
 
 const PremiumTextarea = React.forwardRef<HTMLTextAreaElement, PremiumTextareaProps>(
-  ({ 
-    className, 
-    label, 
-    error, 
+  ({
+    className,
+    label,
+    error,
     variant = "glass",
     floatingLabel = true,
-    ...props 
+    ...props
   }, ref) => {
     const [isFocused, setIsFocused] = React.useState(false);
     const [hasValue, setHasValue] = React.useState(false);
+    const { selectedTheme } = useAdvancedTheme();
 
     React.useEffect(() => {
       setHasValue(!!props.value || !!props.defaultValue);
     }, [props.value, props.defaultValue]);
 
-    const variantClasses = {
-      default: "bg-background border border-input",
-      glass: "glass-card border-glass-border-strong",
-      gradient: "bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20"
+    const getThemeAwareTextareaVariantClasses = () => {
+      const baseClasses = {
+        default: "bg-background border border-input",
+        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(selectedTheme)}`,
+        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(selectedTheme)} border ${getThemeAwareBorderColor(selectedTheme)}`
+      };
+      return baseClasses;
     };
 
     return (
@@ -288,11 +303,12 @@ const PremiumTextarea = React.forwardRef<HTMLTextAreaElement, PremiumTextareaPro
           <motion.textarea
             ref={ref}
             className={cn(
-              "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300",
-              "focus:outline-none focus:ring-2 focus:ring-primary/50",
+              "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300 theme-transition",
+              "focus:outline-none focus:ring-2",
               "placeholder:text-muted-foreground resize-none",
-              variantClasses[variant],
-              isFocused && variant === "glass" && "shadow-glow",
+              getThemeAwareTextareaVariantClasses()[variant],
+              isFocused && variant === "glass" && getThemeAwareFocusGlow(selectedTheme),
+              getThemeAwareFocusRing(selectedTheme),
               error && "border-red-500 focus:ring-red-500/50"
             )}
             onFocus={(e) => {
@@ -351,6 +367,92 @@ const PremiumTextarea = React.forwardRef<HTMLTextAreaElement, PremiumTextareaPro
 );
 
 PremiumTextarea.displayName = "PremiumTextarea";
+
+// Theme-aware styling functions for forms
+const getThemeAwareGlassClasses = (theme: string): string => {
+  switch (theme) {
+    case 'ocean-blue':
+      return 'hover:bg-blue-500/5 focus-within:bg-blue-500/5';
+    case 'forest-green':
+      return 'hover:bg-green-500/5 focus-within:bg-green-500/5';
+    case 'sunset-orange':
+      return 'hover:bg-orange-500/5 focus-within:bg-orange-500/5';
+    case 'purple-galaxy':
+      return 'hover:bg-purple-500/5 focus-within:bg-purple-500/5';
+    case 'minimalist-gray':
+      return 'hover:bg-gray-500/5 focus-within:bg-gray-500/5';
+    default:
+      return 'hover:bg-primary/5 focus-within:bg-primary/5';
+  }
+};
+
+const getThemeAwareFormGradient = (theme: string): string => {
+  switch (theme) {
+    case 'ocean-blue':
+      return 'from-blue-500/5 to-cyan-500/5';
+    case 'forest-green':
+      return 'from-green-500/5 to-emerald-500/5';
+    case 'sunset-orange':
+      return 'from-orange-500/5 to-yellow-500/5';
+    case 'purple-galaxy':
+      return 'from-purple-500/5 to-pink-500/5';
+    case 'minimalist-gray':
+      return 'from-gray-500/5 to-slate-500/5';
+    default:
+      return 'from-primary/5 to-secondary/5';
+  }
+};
+
+const getThemeAwareBorderColor = (theme: string): string => {
+  switch (theme) {
+    case 'ocean-blue':
+      return 'border-blue-500/20';
+    case 'forest-green':
+      return 'border-green-500/20';
+    case 'sunset-orange':
+      return 'border-orange-500/20';
+    case 'purple-galaxy':
+      return 'border-purple-500/20';
+    case 'minimalist-gray':
+      return 'border-gray-500/20';
+    default:
+      return 'border-primary/20';
+  }
+};
+
+const getThemeAwareFocusGlow = (theme: string): string => {
+  switch (theme) {
+    case 'ocean-blue':
+      return 'shadow-glow-blue';
+    case 'forest-green':
+      return 'shadow-glow-green';
+    case 'sunset-orange':
+      return 'shadow-glow-orange';
+    case 'purple-galaxy':
+      return 'shadow-glow';
+    case 'minimalist-gray':
+      return 'shadow-md';
+    default:
+      return 'shadow-glow';
+  }
+};
+
+const getThemeAwareFocusRing = (theme: string): string => {
+  switch (theme) {
+    case 'ocean-blue':
+      return 'focus:ring-blue-500/50';
+    case 'forest-green':
+      return 'focus:ring-green-500/50';
+    case 'sunset-orange':
+      return 'focus:ring-orange-500/50';
+    case 'purple-galaxy':
+      return 'focus:ring-purple-500/50';
+    case 'minimalist-gray':
+      return 'focus:ring-gray-500/50';
+    default:
+      return 'focus:ring-primary/50';
+  }
+};
 
 export {
   PremiumInput,

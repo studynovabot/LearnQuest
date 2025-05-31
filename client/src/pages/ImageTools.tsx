@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAdvancedTheme } from "@/hooks/useAdvancedTheme";
 import { Badge } from "@/components/ui/badge";
 import { ImageIcon, UploadIcon, WandIcon, EyeIcon, LoaderIcon, SparklesIcon } from "@/components/ui/icons";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 const ImageTools = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { selectedTheme, themeConfig } = useAdvancedTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Text to Image states
@@ -751,6 +753,41 @@ const ImageTools = () => {
       </div>
     </>
   );
+};
+
+// Theme-aware styling functions for image tools
+const getThemeAwareImageCardClasses = (theme: string): string => {
+  switch (theme) {
+    case 'ocean-blue':
+      return 'border-blue-400/20 hover:border-blue-400/40';
+    case 'forest-green':
+      return 'border-green-400/20 hover:border-green-400/40';
+    case 'sunset-orange':
+      return 'border-orange-400/20 hover:border-orange-400/40';
+    case 'purple-galaxy':
+      return 'border-purple-400/20 hover:border-purple-400/40';
+    case 'minimalist-gray':
+      return 'border-gray-400/20 hover:border-gray-400/40';
+    default:
+      return 'border-primary/20 hover:border-primary/40';
+  }
+};
+
+const getThemeAwareImageShadow = (theme: string): string => {
+  switch (theme) {
+    case 'ocean-blue':
+      return 'hover:shadow-glow-blue';
+    case 'forest-green':
+      return 'hover:shadow-glow-green';
+    case 'sunset-orange':
+      return 'hover:shadow-glow-orange';
+    case 'purple-galaxy':
+      return 'hover:shadow-glow';
+    case 'minimalist-gray':
+      return 'hover:shadow-lg';
+    default:
+      return 'hover:shadow-glow';
+  }
 };
 
 export default ImageTools;
