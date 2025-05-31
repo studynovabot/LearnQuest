@@ -183,7 +183,13 @@ const PersonalizedAgent = () => {
       });
 
       if (response.ok) {
-        const assistantResponse = await response.json();
+        const data = await response.json();
+        const assistantResponse = {
+          id: Date.now().toString() + '-assistant',
+          role: 'assistant',
+          content: data.content || data.message || 'Sorry, I encountered an error. Please try again.',
+          timestamp: new Date()
+        };
         setChatHistory(prev => [...prev, assistantResponse]);
       } else {
         throw new Error('Failed to get response');
@@ -347,7 +353,7 @@ const PersonalizedAgent = () => {
                             <PremiumChatBubble
                               message={msg.content}
                               isUser={msg.role === 'user'}
-                              timestamp={msg.timestamp}
+                              timestamp={msg.timestamp instanceof Date ? msg.timestamp.toLocaleTimeString() : msg.timestamp}
                               avatar={msg.role === 'user' ? <UserIcon size={16} /> : <SparklesIcon size={16} />}
                             />
                           </motion.div>
@@ -371,7 +377,7 @@ const PersonalizedAgent = () => {
                         placeholder="Ask about your studies, get personalized advice..."
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                        onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
                         disabled={isLoading}
                         variant="glass"
                         className="flex-1"
