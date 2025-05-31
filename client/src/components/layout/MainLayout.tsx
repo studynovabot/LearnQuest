@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import SlidingSidebar from "./SlidingSidebar";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { generateAvatar } from "@/lib/utils";
 import { FlashlightIcon, FireIcon, HomeIcon, MessageIcon, TrophyIcon, StoreIcon, CreditCardIcon, SettingsIcon, BookOpenIcon, ImageIcon, HamburgerIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
 import NovaLogo from "@/components/ui/NovaLogo";
 import { ThemeToggle, ThemeToggleCompact } from "@/components/ui/theme-toggle";
@@ -21,6 +20,18 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const { user, logout } = useAuth();
   const [location, setLocation] = useLocation();
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if screen is mobile size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint is 1024px
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Mobile navigation items
   const mobileNavItems = [
@@ -58,17 +69,16 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="min-h-screen relative flex">
       {/* Desktop Sliding Sidebar - only visible on desktop */}
-      <div className="hidden lg:block">
-        <SlidingSidebar />
-      </div>
+      {!isMobile && <SlidingSidebar />}
 
       {/* Main content area */}
       <div className={cn(
         "flex-1 flex flex-col",
-        "lg:ml-20" // Add left margin for sidebar on desktop
+        !isMobile && "ml-20" // Add left margin for sidebar on desktop
       )}>
         {/* Header with logout - mobile only */}
-        <header className="lg:hidden bg-card border-b border-border mobile-header pt-safe flex items-center justify-between">
+        {isMobile && (
+          <header className="bg-card border-b border-border mobile-header pt-safe flex items-center justify-between">
           <Link href="/">
             <div className="flex items-center gap-4">
               <NovaLogo size="sm" iconOnly={true} />
@@ -92,26 +102,28 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </Button>
           </div>
         </header>
+        )}
 
         {/* Desktop controls (top right) */}
-        <div className="hidden lg:flex absolute top-4 right-4 z-50 items-center gap-3">
-          <ThemeToggle size="default" variant="outline" />
-          <Button
-            variant="outline"
-            onClick={() => {
-              logout();
-              setLocation("/login");
-            }}
-          >
-            Logout
-          </Button>
-        </div>
+        {!isMobile && (
+          <div className="absolute top-4 right-4 z-50 flex items-center gap-3">
+            <ThemeToggle size="default" variant="outline" />
+            <Button
+              variant="outline"
+              onClick={() => {
+                logout();
+                setLocation("/login");
+              }}
+            >
+              Logout
+            </Button>
+          </div>
+        )}
 
         {/* Main content container */}
         <div className={cn(
           "flex-1 container mx-auto max-w-7xl",
-          "lg:px-4 lg:py-6 lg:mb-0", // Desktop styling
-          "mobile-content" // Mobile styling with proper spacing
+          !isMobile ? "px-4 py-6 mb-0" : "mobile-content" // Responsive styling
         )}>
           {/* Main content */}
           <div className="flex-grow flex flex-col gap-6">
@@ -123,9 +135,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         </div>
 
         {/* Premium Floating Navigation for Mobile - replaces bottom nav */}
-        <div className="lg:hidden">
-          <FloatingNav variant="bottom" />
-        </div>
+        {isMobile && <FloatingNav variant="bottom" />}
       </div>
     </div>
   );
