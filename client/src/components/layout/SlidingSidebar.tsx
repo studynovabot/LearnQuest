@@ -35,8 +35,18 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
         "fixed left-0 top-0 h-full bg-card border-r border-border z-50 transition-all duration-300 ease-in-out",
         "flex flex-col shadow-lg group",
         "w-20 hover:w-64",
+        // Temporary debugging styles to make sidebar very visible
+        "bg-red-500 border-4 border-yellow-500",
         className
       )}
+      style={{
+        minHeight: '100vh',
+        // Force positioning to ensure visibility
+        position: 'fixed',
+        left: '0',
+        top: '0',
+        zIndex: 9999
+      }}
     >
       {/* Header with logo only */}
       <div className="flex items-center p-4 border-b border-border">

@@ -1,5 +1,4 @@
 import { ReactNode, useState, useEffect } from "react";
-import Sidebar from "./Sidebar";
 import SlidingSidebar from "./SlidingSidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation, Link } from "wouter";
@@ -25,7 +24,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   // Check if screen is mobile size
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024); // lg breakpoint is 1024px
+      const mobile = window.innerWidth < 1024; // lg breakpoint is 1024px
+      setIsMobile(mobile);
     };
 
     checkMobile();
@@ -67,75 +67,31 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   }
 
   return (
-    <div className="min-h-screen relative flex">
-      {/* Desktop Sliding Sidebar - only visible on desktop */}
-      {!isMobile && <SlidingSidebar />}
+    <div className="min-h-screen bg-blue-500 p-8">
+      <div className="bg-white p-4 rounded">
+        <h1 className="text-2xl font-bold mb-4">Layout Debug Test</h1>
+        <p>Screen width: {typeof window !== 'undefined' ? window.innerWidth : 'unknown'}</p>
+        <p>Is mobile: {isMobile ? 'Yes' : 'No'}</p>
+        <p>User: {user?.displayName || 'Unknown'}</p>
 
-      {/* Main content area */}
-      <div className={cn(
-        "flex-1 flex flex-col",
-        !isMobile && "ml-20" // Add left margin for sidebar on desktop
-      )}>
-        {/* Header with logout - mobile only */}
-        {isMobile && (
-          <header className="bg-card border-b border-border mobile-header pt-safe flex items-center justify-between">
-          <Link href="/">
-            <div className="flex items-center gap-4">
-              <NovaLogo size="sm" iconOnly={true} />
-              <div>
-                <h1 className="mobile-subtitle">Nova AI</h1>
-                <p className="mobile-caption">Your AI Study Buddy</p>
-              </div>
+        {/* Test SlidingSidebar rendering */}
+        <div className="mt-4">
+          <h2 className="text-lg font-semibold">SlidingSidebar Test:</h2>
+          {!isMobile ? (
+            <div>
+              <p>Should render SlidingSidebar (desktop mode)</p>
+              <SlidingSidebar />
             </div>
-          </Link>
-          <div className="flex items-center gap-2">
-            <ThemeToggleCompact />
-            <Button
-              variant="outline"
-              className="mobile-button"
-              onClick={() => {
-                logout();
-                setLocation("/login");
-              }}
-            >
-              Logout
-            </Button>
-          </div>
-        </header>
-        )}
-
-        {/* Desktop controls (top right) */}
-        {!isMobile && (
-          <div className="absolute top-4 right-4 z-50 flex items-center gap-3">
-            <ThemeToggle size="default" variant="outline" />
-            <Button
-              variant="outline"
-              onClick={() => {
-                logout();
-                setLocation("/login");
-              }}
-            >
-              Logout
-            </Button>
-          </div>
-        )}
-
-        {/* Main content container */}
-        <div className={cn(
-          "flex-1 container mx-auto max-w-7xl",
-          !isMobile ? "px-4 py-6 mb-0" : "mobile-content" // Responsive styling
-        )}>
-          {/* Main content */}
-          <div className="flex-grow flex flex-col gap-6">
-            {children}
-          </div>
-
-          {/* Profile/Settings Modal */}
-          {showProfileModal && <ProfileSettingsModal onClose={() => setShowProfileModal(false)} />}
+          ) : (
+            <p>SlidingSidebar hidden (mobile mode)</p>
+          )}
         </div>
 
-        {/* Premium Floating Navigation for Mobile - replaces bottom nav */}
-        {isMobile && <FloatingNav variant="bottom" />}
+        {/* Original content */}
+        <div className="mt-8 bg-gray-100 p-4 rounded">
+          <h3 className="font-semibold mb-2">Original Content:</h3>
+          {children}
+        </div>
       </div>
     </div>
   );
