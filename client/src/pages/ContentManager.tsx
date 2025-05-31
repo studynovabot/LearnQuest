@@ -5,6 +5,7 @@ import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle, P
 import { PremiumUpload, PremiumFilePreview, PremiumProgressBar } from "@/components/ui/premium-upload";
 import { PremiumSelect, PremiumInput } from "@/components/ui/premium-form";
 import { GradientButton, GlassButton } from "@/components/ui/premium-button";
+import { useAdvancedTheme } from "@/hooks/useAdvancedTheme";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -39,6 +40,7 @@ interface UploadedContent {
 const ContentManager = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { selectedTheme, themeConfig } = useAdvancedTheme();
   const [uploadedFiles, setUploadedFiles] = useState<UploadedContent[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -474,37 +476,37 @@ const ContentManager = () => {
                         variant="document"
                         maxSize={50}
                         disabled={!selectedType || !selectedBoard || !selectedClass || !selectedSubject || !isAdmin}
-                        className="min-h-[200px]"
+                        className={`min-h-[200px] ${getThemeAwareContentUploadClasses(selectedTheme)}`}
                       />
                     )}
                   </div>
 
                   {/* Premium Upload Guidelines */}
-                  <PremiumCard variant="glass" className="bg-blue-500/5 border-blue-500/20">
+                  <PremiumCard variant="glass" className={getThemeAwareGuidelinesClasses(selectedTheme)}>
                     <PremiumCardContent className="p-4">
                       <h3 className="font-semibold mb-3 flex items-center gap-2">
-                        <CheckCircleIcon size={18} className="text-blue-500" />
+                        <CheckCircleIcon size={18} className={getThemeAwareGuidelinesIconColor(selectedTheme)} />
                         Upload Guidelines
                       </h3>
                       <ul className="text-sm text-muted-foreground space-y-2">
                         <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                          <div className={`w-1.5 h-1.5 rounded-full ${getThemeAwareBulletColor(selectedTheme)}`} />
                           Only PDF files are accepted for educational content
                         </li>
                         <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                          <div className={`w-1.5 h-1.5 rounded-full ${getThemeAwareBulletColor(selectedTheme)}`} />
                           Maximum file size: 50MB per document
                         </li>
                         <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                          <div className={`w-1.5 h-1.5 rounded-full ${getThemeAwareBulletColor(selectedTheme)}`} />
                           Files are processed automatically with AI enhancement
                         </li>
                         <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                          <div className={`w-1.5 h-1.5 rounded-full ${getThemeAwareBulletColor(selectedTheme)}`} />
                           Content becomes available instantly after processing
                         </li>
                         <li className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                          <div className={`w-1.5 h-1.5 rounded-full ${getThemeAwareBulletColor(selectedTheme)}`} />
                           Ensure correct classification for optimal organization
                         </li>
                       </ul>
@@ -679,6 +681,75 @@ const ContentManager = () => {
       </div>
     </>
   );
+};
+
+// Theme-aware styling functions for Content Manager
+const getThemeAwareContentUploadClasses = (theme: string): string => {
+  switch (theme) {
+    case 'ocean-blue':
+      return 'hover:border-blue-400/40 focus-within:border-blue-500/60';
+    case 'forest-green':
+      return 'hover:border-green-400/40 focus-within:border-green-500/60';
+    case 'sunset-orange':
+      return 'hover:border-orange-400/40 focus-within:border-orange-500/60';
+    case 'purple-galaxy':
+      return 'hover:border-purple-400/40 focus-within:border-purple-500/60';
+    case 'minimalist-gray':
+      return 'hover:border-gray-400/40 focus-within:border-gray-500/60';
+    default:
+      return 'hover:border-primary/40 focus-within:border-primary/60';
+  }
+};
+
+const getThemeAwareGuidelinesClasses = (theme: string): string => {
+  switch (theme) {
+    case 'ocean-blue':
+      return 'bg-blue-500/5 border-blue-500/20';
+    case 'forest-green':
+      return 'bg-green-500/5 border-green-500/20';
+    case 'sunset-orange':
+      return 'bg-orange-500/5 border-orange-500/20';
+    case 'purple-galaxy':
+      return 'bg-purple-500/5 border-purple-500/20';
+    case 'minimalist-gray':
+      return 'bg-gray-500/5 border-gray-500/20';
+    default:
+      return 'bg-blue-500/5 border-blue-500/20';
+  }
+};
+
+const getThemeAwareGuidelinesIconColor = (theme: string): string => {
+  switch (theme) {
+    case 'ocean-blue':
+      return 'text-blue-500';
+    case 'forest-green':
+      return 'text-green-500';
+    case 'sunset-orange':
+      return 'text-orange-500';
+    case 'purple-galaxy':
+      return 'text-purple-500';
+    case 'minimalist-gray':
+      return 'text-gray-500';
+    default:
+      return 'text-blue-500';
+  }
+};
+
+const getThemeAwareBulletColor = (theme: string): string => {
+  switch (theme) {
+    case 'ocean-blue':
+      return 'bg-blue-500';
+    case 'forest-green':
+      return 'bg-green-500';
+    case 'sunset-orange':
+      return 'bg-orange-500';
+    case 'purple-galaxy':
+      return 'bg-purple-500';
+    case 'minimalist-gray':
+      return 'bg-gray-500';
+    default:
+      return 'bg-blue-500';
+  }
 };
 
 export default ContentManager;

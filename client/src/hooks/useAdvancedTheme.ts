@@ -1,6 +1,12 @@
 import { useTheme as useNextTheme } from "next-themes";
 import { useEffect, useState, useCallback } from "react";
 import { themes, getThemeById, getDefaultTheme, type ThemeConfig } from "@/config/themes";
+import {
+  themePerformanceMonitor,
+  optimizeThemeVariables,
+  batchDOMUpdates,
+  PERFORMANCE_CONFIG
+} from "@/utils/performance";
 
 const THEME_STORAGE_KEY = 'learnquest-selected-theme';
 const THEME_MODE_STORAGE_KEY = 'learnquest-theme-mode';
@@ -16,17 +22,17 @@ export function useAdvancedTheme() {
     setMounted(true);
     const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
     const savedMode = localStorage.getItem(THEME_MODE_STORAGE_KEY);
-    
+
     if (savedTheme && getThemeById(savedTheme)) {
       setSelectedTheme(savedTheme);
     }
-    
+
     if (savedMode && ['light', 'dark', 'system'].includes(savedMode)) {
       setNextTheme(savedMode);
     }
   }, [setNextTheme]);
 
-  // Apply theme variables when theme or mode changes
+  // Apply theme variables when theme or mode changes with performance optimization
   useEffect(() => {
     if (!mounted) return;
 
@@ -34,16 +40,25 @@ export function useAdvancedTheme() {
     const isDarkMode = resolvedTheme === 'dark';
     const variables = isDarkMode ? themeConfig.variables.dark : themeConfig.variables.light;
 
-    // Apply CSS variables to document root
-    const root = document.documentElement;
-    Object.entries(variables).forEach(([property, value]) => {
-      root.style.setProperty(property, value);
-    });
+    // Optimize variables to only update changed ones
+    const optimizedVariables = optimizeThemeVariables(variables);
 
-    // Add theme class to body for additional styling
-    document.body.className = document.body.className
-      .replace(/theme-\w+/g, '')
-      .concat(` theme-${selectedTheme}`);
+    // Batch DOM updates for better performance
+    batchDOMUpdates([
+      () => {
+        // Apply CSS variables to document root
+        const root = document.documentElement;
+        Object.entries(optimizedVariables).forEach(([property, value]) => {
+          root.style.setProperty(property, value);
+        });
+      },
+      () => {
+        // Add theme class to body for additional styling
+        document.body.className = document.body.className
+          .replace(/theme-\w+/g, '')
+          .concat(` theme-${selectedTheme}`);
+      }
+    ]);
 
   }, [selectedTheme, resolvedTheme, mounted]);
 
@@ -76,22 +91,29 @@ export function useAdvancedTheme() {
       return;
     }
 
+    // Start performance monitoring
+    themePerformanceMonitor.startTransition();
+
     setIsTransitioning(true);
-    
+
     // Add transition class to body
     document.body.classList.add('theme-transitioning');
-    
+
     // Small delay to ensure smooth transition
     await new Promise(resolve => setTimeout(resolve, 50));
-    
+
     setSelectedTheme(themeId);
     localStorage.setItem(THEME_STORAGE_KEY, themeId);
-    
-    // Remove transition class after animation
+
+    // Remove transition class after animation with optimized duration
+    const transitionDuration = PERFORMANCE_CONFIG.THEME_TRANSITION_DURATION;
     setTimeout(() => {
       document.body.classList.remove('theme-transitioning');
       setIsTransitioning(false);
-    }, 300);
+
+      // End performance monitoring
+      themePerformanceMonitor.endTransition();
+    }, transitionDuration);
   }, []);
 
   const getCurrentTheme = useCallback((): ThemeConfig => {
@@ -121,7 +143,7 @@ export function useAdvancedTheme() {
     setLightTheme,
     setDarkTheme,
     setSystemTheme,
-    
+
     // Advanced theme functionality
     selectedTheme,
     changeTheme,
@@ -129,9 +151,12 @@ export function useAdvancedTheme() {
     getAvailableThemes,
     resetToDefault,
     isTransitioning,
-    
+
     // Theme utilities
     themeConfig: getCurrentTheme(),
     availableThemes: themes,
+
+    // Performance monitoring
+    performanceMetrics: themePerformanceMonitor.getMetrics(),
   };
 }

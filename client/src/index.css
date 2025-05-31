@@ -272,6 +272,87 @@
   body.theme-minimalist-gray {
     --theme-accent: #6b7280;
   }
+
+  /* Responsive glassmorphism optimizations */
+  @media (max-width: 768px) {
+    .glass-card {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .glass-card-strong {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* Reduce animation complexity on mobile for performance */
+    .theme-transitioning {
+      transition: all 200ms ease-in-out !important;
+    }
+
+    .theme-transitioning * {
+      transition: all 200ms ease-in-out !important;
+    }
+
+    /* Optimize shadow effects for mobile */
+    .shadow-glow {
+      box-shadow: 0 4px 20px rgba(var(--primary), 0.15);
+    }
+
+    .shadow-premium {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  /* Touch-friendly enhancements */
+  @media (hover: none) and (pointer: coarse) {
+    .hover\:shadow-glow:hover {
+      box-shadow: 0 4px 20px rgba(var(--primary), 0.2);
+    }
+
+    .hover\:shadow-premium:hover {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Ensure touch targets are appropriately sized */
+    button, .cursor-pointer {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .glass-card {
+      border-width: 2px;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: var(--background);
+    }
+
+    .glass-card-strong {
+      border-width: 2px;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: var(--background);
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .theme-transitioning,
+    .theme-transitioning *,
+    .theme-transition {
+      transition: none !important;
+      animation: none !important;
+    }
+
+    .animate-shimmer,
+    .animate-pulse,
+    .animate-spin {
+      animation: none !important;
+    }
+  }
 }
 
 @layer components {
