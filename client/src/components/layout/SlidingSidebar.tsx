@@ -5,7 +5,7 @@ import NovaLogo from "@/components/ui/NovaLogo";
 import { ThemeToggleCompact } from "@/components/ui/theme-toggle";
 import {
   HomeIcon, MessageIcon, FlashlightIcon, BookOpenIcon,
-  ImageIcon, SparklesIcon, UploadIcon, CreditCardIcon
+  ImageIcon, SparklesIcon, UploadIcon, CreditCardIcon, PaletteIcon
 } from "@/components/ui/icons";
 
 interface SlidingSidebarProps {
@@ -24,6 +24,7 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
     { icon: ImageIcon, label: "Image Tools", path: "/image-tools" },
     { icon: SparklesIcon, label: "Personalized Agent", path: "/personalized-agent" },
     { icon: UploadIcon, label: "Content Manager", path: "/content-manager" },
+    { icon: PaletteIcon, label: "Themes", path: "/themes" },
     { icon: CreditCardIcon, label: "Subscription", path: "/subscription" },
   ];
 

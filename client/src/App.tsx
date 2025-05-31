@@ -11,6 +11,7 @@ import ChatAgents from "@/pages/ChatAgents";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Settings from "@/pages/Settings";
+import Themes from "@/pages/Themes";
 import Subscription from "@/pages/Subscription";
 import ApiTest from "@/pages/ApiTest";
 import FlashNotes from "@/pages/FlashNotes";
@@ -57,6 +58,11 @@ function Router() {
       <Route path="/settings">
         <MainLayout>
           <Settings />
+        </MainLayout>
+      </Route>
+      <Route path="/themes">
+        <MainLayout>
+          <Themes />
         </MainLayout>
       </Route>
       <Route path="/subscription">
@@ -126,6 +132,7 @@ function InnerApp() {
       defaultTheme="system"
       enableSystem={true}
       disableTransitionOnChange={false}
+      storageKey="learnquest-theme-mode"
     >
       <UserProvider>
         <TooltipProvider>

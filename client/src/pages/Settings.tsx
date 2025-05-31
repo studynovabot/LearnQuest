@@ -12,9 +12,11 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { UserIcon, SettingsIcon, ShieldIcon, CrownIcon } from '@/components/ui/icons';
+import { UserIcon, SettingsIcon, ShieldIcon, CrownIcon, PaletteIcon } from '@/components/ui/icons';
 import { Save, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Link } from 'wouter';
+import { ThemePreviewGrid, CurrentThemeDisplay } from '@/components/ui/theme-preview';
 
 const Settings = () => {
   const { user, refreshUser } = useAuth();
@@ -234,11 +236,67 @@ const Settings = () => {
           </PremiumCard>
         </motion.div>
 
-        {/* Premium Save Button */}
+        {/* Themes Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
+        >
+          <PremiumCard variant="glass" glow={true}>
+            <PremiumCardHeader>
+              <PremiumCardTitle className="flex items-center gap-3 text-2xl">
+                <div className="p-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-lg">
+                  <PaletteIcon className="h-6 w-6 text-purple-500" />
+                </div>
+                Themes & Appearance
+              </PremiumCardTitle>
+              <PremiumCardDescription className="text-base">
+                Customize your LearnQuest visual experience
+              </PremiumCardDescription>
+            </PremiumCardHeader>
+            <PremiumCardContent className="space-y-6">
+              {/* Current Theme Display */}
+              <div className="flex items-center justify-between p-4 glass-card rounded-xl">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl">
+                    <PaletteIcon className="h-6 w-6 text-blue-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">Current Theme</h3>
+                    <CurrentThemeDisplay className="mt-1" />
+                  </div>
+                </div>
+                <Link href="/themes">
+                  <GradientButton
+                    gradient="primary"
+                    size="default"
+                    className="shadow-glow"
+                  >
+                    Customize Themes
+                  </GradientButton>
+                </Link>
+              </div>
+
+              {/* Quick Theme Preview */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-sm text-muted-foreground">Quick Preview</h4>
+                <ThemePreviewGrid
+                  columns={6}
+                  size="sm"
+                  showNames={false}
+                  showDescriptions={false}
+                  interactive={true}
+                />
+              </div>
+            </PremiumCardContent>
+          </PremiumCard>
+        </motion.div>
+
+        {/* Premium Save Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
           className="flex justify-end pt-4"
         >
           <GradientButton
