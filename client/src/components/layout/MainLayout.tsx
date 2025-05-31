@@ -49,13 +49,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   }
 
   return (
-    <div className="min-h-screen relative flex">
+    <div className="min-h-screen relative">
       {/* Desktop Sliding Sidebar - only visible on desktop */}
       {!isMobile && <SlidingSidebar />}
 
       {/* Main content area */}
       <div className={cn(
-        "flex-1 flex flex-col",
+        "flex-1 flex flex-col min-h-screen",
         !isMobile && "ml-20" // Add left margin for sidebar on desktop
       )}>
         {/* Header with logout - mobile only */}

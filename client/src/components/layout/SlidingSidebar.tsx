@@ -30,14 +30,12 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
 
   return (
     <div
-      id="sliding-sidebar"
       className={cn(
-        "fixed left-0 top-0 h-full bg-card border-r border-border z-50 transition-all duration-300 ease-in-out",
-        "flex flex-col shadow-lg group",
-        "w-20 hover:w-64",
+        "sliding-sidebar group w-20 hover:w-64 transition-all duration-300 ease-in-out",
+        "glass-card-strong border-r border-glass-border-strong",
+        "overflow-hidden flex flex-col",
         className
       )}
-      style={{ minHeight: '100vh' }}
     >
       {/* Header with logo only */}
       <div className="flex items-center p-4 border-b border-border">
