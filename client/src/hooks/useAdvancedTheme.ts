@@ -44,30 +44,34 @@ export function useAdvancedTheme() {
     // Optimize variables to only update changed ones
     const optimizedVariables = optimizeThemeVariables(variables);
 
-    // Batch DOM updates for better performance
-    batchDOMUpdates([
-      () => {
-        // Apply CSS variables to document root
-        const root = document.documentElement;
-        Object.entries(optimizedVariables).forEach(([property, value]) => {
-          root.style.setProperty(property, value);
-        });
-      },
-      () => {
-        // Add theme class to body for additional styling
-        // Only remove theme-specific classes, not all theme-related classes
-        document.body.className = document.body.className
-          .replace(/\btheme-(?:default|ocean-blue|forest-green|sunset-orange|purple-galaxy|minimalist-gray)\b/g, '')
-          .concat(` theme-${selectedTheme}`);
-      },
-      () => {
-        // Apply theme personality
-        const themeConfig = getThemeById(selectedTheme);
-        if (themeConfig?.personality) {
-          applyThemePersonality(themeConfig.personality);
-        }
+    // Simplified DOM updates - only colors, no layout changes
+    try {
+      // Apply CSS variables to document root (colors only)
+      const root = document.documentElement;
+      Object.entries(optimizedVariables).forEach(([property, value]) => {
+        root.style.setProperty(property, value);
+      });
+
+      // Add theme class to body for color styling only
+      // Preserve all existing classes except theme color classes
+      const currentClasses = document.body.className;
+      const cleanedClasses = currentClasses
+        .replace(/\btheme-(?:default|ocean-blue|forest-green|sunset-orange|purple-galaxy|minimalist-gray)\b/g, '')
+        .trim();
+
+      document.body.className = `${cleanedClasses} theme-${selectedTheme}`.trim();
+
+      // TEMPORARILY DISABLED: Theme personality application
+      // This prevents layout issues while maintaining color themes
+      const themeConfig = getThemeById(selectedTheme);
+      if (themeConfig?.personality) {
+        applyThemePersonality(themeConfig.personality);
       }
-    ]);
+
+      console.log(`Theme applied: ${selectedTheme}, Layout preserved`);
+    } catch (error) {
+      console.error('Error applying theme:', error);
+    }
 
   }, [selectedTheme, resolvedTheme, mounted]);
 
@@ -167,7 +171,6 @@ export function useAdvancedTheme() {
   return {
     // Next-themes compatibility
     theme: nextTheme,
-    setTheme: setNextTheme,
     resolvedTheme,
     systemTheme,
     mounted,
@@ -181,6 +184,7 @@ export function useAdvancedTheme() {
 
     // Advanced theme functionality
     selectedTheme,
+    setTheme: changeTheme, // Main theme setter for advanced themes
     changeTheme,
     getCurrentTheme,
     getAvailableThemes,

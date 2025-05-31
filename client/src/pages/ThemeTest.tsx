@@ -6,19 +6,55 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useTheme } from "@/hooks/useTheme";
+import { useAdvancedTheme } from "@/hooks/useAdvancedTheme";
 import { SunIcon, MoonIcon, HomeIcon, MessageIcon, ImageIcon } from "@/components/ui/icons";
 
 const ThemeTest = () => {
   const { isDark, isLight, resolvedTheme } = useTheme();
+  const { selectedTheme, setTheme, availableThemes } = useAdvancedTheme();
 
   return (
     <div className="space-y-6 p-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">Theme Test Page</h1>
         <p className="text-muted-foreground mb-4">
-          Current theme: <span className="font-semibold">{resolvedTheme}</span>
+          Current theme: <span className="font-semibold">{resolvedTheme}</span> |
+          Advanced theme: <span className="font-semibold">{selectedTheme}</span>
         </p>
-        <ThemeToggle size="lg" />
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <ThemeToggle size="lg" />
+        </div>
+
+        {/* Advanced Theme Selector */}
+        <Card className="max-w-2xl mx-auto mb-6">
+          <CardHeader>
+            <CardTitle>Advanced Theme Testing</CardTitle>
+            <CardDescription>Test color theme switching (layout-safe mode)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {availableThemes.map((theme) => (
+                <Button
+                  key={theme.id}
+                  variant={selectedTheme === theme.id ? "default" : "outline"}
+                  onClick={() => setTheme(theme.id)}
+                  className="h-auto p-3 flex flex-col items-center gap-2"
+                >
+                  <div
+                    className="w-6 h-6 rounded-full border-2 border-white/20"
+                    style={{ backgroundColor: theme.preview.primary }}
+                  />
+                  <span className="text-xs">{theme.name}</span>
+                </Button>
+              ))}
+            </div>
+            <div className="mt-4 p-3 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                ✅ Layout protection enabled - sidebar and navigation remain functional during theme changes
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

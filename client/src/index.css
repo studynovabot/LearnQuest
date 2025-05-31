@@ -173,11 +173,17 @@
 }
 
 @layer base {
-  * {
+  /* FIXED: More specific selector to avoid interfering with layout components */
+  *:not(#sliding-sidebar):not([data-sidebar]):not(.sidebar):not(nav):not(header):not(.mobile-header):not(.floating-nav):not(.mobile-nav) {
     @apply border-[hsl(var(--border))];
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;
+  }
+
+  /* Ensure layout components have no unwanted transitions */
+  #sliding-sidebar, [data-sidebar], .sidebar, nav, header, .mobile-header, .floating-nav, .mobile-nav {
+    transition: none !important;
   }
 
   body {
@@ -446,7 +452,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Theme Personality System - Border Radius */
+  /* TEMPORARILY DISABLED - Theme Personality System - Border Radius
   .theme-radius-sharp .glass-card,
   .theme-radius-sharp .premium-card,
   .theme-radius-sharp .btn-premium,
@@ -476,10 +482,11 @@
   .theme-radius-pill .input {
     border-radius: 9999px !important;
   }
+  */
 
 
 
-  /* Theme Personality System - Spacing */
+  /* TEMPORARILY DISABLED - Theme Personality System - Spacing
   .theme-spacing-compact {
     --spacing-multiplier: 0.75;
   }
@@ -517,8 +524,9 @@
   .theme-spacing-spacious .space-x-4 > * + * {
     margin: calc(var(--spacing-multiplier, 1) * 1rem);
   }
+  */
 
-  /* Theme Personality System - Density */
+  /* TEMPORARILY DISABLED - Theme Personality System - Density
   .theme-density-dense {
     line-height: 1.2;
   }
@@ -540,8 +548,9 @@
   .theme-density-airy .premium-card {
     padding: 2rem;
   }
+  */
 
-  /* Theme Personality System - Card Styles */
+  /* TEMPORARILY DISABLED - Theme Personality System - Card Styles
   .theme-cards-flat .glass-card,
   .theme-cards-flat .premium-card {
     box-shadow: none;
@@ -560,6 +569,7 @@
     box-shadow: var(--shadow-premium-lg);
     transform: translateY(-4px);
   }
+  */
 
   /* Responsive glassmorphism optimizations */
   @media (max-width: 768px) {
@@ -681,7 +691,7 @@
     transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Theme Personality System - Glassmorphism Intensity */
+  /* TEMPORARILY DISABLED - Theme Personality System - Glassmorphism Intensity
   .theme-glass-subtle .glass-card,
   .theme-glass-subtle .glass-card-strong {
     backdrop-filter: blur(8px);
@@ -704,8 +714,9 @@
     background: var(--glass-bg-strong);
     border: 2px solid var(--glass-border-strong);
   }
+  */
 
-  /* Theme Personality System - Shadow Styles */
+  /* TEMPORARILY DISABLED - Theme Personality System - Shadow Styles
   .theme-shadows-minimal .glass-card,
   .theme-shadows-minimal .premium-card,
   .theme-shadows-minimal .btn-premium,
@@ -731,6 +742,7 @@
   .theme-shadows-glow .btn-premium {
     box-shadow: var(--shadow-glow);
   }
+  */
 
   /* Glass Border Classes */
   .border-glass-border {
