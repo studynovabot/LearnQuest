@@ -644,27 +644,6 @@ export const ImageIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   </svg>
 );
 
-export const SparklesIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-    <path d="M5 3v4" />
-    <path d="M19 17v4" />
-    <path d="M3 5h4" />
-    <path d="M17 19h4" />
-  </svg>
-);
-
 export const ClockIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -1076,27 +1055,6 @@ export const CodeIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   </svg>
 );
 
-export const PaletteIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
-    <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
-    <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
-    <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
-    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
-  </svg>
-);
-
 export const LeafIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -1310,6 +1268,25 @@ export const XIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   </svg>
 );
 
+export const XCircleIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <circle cx="12" cy="12" r="10" />
+    <path d="m15 9-6 6" />
+    <path d="m9 9 6 6" />
+  </svg>
+);
+
 export const EyeOffIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -1433,6 +1410,82 @@ export const ChevronLeftIcon: React.FC<IconProps> = ({ size = 24, ...props }) =>
     {...props}
   >
     <path d="m15 18-6-6 6-6" />
+  </svg>
+);
+
+export const TestTubeIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M14.5 2v17.5c0 1.4-1.1 2.5-2.5 2.5s-2.5-1.1-2.5-2.5V2" />
+    <path d="M8.5 2h7" />
+    <path d="M16.5 6.5 20 10c1.4 1.4 1.4 3.6 0 5L16.5 18.5" />
+  </svg>
+);
+
+export const MonitorIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <rect width="20" height="14" x="2" y="3" rx="2" ry="2" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+    <line x1="12" y1="17" x2="12" y2="21" />
+  </svg>
+);
+
+export const SmartphoneIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+    <line x1="12" y1="18" x2="12.01" y2="18" />
+  </svg>
+);
+
+export const RocketIcon: React.FC<IconProps> = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+    <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+    <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
   </svg>
 );
 
