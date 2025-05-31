@@ -21,6 +21,7 @@ import ImageTools from "@/pages/ImageTools";
 import PersonalizedAgent from "@/pages/PersonalizedAgent";
 import ContentManager from "@/pages/ContentManager";
 import ThemeTest from "@/pages/ThemeTest";
+import Phase4Testing from "@/pages/Phase4Testing";
 import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
@@ -108,6 +109,11 @@ function Router() {
       <Route path="/theme-test">
         <MainLayout>
           <ThemeTest />
+        </MainLayout>
+      </Route>
+      <Route path="/phase4-testing">
+        <MainLayout>
+          <Phase4Testing />
         </MainLayout>
       </Route>
       <Route>
