@@ -378,7 +378,6 @@
   .theme-transitioning .sliding-sidebar {
     transition: width 300ms ease-in-out, background-color 300ms ease-in-out !important;
   }
-  }
 
   /* Prevent flash of unstyled content during theme switch */
   html {
