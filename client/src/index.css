@@ -174,7 +174,7 @@
 
 @layer base {
   /* FIXED: More specific selector to avoid interfering with layout components */
-  *:not(#sliding-sidebar):not([data-sidebar]):not(.sidebar):not(nav):not(header):not(.mobile-header):not(.mobile-nav) {
+  *:not(.sliding-sidebar):not([data-sidebar]):not(.sidebar):not(nav):not(header):not(.mobile-header):not(.mobile-nav) {
     @apply border-[hsl(var(--border))];
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -182,7 +182,7 @@
   }
 
   /* Ensure layout components have no unwanted transitions */
-  #sliding-sidebar, [data-sidebar], .sidebar, nav, header, .mobile-header, .mobile-nav {
+  .sliding-sidebar, [data-sidebar], .sidebar, nav, header, .mobile-header, .mobile-nav {
     transition: none !important;
   }
 
