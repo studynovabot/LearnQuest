@@ -190,6 +190,23 @@ export default function OTPLogin({ mode = 'login' }: OTPLoginProps) {
     }
   };
 
+  // Stable event handlers to prevent input focus loss
+  const handleEmailChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  }, []);
+
+  const handleDisplayNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setDisplayName(e.target.value);
+  }, []);
+
+  const handlePasswordChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  }, []);
+
+  const handleOtpChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setOtp(e.target.value.replace(/\D/g, '').slice(0, 6));
+  }, []);
+
   const EmailStep = () => (
     <form onSubmit={(e) => { e.preventDefault(); sendOTP(); }}>
       <PremiumCardContent className="space-y-6">
@@ -198,7 +215,7 @@ export default function OTPLogin({ mode = 'login' }: OTPLoginProps) {
           type="email"
           placeholder="Enter your email address"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={handleEmailChange}
           required
           variant="glass"
         />
@@ -210,7 +227,7 @@ export default function OTPLogin({ mode = 'login' }: OTPLoginProps) {
               type="text"
               placeholder="Enter your name"
               value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
+              onChange={handleDisplayNameChange}
               required
               variant="glass"
             />
@@ -219,7 +236,7 @@ export default function OTPLogin({ mode = 'login' }: OTPLoginProps) {
               type="password"
               placeholder="Create a secure password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
               required
               variant="glass"
             />
@@ -284,7 +301,7 @@ export default function OTPLogin({ mode = 'login' }: OTPLoginProps) {
           type="text"
           placeholder="Enter 6-digit code"
           value={otp}
-          onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+          onChange={handleOtpChange}
           required
           variant="glass"
           className="text-center text-2xl tracking-widest"

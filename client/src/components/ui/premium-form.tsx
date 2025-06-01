@@ -32,6 +32,22 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
     // Combine refs
     React.useImperativeHandle(ref, () => inputRef.current!);
 
+    // Stable event handlers to prevent re-renders and focus loss
+    const handleFocus = React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(true);
+      props.onFocus?.(e);
+    }, [props.onFocus]);
+
+    const handleBlur = React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(false);
+      props.onBlur?.(e);
+    }, [props.onBlur]);
+
+    const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+      setHasValue(!!e.target.value);
+      props.onChange?.(e);
+    }, [props.onChange]);
+
     React.useEffect(() => {
       setHasValue(!!props.value || !!props.defaultValue);
     }, [props.value, props.defaultValue]);
@@ -59,7 +75,7 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
           )}
 
           {/* Input */}
-          <motion.input
+          <input
             ref={inputRef}
             type={inputType}
             className={cn(
@@ -73,18 +89,9 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
               getThemeAwareFocusRing(selectedTheme),
               error && "border-red-500 focus:ring-red-500/50"
             )}
-            onFocus={React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-              setIsFocused(true);
-              props.onFocus?.(e);
-            }, [props.onFocus])}
-            onBlur={React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-              setIsFocused(false);
-              props.onBlur?.(e);
-            }, [props.onBlur])}
-            onChange={React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-              setHasValue(!!e.target.value);
-              props.onChange?.(e);
-            }, [props.onChange])}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChange={handleChange}
             {...props}
             placeholder={floatingLabel ? "" : props.placeholder}
           />
@@ -148,9 +155,6 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
 );
 
 PremiumInput.displayName = "PremiumInput";
-
-// Memoize the component to prevent unnecessary re-renders
-const MemoizedPremiumInput = React.memo(PremiumInput);
 
 interface PremiumSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -477,7 +481,7 @@ const getThemeAwareFocusRing = (theme: string): string => {
 };
 
 export {
-  MemoizedPremiumInput as PremiumInput,
+  PremiumInput,
   PremiumSelect,
   PremiumTextarea,
 };
