@@ -173,9 +173,9 @@ const PremiumSelect = React.forwardRef<HTMLSelectElement, PremiumSelectProps>(
 
     const getThemeAwareSelectVariantClasses = () => {
       const baseClasses = {
-        default: "bg-background border border-input",
-        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(selectedTheme)}`,
-        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(selectedTheme)} border ${getThemeAwareBorderColor(selectedTheme)}`
+        default: "bg-background border border-input text-foreground",
+        glass: `glass-card border-glass-border-strong text-foreground ${getThemeAwareGlassClasses(selectedTheme)}`,
+        gradient: `bg-gradient-to-r text-foreground ${getThemeAwareFormGradient(selectedTheme)} border ${getThemeAwareBorderColor(selectedTheme)}`
       };
       return baseClasses;
     };
@@ -189,6 +189,10 @@ const PremiumSelect = React.forwardRef<HTMLSelectElement, PremiumSelectProps>(
               "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300 theme-transition",
               "focus:outline-none focus:ring-2",
               "appearance-none cursor-pointer",
+              "text-foreground", // Ensure text is visible in both themes
+              "[&>option]:text-foreground [&>option]:bg-background", // Style options for visibility
+              "[&>option]:dark:text-white [&>option]:dark:bg-gray-800", // Dark mode option styling
+              "[&>option]:light:text-gray-900 [&>option]:light:bg-white", // Light mode option styling
               getThemeAwareSelectVariantClasses()[variant],
               isFocused && variant === "glass" && getThemeAwareFocusGlow(selectedTheme),
               getThemeAwareFocusRing(selectedTheme),
@@ -208,9 +212,20 @@ const PremiumSelect = React.forwardRef<HTMLSelectElement, PremiumSelectProps>(
             }}
             {...props}
           >
-            {!hasValue && <option value="">Select an option</option>}
+            {!hasValue && (
+              <option
+                value=""
+                className="text-foreground bg-background dark:text-white dark:bg-gray-800"
+              >
+                Select an option
+              </option>
+            )}
             {options.map((option) => (
-              <option key={option.value} value={option.value}>
+              <option
+                key={option.value}
+                value={option.value}
+                className="text-foreground bg-background dark:text-white dark:bg-gray-800"
+              >
                 {option.label}
               </option>
             ))}

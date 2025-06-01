@@ -439,6 +439,108 @@
     opacity: 1 !important;
   }
 
+  /* Fix dropdown text visibility in both light and dark modes */
+  select {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  select option {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  /* Dark mode specific fixes for dropdowns */
+  .dark select {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  .dark select option {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  /* Light mode specific fixes for dropdowns */
+  :not(.dark) select {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  :not(.dark) select option {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  /* Additional fixes for premium form components */
+  .glass-card select,
+  .premium-card select {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  .glass-card select option,
+  .premium-card select option {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  /* Ensure proper contrast for all form elements */
+  input, textarea, select {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  /* Fix for webkit browsers (Safari, Chrome) */
+  select::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  select::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  select::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground));
+    border-radius: 4px;
+  }
+
+  /* Force text visibility in all browsers */
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  /* Ensure option text is always visible */
+  option {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+    padding: 8px 12px;
+  }
+
+  /* Dark mode option styling */
+  .dark option {
+    color: #ffffff !important;
+    background-color: #1f2937 !important;
+  }
+
+  /* Light mode option styling */
+  :not(.dark) option {
+    color: #111827 !important;
+    background-color: #ffffff !important;
+  }
+
+  /* High contrast mode for better visibility */
+  @media (prefers-contrast: high) {
+    select, option {
+      color: hsl(var(--foreground)) !important;
+      background-color: hsl(var(--background)) !important;
+      border: 2px solid hsl(var(--border)) !important;
+    }
+  }
+
   /* Theme Personality System - Typography */
   .text-rendering-crisp {
     text-rendering: optimizeSpeed;

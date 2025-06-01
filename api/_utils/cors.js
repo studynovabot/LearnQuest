@@ -8,7 +8,9 @@ export function setCorsHeaders(res, origin = null) {
     'http://localhost:5173',
     'https://learn-quest-chi.vercel.app',
     'https://studynova.vercel.app',
-    'https://learnquest.vercel.app'
+    'https://learnquest.vercel.app',
+    'https://studynovaai.vercel.app',
+    'https://studynovabot.vercel.app'
   ];
 
   const requestOrigin = origin || 'http://localhost:3004';
@@ -21,13 +23,18 @@ export function setCorsHeaders(res, origin = null) {
   res.setHeader('Access-Control-Max-Age', '86400');
 }
 
-export function handleCors(req, res, handler) {
+export function handleCors(req, res, handler = null) {
   const origin = req.headers.origin;
   setCorsHeaders(res, origin);
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
+  }
+
+  // If no handler provided, just return null (for manual handling)
+  if (!handler) {
+    return null;
   }
 
   return handler(req, res);

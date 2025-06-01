@@ -270,18 +270,21 @@ async function verifyApiKey() {
   return results;
 }
 
-export default function handler(req, res) {
-  return handleCors(req, res, async (req, res) => {
-    console.log('🚀 Chat API called with method:', req.method);
+export default async function handler(req, res) {
+  // Handle CORS
+  const corsResult = handleCors(req, res);
+  if (corsResult) return corsResult;
 
-    if (req.method !== 'POST') {
-      console.log('❌ Method not allowed:', req.method);
-      return res.status(405).json({
-        error: true,
-        message: 'Method not allowed',
-        details: `${req.method} is not supported, use POST`
-      });
-    }
+  console.log('🚀 Chat API called with method:', req.method);
+
+  if (req.method !== 'POST') {
+    console.log('❌ Method not allowed:', req.method);
+    return res.status(405).json({
+      error: true,
+      message: 'Method not allowed',
+      details: `${req.method} is not supported, use POST`
+    });
+  }
 
     try {
       console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
@@ -377,7 +380,6 @@ export default function handler(req, res) {
         errorType: 'UNEXPECTED_ERROR'
       });
     }
-  });
 }
 
 // Map agent IDs to subjects for performance tracking
