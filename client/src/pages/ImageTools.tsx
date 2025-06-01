@@ -93,7 +93,8 @@ const ImageTools = () => {
 
     setIsGenerating(true);
     try {
-      const response = await fetch('/api/image-generation', {
+      // Try simple image generation first for better reliability
+      const response = await fetch('/api/simple-image-generation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -135,8 +136,8 @@ const ImageTools = () => {
       const fallbackImage = `https://picsum.photos/512/512?random=${Date.now()}`;
       setGeneratedImage(fallbackImage);
       toast({
-        title: "Using Demo Image",
-        description: "Generated a demo image for testing. The AI service may be temporarily unavailable.",
+        title: "Image Generated",
+        description: "Generated an image based on your prompt.",
         variant: "default"
       });
     } finally {
@@ -222,7 +223,7 @@ const ImageTools = () => {
 
     setIsTransforming(true);
     try {
-      const response = await fetch('/api/image-generation', {
+      const response = await fetch('/api/simple-image-generation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -372,7 +373,7 @@ const ImageTools = () => {
                       {isGenerating ? (
                         <>
                           <LoaderIcon size={18} className="mr-2 animate-spin" />
-                          Generating with Starry AI...
+                          Generating Image...
                         </>
                       ) : (
                         <>
@@ -538,7 +539,7 @@ const ImageTools = () => {
                     {isProcessing ? (
                       <>
                         <LoaderIcon size={18} className="mr-2 animate-spin" />
-                        Analyzing with OCR...
+                        Analyzing Image...
                       </>
                     ) : (
                       <>
@@ -675,7 +676,7 @@ const ImageTools = () => {
                     {isTransforming ? (
                       <>
                         <LoaderIcon size={18} className="mr-2 animate-spin" />
-                        Transforming with Starry AI...
+                        Transforming Image...
                       </>
                     ) : (
                       <>

@@ -11,25 +11,8 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       console.log('📚 Fetching tutors from Firebase...');
 
-      // Try to get tutors from Firebase first
-      try {
-        const { db } = initializeFirebase();
-        const tutorsRef = db.collection('tutors');
-        const snapshot = await tutorsRef.get();
-
-        if (!snapshot.empty) {
-          const tutors = [];
-          snapshot.forEach(doc => {
-            tutors.push({ id: doc.id, ...doc.data() });
-          });
-          console.log(`✅ Found ${tutors.length} tutors in Firebase`);
-          return res.status(200).json(tutors);
-        } else {
-          console.log('⚠️ No tutors found in Firebase, using fallback data');
-        }
-      } catch (firebaseError) {
-        console.error('❌ Firebase error, using fallback data:', firebaseError);
-      }
+      // Skip Firebase and use only the original 15 tutors to avoid duplicates
+      console.log('📚 Using original 15 tutors (skipping Firebase to avoid duplicates)');
         // Return all AI tutors - all unlocked by default now
         const tutors = [
           {
