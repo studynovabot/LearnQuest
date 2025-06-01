@@ -70,17 +70,20 @@ const EnhancedAITutor: React.FC<EnhancedAITutorProps> = ({ userId, subject, tuto
         });
       }
 
-      // Use Groq API for response generation
-      const response = await fetch('/api/chat/groq-enhanced', {
+      // Use existing Groq API for response generation
+      const enhancedMessage = context
+        ? `Based on the student's uploaded materials: ${context}\n\nStudent's question: ${userQuery}\n\nPlease provide a helpful answer using the uploaded content when relevant.`
+        : userQuery;
+
+      const response = await fetch('/api/chat/groq', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: userQuery,
-          context: context,
-          subject: subject,
-          tutorName: tutorName
+          message: enhancedMessage,
+          tutorType: subject.toLowerCase(),
+          conversationHistory: []
         })
       });
 

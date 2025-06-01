@@ -42,27 +42,41 @@ export class VectorDatabaseService {
     this.config = config;
   }
 
-  // Generate embeddings for text content
+  // Generate simple text-based embeddings locally
   async generateEmbedding(text: string): Promise<number[]> {
     try {
-      const response = await fetch('/api/embeddings/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Embedding API error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.embedding;
+      // Simple local embedding generation
+      return this.generateLocalEmbedding(text);
     } catch (error) {
       console.error('Error generating embedding:', error);
       throw new Error('Failed to generate embedding');
     }
+  }
+
+  // Generate local text-based embedding
+  private generateLocalEmbedding(text: string): number[] {
+    const dimension = 384;
+    const words = text.toLowerCase().replace(/[^\w\s]/g, ' ').split(/\s+/).filter(w => w.length > 2);
+    const embedding = new Array(dimension).fill(0);
+
+    words.forEach((word, index) => {
+      const hash = this.simpleHash(word);
+      const pos = Math.abs(hash) % dimension;
+      embedding[pos] += 1 / (index + 1); // Weight by position
+    });
+
+    // Normalize
+    const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
+    return magnitude > 0 ? embedding.map(val => val / magnitude) : embedding;
+  }
+
+  private simpleHash(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash = hash & hash;
+    }
+    return hash;
   }
 
   // Chunk text into smaller pieces for better retrieval
@@ -127,76 +141,98 @@ export class VectorDatabaseService {
     }
   }
 
-  // Pinecone implementation
+  // Local storage implementation (simulating Pinecone)
   private async storeToPinecone(document: VectorDocument): Promise<boolean> {
     try {
-      const response = await fetch('/api/pinecone/upsert', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          vectors: [{
-            id: document.id,
-            values: document.embedding,
-            metadata: {
-              content: document.content.substring(0, 1000), // Limit content size
-              ...document.metadata
-            }
-          }]
-        })
+      // Store in localStorage for now
+      const stored = localStorage.getItem('learnquest_vectors') || '[]';
+      const vectors = JSON.parse(stored);
+
+      vectors.push({
+        id: document.id,
+        values: document.embedding,
+        metadata: {
+          content: document.content.substring(0, 1000),
+          ...document.metadata
+        }
       });
 
-      return response.ok;
+      localStorage.setItem('learnquest_vectors', JSON.stringify(vectors));
+      return true;
     } catch (error) {
-      console.error('Error storing to Pinecone:', error);
+      console.error('Error storing document:', error);
       return false;
     }
   }
 
   private async searchPinecone(embedding: number[], limit: number, filters?: any): Promise<SearchResult[]> {
     try {
-      const response = await fetch('/api/pinecone/query', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          vector: embedding,
-          topK: limit,
-          includeMetadata: true,
-          filter: filters
-        })
-      });
+      // Search in localStorage
+      const stored = localStorage.getItem('learnquest_vectors') || '[]';
+      const vectors = JSON.parse(stored);
 
-      if (!response.ok) {
-        throw new Error('Pinecone search failed');
+      const results: SearchResult[] = [];
+
+      for (const vector of vectors) {
+        // Apply filters
+        if (filters) {
+          if (filters.userId && vector.metadata.userId !== filters.userId) continue;
+          if (filters.subject && vector.metadata.subject !== filters.subject) continue;
+          if (filters.chapter && vector.metadata.chapter !== filters.chapter) continue;
+        }
+
+        // Calculate cosine similarity
+        const similarity = this.calculateCosineSimilarity(embedding, vector.values);
+
+        if (similarity > 0.1) {
+          results.push({
+            document: {
+              id: vector.id,
+              content: vector.metadata.content,
+              metadata: {
+                title: vector.metadata.title,
+                subject: vector.metadata.subject,
+                chapter: vector.metadata.chapter,
+                fileType: vector.metadata.fileType,
+                uploadedAt: vector.metadata.uploadedAt,
+                userId: vector.metadata.userId,
+                tags: vector.metadata.tags || []
+              },
+              embedding: vector.values
+            },
+            score: similarity,
+            relevantChunk: vector.metadata.content
+          });
+        }
       }
 
-      const data = await response.json();
-
-      return data.matches.map((match: any) => ({
-        document: {
-          id: match.id,
-          content: match.metadata.content,
-          metadata: {
-            title: match.metadata.title,
-            subject: match.metadata.subject,
-            chapter: match.metadata.chapter,
-            fileType: match.metadata.fileType,
-            uploadedAt: match.metadata.uploadedAt,
-            userId: match.metadata.userId,
-            tags: match.metadata.tags || []
-          },
-          embedding: match.values
-        },
-        score: match.score,
-        relevantChunk: match.metadata.content
-      }));
+      // Sort by similarity and limit
+      results.sort((a, b) => b.score - a.score);
+      return results.slice(0, limit);
     } catch (error) {
-      console.error('Error searching Pinecone:', error);
+      console.error('Error searching vectors:', error);
       return [];
     }
+  }
+
+  // Calculate cosine similarity between two vectors
+  private calculateCosineSimilarity(a: number[], b: number[]): number {
+    if (a.length !== b.length) return 0;
+
+    let dotProduct = 0;
+    let normA = 0;
+    let normB = 0;
+
+    for (let i = 0; i < a.length; i++) {
+      dotProduct += a[i] * b[i];
+      normA += a[i] * a[i];
+      normB += b[i] * b[i];
+    }
+
+    normA = Math.sqrt(normA);
+    normB = Math.sqrt(normB);
+
+    return (normA === 0 || normB === 0) ? 0 : dotProduct / (normA * normB);
   }
 
   // Chroma implementation
