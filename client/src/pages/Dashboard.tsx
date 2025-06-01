@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import { PremiumCard, PremiumCardContent } from "@/components/ui/premium-card";
 import { GradientButton } from "@/components/ui/premium-button";
+import IconTest from "@/components/debug/IconTest";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -117,6 +118,11 @@ const Dashboard = () => {
         {/* AI Tutors Section */}
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
           <AITutors />
+        </motion.div>
+
+        {/* Debug: Icon Test */}
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+          <IconTest />
         </motion.div>
       </motion.div>
     </>

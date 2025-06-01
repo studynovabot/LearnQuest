@@ -28,6 +28,12 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
     { icon: CreditCardIcon, label: "Subscription", path: "/subscription" },
   ];
 
+  // Debug logging
+  React.useEffect(() => {
+    console.log('SlidingSidebar rendered with location:', location);
+    console.log('Navigation items:', navItems.length);
+  }, [location, navItems.length]);
+
   return (
     <div
       className={cn(
@@ -37,6 +43,10 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
         "overflow-hidden flex flex-col shadow-lg",
         className
       )}
+      style={{
+        backgroundColor: 'rgba(var(--card), 0.95)',
+        borderColor: 'hsl(var(--border))'
+      }}
     >
       {/* Header with logo only */}
       <div className="flex items-center p-4 border-b border-border">
@@ -56,37 +66,46 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       {/* Navigation */}
       <nav className="flex-1 p-4">
         <div className="space-y-2">
-          {navItems.map((item, index) => (
-            <Link key={index} href={item.path}>
-              <button
-                className={cn(
-                  "w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors",
-                  "group relative",
-                  location === item.path
-                    ? "bg-primary/10 text-primary border border-primary/20"
-                    : "text-foreground hover:text-primary"
-                )}
-              >
-                <item.icon
-                  size={22}
-                  className={cn(
-                    "flex-shrink-0 transition-colors",
-                    location === item.path ? "text-primary" : ""
-                  )}
-                />
+          {navItems.map((item, index) => {
+            const IconComponent = item.icon;
+            const isActive = location === item.path;
 
-                {/* Label - visible on hover */}
-                <span className={cn(
-                  "text-base font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-                  "opacity-0 max-w-0",
-                  "group-hover:opacity-100 group-hover:max-w-[200px]",
-                  location === item.path ? "text-primary" : ""
-                )}>
-                  {item.label}
-                </span>
-              </button>
-            </Link>
-          ))}
+            return (
+              <Link key={`nav-${index}-${item.path}`} href={item.path}>
+                <button
+                  className={cn(
+                    "w-full flex items-center gap-3 p-3 rounded-lg transition-all duration-200",
+                    "hover:bg-muted/50 hover:scale-[1.02]",
+                    "group/item relative",
+                    isActive
+                      ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
+                      : "text-foreground hover:text-primary"
+                  )}
+                >
+                  {/* Icon Container */}
+                  <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                    <IconComponent
+                      size={20}
+                      className={cn(
+                        "transition-colors",
+                        isActive ? "text-primary" : "text-muted-foreground"
+                      )}
+                    />
+                  </div>
+
+                  {/* Label - visible on hover */}
+                  <span className={cn(
+                    "text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
+                    "opacity-0 max-w-0",
+                    "group-hover:opacity-100 group-hover:max-w-[200px]",
+                    isActive ? "text-primary" : "text-foreground"
+                  )}>
+                    {item.label}
+                  </span>
+                </button>
+              </Link>
+            );
+          })}
         </div>
       </nav>
 
