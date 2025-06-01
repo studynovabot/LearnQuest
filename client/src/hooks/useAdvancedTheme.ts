@@ -37,40 +37,65 @@ export function useAdvancedTheme() {
   useEffect(() => {
     if (!mounted) return;
 
-    const themeConfig = getThemeById(selectedTheme) || getDefaultTheme();
-    const isDarkMode = resolvedTheme === 'dark';
-    const variables = isDarkMode ? themeConfig.variables.dark : themeConfig.variables.light;
+    // Check if any input is currently focused to prevent interruption
+    const activeElement = document.activeElement;
+    const isInputFocused = activeElement && (
+      activeElement.tagName === 'INPUT' ||
+      activeElement.tagName === 'TEXTAREA' ||
+      activeElement.contentEditable === 'true'
+    );
 
-    // Optimize variables to only update changed ones
-    const optimizedVariables = optimizeThemeVariables(variables);
+    // If an input is focused, defer theme application to prevent focus loss
+    if (isInputFocused) {
+      console.log('Input focused, deferring theme application');
+      const deferredUpdate = () => {
+        // Check again if input is still focused
+        const stillFocused = document.activeElement === activeElement;
+        if (!stillFocused) {
+          // Input is no longer focused, safe to apply theme
+          applyThemeChanges();
+        } else {
+          // Still focused, defer again
+          setTimeout(deferredUpdate, 100);
+        }
+      };
+      setTimeout(deferredUpdate, 100);
+      return;
+    }
 
-    // Simplified DOM updates - only colors, no layout changes
-    try {
-      // Apply CSS variables to document root (colors only)
-      const root = document.documentElement;
-      Object.entries(optimizedVariables).forEach(([property, value]) => {
-        root.style.setProperty(property, value);
-      });
+    applyThemeChanges();
 
-      // Add theme class to body for color styling only
-      // Preserve all existing classes except theme color classes
-      const currentClasses = document.body.className;
-      const cleanedClasses = currentClasses
-        .replace(/\btheme-(?:default|ocean-blue|forest-green|sunset-orange|purple-galaxy|minimalist-gray)\b/g, '')
-        .trim();
+    function applyThemeChanges() {
+      const themeConfig = getThemeById(selectedTheme) || getDefaultTheme();
+      const isDarkMode = resolvedTheme === 'dark';
+      const variables = isDarkMode ? themeConfig.variables.dark : themeConfig.variables.light;
 
-      document.body.className = `${cleanedClasses} theme-${selectedTheme}`.trim();
+      // Optimize variables to only update changed ones
+      const optimizedVariables = optimizeThemeVariables(variables);
 
-      // TEMPORARILY DISABLED: Theme personality application
-      // This prevents layout issues while maintaining color themes
-      const themeConfig = getThemeById(selectedTheme);
-      if (themeConfig?.personality) {
-        applyThemePersonality(themeConfig.personality);
+      // Simplified DOM updates - only colors, no layout changes
+      try {
+        // Apply CSS variables to document root (colors only)
+        const root = document.documentElement;
+        Object.entries(optimizedVariables).forEach(([property, value]) => {
+          root.style.setProperty(property, value);
+        });
+
+        // Add theme class to body for color styling only
+        // Preserve all existing classes except theme color classes
+        const currentClasses = document.body.className;
+        const cleanedClasses = currentClasses
+          .replace(/\btheme-(?:default|ocean-blue|forest-green|sunset-orange|purple-galaxy|minimalist-gray)\b/g, '')
+          .trim();
+
+        document.body.className = `${cleanedClasses} theme-${selectedTheme}`.trim();
+
+        // COMPLETELY DISABLED: Theme personality application to prevent focus loss
+        // This prevents any DOM manipulation that could cause input focus loss
+        console.log(`Theme applied: ${selectedTheme}, Input focus preserved`);
+      } catch (error) {
+        console.error('Error applying theme:', error);
       }
-
-      console.log(`Theme applied: ${selectedTheme}, Layout preserved`);
-    } catch (error) {
-      console.error('Error applying theme:', error);
     }
 
   }, [selectedTheme, resolvedTheme, mounted]);
