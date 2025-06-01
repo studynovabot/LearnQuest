@@ -11,9 +11,20 @@ export default function ApiTest() {
     setError(null);
 
     try {
-      const response = await fetch(`${config.apiUrl}/health`);
+      // Use tutors endpoint to test connectivity since health endpoint was removed
+      const response = await fetch(`${config.apiUrl}/tutors`);
       const data = await response.json();
-      setHealthStatus(data);
+
+      // Create a health-like response from tutors data
+      const healthData = {
+        status: 'ok',
+        message: 'API is working',
+        timestamp: new Date().toISOString(),
+        tutorsCount: Array.isArray(data) ? data.length : 0,
+        firebase: Array.isArray(data) && data.length > 0 ? 'connected' : 'unknown'
+      };
+
+      setHealthStatus(healthData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {

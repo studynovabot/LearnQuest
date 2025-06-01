@@ -16,18 +16,20 @@ export function FirebaseStatus() {
     setIsChecking(true);
 
     try {
-      const response = await apiRequest('GET', '/api/health');
+      // Use the tutors endpoint to check Firebase connectivity
+      const response = await apiRequest('GET', '/api/tutors');
       const data = await response.json();
 
-      if (data.firebase === 'connected') {
+      // If we get tutors data successfully, Firebase is working
+      if (Array.isArray(data) && data.length > 0) {
         setStatus('connected');
       } else {
         setStatus('error');
-        setErrorMessage(data.message || 'Unknown error connecting to Firebase');
-        trackError('firebase', data.message || 'Unknown error connecting to Firebase');
+        setErrorMessage('No tutors data found - Firebase may not be properly connected');
+        trackError('firebase', 'No tutors data found');
       }
     } catch (error) {
-      console.error('Firebase health check error:', error);
+      console.error('Firebase connectivity check error:', error);
       setStatus('error');
       const message = error instanceof Error ? error.message : 'Unknown error connecting to Firebase';
       setErrorMessage(message);

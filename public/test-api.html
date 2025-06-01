@@ -128,8 +128,25 @@
 
         async function testHealth() {
             setLoading('health-result');
-            const result = await makeRequest('/health');
-            displayResult('health-result', result);
+            // Use tutors endpoint since health endpoint was removed
+            const result = await makeRequest('/tutors');
+
+            // Transform tutors response to health-like format
+            if (result.success && Array.isArray(result.data)) {
+                const healthResult = {
+                    success: true,
+                    data: {
+                        status: 'ok',
+                        message: 'API is working',
+                        timestamp: new Date().toISOString(),
+                        tutorsCount: result.data.length,
+                        firebase: result.data.length > 0 ? 'connected' : 'unknown'
+                    }
+                };
+                displayResult('health-result', healthResult);
+            } else {
+                displayResult('health-result', result);
+            }
         }
 
         async function testSeed() {
