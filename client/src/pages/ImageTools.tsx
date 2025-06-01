@@ -44,42 +44,7 @@ const ImageTools = () => {
   const [transformedImage, setTransformedImage] = useState<string | null>(null);
   const [isTransforming, setIsTransforming] = useState(false);
 
-  const handleTestImage = async () => {
-    setIsGenerating(true);
-    try {
-      const response = await fetch('/api/test-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': user?.id || 'demo-user'
-        },
-        body: JSON.stringify({
-          prompt: textPrompt || 'test image'
-        })
-      });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Test image response:', data);
-        setGeneratedImage(data.imageUrl);
-        toast({
-          title: "Test Image Generated! 🎨",
-          description: "Test image loaded successfully.",
-        });
-      } else {
-        throw new Error('Failed to generate test image');
-      }
-    } catch (error) {
-      console.error('Test image error:', error);
-      toast({
-        title: "Test Failed",
-        description: "Could not generate test image.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   const handleTextToImage = async () => {
     if (!textPrompt.trim()) {
@@ -93,8 +58,8 @@ const ImageTools = () => {
 
     setIsGenerating(true);
     try {
-      // Try simple image generation first for better reliability
-      const response = await fetch('/api/simple-image-generation', {
+      // Use the main image generation API
+      const response = await fetch('/api/image-generation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -223,7 +188,7 @@ const ImageTools = () => {
 
     setIsTransforming(true);
     try {
-      const response = await fetch('/api/simple-image-generation', {
+      const response = await fetch('/api/image-generation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -362,45 +327,25 @@ const ImageTools = () => {
                     variant="glass"
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <GradientButton
-                      gradient="primary"
-                      onClick={handleTextToImage}
-                      disabled={isGenerating || !textPrompt.trim()}
-                      size="lg"
-                      className="shadow-glow"
-                    >
-                      {isGenerating ? (
-                        <>
-                          <LoaderIcon size={18} className="mr-2 animate-spin" />
-                          Generating Image...
-                        </>
-                      ) : (
-                        <>
-                          <WandIcon size={18} className="mr-2" />
-                          Generate Image
-                        </>
-                      )}
-                    </GradientButton>
-
-                    <GlassButton
-                      onClick={handleTestImage}
-                      disabled={isGenerating}
-                      size="lg"
-                    >
-                      {isGenerating ? (
-                        <>
-                          <LoaderIcon size={18} className="mr-2 animate-spin" />
-                          Testing...
-                        </>
-                      ) : (
-                        <>
-                          <ImageIcon size={18} className="mr-2" />
-                          Test Generation
-                        </>
-                      )}
-                    </GlassButton>
-                  </div>
+                  <GradientButton
+                    gradient="primary"
+                    onClick={handleTextToImage}
+                    disabled={isGenerating || !textPrompt.trim()}
+                    size="lg"
+                    className="w-full shadow-glow"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <LoaderIcon size={18} className="mr-2 animate-spin" />
+                        Generating Image...
+                      </>
+                    ) : (
+                      <>
+                        <WandIcon size={18} className="mr-2" />
+                        Generate Image
+                      </>
+                    )}
+                  </GradientButton>
 
                   <AnimatePresence>
                     {generatedImage && (
