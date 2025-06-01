@@ -20,17 +20,35 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
   const [searchResults, setSearchResults] = useState<SimpleSearchResult[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
 
-  // Test Simple Vector DB connection
+  // Test Firebase Vector DB connection
   const testConnection = async () => {
     setConnectionStatus('testing');
     try {
-      // Try to search with a simple query to test connection
-      const results = await simpleVectorDB.searchSimilar('test connection', 1);
-      setConnectionStatus('success');
-      console.log('Simple Vector DB connection successful');
+      // Test Firebase vector database connection by doing a simple search
+      const response = await fetch('/api/vector-search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': userId,
+          'x-user-email': 'thakurranveersingh505@gmail.com'
+        },
+        body: JSON.stringify({
+          query: 'test connection',
+          filters: {},
+          limit: 1
+        })
+      });
+
+      if (response.ok) {
+        setConnectionStatus('success');
+        console.log('Firebase Vector DB connection successful');
+      } else {
+        setConnectionStatus('error');
+        console.error('Firebase Vector DB connection failed');
+      }
     } catch (error) {
       setConnectionStatus('error');
-      console.error('Simple Vector DB connection failed:', error);
+      console.error('Firebase Vector DB connection failed:', error);
     }
   };
 
@@ -71,7 +89,7 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
     }
   };
 
-  // Test search functionality
+  // Test search functionality using real Firebase API
   const testSearch = async () => {
     if (!searchQuery.trim()) return;
 
@@ -79,8 +97,27 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
     setSearchResults([]);
 
     try {
-      const results = await simpleVectorDB.searchSimilar(searchQuery, 5, { userId });
-      setSearchResults(results);
+      // Use the real Firebase vector search API
+      const response = await fetch('/api/vector-search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': userId,
+          'x-user-email': 'thakurranveersingh505@gmail.com' // Admin email for testing
+        },
+        body: JSON.stringify({
+          query: searchQuery,
+          filters: {},
+          limit: 10
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Search request failed');
+      }
+
+      const data = await response.json();
+      setSearchResults(data.results || []);
     } catch (error) {
       console.error('Search test failed:', error);
       setSearchResults([]);
@@ -107,7 +144,7 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
       case 'testing':
         return 'Testing connection...';
       case 'success':
-        return 'Simple Vector DB Ready';
+        return 'Firebase Vector DB Ready';
       case 'error':
         return 'Connection failed';
       default:
@@ -127,7 +164,7 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
         <CardContent className="space-y-6">
           {/* Connection Test */}
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">1. Test Simple Vector DB</h3>
+            <h3 className="text-lg font-semibold">1. Test Firebase Vector DB</h3>
             <div className="flex items-center gap-4">
               <Button onClick={testConnection} disabled={connectionStatus === 'testing'}>
                 Test Connection
@@ -234,10 +271,10 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
           <div className="bg-blue-50 p-4 rounded-lg">
             <h4 className="font-medium text-blue-900 mb-2">Testing Instructions:</h4>
             <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-              <li>First, test the Pinecone connection</li>
-              <li>Upload a test document with some content</li>
-              <li>Search for keywords from your uploaded content</li>
+              <li>First, test the Firebase Vector DB connection</li>
+              <li>Search for keywords from your uploaded documents (like "sionim", "company", "pragnius")</li>
               <li>Check that results are returned with similarity scores</li>
+              <li>Your uploaded document should appear in search results</li>
             </ol>
           </div>
         </CardContent>
