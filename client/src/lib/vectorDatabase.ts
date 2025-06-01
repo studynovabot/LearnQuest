@@ -174,14 +174,15 @@ export class VectorDatabaseService {
 
   private async searchPinecone(embedding: number[], limit: number, filters?: any): Promise<SearchResult[]> {
     try {
-      // Use the vector-search API endpoint
-      const response = await fetch('/api/vector-search', {
+      // Use the vector-enhanced-chat API endpoint with search action
+      const response = await fetch('/api/vector-enhanced-chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-user-id': filters?.userId || 'demo-user'
         },
         body: JSON.stringify({
+          action: 'search',
           query: 'search query', // This will be converted to embedding on the server
           filters: {
             subject: filters?.subject,

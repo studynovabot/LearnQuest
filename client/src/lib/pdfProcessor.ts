@@ -222,13 +222,14 @@ In a real implementation, this would use mammoth.js or a server-side document pr
     }
   ): Promise<SimpleSearchResult[]> {
     try {
-      const response = await fetch('/api/vector-search', {
+      const response = await fetch('/api/vector-enhanced-chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-user-id': filters?.userId || 'demo-user'
         },
         body: JSON.stringify({
+          action: 'search',
           query,
           filters: {
             subject: filters?.subject,

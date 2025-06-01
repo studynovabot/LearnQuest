@@ -9,6 +9,7 @@ import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
 import NovaLogo from "@/components/ui/NovaLogo";
 import { ThemeToggle, ThemeToggleCompact } from "@/components/ui/theme-toggle";
 import { FloatingNav } from "@/components/ui/floating-nav";
+import PrivacyBanner from "@/components/privacy/PrivacyBanner";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -101,6 +102,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </Button>
           </div>
         )}
+
+        {/* Privacy Banner */}
+        <PrivacyBanner variant="compact" showOnce={true} className="mx-4 mt-4" />
 
         {/* Main content container */}
         <div className={cn(

@@ -106,11 +106,20 @@ const Login = () => {
                   {loading ? "Logging in..." : "Login"}
                 </GradientButton>
 
-                <div className="text-center text-sm">
-                  Don't have an account?{" "}
-                  <Link href="/register" className="text-primary hover:underline font-medium">
-                    Register
-                  </Link>
+                <div className="text-center text-sm space-y-2">
+                  <div>
+                    Don't have an account?{" "}
+                    <Link href="/register" className="text-primary hover:underline font-medium">
+                      Register
+                    </Link>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Or try our{" "}
+                    <Link href="/otp-login" className="text-primary hover:underline font-medium">
+                      secure OTP login
+                    </Link>
+                    {" "}for password-free authentication
+                  </div>
                 </div>
               </PremiumCardContent>
             </form>

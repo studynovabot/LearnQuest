@@ -4,6 +4,7 @@ import { z } from "zod";
 export const userSchema = z.object({
   id: z.string(),
   email: z.string().email(),
+  emailHash: z.string().optional(), // Hashed email for privacy
   password: z.string(),
   displayName: z.string(),
   lastLogin: z.date().nullable(),
@@ -12,7 +13,11 @@ export const userSchema = z.object({
   board: z.string().default(''),
   role: z.enum(['user', 'admin']).default('user'),
   createdAt: z.date(),
-  updatedAt: z.date()
+  updatedAt: z.date(),
+  // Privacy fields
+  privacyCompliant: z.boolean().default(true),
+  authMethod: z.enum(['password', 'otp']).default('password'),
+  trialStarted: z.boolean().default(false)
 });
 
 export const subjectSchema = z.object({
@@ -29,6 +34,45 @@ export const aiTutorSchema = z.object({
   subject: z.string().nullable(),
   iconName: z.string().nullable(),
   color: z.string().nullable()
+});
+
+// Privacy-related schemas
+export const trialRecordSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  emailHash: z.string(),
+  fingerprintHash: z.string(),
+  ipHash: z.string(),
+  active: z.boolean().default(true),
+  createdAt: z.date(),
+  lastActivity: z.date(),
+  endedAt: z.date().optional(),
+  privacyCompliant: z.boolean().default(true),
+  dataMinimized: z.boolean().default(true),
+  autoDeleteAt: z.date()
+});
+
+export const otpVerificationSchema = z.object({
+  id: z.string(),
+  emailHash: z.string(),
+  otpHash: z.string(),
+  purpose: z.enum(['login', 'register', 'verification']),
+  createdAt: z.date(),
+  expiresAt: z.date(),
+  attempts: z.number().default(0),
+  verified: z.boolean().default(false),
+  verifiedAt: z.date().optional()
+});
+
+export const deletionLogSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  emailHash: z.string(),
+  deletedAt: z.date(),
+  recordsDeleted: z.number(),
+  reason: z.string(),
+  privacyCompliant: z.boolean().default(true),
+  gdprCompliant: z.boolean().default(true)
 });
 
 export const chatMessageSchema = z.object({

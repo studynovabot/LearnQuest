@@ -25,7 +25,7 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
     setConnectionStatus('testing');
     try {
       // Test Firebase vector database connection by doing a simple search
-      const response = await fetch('/api/vector-search', {
+      const response = await fetch('/api/vector-enhanced-chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -33,6 +33,7 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
           'x-user-email': 'thakurranveersingh505@gmail.com'
         },
         body: JSON.stringify({
+          action: 'search',
           query: 'test connection',
           filters: {},
           limit: 1
@@ -98,7 +99,7 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
 
     try {
       // Use the real Firebase vector search API
-      const response = await fetch('/api/vector-search', {
+      const response = await fetch('/api/vector-enhanced-chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,6 +107,7 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
           'x-user-email': 'thakurranveersingh505@gmail.com' // Admin email for testing
         },
         body: JSON.stringify({
+          action: 'search',
           query: searchQuery,
           filters: {},
           limit: 10

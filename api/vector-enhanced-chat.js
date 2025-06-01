@@ -1,4 +1,4 @@
-// Enhanced chat endpoint that uses vector database for context
+// Enhanced chat endpoint with vector database context + vector search functionality
 import { handleCors } from './_utils/cors.js';
 import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
 import { pineconeService, generateSimpleEmbedding } from './_utils/pinecone.js';
@@ -68,6 +68,35 @@ function calculateCosineSimilarity(a, b) {
   return (normA === 0 || normB === 0) ? 0 : dotProduct / (normA * normB);
 }
 
+// Find relevant chunk of text for display
+function findRelevantChunk(content, query, chunkSize = 200) {
+  const words = content.split(' ');
+  const queryWords = query.toLowerCase().split(' ').filter(w => w.length > 2);
+
+  if (words.length <= chunkSize) return content;
+
+  let bestChunk = '';
+  let bestScore = 0;
+
+  for (let i = 0; i <= words.length - chunkSize; i += 50) {
+    const chunk = words.slice(i, i + chunkSize).join(' ');
+    const chunkLower = chunk.toLowerCase();
+
+    let score = 0;
+    for (const queryWord of queryWords) {
+      const matches = (chunkLower.match(new RegExp(queryWord, 'g')) || []).length;
+      score += matches;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestChunk = chunk;
+    }
+  }
+
+  return bestChunk || words.slice(0, chunkSize).join(' ');
+}
+
 // Search documents for relevant context using Pinecone
 async function searchUserDocuments(db, userId, query, subject, userEmail) {
   try {
@@ -128,11 +157,17 @@ export default function handler(req, res) {
       initializeFirebase();
       const db = getFirestoreDb();
 
-      const { message, subject, tutorName } = req.body;
+      const { action = 'chat', message, query, subject, tutorName, filters = {}, limit = 10 } = req.body;
       const userId = req.headers['x-user-id'] || 'demo-user';
 
+      // Handle vector search action
+      if (action === 'search') {
+        return await handleVectorSearch(req, res, db, query, filters, limit, userId);
+      }
+
+      // Handle chat action (default)
       if (!message) {
-        return res.status(400).json({ message: 'Message is required' });
+        return res.status(400).json({ message: 'Message is required for chat' });
       }
 
       console.log('🤖 Enhanced Chat: Processing message with vector context');
@@ -241,4 +276,101 @@ The student hasn't uploaded relevant documents for this topic yet. Provide a hel
       res.status(200).json({ response: fallbackResponse });
     }
   });
+}
+
+// Handle vector search functionality
+async function handleVectorSearch(req, res, db, query, filters, limit, userId) {
+  try {
+    if (!query) {
+      return res.status(400).json({ message: 'Search query is required' });
+    }
+
+    console.log('🔍 Vector Search: Processing search query:', query);
+
+    // Generate embedding for search query using Pinecone service
+    const queryEmbedding = generateSimpleEmbedding(query, 384);
+
+    // Build Pinecone filter
+    const pineconeFilter = {};
+
+    // Apply filters
+    if (filters.subject) {
+      pineconeFilter.subject = { "$eq": filters.subject };
+    }
+
+    if (filters.chapter) {
+      pineconeFilter.chapter = { "$eq": filters.chapter };
+    }
+
+    console.log('🔍 Vector Search: Querying Pinecone with filters:', pineconeFilter);
+
+    // Search in Pinecone
+    const pineconeResults = await pineconeService.query(
+      queryEmbedding,
+      limit,
+      Object.keys(pineconeFilter).length > 0 ? pineconeFilter : null
+    );
+
+    console.log(`📄 Vector Search: Found ${pineconeResults.matches?.length || 0} matches from Pinecone`);
+
+    const results = [];
+
+    // Process Pinecone results
+    if (pineconeResults.matches) {
+      for (const match of pineconeResults.matches) {
+        if (match.score > 0.1) { // Minimum similarity threshold
+          const relevantChunk = findRelevantChunk(match.metadata.content || '', query);
+
+          results.push({
+            document: {
+              id: match.id,
+              content: match.metadata.content || '',
+              metadata: {
+                title: match.metadata.title || '',
+                subject: match.metadata.subject || '',
+                chapter: match.metadata.chapter || '',
+                userId: match.metadata.userId || '',
+                uploadedAt: match.metadata.uploadedAt || ''
+              }
+            },
+            score: match.score,
+            relevantChunk: relevantChunk
+          });
+        }
+      }
+    }
+
+    const limitedResults = results;
+
+    console.log(`🎯 Vector Search: Returning ${limitedResults.length} results`);
+
+    // Record search activity
+    try {
+      await db.collection('search_activities').add({
+        userId,
+        query,
+        filters,
+        resultsCount: limitedResults.length,
+        timestamp: new Date()
+      });
+    } catch (error) {
+      console.error('Error recording search activity:', error);
+    }
+
+    return res.status(200).json({
+      success: true,
+      results: limitedResults,
+      total: results.length,
+      query: query,
+      filters: filters
+    });
+
+  } catch (error) {
+    console.error('Vector search error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to search documents',
+      error: error.message
+    });
+  }
 }

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle, PremiumCardDescription } from '@/components/ui/premium-card';
 import { PremiumInput, PremiumSelect } from '@/components/ui/premium-form';
@@ -12,6 +13,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import PrivacyDashboard from '@/components/privacy/PrivacyDashboard';
 import { UserIcon, SettingsIcon, ShieldIcon, CrownIcon, PaletteIcon } from '@/components/ui/icons';
 import { Save, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -21,12 +24,23 @@ import { ThemePreviewGrid, CurrentThemeDisplay } from '@/components/ui/theme-pre
 const Settings = () => {
   const { user, refreshUser } = useAuth();
   const { toast } = useToast();
+  const [location] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
   const [formData, setFormData] = useState({
     displayName: user?.displayName || '',
     className: user?.className || '',
     board: user?.board || 'CBSE'
   });
+
+  // Handle URL parameters for tab switching
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab && ['profile', 'privacy', 'themes'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [location]);
 
   const handleSave = async () => {
     if (!user) return;
@@ -70,7 +84,7 @@ const Settings = () => {
       </Helmet>
 
       <motion.div
-        className="max-w-2xl mx-auto space-y-6"
+        className="max-w-4xl mx-auto space-y-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -88,16 +102,35 @@ const Settings = () => {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
               Settings
             </h1>
-            <p className="text-muted-foreground text-lg">Manage your profile and preferences</p>
+            <p className="text-muted-foreground text-lg">Manage your profile, privacy, and preferences</p>
           </div>
         </motion.div>
 
-        {/* Premium Profile Settings */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+        {/* Tabs Navigation */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <UserIcon className="h-4 w-4" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="privacy" className="flex items-center gap-2">
+              <ShieldIcon className="h-4 w-4" />
+              Privacy
+            </TabsTrigger>
+            <TabsTrigger value="themes" className="flex items-center gap-2">
+              <PaletteIcon className="h-4 w-4" />
+              Themes
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Profile Tab */}
+          <TabsContent value="profile" className="space-y-6">
+            {/* Premium Profile Settings */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
           <PremiumCard variant="glass" glow={true}>
             <PremiumCardHeader>
               <PremiumCardTitle className="flex items-center gap-3 text-2xl">
@@ -236,7 +269,43 @@ const Settings = () => {
           </PremiumCard>
         </motion.div>
 
-        {/* Themes Section */}
+            {/* Premium Save Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="flex justify-end pt-4"
+            >
+              <GradientButton
+                gradient="primary"
+                size="lg"
+                onClick={handleSave}
+                disabled={isLoading}
+                className="min-w-[160px] shadow-glow"
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Saving...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Save className="h-5 w-5" />
+                    Save Changes
+                  </div>
+                )}
+              </GradientButton>
+            </motion.div>
+          </TabsContent>
+
+          {/* Privacy Tab */}
+          <TabsContent value="privacy" className="space-y-6">
+            <PrivacyDashboard />
+          </TabsContent>
+
+          {/* Themes Tab */}
+          <TabsContent value="themes" className="space-y-6">
+            {/* Themes Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -291,34 +360,8 @@ const Settings = () => {
             </PremiumCardContent>
           </PremiumCard>
         </motion.div>
-
-        {/* Premium Save Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="flex justify-end pt-4"
-        >
-          <GradientButton
-            gradient="primary"
-            size="lg"
-            onClick={handleSave}
-            disabled={isLoading}
-            className="min-w-[160px] shadow-glow"
-          >
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Saving...
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Save className="h-5 w-5" />
-                Save Changes
-              </div>
-            )}
-          </GradientButton>
-        </motion.div>
+          </TabsContent>
+        </Tabs>
       </motion.div>
     </>
   );

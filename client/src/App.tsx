@@ -10,6 +10,8 @@ import Dashboard from "@/pages/Dashboard";
 import ChatAgents from "@/pages/ChatAgents";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import OTPLogin from "@/pages/OTPLogin";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Settings from "@/pages/Settings";
 import Themes from "@/pages/Themes";
 import Subscription from "@/pages/Subscription";
@@ -59,6 +61,15 @@ function Router() {
       </Route>
       <Route path="/register">
         <Register />
+      </Route>
+      <Route path="/otp-login">
+        <OTPLogin mode="login" />
+      </Route>
+      <Route path="/otp-register">
+        <OTPLogin mode="register" />
+      </Route>
+      <Route path="/privacy-policy">
+        <PrivacyPolicy />
       </Route>
       <Route path="/settings">
         <MainLayout>
