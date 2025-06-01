@@ -28,37 +28,10 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
     const [showPassword, setShowPassword] = React.useState(false);
     const inputRef = React.useRef<HTMLInputElement>(null);
 
-    // Get theme only once and memoize to prevent re-renders during typing
     const { selectedTheme } = useAdvancedTheme();
-    const memoizedTheme = React.useMemo(() => selectedTheme, [selectedTheme]);
 
     // Combine refs
     React.useImperativeHandle(ref, () => inputRef.current!);
-
-    // Ultra-stable event handlers with no dependencies to prevent any re-renders
-    const handleFocus = React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-      setIsFocused(true);
-      // Call the original onFocus if it exists
-      if (props.onFocus) {
-        props.onFocus(e);
-      }
-    }, []); // No dependencies to ensure maximum stability
-
-    const handleBlur = React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-      setIsFocused(false);
-      // Call the original onBlur if it exists
-      if (props.onBlur) {
-        props.onBlur(e);
-      }
-    }, []); // No dependencies to ensure maximum stability
-
-    const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-      setHasValue(!!e.target.value);
-      // Call the original onChange if it exists
-      if (props.onChange) {
-        props.onChange(e);
-      }
-    }, []); // No dependencies to ensure maximum stability
 
     React.useEffect(() => {
       setHasValue(!!props.value || !!props.defaultValue);
@@ -67,15 +40,14 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
     const isPasswordType = type === "password";
     const inputType = isPasswordType && showPassword ? "text" : type;
 
-    // Memoize theme-aware classes to prevent re-computation during typing
-    const getThemeAwareVariantClasses = React.useMemo(() => {
+    const getThemeAwareVariantClasses = () => {
       const baseClasses = {
         default: "bg-background border border-input",
-        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(memoizedTheme)}`,
-        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(memoizedTheme)} border ${getThemeAwareBorderColor(memoizedTheme)}`
+        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(selectedTheme)}`,
+        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(selectedTheme)} border ${getThemeAwareBorderColor(selectedTheme)}`
       };
       return baseClasses;
-    }, [memoizedTheme]);
+    };
 
     return (
       <div className={cn("relative", className)}>
@@ -98,13 +70,22 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
               getThemeAwareVariantClasses()[variant],
               icon && "pl-10",
               (isPasswordType || floatingLabel) && "pr-10",
-              isFocused && variant === "glass" && getThemeAwareFocusGlow(memoizedTheme),
-              getThemeAwareFocusRing(memoizedTheme),
+              isFocused && variant === "glass" && getThemeAwareFocusGlow(selectedTheme),
+              getThemeAwareFocusRing(selectedTheme),
               error && "border-red-500 focus:ring-red-500/50"
             )}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onChange={handleChange}
+            onFocus={(e) => {
+              setIsFocused(true);
+              props.onFocus?.(e);
+            }}
+            onBlur={(e) => {
+              setIsFocused(false);
+              props.onBlur?.(e);
+            }}
+            onChange={(e) => {
+              setHasValue(!!e.target.value);
+              props.onChange?.(e);
+            }}
             {...props}
             placeholder={floatingLabel ? "" : props.placeholder}
           />
