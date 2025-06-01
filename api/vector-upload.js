@@ -1,6 +1,7 @@
 // Vercel serverless function for vector database document upload
 import { handleCors } from './_utils/cors.js';
 import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
+import { pineconeService, generateSimpleEmbedding } from './_utils/pinecone.js';
 
 // Admin configuration
 const ADMIN_EMAIL = 'thakurranveersingh505@gmail.com';
@@ -127,8 +128,8 @@ export default function handler(req, res) {
         const chunk = chunks[i];
         const chunkId = `${documentId}_chunk_${i}`;
 
-        // Generate embedding
-        const embedding = generateTextEmbedding(chunk);
+        // Generate embedding using Pinecone service
+        const embedding = generateSimpleEmbedding(chunk, 384);
 
         // Prepare document data
         const chunkDocument = {
@@ -149,13 +150,38 @@ export default function handler(req, res) {
           createdAt: new Date()
         };
 
-        // Store in Firestore
+        // Store in both Firestore and Pinecone
         try {
+          // Store metadata in Firestore
           await db.collection('vector_documents').doc(chunkId).set(chunkDocument);
+
+          // Store vector in Pinecone
+          const pineconeVector = {
+            id: chunkId,
+            values: embedding,
+            metadata: {
+              content: chunk.substring(0, 1000), // Limit content size for metadata
+              title: metadata.title,
+              subject: metadata.subject,
+              chapter: metadata.chapter || '',
+              userId: userId,
+              uploadedAt: new Date().toISOString()
+            }
+          };
+
+          await pineconeService.upsert([pineconeVector]);
           storedChunks.push(chunkId);
-          console.log(`✅ Vector Upload: Stored chunk ${i + 1}/${chunks.length}`);
+          console.log(`✅ Vector Upload: Stored chunk ${i + 1}/${chunks.length} in both Firestore and Pinecone`);
         } catch (error) {
           console.error(`❌ Vector Upload: Failed to store chunk ${i}:`, error);
+          // Still count as stored if at least Firestore succeeded
+          try {
+            await db.collection('vector_documents').doc(chunkId).set(chunkDocument);
+            storedChunks.push(chunkId);
+            console.log(`⚠️ Vector Upload: Stored chunk ${i + 1}/${chunks.length} in Firestore only (Pinecone failed)`);
+          } catch (firestoreError) {
+            console.error(`❌ Vector Upload: Failed to store chunk ${i} in Firestore:`, firestoreError);
+          }
         }
       }
 

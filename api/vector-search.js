@@ -1,6 +1,7 @@
 // Vercel serverless function for vector database search
 import { handleCors } from './_utils/cors.js';
 import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
+import { pineconeService, generateSimpleEmbedding, calculateCosineSimilarity } from './_utils/pinecone.js';
 
 // Generate text embedding for search query
 function generateTextEmbedding(text) {
@@ -115,66 +116,60 @@ export default function handler(req, res) {
 
       console.log('🔍 Vector Search: Processing search query:', query);
 
-      // Generate embedding for search query
-      const queryEmbedding = generateTextEmbedding(query);
+      // Generate embedding for search query using Pinecone service
+      const queryEmbedding = generateSimpleEmbedding(query, 384);
 
-      // Build Firestore query with filters
-      let dbQuery = db.collection('vector_documents');
+      // Build Pinecone filter
+      const pineconeFilter = {};
 
-      // For regular users, search through admin-uploaded content
-      // For admin, search through their own content
-      const ADMIN_EMAIL = 'thakurranveersingh505@gmail.com';
-      const isUserAdmin = userEmail && userEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-
-      if (isUserAdmin) {
-        // Admin searches their own uploads
-        dbQuery = dbQuery.where('metadata.userId', '==', userId);
-      } else {
-        // Regular users search through admin's uploaded content
-        dbQuery = dbQuery.where('metadata.userEmail', '==', ADMIN_EMAIL);
-      }
-
-      // Apply additional filters
+      // Apply filters
       if (filters.subject) {
-        dbQuery = dbQuery.where('metadata.subject', '==', filters.subject);
+        pineconeFilter.subject = { "$eq": filters.subject };
       }
 
       if (filters.chapter) {
-        dbQuery = dbQuery.where('metadata.chapter', '==', filters.chapter);
+        pineconeFilter.chapter = { "$eq": filters.chapter };
       }
 
-      // Execute query
-      const snapshot = await dbQuery.get();
-      console.log(`📄 Vector Search: Found ${snapshot.size} documents to search`);
+      console.log('🔍 Vector Search: Querying Pinecone with filters:', pineconeFilter);
+
+      // Search in Pinecone
+      const pineconeResults = await pineconeService.query(
+        queryEmbedding,
+        limit,
+        Object.keys(pineconeFilter).length > 0 ? pineconeFilter : null
+      );
+
+      console.log(`📄 Vector Search: Found ${pineconeResults.matches?.length || 0} matches from Pinecone`);
 
       const results = [];
 
-      // Calculate similarity for each document
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        
-        if (data.embedding && Array.isArray(data.embedding)) {
-          const similarity = calculateCosineSimilarity(queryEmbedding, data.embedding);
-          
-          if (similarity > 0.1) { // Minimum similarity threshold
-            const relevantChunk = findRelevantChunk(data.content, query);
-            
+      // Process Pinecone results
+      if (pineconeResults.matches) {
+        for (const match of pineconeResults.matches) {
+          if (match.score > 0.1) { // Minimum similarity threshold
+            const relevantChunk = findRelevantChunk(match.metadata.content || '', query);
+
             results.push({
               document: {
-                id: data.id,
-                content: data.content,
-                metadata: data.metadata
+                id: match.id,
+                content: match.metadata.content || '',
+                metadata: {
+                  title: match.metadata.title || '',
+                  subject: match.metadata.subject || '',
+                  chapter: match.metadata.chapter || '',
+                  userId: match.metadata.userId || '',
+                  uploadedAt: match.metadata.uploadedAt || ''
+                }
               },
-              score: similarity,
+              score: match.score,
               relevantChunk: relevantChunk
             });
           }
         }
-      });
+      }
 
-      // Sort by similarity score and limit results
-      results.sort((a, b) => b.score - a.score);
-      const limitedResults = results.slice(0, limit);
+      const limitedResults = results;
 
       console.log(`🎯 Vector Search: Returning ${limitedResults.length} results`);
 

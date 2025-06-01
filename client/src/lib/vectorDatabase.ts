@@ -141,76 +141,77 @@ export class VectorDatabaseService {
     }
   }
 
-  // Local storage implementation (simulating Pinecone)
+  // Real Pinecone implementation
   private async storeToPinecone(document: VectorDocument): Promise<boolean> {
     try {
-      // Store in localStorage for now
-      const stored = localStorage.getItem('learnquest_vectors') || '[]';
-      const vectors = JSON.parse(stored);
-
-      vectors.push({
-        id: document.id,
-        values: document.embedding,
-        metadata: {
-          content: document.content.substring(0, 1000),
-          ...document.metadata
-        }
+      // Use the vector-upload API endpoint
+      const response = await fetch('/api/vector-upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': document.metadata.userId || 'demo-user',
+          'x-user-email': 'thakurranveersingh505@gmail.com' // Admin email for uploads
+        },
+        body: JSON.stringify({
+          content: document.content,
+          metadata: document.metadata
+        })
       });
 
-      localStorage.setItem('learnquest_vectors', JSON.stringify(vectors));
-      return true;
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Document stored in Pinecone:', result);
+        return true;
+      } else {
+        console.error('❌ Failed to store document in Pinecone:', response.status);
+        return false;
+      }
     } catch (error) {
-      console.error('Error storing document:', error);
+      console.error('Error storing document in Pinecone:', error);
       return false;
     }
   }
 
   private async searchPinecone(embedding: number[], limit: number, filters?: any): Promise<SearchResult[]> {
     try {
-      // Search in localStorage
-      const stored = localStorage.getItem('learnquest_vectors') || '[]';
-      const vectors = JSON.parse(stored);
+      // Use the vector-search API endpoint
+      const response = await fetch('/api/vector-search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': filters?.userId || 'demo-user'
+        },
+        body: JSON.stringify({
+          query: 'search query', // This will be converted to embedding on the server
+          filters: {
+            subject: filters?.subject,
+            chapter: filters?.chapter
+          },
+          limit: limit
+        })
+      });
 
-      const results: SearchResult[] = [];
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Pinecone search results:', result.results?.length || 0);
 
-      for (const vector of vectors) {
-        // Apply filters
-        if (filters) {
-          if (filters.userId && vector.metadata.userId !== filters.userId) continue;
-          if (filters.subject && vector.metadata.subject !== filters.subject) continue;
-          if (filters.chapter && vector.metadata.chapter !== filters.chapter) continue;
-        }
-
-        // Calculate cosine similarity
-        const similarity = this.calculateCosineSimilarity(embedding, vector.values);
-
-        if (similarity > 0.1) {
-          results.push({
-            document: {
-              id: vector.id,
-              content: vector.metadata.content,
-              metadata: {
-                title: vector.metadata.title,
-                subject: vector.metadata.subject,
-                chapter: vector.metadata.chapter,
-                fileType: vector.metadata.fileType,
-                uploadedAt: vector.metadata.uploadedAt,
-                userId: vector.metadata.userId,
-                tags: vector.metadata.tags || []
-              },
-              embedding: vector.values
-            },
-            score: similarity,
-            relevantChunk: vector.metadata.content
-          });
-        }
+        // Convert API results to SearchResult format
+        return (result.results || []).map((item: any) => ({
+          document: {
+            id: item.document.id,
+            content: item.document.content,
+            metadata: item.document.metadata,
+            embedding: [] // Not needed for display
+          },
+          score: item.score,
+          relevantChunk: item.relevantChunk || item.document.content.substring(0, 200)
+        }));
+      } else {
+        console.error('❌ Failed to search Pinecone:', response.status);
+        return [];
       }
-
-      // Sort by similarity and limit
-      results.sort((a, b) => b.score - a.score);
-      return results.slice(0, limit);
     } catch (error) {
-      console.error('Error searching vectors:', error);
+      console.error('Error searching Pinecone:', error);
       return [];
     }
   }

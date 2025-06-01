@@ -1,6 +1,7 @@
 // Enhanced chat endpoint that uses vector database for context
 import { handleCors } from './_utils/cors.js';
 import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
+import { pineconeService, generateSimpleEmbedding } from './_utils/pinecone.js';
 
 // Generate text embedding for search
 function generateTextEmbedding(text) {
@@ -67,50 +68,50 @@ function calculateCosineSimilarity(a, b) {
   return (normA === 0 || normB === 0) ? 0 : dotProduct / (normA * normB);
 }
 
-// Search documents for relevant context (admin content for all users)
+// Search documents for relevant context using Pinecone
 async function searchUserDocuments(db, userId, query, subject, userEmail) {
   try {
-    const queryEmbedding = generateTextEmbedding(query);
+    const queryEmbedding = generateSimpleEmbedding(query, 384);
 
-    // For regular users, search through admin-uploaded content
-    // For admin, search through their own content
-    const ADMIN_EMAIL = 'thakurranveersingh505@gmail.com';
-    const isUserAdmin = userEmail && userEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-
-    let dbQuery = db.collection('vector_documents');
-
-    if (isUserAdmin) {
-      // Admin searches their own uploads
-      dbQuery = dbQuery.where('metadata.userId', '==', userId);
-    } else {
-      // Regular users search through admin's uploaded content
-      dbQuery = dbQuery.where('metadata.userEmail', '==', ADMIN_EMAIL);
-    }
+    // Build Pinecone filter
+    const pineconeFilter = {};
 
     if (subject) {
-      dbQuery = dbQuery.where('metadata.subject', '==', subject);
+      pineconeFilter.subject = { "$eq": subject };
     }
-    
-    const snapshot = await dbQuery.limit(50).get();
+
+    console.log('🔍 Enhanced Chat: Searching Pinecone for context');
+
+    // Search in Pinecone
+    const pineconeResults = await pineconeService.query(
+      queryEmbedding,
+      5, // Top 5 most relevant
+      Object.keys(pineconeFilter).length > 0 ? pineconeFilter : null
+    );
+
     const results = [];
-    
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      if (data.embedding && Array.isArray(data.embedding)) {
-        const similarity = calculateCosineSimilarity(queryEmbedding, data.embedding);
-        if (similarity > 0.2) {
+
+    // Process Pinecone results
+    if (pineconeResults.matches) {
+      for (const match of pineconeResults.matches) {
+        if (match.score > 0.2) { // Minimum similarity threshold
           results.push({
-            content: data.content,
-            metadata: data.metadata,
-            score: similarity
+            content: match.metadata.content || '',
+            metadata: {
+              title: match.metadata.title || '',
+              subject: match.metadata.subject || '',
+              chapter: match.metadata.chapter || '',
+              userId: match.metadata.userId || ''
+            },
+            score: match.score
           });
         }
       }
-    });
-    
-    results.sort((a, b) => b.score - a.score);
-    return results.slice(0, 5); // Top 5 most relevant
-    
+    }
+
+    console.log(`📄 Enhanced Chat: Found ${results.length} relevant documents`);
+    return results;
+
   } catch (error) {
     console.error('Error searching user documents:', error);
     return [];
