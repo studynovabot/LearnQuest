@@ -1,6 +1,5 @@
 // Vector Database Configuration and Utilities
-import { OpenAI } from 'openai';
-import { pineconeConfig, openaiConfig } from './config';
+import { pineconeConfig } from './config';
 
 // Configuration for different vector database providers
 export interface VectorConfig {
@@ -38,14 +37,9 @@ export interface SearchResult {
 // Vector Database Service Class
 export class VectorDatabaseService {
   private config: VectorConfig;
-  private openai: OpenAI;
 
   constructor(config: VectorConfig) {
     this.config = config;
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY || '',
-      dangerouslyAllowBrowser: true // Only for demo - use backend in production
-    });
   }
 
   // Generate embeddings for text content

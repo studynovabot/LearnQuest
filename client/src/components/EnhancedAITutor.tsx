@@ -5,14 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { pdfProcessor } from '@/lib/pdfProcessor';
-import { SearchResult } from '@/lib/vectorDatabase';
+import { SimpleSearchResult } from '@/lib/simpleVectorDB';
 
 interface Message {
   id: string;
   content: string;
   sender: 'user' | 'ai';
   timestamp: Date;
-  sources?: SearchResult[];
+  sources?: SimpleSearchResult[];
 }
 
 interface EnhancedAITutorProps {
@@ -46,7 +46,7 @@ const EnhancedAITutor: React.FC<EnhancedAITutorProps> = ({ userId, subject, tuto
     setMessages([welcomeMessage]);
   }, [tutorName, subject]);
 
-  const searchUserDocuments = async (query: string): Promise<SearchResult[]> => {
+  const searchUserDocuments = async (query: string): Promise<SimpleSearchResult[]> => {
     try {
       const results = await pdfProcessor.searchDocuments(query, {
         subject: subject,
@@ -59,7 +59,7 @@ const EnhancedAITutor: React.FC<EnhancedAITutorProps> = ({ userId, subject, tuto
     }
   };
 
-  const generateAIResponse = async (userQuery: string, sources: SearchResult[]): Promise<string> => {
+  const generateAIResponse = async (userQuery: string, sources: SimpleSearchResult[]): Promise<string> => {
     try {
       // Prepare context from user's documents
       let context = '';
@@ -71,7 +71,7 @@ const EnhancedAITutor: React.FC<EnhancedAITutorProps> = ({ userId, subject, tuto
       }
 
       // Use Groq API for response generation
-      const response = await fetch('/api/chat/groq', {
+      const response = await fetch('/api/chat/groq-enhanced', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

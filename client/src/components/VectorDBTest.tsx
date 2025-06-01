@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { vectorDB } from '@/lib/vectorDatabase';
-import { VectorDocument, SearchResult } from '@/lib/vectorDatabase';
+import { simpleVectorDB } from '@/lib/simpleVectorDB';
+import { SimpleDocument, SimpleSearchResult } from '@/lib/simpleVectorDB';
 import { Loader, CheckCircle, AlertCircle, Database, Search } from 'lucide-react';
 
 interface VectorDBTestProps {
@@ -17,20 +17,20 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [uploadResult, setUploadResult] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<SimpleSearchResult[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
 
-  // Test Pinecone connection
+  // Test Simple Vector DB connection
   const testConnection = async () => {
     setConnectionStatus('testing');
     try {
       // Try to search with a simple query to test connection
-      const results = await vectorDB.searchSimilar('test connection', 1);
+      const results = await simpleVectorDB.searchSimilar('test connection', 1);
       setConnectionStatus('success');
-      console.log('Pinecone connection successful');
+      console.log('Simple Vector DB connection successful');
     } catch (error) {
       setConnectionStatus('error');
-      console.error('Pinecone connection failed:', error);
+      console.error('Simple Vector DB connection failed:', error);
     }
   };
 
@@ -42,7 +42,7 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
     setUploadResult('');
 
     try {
-      const testDocument: VectorDocument = {
+      const testDocument: SimpleDocument = {
         id: `test_${Date.now()}`,
         content: testText,
         metadata: {
@@ -56,10 +56,10 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
         }
       };
 
-      const success = await vectorDB.storeDocument(testDocument);
-      
+      const success = await simpleVectorDB.storeDocument(testDocument);
+
       if (success) {
-        setUploadResult('✅ Document uploaded successfully to Pinecone!');
+        setUploadResult('✅ Document uploaded successfully to Simple Vector DB!');
       } else {
         setUploadResult('❌ Failed to upload document');
       }
@@ -79,7 +79,7 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
     setSearchResults([]);
 
     try {
-      const results = await vectorDB.searchSimilar(searchQuery, 5, { userId });
+      const results = await simpleVectorDB.searchSimilar(searchQuery, 5, { userId });
       setSearchResults(results);
     } catch (error) {
       console.error('Search test failed:', error);
@@ -107,7 +107,7 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
       case 'testing':
         return 'Testing connection...';
       case 'success':
-        return 'Connected to Pinecone';
+        return 'Simple Vector DB Ready';
       case 'error':
         return 'Connection failed';
       default:
@@ -127,7 +127,7 @@ const VectorDBTest: React.FC<VectorDBTestProps> = ({ userId }) => {
         <CardContent className="space-y-6">
           {/* Connection Test */}
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">1. Test Pinecone Connection</h3>
+            <h3 className="text-lg font-semibold">1. Test Simple Vector DB</h3>
             <div className="flex items-center gap-4">
               <Button onClick={testConnection} disabled={connectionStatus === 'testing'}>
                 Test Connection

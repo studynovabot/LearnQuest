@@ -6,13 +6,13 @@ export const config = {
     apiKey: 'pcsk_59mbXi_HQ9o2j3xXRLjszb6uTbFRApCRFFXi1D3CHTzGrw751HNsxPDndaUFnTqfaTWbNR',
     environment: 'gcp-starter',
     indexName: 'learnquest-documents',
-    dimension: 1536
+    dimension: 384 // Using smaller dimension for text-based embeddings
   },
 
-  // OpenAI Configuration (for embeddings)
-  openai: {
-    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || '',
-    model: 'text-embedding-ada-002'
+  // Embedding Configuration (using simple text-based embeddings)
+  embeddings: {
+    method: 'text-hash', // Simple text-based similarity
+    dimension: 384 // Smaller dimension for efficiency
   },
 
   // Groq Configuration (existing)
@@ -81,12 +81,11 @@ export const validatePineconeConfig = () => {
   return !!(apiKey && environment && indexName);
 };
 
-export const validateOpenAIConfig = () => {
-  return !!config.openai.apiKey;
+export const validateGroqConfig = () => {
+  return !!config.groq.apiKey;
 };
 
 // Export individual configs for easier access
 export const pineconeConfig = config.pinecone;
-export const openaiConfig = config.openai;
 export const uploadConfig = config.upload;
 export const vectorDBConfig = config.vectorDB;

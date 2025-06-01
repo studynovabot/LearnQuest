@@ -13,7 +13,7 @@ import {
   Target
 } from 'lucide-react';
 import { pdfProcessor } from '../lib/pdfProcessor';
-import { SearchResult } from '../lib/vectorDatabase';
+import { SimpleSearchResult } from '../lib/simpleVectorDB';
 
 interface NCERTSolutionsProps {
   userId: string;
@@ -30,10 +30,10 @@ const NCERTSolutions: React.FC<NCERTSolutionsProps> = ({ userId }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedClass, setSelectedClass] = useState('12');
   const [selectedSubject, setSelectedSubject] = useState('Mathematics');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<SimpleSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [suggestions, setSuggestions] = useState<SearchResult[]>([]);
+  const [suggestions, setSuggestions] = useState<SimpleSearchResult[]>([]);
 
   // Quick access data
   const quickAccess: QuickAccess[] = [

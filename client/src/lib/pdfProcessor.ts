@@ -1,5 +1,5 @@
-// PDF Processing Utilities for Vector Database
-import { VectorDocument, vectorDB } from './vectorDatabase';
+// PDF Processing Utilities for Simple Vector Database
+import { SimpleDocument, simpleVectorDB, SimpleSearchResult } from './simpleVectorDB';
 
 // PDF processing interface
 export interface PDFProcessingResult {
@@ -45,20 +45,19 @@ export class PDFProcessor {
       const documentId = this.generateDocumentId(file.name, userId);
 
       // Chunk the text for better retrieval
-      const chunks = vectorDB.chunkText(text, 1000, 200);
+      const chunks = simpleVectorDB.chunkText(text, 1000, 200);
 
       // Store each chunk as a separate document
       let storedChunks = 0;
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
-        const chunkDocument: VectorDocument = {
+        const chunkDocument: SimpleDocument = {
           id: `${documentId}_chunk_${i}`,
           content: chunk,
           metadata: {
             title: metadata.title,
             subject: metadata.subject,
             chapter: metadata.chapter,
-            page: Math.floor(i / 2) + 1, // Approximate page number
             fileType: 'pdf',
             uploadedAt: new Date().toISOString(),
             userId: userId,
@@ -66,7 +65,7 @@ export class PDFProcessor {
           }
         };
 
-        const stored = await vectorDB.storeDocument(chunkDocument);
+        const stored = await simpleVectorDB.storeDocument(chunkDocument);
         if (stored) {
           storedChunks++;
         }
@@ -185,16 +184,16 @@ export class PDFProcessor {
 
   // Search for content in uploaded documents
   async searchDocuments(
-    query: string, 
+    query: string,
     filters?: {
       subject?: string;
       chapter?: string;
       tags?: string[];
       userId?: string;
     }
-  ) {
+  ): Promise<SimpleSearchResult[]> {
     try {
-      const results = await vectorDB.searchSimilar(query, 10, filters);
+      const results = await simpleVectorDB.searchSimilar(query, 10, filters);
       return results;
     } catch (error) {
       console.error('Error searching documents:', error);
@@ -203,14 +202,9 @@ export class PDFProcessor {
   }
 
   // Get document suggestions based on subject/chapter
-  async getDocumentSuggestions(subject: string, chapter?: string) {
+  async getDocumentSuggestions(subject: string, chapter?: string): Promise<SimpleSearchResult[]> {
     try {
-      const query = chapter ? `${subject} ${chapter}` : subject;
-      const results = await vectorDB.searchSimilar(query, 5, {
-        subject: subject,
-        chapter: chapter
-      });
-      return results;
+      return await simpleVectorDB.getDocumentSuggestions(subject, chapter);
     } catch (error) {
       console.error('Error getting document suggestions:', error);
       return [];
@@ -220,7 +214,7 @@ export class PDFProcessor {
   // Delete uploaded document
   async deleteDocument(documentId: string): Promise<boolean> {
     try {
-      return await vectorDB.deleteDocument(documentId);
+      return await simpleVectorDB.deleteDocument(documentId);
     } catch (error) {
       console.error('Error deleting document:', error);
       return false;
@@ -230,7 +224,7 @@ export class PDFProcessor {
   // Get user's uploaded documents
   async getUserDocuments(userId: string, page: number = 1, limit: number = 20) {
     try {
-      return await vectorDB.listDocuments(page, limit, { userId });
+      return await simpleVectorDB.getUserDocuments(userId, page, limit);
     } catch (error) {
       console.error('Error getting user documents:', error);
       return {

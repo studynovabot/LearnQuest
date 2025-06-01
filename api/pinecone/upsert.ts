@@ -93,7 +93,7 @@ async function createPineconeIndex() {
       },
       body: JSON.stringify({
         name: PINECONE_INDEX_NAME,
-        dimension: 1536,
+        dimension: 384,
         metric: 'cosine',
         pods: 1,
         replicas: 1,
