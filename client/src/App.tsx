@@ -22,6 +22,8 @@ import PersonalizedAgent from "@/pages/PersonalizedAgent";
 import ContentManager from "@/pages/ContentManager";
 import ThemeTest from "@/pages/ThemeTest";
 import Phase4Testing from "@/pages/Phase4Testing";
+import VectorDBTest from "@/pages/VectorDBTest";
+import DocumentSearch from "@/pages/DocumentSearch";
 import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
@@ -114,6 +116,16 @@ function Router() {
       <Route path="/phase4-testing">
         <MainLayout>
           <Phase4Testing />
+        </MainLayout>
+      </Route>
+      <Route path="/vector-db-test">
+        <MainLayout>
+          <VectorDBTest />
+        </MainLayout>
+      </Route>
+      <Route path="/document-search">
+        <MainLayout>
+          <DocumentSearch />
         </MainLayout>
       </Route>
       <Route>
