@@ -9,6 +9,7 @@ import { Helmet } from "react-helmet";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import NovaLogo from "@/components/ui/NovaLogo";
+import { PrivacyFormNotice } from "@/components/privacy/PrivacyBanner";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -136,6 +137,8 @@ const Register = () => {
                     <p className="text-destructive text-sm mt-1">{passwordError}</p>
                   )}
                 </div>
+
+                <PrivacyFormNotice />
               </CardContent>
               <CardFooter className="flex flex-col space-y-4">
                 <Button type="submit" className="w-full" disabled={loading}>

@@ -27,6 +27,10 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
     const [hasValue, setHasValue] = React.useState(false);
     const [showPassword, setShowPassword] = React.useState(false);
     const { selectedTheme } = useAdvancedTheme();
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
+    // Combine refs
+    React.useImperativeHandle(ref, () => inputRef.current!);
 
     React.useEffect(() => {
       setHasValue(!!props.value || !!props.defaultValue);
@@ -56,7 +60,7 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
 
           {/* Input */}
           <motion.input
-            ref={ref}
+            ref={inputRef}
             type={inputType}
             className={cn(
               "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300 theme-transition",
@@ -69,18 +73,18 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
               getThemeAwareFocusRing(selectedTheme),
               error && "border-red-500 focus:ring-red-500/50"
             )}
-            onFocus={(e) => {
+            onFocus={React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
               setIsFocused(true);
               props.onFocus?.(e);
-            }}
-            onBlur={(e) => {
+            }, [props.onFocus])}
+            onBlur={React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
               setIsFocused(false);
               props.onBlur?.(e);
-            }}
-            onChange={(e) => {
+            }, [props.onBlur])}
+            onChange={React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
               setHasValue(!!e.target.value);
               props.onChange?.(e);
-            }}
+            }, [props.onChange])}
             {...props}
             placeholder={floatingLabel ? "" : props.placeholder}
           />
@@ -144,6 +148,9 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
 );
 
 PremiumInput.displayName = "PremiumInput";
+
+// Memoize the component to prevent unnecessary re-renders
+const MemoizedPremiumInput = React.memo(PremiumInput);
 
 interface PremiumSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -470,7 +477,7 @@ const getThemeAwareFocusRing = (theme: string): string => {
 };
 
 export {
-  PremiumInput,
+  MemoizedPremiumInput as PremiumInput,
   PremiumSelect,
   PremiumTextarea,
 };

@@ -12,6 +12,7 @@ import { Helmet } from "react-helmet";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import NovaLogo from "@/components/ui/NovaLogo";
+import { PrivacyFormNotice } from "@/components/privacy/PrivacyBanner";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -95,6 +96,8 @@ const Login = () => {
                     variant="glass"
                   />
                 </div>
+
+                <PrivacyFormNotice />
 
                 <GradientButton
                   type="submit"
