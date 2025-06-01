@@ -159,18 +159,13 @@ export default function handler(req, res) {
         }
       }
 
-      // Award XP for document upload (admin gets bonus XP)
-      const baseXP = storedChunks.length * 2;
-      const xpEarned = userIsAdmin ? Math.min(baseXP * 2, 100) : Math.min(baseXP, 50); // Admin gets 2x XP
-
+      // Update user record (no gamification)
       try {
         const userRef = db.collection('users').doc(userId);
         const userDoc = await userRef.get();
 
         if (userDoc.exists) {
-          const currentXP = userDoc.data().xp || 0;
           await userRef.update({
-            xp: currentXP + xpEarned,
             lastActivity: new Date(),
             isAdmin: userIsAdmin,
             adminEmail: userIsAdmin ? userEmail : null
@@ -179,7 +174,6 @@ export default function handler(req, res) {
           // Create admin user record if doesn't exist
           await userRef.set({
             email: userEmail,
-            xp: xpEarned,
             isAdmin: true,
             adminEmail: userEmail,
             role: 'owner',
@@ -188,7 +182,7 @@ export default function handler(req, res) {
           });
         }
       } catch (error) {
-        console.error('Error updating user XP:', error);
+        console.error('Error updating user record:', error);
       }
 
       // Record upload activity
@@ -202,7 +196,6 @@ export default function handler(req, res) {
           subject: metadata.subject,
           chunksStored: storedChunks.length,
           totalChunks: chunks.length,
-          xpEarned,
           userLimits,
           timestamp: new Date()
         });
@@ -217,7 +210,6 @@ export default function handler(req, res) {
         documentId: documentId,
         chunksStored: storedChunks.length,
         totalChunks: chunks.length,
-        xpEarned,
         isAdmin: userIsAdmin,
         userLimits,
         message: `Document uploaded and processed successfully${userIsAdmin ? ' (Admin privileges applied)' : ''}`

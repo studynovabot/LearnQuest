@@ -121,8 +121,18 @@ export default function handler(req, res) {
       // Build Firestore query with filters
       let dbQuery = db.collection('vector_documents');
 
-      // Apply user filter (always filter by user)
-      dbQuery = dbQuery.where('metadata.userId', '==', userId);
+      // For regular users, search through admin-uploaded content
+      // For admin, search through their own content
+      const ADMIN_EMAIL = 'thakurranveersingh505@gmail.com';
+      const isUserAdmin = userEmail && userEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+      if (isUserAdmin) {
+        // Admin searches their own uploads
+        dbQuery = dbQuery.where('metadata.userId', '==', userId);
+      } else {
+        // Regular users search through admin's uploaded content
+        dbQuery = dbQuery.where('metadata.userEmail', '==', ADMIN_EMAIL);
+      }
 
       // Apply additional filters
       if (filters.subject) {

@@ -68,12 +68,7 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       path: "/personalized-agent",
       description: "AI Assistant"
     },
-    {
-      icon: UploadIcon,
-      label: "Content Manager",
-      path: "/content-manager",
-      description: "File Management"
-    },
+
     {
       icon: PaletteIcon,
       label: "Themes",
@@ -97,6 +92,14 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       description: "Admin Upload",
       adminOnly: true,
       feature: ADMIN_FEATURES.VECTOR_UPLOAD
+    },
+    {
+      icon: UploadIcon,
+      label: "Content Manager",
+      path: "/content-manager",
+      description: "File Management",
+      adminOnly: true,
+      feature: ADMIN_FEATURES.CONTENT_MODERATION
     }
   ];
 

@@ -24,6 +24,8 @@ import ThemeTest from "@/pages/ThemeTest";
 import Phase4Testing from "@/pages/Phase4Testing";
 import VectorDBTest from "@/pages/VectorDBTest";
 import DocumentSearch from "@/pages/DocumentSearch";
+import VectorUploadPage from "@/pages/VectorUploadPage";
+import AdminRoute from "@/components/AdminRoute";
 import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
@@ -105,7 +107,16 @@ function Router() {
       </Route>
       <Route path="/content-manager">
         <MainLayout>
-          <ContentManager />
+          <AdminRoute>
+            <ContentManager />
+          </AdminRoute>
+        </MainLayout>
+      </Route>
+      <Route path="/vector-upload">
+        <MainLayout>
+          <AdminRoute>
+            <VectorUploadPage />
+          </AdminRoute>
         </MainLayout>
       </Route>
       <Route path="/theme-test">

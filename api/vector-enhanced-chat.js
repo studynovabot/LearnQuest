@@ -67,14 +67,26 @@ function calculateCosineSimilarity(a, b) {
   return (normA === 0 || normB === 0) ? 0 : dotProduct / (normA * normB);
 }
 
-// Search user's documents for relevant context
-async function searchUserDocuments(db, userId, query, subject) {
+// Search documents for relevant context (admin content for all users)
+async function searchUserDocuments(db, userId, query, subject, userEmail) {
   try {
     const queryEmbedding = generateTextEmbedding(query);
-    
-    let dbQuery = db.collection('vector_documents')
-      .where('metadata.userId', '==', userId);
-    
+
+    // For regular users, search through admin-uploaded content
+    // For admin, search through their own content
+    const ADMIN_EMAIL = 'thakurranveersingh505@gmail.com';
+    const isUserAdmin = userEmail && userEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+    let dbQuery = db.collection('vector_documents');
+
+    if (isUserAdmin) {
+      // Admin searches their own uploads
+      dbQuery = dbQuery.where('metadata.userId', '==', userId);
+    } else {
+      // Regular users search through admin's uploaded content
+      dbQuery = dbQuery.where('metadata.userEmail', '==', ADMIN_EMAIL);
+    }
+
     if (subject) {
       dbQuery = dbQuery.where('metadata.subject', '==', subject);
     }
@@ -124,8 +136,8 @@ export default function handler(req, res) {
 
       console.log('🤖 Enhanced Chat: Processing message with vector context');
 
-      // Search user's documents for relevant context
-      const relevantDocs = await searchUserDocuments(db, userId, message, subject);
+      // Search documents for relevant context (admin content for all users)
+      const relevantDocs = await searchUserDocuments(db, userId, message, subject, userEmail);
       
       let context = '';
       if (relevantDocs.length > 0) {

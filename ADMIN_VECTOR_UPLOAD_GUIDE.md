@@ -10,7 +10,6 @@
 - **Unlimited AI requests** (no API call limits)
 - **500MB max file size** (vs 50MB for regular users)
 - **Priority processing** for all uploads
-- **2x XP rewards** for all activities
 
 #### **🎯 Admin-Only Features:**
 - **Vector Upload** component in sidebar (orange-themed)
@@ -65,7 +64,6 @@
 | **Monthly Uploads** | 50 documents | Unlimited |
 | **Storage Limit** | 1GB | Unlimited |
 | **AI Requests** | 500/month | Unlimited |
-| **XP Multiplier** | 1x | 2x |
 | **Processing Priority** | Normal | High |
 | **Sidebar Access** | No | Yes (Orange) |
 
@@ -107,14 +105,12 @@ Admin Status: ✅ Detected
 File Size: ✅ 500MB (Admin limit)
 Processing: ⚡ High Priority
 Storage: ✅ Unlimited
-XP Reward: 🎉 2x Bonus
 ```
 
 #### **4. System Response**
 ```
 ✅ Document uploaded successfully (Admin privileges applied)
 📊 Processed into 45 chunks
-🎉 Earned 90 XP (2x admin bonus)
 ⚡ High priority processing completed
 ```
 
