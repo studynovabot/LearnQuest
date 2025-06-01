@@ -1,12 +1,13 @@
 // Enhanced Vercel serverless function for educational content management
 import { handleCors } from './_utils/cors.js';
 import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
-import { uploadToStorage, deleteFromStorage, generateUniqueFileName, validateFileType, formatFileSize } from './_utils/file-storage.js';
-import { extractTextFromPDF, processEducationalContent, validateProcessedContent, extractKeywords } from './_utils/pdf-processor.js';
-import { requireAdmin, optionalAdmin } from './_utils/admin-auth.js';
-import formidable from 'formidable';
-import fs from 'fs';
-import path from 'path';
+// Temporarily comment out complex dependencies to fix 500 error
+// import { uploadToStorage, deleteFromStorage, generateUniqueFileName, validateFileType, formatFileSize } from './_utils/file-storage.js';
+// import { extractTextFromPDF, processEducationalContent, validateProcessedContent, extractKeywords } from './_utils/pdf-processor.js';
+// import { requireAdmin, optionalAdmin } from './_utils/admin-auth.js';
+// import formidable from 'formidable';
+// import fs from 'fs';
+// import path from 'path';
 
 // Route handlers
 const getContent = async (req, res) => {
@@ -100,34 +101,38 @@ const getContent = async (req, res) => {
   }
 };
 
-export default function handler(req, res) {
-  return handleCors(req, res, async (req, res) => {
-    try {
-      // Initialize Firebase
-      initializeFirebase();
+export default async function handler(req, res) {
+  // Handle CORS
+  const corsResult = handleCors(req, res);
+  if (corsResult) return corsResult;
 
-      if (req.method === 'GET') {
-        return getContent(req, res);
+  try {
+    // Initialize Firebase
+    initializeFirebase();
 
-      } else if (req.method === 'POST' && req.url?.includes('/upload')) {
-        return requireAdmin(uploadContent)(req, res);
+    if (req.method === 'GET') {
+      return getContent(req, res);
 
-      } else if (req.method === 'PUT') {
-        return requireAdmin(updateContent)(req, res);
+    } else if (req.method === 'POST') {
+      return res.status(501).json({ message: 'Upload functionality temporarily disabled' });
 
-      } else if (req.method === 'DELETE') {
-        return requireAdmin(deleteContent)(req, res);
+    } else if (req.method === 'PUT') {
+      return res.status(501).json({ message: 'Update functionality temporarily disabled' });
 
-      } else {
-        res.status(405).json({ message: 'Method not allowed' });
-      }
-    } catch (error) {
-      console.error('Content manager error:', error);
-      res.status(500).json({ message: 'Internal server error', error: error.message });
+    } else if (req.method === 'DELETE') {
+      return res.status(501).json({ message: 'Delete functionality temporarily disabled' });
+
+    } else {
+      res.status(405).json({ message: 'Method not allowed' });
     }
-  });
+  } catch (error) {
+    console.error('Content manager error:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
 }
 
+// Temporarily disabled functions to fix 500 error
+/*
 // Upload content handler (admin only)
 const uploadContent = async (req, res) => {
   try {
@@ -410,5 +415,4 @@ async function processUploadedFile(uploadId, filePath, uploadData) {
     });
   }
 }
-
-
+*/
