@@ -21,8 +21,8 @@ export interface FileMetadata {
 // PDF Processor Class
 export class PDFProcessor {
   
-  // Process PDF file and extract text
-  async processPDF(file: File, metadata: FileMetadata, userId: string): Promise<PDFProcessingResult> {
+  // Process PDF file and extract text using vector database API
+  async processPDF(file: File, metadata: FileMetadata, userId: string, userEmail?: string): Promise<PDFProcessingResult> {
     try {
       // Validate file
       if (!this.isValidPDF(file)) {
@@ -41,40 +41,37 @@ export class PDFProcessor {
         };
       }
 
-      // Create document ID
-      const documentId = this.generateDocumentId(file.name, userId);
-
-      // Chunk the text for better retrieval
-      const chunks = simpleVectorDB.chunkText(text, 1000, 200);
-
-      // Store each chunk as a separate document
-      let storedChunks = 0;
-      for (let i = 0; i < chunks.length; i++) {
-        const chunk = chunks[i];
-        const chunkDocument: SimpleDocument = {
-          id: `${documentId}_chunk_${i}`,
-          content: chunk,
+      // Upload to vector database via API
+      const response = await fetch('/api/vector-upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': userId,
+          'x-user-email': userEmail || ''
+        },
+        body: JSON.stringify({
+          content: text,
           metadata: {
             title: metadata.title,
             subject: metadata.subject,
             chapter: metadata.chapter,
             fileType: 'pdf',
-            uploadedAt: new Date().toISOString(),
-            userId: userId,
             tags: metadata.tags || []
           }
-        };
+        })
+      });
 
-        const stored = await simpleVectorDB.storeDocument(chunkDocument);
-        if (stored) {
-          storedChunks++;
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to upload to vector database');
       }
 
+      const result = await response.json();
+
       return {
-        success: true,
-        documentId: documentId,
-        chunks: storedChunks
+        success: result.success,
+        documentId: result.documentId,
+        chunks: result.chunksStored
       };
 
     } catch (error) {
@@ -182,7 +179,7 @@ export class PDFProcessor {
     return results;
   }
 
-  // Search for content in uploaded documents
+  // Search for content in uploaded documents using vector search API
   async searchDocuments(
     query: string,
     filters?: {
@@ -193,8 +190,28 @@ export class PDFProcessor {
     }
   ): Promise<SimpleSearchResult[]> {
     try {
-      const results = await simpleVectorDB.searchSimilar(query, 10, filters);
-      return results;
+      const response = await fetch('/api/vector-search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': filters?.userId || 'demo-user'
+        },
+        body: JSON.stringify({
+          query,
+          filters: {
+            subject: filters?.subject,
+            chapter: filters?.chapter
+          },
+          limit: 10
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Search request failed');
+      }
+
+      const data = await response.json();
+      return data.results || [];
     } catch (error) {
       console.error('Error searching documents:', error);
       return [];

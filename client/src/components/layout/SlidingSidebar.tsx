@@ -3,6 +3,8 @@ import { useLocation, Link } from "wouter";
 import { cn } from "@/lib/utils";
 import NovaLogo from "@/components/ui/NovaLogo";
 import { ThemeToggleCompact } from "@/components/ui/theme-toggle";
+import { useAuth } from "@/hooks/useAuth";
+import { isAdmin, shouldShowAdminFeature, ADMIN_FEATURES } from "@/lib/adminConfig";
 import {
   HomeIcon,
   MessageIcon,
@@ -12,7 +14,9 @@ import {
   SparklesIcon,
   UploadIcon,
   CreditCardIcon,
-  PaletteIcon
+  PaletteIcon,
+  DatabaseIcon,
+  ShieldIcon
 } from "@/components/ui/icons";
 
 interface SlidingSidebarProps {
@@ -21,6 +25,10 @@ interface SlidingSidebarProps {
 
 const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
   const [location] = useLocation();
+  const { user } = useAuth();
+
+  // Check if current user is admin
+  const userIsAdmin = isAdmin(user?.email);
 
   // Complete navigation items
   const navigationItems = [
@@ -80,6 +88,18 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
     }
   ];
 
+  // Admin-only navigation items
+  const adminNavigationItems = [
+    {
+      icon: DatabaseIcon,
+      label: "Vector Upload",
+      path: "/vector-upload",
+      description: "Admin Upload",
+      adminOnly: true,
+      feature: ADMIN_FEATURES.VECTOR_UPLOAD
+    }
+  ];
+
   return (
     <aside
       className={cn(
@@ -118,6 +138,7 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       {/* Navigation Section */}
       <nav className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-2">
+          {/* Regular Navigation Items */}
           {navigationItems.map((item) => {
             const isActive = location === item.path;
             const IconComponent = item.icon;
@@ -159,6 +180,78 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
                     <p className="text-xs text-muted-foreground whitespace-nowrap">
                       {item.description}
                     </p>
+                  </div>
+                </button>
+              </Link>
+            );
+          })}
+
+          {/* Admin Section Separator */}
+          {userIsAdmin && (
+            <div className="py-2">
+              <div className="border-t border-border/50 my-2"></div>
+              <div className="overflow-hidden transition-all duration-300 opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-[200px]">
+                <div className="flex items-center gap-2 px-3 py-1">
+                  <ShieldIcon size={14} className="text-orange-500" />
+                  <span className="text-xs font-medium text-orange-500 whitespace-nowrap">
+                    Admin Tools
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Admin-Only Navigation Items */}
+          {userIsAdmin && adminNavigationItems.map((item) => {
+            if (!shouldShowAdminFeature(user?.email || '', item.feature)) return null;
+
+            const isActive = location === item.path;
+            const IconComponent = item.icon;
+
+            return (
+              <Link key={item.path} href={item.path}>
+                <button
+                  className={cn(
+                    // Base styles
+                    "w-full flex items-center gap-3 p-3 rounded-lg",
+                    "transition-all duration-200 group/item",
+                    // Admin styling
+                    "border border-orange-200/50 bg-orange-50/50 dark:bg-orange-950/20 dark:border-orange-800/50",
+                    // Hover effects
+                    "hover:bg-orange-100/50 hover:scale-[1.02] dark:hover:bg-orange-900/30",
+                    // Active state
+                    isActive
+                      ? "bg-orange-100 text-orange-700 border-orange-300 shadow-sm dark:bg-orange-900/50 dark:text-orange-300 dark:border-orange-700"
+                      : "text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                  )}
+                >
+                  {/* Icon */}
+                  <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                    <IconComponent
+                      size={20}
+                      className={cn(
+                        "transition-colors",
+                        isActive ? "text-orange-700 dark:text-orange-300" : "text-current"
+                      )}
+                    />
+                  </div>
+
+                  {/* Label - Visible on sidebar hover */}
+                  <div className="overflow-hidden transition-all duration-300 opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-[200px]">
+                    <span className={cn(
+                      "text-sm font-medium whitespace-nowrap",
+                      isActive ? "text-orange-700 dark:text-orange-300" : "text-current"
+                    )}>
+                      {item.label}
+                    </span>
+                    <p className="text-xs text-orange-500/70 whitespace-nowrap dark:text-orange-400/70">
+                      {item.description}
+                    </p>
+                  </div>
+
+                  {/* Admin Badge */}
+                  <div className="overflow-hidden transition-all duration-300 opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-[50px] ml-auto">
+                    <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
                   </div>
                 </button>
               </Link>

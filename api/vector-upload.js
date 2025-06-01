@@ -2,6 +2,33 @@
 import { handleCors } from './_utils/cors.js';
 import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
 
+// Admin configuration
+const ADMIN_EMAIL = 'thakurranveersingh505@gmail.com';
+
+// Check if user is admin
+function isAdmin(userEmail) {
+  return userEmail && userEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+}
+
+// Get user limits based on admin status
+function getUserLimits(userEmail) {
+  if (isAdmin(userEmail)) {
+    return {
+      maxFileSize: 500 * 1024 * 1024, // 500MB for admin
+      maxChunks: 'unlimited',
+      maxUploads: 'unlimited',
+      priority: 'high'
+    };
+  }
+
+  return {
+    maxFileSize: 50 * 1024 * 1024, // 50MB for regular users
+    maxChunks: 100,
+    maxUploads: 50,
+    priority: 'normal'
+  };
+}
+
 // Simple text-based embedding generation
 function generateTextEmbedding(text) {
   const dimension = 384;
@@ -74,12 +101,17 @@ export default function handler(req, res) {
 
       const { content, metadata } = req.body;
       const userId = req.headers['x-user-id'] || 'demo-user';
+      const userEmail = req.headers['x-user-email'] || '';
 
       if (!content || !metadata) {
         return res.status(400).json({ message: 'Content and metadata are required' });
       }
 
-      console.log('📤 Vector Upload: Processing document upload...');
+      // Get user limits and check admin status
+      const userLimits = getUserLimits(userEmail);
+      const userIsAdmin = isAdmin(userEmail);
+
+      console.log(`📤 Vector Upload: Processing document upload for ${userIsAdmin ? 'ADMIN' : 'USER'}: ${userEmail}`);
 
       // Generate document ID
       const documentId = `${userId}_${Date.now()}_${metadata.title.replace(/[^a-zA-Z0-9]/g, '_')}`;
@@ -127,8 +159,9 @@ export default function handler(req, res) {
         }
       }
 
-      // Award XP for document upload
-      const xpEarned = Math.min(storedChunks.length * 2, 50); // 2 XP per chunk, max 50
+      // Award XP for document upload (admin gets bonus XP)
+      const baseXP = storedChunks.length * 2;
+      const xpEarned = userIsAdmin ? Math.min(baseXP * 2, 100) : Math.min(baseXP, 50); // Admin gets 2x XP
 
       try {
         const userRef = db.collection('users').doc(userId);
@@ -138,6 +171,19 @@ export default function handler(req, res) {
           const currentXP = userDoc.data().xp || 0;
           await userRef.update({
             xp: currentXP + xpEarned,
+            lastActivity: new Date(),
+            isAdmin: userIsAdmin,
+            adminEmail: userIsAdmin ? userEmail : null
+          });
+        } else if (userIsAdmin) {
+          // Create admin user record if doesn't exist
+          await userRef.set({
+            email: userEmail,
+            xp: xpEarned,
+            isAdmin: true,
+            adminEmail: userEmail,
+            role: 'owner',
+            createdAt: new Date(),
             lastActivity: new Date()
           });
         }
@@ -149,19 +195,22 @@ export default function handler(req, res) {
       try {
         await db.collection('document_uploads').add({
           userId,
+          userEmail,
+          isAdmin: userIsAdmin,
           documentId,
           title: metadata.title,
           subject: metadata.subject,
           chunksStored: storedChunks.length,
           totalChunks: chunks.length,
           xpEarned,
+          userLimits,
           timestamp: new Date()
         });
       } catch (error) {
         console.error('Error recording upload activity:', error);
       }
 
-      console.log(`🎉 Vector Upload: Successfully uploaded ${storedChunks.length}/${chunks.length} chunks`);
+      console.log(`🎉 Vector Upload: Successfully uploaded ${storedChunks.length}/${chunks.length} chunks for ${userIsAdmin ? 'ADMIN' : 'USER'}`);
 
       res.status(200).json({
         success: true,
@@ -169,7 +218,9 @@ export default function handler(req, res) {
         chunksStored: storedChunks.length,
         totalChunks: chunks.length,
         xpEarned,
-        message: 'Document uploaded and processed successfully'
+        isAdmin: userIsAdmin,
+        userLimits,
+        message: `Document uploaded and processed successfully${userIsAdmin ? ' (Admin privileges applied)' : ''}`
       });
 
     } catch (error) {
