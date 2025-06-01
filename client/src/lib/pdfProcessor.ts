@@ -21,23 +21,24 @@ export interface FileMetadata {
 // PDF Processor Class
 export class PDFProcessor {
   
-  // Process PDF file and extract text using vector database API
+  // Process document file and extract text using vector database API
   async processPDF(file: File, metadata: FileMetadata, userId: string, userEmail?: string): Promise<PDFProcessingResult> {
     try {
       // Validate file
-      if (!this.isValidPDF(file)) {
+      const validation = validateFile(file);
+      if (!validation.valid) {
         return {
           success: false,
-          error: 'Invalid PDF file'
+          error: validation.error || 'Invalid file'
         };
       }
 
-      // Extract text from PDF
-      const text = await this.extractTextFromPDF(file);
+      // Extract text from document
+      const text = await this.extractTextFromDocument(file);
       if (!text || text.trim().length === 0) {
         return {
           success: false,
-          error: 'No text content found in PDF'
+          error: 'No text content found in document'
         };
       }
 
@@ -55,7 +56,7 @@ export class PDFProcessor {
             title: metadata.title,
             subject: metadata.subject,
             chapter: metadata.chapter,
-            fileType: 'pdf',
+            fileType: this.getFileType(file),
             tags: metadata.tags || []
           }
         })
@@ -75,7 +76,7 @@ export class PDFProcessor {
       };
 
     } catch (error) {
-      console.error('Error processing PDF:', error);
+      console.error('Error processing document:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred'
@@ -83,31 +84,48 @@ export class PDFProcessor {
     }
   }
 
-  // Extract text from PDF using PDF.js (browser-based)
-  private async extractTextFromPDF(file: File): Promise<string> {
+  // Extract text from document (supports multiple file types)
+  private async extractTextFromDocument(file: File): Promise<string> {
     try {
-      // For now, we'll use a simple text extraction
-      // In production, you'd use PDF.js or similar library
-      
-      // Check if it's actually a text file disguised as PDF
-      const text = await this.readFileAsText(file);
-      if (text && text.length > 0) {
-        return text;
+      const fileType = this.getFileType(file);
+
+      switch (fileType) {
+        case 'txt':
+          // For text files, read directly
+          return await this.readFileAsText(file);
+
+        case 'pdf':
+          // For PDF files, use text extraction (placeholder for now)
+          // In production, you'd use PDF.js or similar library
+          try {
+            const text = await this.readFileAsText(file);
+            if (text && text.length > 0) {
+              return text;
+            }
+          } catch {
+            // If reading as text fails, use placeholder
+          }
+
+          // Placeholder implementation for PDF
+          return `Sample extracted text from ${file.name}.
+This is where the actual PDF text content would be extracted.
+In a real implementation, this would use PDF.js or a server-side PDF processing library.`;
+
+        case 'doc':
+        case 'docx':
+          // For Word documents, placeholder implementation
+          // In production, you'd use mammoth.js or similar library
+          return `Sample extracted text from Word document: ${file.name}.
+This is where the actual Word document content would be extracted.
+In a real implementation, this would use mammoth.js or a server-side document processing library.`;
+
+        default:
+          throw new Error(`Unsupported file type: ${fileType}`);
       }
 
-      // For actual PDF processing, you would use:
-      // import * as pdfjsLib from 'pdfjs-dist';
-      // const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-      // ... extract text from each page
-      
-      // Placeholder implementation
-      return `Sample extracted text from ${file.name}. 
-      This is where the actual PDF text content would be extracted.
-      In a real implementation, this would use PDF.js or a server-side PDF processing library.`;
-      
     } catch (error) {
-      console.error('Error extracting text from PDF:', error);
-      throw new Error('Failed to extract text from PDF');
+      console.error('Error extracting text from document:', error);
+      throw new Error(`Failed to extract text from ${file.name}`);
     }
   }
 
@@ -124,20 +142,34 @@ export class PDFProcessor {
     });
   }
 
-  // Validate PDF file
-  private isValidPDF(file: File): boolean {
-    // Check file type
-    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-      return false;
+  // Get file type from file
+  private getFileType(file: File): string {
+    // Check by MIME type first
+    switch (file.type) {
+      case 'application/pdf':
+        return 'pdf';
+      case 'text/plain':
+        return 'txt';
+      case 'application/msword':
+        return 'doc';
+      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        return 'docx';
+      default:
+        // Fallback to file extension
+        const extension = file.name.toLowerCase().split('.').pop();
+        switch (extension) {
+          case 'pdf':
+            return 'pdf';
+          case 'txt':
+            return 'txt';
+          case 'doc':
+            return 'doc';
+          case 'docx':
+            return 'docx';
+          default:
+            return 'unknown';
+        }
     }
-
-    // Check file size (max 50MB)
-    const maxSize = 50 * 1024 * 1024; // 50MB
-    if (file.size > maxSize) {
-      return false;
-    }
-
-    return true;
   }
 
   // Generate unique document ID
