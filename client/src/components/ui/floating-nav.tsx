@@ -10,7 +10,8 @@ import {
   ImageIcon,
   SparklesIcon,
   UploadIcon,
-  CreditCardIcon
+  CreditCardIcon,
+  SettingsIcon
 } from "@/components/ui/icons";
 
 interface FloatingNavProps {
@@ -36,7 +37,9 @@ const FloatingNav: React.FC<FloatingNavProps> = ({
     { icon: ImageIcon, label: "Images", path: "/image-tools" },
     { icon: SparklesIcon, label: "AI Agent", path: "/personalized-agent" },
     { icon: UploadIcon, label: "Content", path: "/content-manager" },
-    { icon: CreditCardIcon, label: "Premium", path: "/subscription" },
+    { icon: CreditCardIcon,
+  SettingsIcon, label: "Premium", path: "/subscription" },
+    { icon: SettingsIcon, label: "Settings", path: "/settings" },
   ];
 
   // Auto-hide on scroll for bottom variant

@@ -4,7 +4,7 @@ LearnQuest is an innovative educational platform that combines gamification with
 
 ## Features
 
-- 15 specialized AI tutors powered by Groq's Llama-3.3-70B-Versatile model
+- 15 specialized AI tutors powered by Nova AI
 - Interactive chat interface with real-time responses
 - Gamified learning experience with points and achievements
 - Personalized learning paths
@@ -18,7 +18,7 @@ LearnQuest is an innovative educational platform that combines gamification with
 
 - Node.js (v18 or higher)
 - npm or yarn
-- Groq API key
+- Nova AI configuration
 
 ### Installation
 
@@ -36,7 +36,7 @@ npm install
 3. Set up environment variables:
 Create a `.env` file in the root directory with the following variables:
 ```
-GROQ_API_KEY=your_groq_api_key
+NOVA_AI_MODEL=nova-ai-v1
 ```
 
 4. Start the development server:
@@ -44,12 +44,11 @@ GROQ_API_KEY=your_groq_api_key
 npm run dev
 ```
 
-## API Keys
+## Configuration
 
-### Groq API Key
-- Sign up at [Groq](https://console.groq.com)
-- Create an API key in your dashboard
-- Add the key to your `.env` file as `GROQ_API_KEY`
+### Nova AI Setup
+- Configure Nova AI model in your environment
+- Set the model version in your `.env` file as `NOVA_AI_MODEL`
 
 ## Development
 
