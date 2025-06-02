@@ -15,17 +15,17 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { 
   User, 
   Shield, 
-  Bell, 
-  Palette, 
+  Lock,
   Trash2, 
   Save, 
   Eye, 
   EyeOff, 
-  Lock,
   Mail,
   GraduationCap,
   BookOpen,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Calendar,
+  Clock
 } from 'lucide-react';
 import { Link } from 'wouter';
 
@@ -164,6 +164,20 @@ const Settings = () => {
       return;
     }
 
+    // Password strength validation
+    const hasUpperCase = /[A-Z]/.test(passwordData.newPassword);
+    const hasLowerCase = /[a-z]/.test(passwordData.newPassword);
+    const hasNumbers = /\d/.test(passwordData.newPassword);
+    
+    if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
+      toast({
+        title: 'Weak Password',
+        description: 'Password must contain uppercase, lowercase, and numbers.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       const response = await fetch('/api/change-password', {
@@ -285,7 +299,7 @@ const Settings = () => {
       {/* Settings Tabs */}
       <motion.div variants={itemVariants}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="h-4 w-4" />
               Profile
@@ -296,11 +310,7 @@ const Settings = () => {
             </TabsTrigger>
             <TabsTrigger value="privacy" className="flex items-center gap-2">
               <Lock className="h-4 w-4" />
-              Privacy
-            </TabsTrigger>
-            <TabsTrigger value="preferences" className="flex items-center gap-2">
-              <Palette className="h-4 w-4" />
-              Preferences
+              Privacy & Account
             </TabsTrigger>
           </TabsList>
 
@@ -379,8 +389,8 @@ const Settings = () => {
                 
                 <Separator />
                 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">Account Status</span>
                       <Badge variant={profile.isPro ? "default" : "secondary"}>
@@ -390,12 +400,30 @@ const Settings = () => {
                     <p className="text-sm text-muted-foreground">
                       {profile.isPro ? "You have access to all premium features" : "Upgrade to Pro for unlimited access"}
                     </p>
+                    {!profile.isPro && (
+                      <Button asChild variant="outline" size="sm">
+                        <Link href="/subscription">Upgrade to Pro</Link>
+                      </Button>
+                    )}
                   </div>
-                  {!profile.isPro && (
-                    <Button asChild variant="outline">
-                      <Link href="/subscription">Upgrade to Pro</Link>
-                    </Button>
-                  )}
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      <span className="font-medium">Member Since</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'N/A'}
+                    </p>
+                    
+                    <div className="flex items-center gap-2 mt-2">
+                      <Clock className="h-4 w-4" />
+                      <span className="font-medium">Last Login</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {profile.lastLogin ? new Date(profile.lastLogin).toLocaleDateString() : 'N/A'}
+                    </p>
+                  </div>
                 </div>
                 
                 <div className="flex justify-end">
@@ -464,6 +492,9 @@ const Settings = () => {
                         {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      Password must contain uppercase, lowercase, and numbers (minimum 6 characters)
+                    </p>
                   </div>
                   
                   <div className="space-y-2">
@@ -494,7 +525,7 @@ const Settings = () => {
                     onClick={handlePasswordChange} 
                     disabled={saving || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
                   >
-                    <Lock className="h-4 w-4 mr-2" />
+                    <Shield className="h-4 w-4 mr-2" />
                     {saving ? 'Changing...' : 'Change Password'}
                   </Button>
                 </div>
@@ -502,7 +533,7 @@ const Settings = () => {
             </Card>
           </TabsContent>
 
-          {/* Privacy Tab */}
+          {/* Privacy & Account Tab */}
           <TabsContent value="privacy" className="space-y-6">
             <Card>
               <CardHeader>
@@ -575,7 +606,7 @@ const Settings = () => {
                   <div className="space-y-2">
                     <h4 className="font-medium text-destructive">Danger Zone</h4>
                     <p className="text-sm text-muted-foreground">
-                      Permanently delete your account and all associated data
+                      Permanently delete your account and all associated data. This action cannot be undone.
                     </p>
                   </div>
                   
@@ -591,89 +622,21 @@ const Settings = () => {
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
                           This action cannot be undone. This will permanently delete your account
-                          and remove all your data from our servers.
+                          and remove all your data from our servers including:
+                          <br />• All your chat history
+                          <br />• Flash notes and saved content
+                          <br />• Account preferences and settings
+                          <br />• Subscription information
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleAccountDeletion} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                          Delete Account
+                          {loading ? 'Deleting...' : 'Delete Account'}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Preferences Tab */}
-          <TabsContent value="preferences" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-5 w-5" />
-                  App Preferences
-                </CardTitle>
-                <CardDescription>
-                  Customize your app experience and preferences
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Theme Settings</Label>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Customize your visual experience
-                    </p>
-                    <Button asChild variant="outline" className="w-full">
-                      <Link href="/themes">
-                        <Palette className="h-4 w-4 mr-2" />
-                        Open Theme Settings
-                      </Link>
-                    </Button>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-2">
-                    <Label>Quick Actions</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <Button asChild variant="outline">
-                        <Link href="/privacy-policy">
-                          <Shield className="h-4 w-4 mr-2" />
-                          Privacy Policy
-                        </Link>
-                      </Button>
-                      
-                      <Button asChild variant="outline">
-                        <Link href="/subscription">
-                          <GraduationCap className="h-4 w-4 mr-2" />
-                          Subscription
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-2">
-                    <Label>Account Information</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="font-medium">Member Since:</span>
-                        <p className="text-muted-foreground">
-                          {profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'N/A'}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="font-medium">Last Login:</span>
-                        <p className="text-muted-foreground">
-                          {profile.lastLogin ? new Date(profile.lastLogin).toLocaleDateString() : 'N/A'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -81,6 +81,12 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       label: "Subscription",
       path: "/subscription",
       description: "Premium Plans"
+    },
+    {
+      icon: SettingsIcon,
+      label: "Settings",
+      path: "/settings",
+      description: "Account Settings"
     }
   ];
 

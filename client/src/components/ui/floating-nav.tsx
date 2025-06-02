@@ -11,6 +11,7 @@ import {
   SparklesIcon,
   UploadIcon,
   CreditCardIcon,
+  SettingsIcon,
   SettingsIcon
 } from "@/components/ui/icons";
 
