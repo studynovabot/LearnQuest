@@ -17,6 +17,8 @@ export function useAdvancedTheme() {
   const [mounted, setMounted] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<string>('default');
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [lastAppliedTheme, setLastAppliedTheme] = useState<string>('');
+  const [lastAppliedMode, setLastAppliedMode] = useState<string>('');
 
   // Initialize theme from localStorage
   useEffect(() => {
@@ -37,6 +39,12 @@ export function useAdvancedTheme() {
   useEffect(() => {
     if (!mounted) return;
 
+    // Check if theme actually changed to prevent unnecessary applications
+    const currentThemeKey = `${selectedTheme}-${resolvedTheme}`;
+    if (currentThemeKey === `${lastAppliedTheme}-${lastAppliedMode}`) {
+      return; // No change, skip application
+    }
+
     // Check if any input is currently focused to prevent interruption
     const activeElement = document.activeElement;
     const isInputFocused = activeElement && (
@@ -47,7 +55,6 @@ export function useAdvancedTheme() {
 
     // If an input is focused, defer theme application to prevent focus loss
     if (isInputFocused) {
-      console.log('Input focused, deferring theme application');
       const deferredUpdate = () => {
         // Check again if input is still focused
         const stillFocused = document.activeElement === activeElement;
@@ -56,10 +63,10 @@ export function useAdvancedTheme() {
           applyThemeChanges();
         } else {
           // Still focused, defer again
-          setTimeout(deferredUpdate, 100);
+          setTimeout(deferredUpdate, 200);
         }
       };
-      setTimeout(deferredUpdate, 100);
+      setTimeout(deferredUpdate, 200);
       return;
     }
 
@@ -92,7 +99,15 @@ export function useAdvancedTheme() {
 
         // COMPLETELY DISABLED: Theme personality application to prevent focus loss
         // This prevents any DOM manipulation that could cause input focus loss
-        console.log(`Theme applied: ${selectedTheme}, Input focus preserved`);
+
+        // Update tracking variables to prevent unnecessary re-applications
+        setLastAppliedTheme(selectedTheme);
+        setLastAppliedMode(resolvedTheme || '');
+
+        // Only log when theme actually changes
+        if (currentThemeKey !== `${lastAppliedTheme}-${lastAppliedMode}`) {
+          console.log(`Theme applied: ${selectedTheme} (${resolvedTheme})`);
+        }
       } catch (error) {
         console.error('Error applying theme:', error);
       }

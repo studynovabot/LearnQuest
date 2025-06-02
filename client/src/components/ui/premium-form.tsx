@@ -30,6 +30,9 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
 
     const { selectedTheme } = useAdvancedTheme();
 
+    // Memoize theme to prevent unnecessary re-renders
+    const memoizedTheme = React.useMemo(() => selectedTheme, [selectedTheme]);
+
     // Combine refs
     React.useImperativeHandle(ref, () => inputRef.current!);
 
@@ -40,14 +43,14 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
     const isPasswordType = type === "password";
     const inputType = isPasswordType && showPassword ? "text" : type;
 
-    const getThemeAwareVariantClasses = () => {
+    const getThemeAwareVariantClasses = React.useMemo(() => {
       const baseClasses = {
         default: "bg-background border border-input",
-        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(selectedTheme)}`,
-        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(selectedTheme)} border ${getThemeAwareBorderColor(selectedTheme)}`
+        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(memoizedTheme)}`,
+        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(memoizedTheme)} border ${getThemeAwareBorderColor(memoizedTheme)}`
       };
       return baseClasses;
-    };
+    }, [memoizedTheme]);
 
     return (
       <div className={cn("relative", className)}>
@@ -67,11 +70,11 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
               "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300 theme-transition",
               "focus:outline-none focus:ring-2",
               "placeholder:text-muted-foreground",
-              getThemeAwareVariantClasses()[variant],
+              getThemeAwareVariantClasses[variant],
               icon && "pl-10",
               (isPasswordType || floatingLabel) && "pr-10",
-              isFocused && variant === "glass" && getThemeAwareFocusGlow(selectedTheme),
-              getThemeAwareFocusRing(selectedTheme),
+              isFocused && variant === "glass" && getThemeAwareFocusGlow(memoizedTheme),
+              getThemeAwareFocusRing(memoizedTheme),
               error && "border-red-500 focus:ring-red-500/50"
             )}
             onFocus={(e) => {
@@ -172,18 +175,21 @@ const PremiumSelect = React.forwardRef<HTMLSelectElement, PremiumSelectProps>(
     const [hasValue, setHasValue] = React.useState(false);
     const { selectedTheme } = useAdvancedTheme();
 
+    // Memoize theme to prevent unnecessary re-renders
+    const memoizedTheme = React.useMemo(() => selectedTheme, [selectedTheme]);
+
     React.useEffect(() => {
       setHasValue(!!props.value || !!props.defaultValue);
     }, [props.value, props.defaultValue]);
 
-    const getThemeAwareSelectVariantClasses = () => {
+    const getThemeAwareSelectVariantClasses = React.useMemo(() => {
       const baseClasses = {
         default: "bg-background border border-input text-foreground",
-        glass: `glass-card border-glass-border-strong text-foreground ${getThemeAwareGlassClasses(selectedTheme)}`,
-        gradient: `bg-gradient-to-r text-foreground ${getThemeAwareFormGradient(selectedTheme)} border ${getThemeAwareBorderColor(selectedTheme)}`
+        glass: `glass-card border-glass-border-strong text-foreground ${getThemeAwareGlassClasses(memoizedTheme)}`,
+        gradient: `bg-gradient-to-r text-foreground ${getThemeAwareFormGradient(memoizedTheme)} border ${getThemeAwareBorderColor(memoizedTheme)}`
       };
       return baseClasses;
-    };
+    }, [memoizedTheme]);
 
     return (
       <div className={cn("relative", className)}>
@@ -198,9 +204,9 @@ const PremiumSelect = React.forwardRef<HTMLSelectElement, PremiumSelectProps>(
               "[&>option]:text-foreground [&>option]:bg-background", // Style options for visibility
               "[&>option]:dark:text-white [&>option]:dark:bg-gray-800", // Dark mode option styling
               "[&>option]:light:text-gray-900 [&>option]:light:bg-white", // Light mode option styling
-              getThemeAwareSelectVariantClasses()[variant],
-              isFocused && variant === "glass" && getThemeAwareFocusGlow(selectedTheme),
-              getThemeAwareFocusRing(selectedTheme),
+              getThemeAwareSelectVariantClasses[variant],
+              isFocused && variant === "glass" && getThemeAwareFocusGlow(memoizedTheme),
+              getThemeAwareFocusRing(memoizedTheme),
               error && "border-red-500 focus:ring-red-500/50"
             )}
             onFocus={(e) => {
@@ -304,18 +310,21 @@ const PremiumTextarea = React.forwardRef<HTMLTextAreaElement, PremiumTextareaPro
     const [hasValue, setHasValue] = React.useState(false);
     const { selectedTheme } = useAdvancedTheme();
 
+    // Memoize theme to prevent unnecessary re-renders
+    const memoizedTheme = React.useMemo(() => selectedTheme, [selectedTheme]);
+
     React.useEffect(() => {
       setHasValue(!!props.value || !!props.defaultValue);
     }, [props.value, props.defaultValue]);
 
-    const getThemeAwareTextareaVariantClasses = () => {
+    const getThemeAwareTextareaVariantClasses = React.useMemo(() => {
       const baseClasses = {
         default: "bg-background border border-input",
-        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(selectedTheme)}`,
-        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(selectedTheme)} border ${getThemeAwareBorderColor(selectedTheme)}`
+        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(memoizedTheme)}`,
+        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(memoizedTheme)} border ${getThemeAwareBorderColor(memoizedTheme)}`
       };
       return baseClasses;
-    };
+    }, [memoizedTheme]);
 
     return (
       <div className={cn("relative", className)}>
@@ -326,9 +335,9 @@ const PremiumTextarea = React.forwardRef<HTMLTextAreaElement, PremiumTextareaPro
               "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300 theme-transition",
               "focus:outline-none focus:ring-2",
               "placeholder:text-muted-foreground resize-none",
-              getThemeAwareTextareaVariantClasses()[variant],
-              isFocused && variant === "glass" && getThemeAwareFocusGlow(selectedTheme),
-              getThemeAwareFocusRing(selectedTheme),
+              getThemeAwareTextareaVariantClasses[variant],
+              isFocused && variant === "glass" && getThemeAwareFocusGlow(memoizedTheme),
+              getThemeAwareFocusRing(memoizedTheme),
               error && "border-red-500 focus:ring-red-500/50"
             )}
             onFocus={(e) => {
