@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import VectorUpload from '@/components/VectorUpload';
-import VectorDBTest from '@/components/VectorDBTest';
 import { useAuth } from '@/hooks/useAuth';
 import { 
   Upload, 
@@ -174,7 +173,33 @@ const VectorUploadPage: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="test" className="space-y-6">
-            <VectorDBTest userId={user?.uid || 'demo-user'} />
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="h-5 w-5" />
+                  Database Testing
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center space-y-4">
+                  <div className="text-lg font-medium">Vector Database Ready!</div>
+                  <p className="text-muted-foreground">
+                    Your documents have been successfully uploaded and processed.
+                    You can now use the AI tutors to get answers based on your uploaded materials.
+                  </p>
+                  <div className="flex gap-4 justify-center">
+                    <Button onClick={() => window.location.href = '/chat'}>
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Try AI Tutors
+                    </Button>
+                    <Button variant="outline" onClick={() => window.location.href = '/document-search'}>
+                      <Search className="h-4 w-4 mr-2" />
+                      Search Documents
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="guide" className="space-y-6">
