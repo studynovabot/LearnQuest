@@ -19,53 +19,26 @@ export function initializeFirebase() {
       return { app: firebaseApp, db };
     }
 
-    // Use your actual Firebase project credentials
-    const projectId = 'learnquest-ai';
+    // Use environment variables for Firebase credentials
+    const projectId = process.env.FIREBASE_PROJECT_ID || 'studynovabot';
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || 'firebase-adminsdk-fbsvc@studynovabot.iam.gserviceaccount.com';
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+    if (!privateKey) {
+      throw new Error('FIREBASE_PRIVATE_KEY environment variable is required');
+    }
+
+    // Clean up the private key (remove extra quotes and fix newlines)
+    const cleanPrivateKey = privateKey.replace(/\\n/g, '\n');
+
     const serviceAccount = {
       type: "service_account",
       project_id: projectId,
-      private_key_id: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0",
-      private_key: `-----BEGIN PRIVATE KEY-----
-MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKB
-UAoAMhYiwL+Edt/yrMRE4O4+/LolitNaY7mlbfDu0Vo23MjqQBaJ5UOASAhzA6+9
-WJO3RIrAiQQBtQEOILmuFqBujsscfnpC1urIVNuUBuoy6L4wZaiLbMpLHrn1
-FbcfYdVRIyDxdwdxMHocAQYkuAjXEuOiifqfMjkQn9Ll+DiWolKXRlBhMTi10+
-zqnyAGCfPw2iIkVx2IgAa6Dsg+SqorSLuTuHiYsIlVLXgHcGxaXB5Rg7z0X9UJ
-OOVkLcXSmA+oo5+cSCS3DCJVYvs0+bDBHdAipmgEHKRJWoWnFb0WoWoWnFb0Wo
-WoWnFb0WoWoWnFb0WoWnFb0WoWoWnFb0WoWnFb0WoWoWnFb0WoWoWnFb0WoWo
-AgMBAAECggEBALc+lQh2QpuXhuW8++DQkf3G1o/+Nxo6l8AKaQiAjXiQBtQEOIL
-muFqBujsscfnpC1urIVNuUBuoy6L4wZaiLbMpLHrn1FbcfYdVRIyDxdwdxMHoc
-AQYkuAjXEuOiifqfMjkQn9Ll+DiWolKXRlBhMTi10+zqnyAGCfPw2iIkVx2IgA
-a6Dsg+SqorSLuTuHiYsIlVLXgHcGxaXB5Rg7z0X9UJOOVkLcXSmA+oo5+cSCS3
-DCJVYvs0+bDBHdAipmgEHKRJWoWnFb0WoWoWnFb0WoWoWnFb0WoWoWnFb0WoWo
-WnFb0WoWnFb0WoWoWnFb0WoWoWnFb0WoWoWnFb0WoWoWnFb0WoWoWnFb0WoWo
-QKBgQDYyCWUuyFQs0i2XnDVEhQGm+6LWnOhL2+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-QKBgQDYyCWUuyFQs0i2XnDVEhQGm+6LWnOhL2+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-QKBgQDYyCWUuyFQs0i2XnDVEhQGm+6LWnOhL2+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-QKBgQDYyCWUuyFQs0i2XnDVEhQGm+6LWnOhL2+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-QKBgQDYyCWUuyFQs0i2XnDVEhQGm+6LWnOhL2+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
-1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
------END PRIVATE KEY-----`,
-      client_email: "firebase-adminsdk-xyz@learnquest-ai.iam.gserviceaccount.com",
-      client_id: "123456789012345678901",
+      private_key: cleanPrivateKey,
+      client_email: clientEmail,
       auth_uri: "https://accounts.google.com/o/oauth2/auth",
       token_uri: "https://oauth2.googleapis.com/token",
-      auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-      client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xyz%40learnquest-ai.iam.gserviceaccount.com"
+      auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs"
     };
 
     firebaseApp = initializeApp({
@@ -75,7 +48,7 @@ QKBgQDYyCWUuyFQs0i2XnDVEhQGm+6LWnOhL2+1+1+1+1+1+1+1+1+1+1+1+1+
 
     db = getFirestore(firebaseApp);
 
-    console.log('✅ Firebase initialized successfully');
+    console.log('✅ Firebase initialized successfully with project:', projectId);
     return { app: firebaseApp, db };
   } catch (error) {
     console.error('❌ Firebase initialization failed:', error);
