@@ -15,16 +15,12 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Settings from "@/pages/Settings";
 import Themes from "@/pages/Themes";
 import Subscription from "@/pages/Subscription";
-import ApiTest from "@/pages/ApiTest";
 import FlashNotes from "@/pages/FlashNotes";
 import FlowCharts from "@/pages/FlowCharts";
 import NCERTSolutions from "@/pages/NCERTSolutions";
 import ImageTools from "@/pages/ImageTools";
 import PersonalizedAgent from "@/pages/PersonalizedAgent";
 import ContentManager from "@/pages/ContentManager";
-import ThemeTest from "@/pages/ThemeTest";
-import Phase4Testing from "@/pages/Phase4Testing";
-import VectorDBTest from "@/pages/VectorDBTest";
 import DocumentSearch from "@/pages/DocumentSearch";
 import VectorUploadPage from "@/pages/VectorUploadPage";
 import AdminRoute from "@/components/AdminRoute";
@@ -86,11 +82,7 @@ function Router() {
           <Subscription />
         </MainLayout>
       </Route>
-      <Route path="/api-test">
-        <MainLayout>
-          <ApiTest />
-        </MainLayout>
-      </Route>
+
       <Route path="/flash-notes">
         <MainLayout>
           <FlashNotes />
@@ -130,21 +122,7 @@ function Router() {
           </AdminRoute>
         </MainLayout>
       </Route>
-      <Route path="/theme-test">
-        <MainLayout>
-          <ThemeTest />
-        </MainLayout>
-      </Route>
-      <Route path="/phase4-testing">
-        <MainLayout>
-          <Phase4Testing />
-        </MainLayout>
-      </Route>
-      <Route path="/vector-db-test">
-        <MainLayout>
-          <VectorDBTest />
-        </MainLayout>
-      </Route>
+
       <Route path="/document-search">
         <MainLayout>
           <DocumentSearch />
