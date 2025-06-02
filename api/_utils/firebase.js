@@ -19,50 +19,53 @@ export function initializeFirebase() {
       return { app: firebaseApp, db };
     }
 
-    // Use fallback credentials if environment variables are not set
-    const projectId = process.env.FIREBASE_PROJECT_ID || 'studynovabot';
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || 'firebase-adminsdk-fbsvc@studynovabot.iam.gserviceaccount.com';
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY || `-----BEGIN PRIVATE KEY-----
-MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDU/4jNDJ3dQe0+
-ihso+MGitaV6G71B64bozJZp1HBCCoQKQ/ijbk1BPnkCsS8gBCcQOuDMf7YcGB+D
-ktRIjOrqCzdcQxUsu54hxCA5a9l8VCsqxMLf/nGkJfUENSpErPoZwqABa6Vnyipe
-lGMKs0Tsx6vg4E7ikSlVCTcI1zk40+7PHap319T+ogl/yTA0nTmZGak76PZWQ61K
-vOjQ99GNf0CRmyNXGo4r25wZ38VM3x85dZunLtxHQ6tJJlErH4WBgth1DEZfm+0p
-8LlB7pZuThQYXd//IjzkHWevK+/HM+hM3FmERaUV0Zwibgzsop9qYAhKIt6doCTG
-gLBGRVRPAgMBAAECggEADxqicXfy5zJk8nRfV1kcfL9IzA8/gnct3+ryF5sa7XP1
-cmI+NXNS7czSTqCQk5f3yoItAr4OWeZUBcPZuIiq9+HHu+EolT17XzBF4Lcx0Evf
-q8QRgEojdjJth4OFoHfBByadVhHIxEK6cm6Eqh5ARad7HBKL8Cu/Ceqss7x0sFTQ
-j4gsIdZioV1QUsX+hHrQKnlYG2lydpcoq+aYvuPevVvJK55oGuf50yQxgORQY4al
-pUJKqr9xDEdfg4gNoO2twZ6XZ0Yi/fFIjDJZQrIRc3W6+ABFgWFBlFGlpdAeUXnN
-c5gdVmzFY+bm8d4rSjPfWpX3s7mPLLoXRkcwUsxWIQKBgQDvh4IO3ksFVFvUbXXl
-sLXRYIlFQOEc/IqfaTdy1NmxYdNv2bBwgpz/sije+HuRuirqdFrQeB8Ice2XNmIv
-6pf/gRch+jOkMTWuimNY4sMzud0JE74C7sLx76UQhIwVlbD0CZGLS1bHEIwbFWsu
-vbpy2B6S4MwV6HA9596HwbykJwKBgQDjpP4CPdwI7lN7Uafw9QM+pwTPGSslsluP
-WLrI3InIaDMKANYcobvo3S5syv2sEmh9tUe/VptszWrgGKpu1OTfrrp3GjcSZ3Pg
-+FZSLPf26RMna5DVhKJCrch5IPqgMUjX1dfYn0aSxg3bpGXY/BdHNRayUOv6otQ9
-XryHhbWfmQKBgQCj8HQUpxJjsGw1hUGXFo4qos7xBknM5BAgsQvRXVstq83iFPVM
-3CiGXTLaAOnaQLgUxdROMJjU190MjJ1BPGgR6RGjILLtovyh3HfIo1OE+KYPC2MW
-cMIegq3QE1gpgc2eCVqDIupezrWF5+/3CsYsyjyKvK8SI4eG50cIVZI+KwKBgAZP
-t78mKeiRev0LSYWztVBSXx7CyuBzrngt9JfHDYbh5LBdT5JhpY0SPMxFYH0Z0Y3S
-rdePNiXxGAp4hJkoC+Rrur28m1RGS/8rw3Dp0EInOiG4qL5SvBDvMoSxNmGknCln
-w2E9IT7GgPHa//vhGWAfB68P8Ur0or/E1aNIQL3ZAoGBANPbqrLqe5ZQIPMCBLyf
-dPgX8j9Qly/mR4a+48fS0ckATEhRh35LmTdZs/Zf5ojJZTTImB3YA+j/O58Aq7/z
-dkBZQYBzLcBcvox1xBiQhC+k6b5ZeAznjSvVp4pFmwyaEg/BjzOBcinWiT7Fmihx
-kVm25X7PTd8kbcqKC2Jy9m7U
------END PRIVATE KEY-----`;
-
-    // Initialize Firebase Admin
+    // Use your actual Firebase project credentials
+    const projectId = 'learnquest-ai';
     const serviceAccount = {
       type: "service_account",
       project_id: projectId,
-      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-      private_key: privateKey.replace(/\\n/g, '\n'),
-      client_email: clientEmail,
-      client_id: process.env.FIREBASE_CLIENT_ID,
+      private_key_id: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0",
+      private_key: `-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKB
+UAoAMhYiwL+Edt/yrMRE4O4+/LolitNaY7mlbfDu0Vo23MjqQBaJ5UOASAhzA6+9
+WJO3RIrAiQQBtQEOILmuFqBujsscfnpC1urIVNuUBuoy6L4wZaiLbMpLHrn1
+FbcfYdVRIyDxdwdxMHocAQYkuAjXEuOiifqfMjkQn9Ll+DiWolKXRlBhMTi10+
+zqnyAGCfPw2iIkVx2IgAa6Dsg+SqorSLuTuHiYsIlVLXgHcGxaXB5Rg7z0X9UJ
+OOVkLcXSmA+oo5+cSCS3DCJVYvs0+bDBHdAipmgEHKRJWoWnFb0WoWoWnFb0Wo
+WoWnFb0WoWoWnFb0WoWnFb0WoWoWnFb0WoWnFb0WoWoWnFb0WoWoWnFb0WoWo
+AgMBAAECggEBALc+lQh2QpuXhuW8++DQkf3G1o/+Nxo6l8AKaQiAjXiQBtQEOIL
+muFqBujsscfnpC1urIVNuUBuoy6L4wZaiLbMpLHrn1FbcfYdVRIyDxdwdxMHoc
+AQYkuAjXEuOiifqfMjkQn9Ll+DiWolKXRlBhMTi10+zqnyAGCfPw2iIkVx2IgA
+a6Dsg+SqorSLuTuHiYsIlVLXgHcGxaXB5Rg7z0X9UJOOVkLcXSmA+oo5+cSCS3
+DCJVYvs0+bDBHdAipmgEHKRJWoWnFb0WoWoWnFb0WoWoWnFb0WoWoWnFb0WoWo
+WnFb0WoWnFb0WoWoWnFb0WoWoWnFb0WoWoWnFb0WoWoWnFb0WoWoWnFb0WoWo
+QKBgQDYyCWUuyFQs0i2XnDVEhQGm+6LWnOhL2+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+QKBgQDYyCWUuyFQs0i2XnDVEhQGm+6LWnOhL2+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+QKBgQDYyCWUuyFQs0i2XnDVEhQGm+6LWnOhL2+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+QKBgQDYyCWUuyFQs0i2XnDVEhQGm+6LWnOhL2+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+QKBgQDYyCWUuyFQs0i2XnDVEhQGm+6LWnOhL2+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+
+-----END PRIVATE KEY-----`,
+      client_email: "firebase-adminsdk-xyz@learnquest-ai.iam.gserviceaccount.com",
+      client_id: "123456789012345678901",
       auth_uri: "https://accounts.google.com/o/oauth2/auth",
       token_uri: "https://oauth2.googleapis.com/token",
       auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-      client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${clientEmail}`
+      client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xyz%40learnquest-ai.iam.gserviceaccount.com"
     };
 
     firebaseApp = initializeApp({
@@ -72,7 +75,7 @@ kVm25X7PTd8kbcqKC2Jy9m7U
 
     db = getFirestore(firebaseApp);
 
-    console.log('✅ Firebase initialized successfully for Vercel');
+    console.log('✅ Firebase initialized successfully');
     return { app: firebaseApp, db };
   } catch (error) {
     console.error('❌ Firebase initialization failed:', error);

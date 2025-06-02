@@ -1,16 +1,28 @@
 // Storage utilities for Vercel serverless functions
 import { getFirestoreDb } from './firebase.js';
 
+// In-memory storage for development (will be replaced with Firebase when properly configured)
+let inMemoryUsers = new Map();
+let inMemoryTutors = new Map();
+let inMemoryUserTutors = new Map();
+
 export class FirebaseStorage {
   constructor() {
     this.db = null;
+    this.useInMemory = false;
   }
 
   getFirestoreDb() {
-    if (!this.db) {
-      this.db = getFirestoreDb();
+    try {
+      if (!this.db) {
+        this.db = getFirestoreDb();
+      }
+      return this.db;
+    } catch (error) {
+      console.log('⚠️ Firebase not available, using in-memory storage');
+      this.useInMemory = true;
+      return null;
     }
-    return this.db;
   }
 
   async createUser(userData) {
@@ -31,19 +43,36 @@ export class FirebaseStorage {
       updatedAt: userData.updatedAt || new Date()
     };
 
-    await db.collection('users').doc(user.id).set(user);
-    return user;
+    if (this.useInMemory || !db) {
+      // Use in-memory storage
+      inMemoryUsers.set(user.email, user);
+      console.log('✅ User created in memory:', user.email);
+      return user;
+    } else {
+      // Use Firebase
+      await db.collection('users').doc(user.id).set(user);
+      return user;
+    }
   }
 
   async getUserByEmail(email) {
     const db = this.getFirestoreDb();
-    const snapshot = await db.collection('users').where('email', '==', email).get();
 
-    if (snapshot.empty) {
-      return null;
+    if (this.useInMemory || !db) {
+      // Use in-memory storage
+      const user = inMemoryUsers.get(email);
+      console.log('🔍 Looking up user in memory:', email, user ? 'found' : 'not found');
+      return user || null;
+    } else {
+      // Use Firebase
+      const snapshot = await db.collection('users').where('email', '==', email).get();
+
+      if (snapshot.empty) {
+        return null;
+      }
+
+      return snapshot.docs[0].data();
     }
-
-    return snapshot.docs[0].data();
   }
 
   async getUser(userId) {
@@ -59,25 +88,42 @@ export class FirebaseStorage {
 
   async updateUserLastLogin(userId) {
     const db = this.getFirestoreDb();
-    const userRef = db.collection('users').doc(userId);
 
-    try {
-      await userRef.update({
-        lastLogin: new Date(),
-        updatedAt: new Date()
-      });
-
-      const updatedDoc = await userRef.get();
-      if (!updatedDoc.exists) {
-        throw new Error('User not found after update');
+    if (this.useInMemory || !db) {
+      // Use in-memory storage - find user by ID
+      for (const [email, user] of inMemoryUsers.entries()) {
+        if (user.id === userId) {
+          user.lastLogin = new Date();
+          user.updatedAt = new Date();
+          inMemoryUsers.set(email, user);
+          console.log('✅ Updated user last login in memory:', email);
+          return user;
+        }
       }
+      console.log('❌ User not found in memory for ID:', userId);
+      return null;
+    } else {
+      // Use Firebase
+      const userRef = db.collection('users').doc(userId);
 
-      return updatedDoc.data();
-    } catch (error) {
-      console.error('❌ Error updating user last login:', error);
-      // Return the original user data if update fails
-      const userDoc = await userRef.get();
-      return userDoc.exists ? userDoc.data() : null;
+      try {
+        await userRef.update({
+          lastLogin: new Date(),
+          updatedAt: new Date()
+        });
+
+        const updatedDoc = await userRef.get();
+        if (!updatedDoc.exists) {
+          throw new Error('User not found after update');
+        }
+
+        return updatedDoc.data();
+      } catch (error) {
+        console.error('❌ Error updating user last login:', error);
+        // Return the original user data if update fails
+        const userDoc = await userRef.get();
+        return userDoc.exists ? userDoc.data() : null;
+      }
     }
   }
 

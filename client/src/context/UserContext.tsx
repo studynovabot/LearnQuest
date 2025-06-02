@@ -171,62 +171,17 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           console.error('Failed to parse error response:', e);
         }
         console.error('❌ Login failed:', errorMessage);
-
-        // If it's a 500 error and we're using your admin email, create a fallback user
-        if (response.status === 500 && email === 'thakurranveersingh505@gmail.com') {
-          console.log('🆘 Server error detected for admin user, creating fallback...');
-          return await createAdminFallbackUser(email, password);
-        }
-
         return false;
       }
     } catch (error) {
       console.error("❌ Login error:", error);
-
-      // If there's a network error and it's your admin email, create fallback
-      if (email === 'thakurranveersingh505@gmail.com') {
-        console.log('🆘 Network error detected for admin user, creating fallback...');
-        return await createAdminFallbackUser(email, password);
-      }
-
       return false;
     } finally {
       setLoading(false);
     }
   };
 
-  // Create admin fallback user when server is unavailable
-  const createAdminFallbackUser = async (email: string, password: string): Promise<boolean> => {
-    try {
-      // Simple password check for admin
-      if (password !== 'India#321') {
-        console.log('❌ Invalid admin password for fallback');
-        return false;
-      }
 
-      console.log('🔧 Creating admin fallback user...');
-      const adminUser = {
-        id: `admin-fallback-${Date.now()}`,
-        email: email,
-        displayName: "Admin User (Offline)",
-        isPro: true,
-        role: 'admin',
-        lastLogin: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isFirstLogin: false,
-        authMethod: 'fallback'
-      };
-
-      setUser(adminUser);
-      localStorage.setItem('user', JSON.stringify(adminUser));
-      console.log('✅ Admin fallback user created successfully');
-      return true;
-    } catch (error) {
-      console.error('❌ Failed to create admin fallback user:', error);
-      return false;
-    }
-  };
 
   // Register function
   const register = async (email: string, displayName: string, password: string): Promise<boolean> => {
@@ -277,24 +232,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           console.error('Failed to parse error response:', e);
         }
         console.error('❌ Registration failed:', errorMessage);
-
-        // If it's a 500 error and we're using your admin email, create a fallback user
-        if (response.status === 500 && email === 'thakurranveersingh505@gmail.com') {
-          console.log('🆘 Server error detected for admin registration, creating fallback...');
-          return await createAdminFallbackUser(email, password);
-        }
-
         return false;
       }
     } catch (error) {
       console.error("❌ Registration error:", error);
-
-      // If there's a network error and it's your admin email, create fallback
-      if (email === 'thakurranveersingh505@gmail.com') {
-        console.log('🆘 Network error detected for admin registration, creating fallback...');
-        return await createAdminFallbackUser(email, password);
-      }
-
       return false;
     } finally {
       setLoading(false);

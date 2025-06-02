@@ -6,19 +6,10 @@ function getApiUrl() {
     return import.meta.env.VITE_API_URL;
   }
 
-  // Check if we're in development or production
-  if (import.meta.env.DEV) {
-    // In development, try to use local API first, fallback to Vercel
-    const localApi = 'http://localhost:5000/api';
-    console.log(`Development mode - using local API: ${localApi}`);
-    return localApi;
-  } else {
-    // In production, use the current domain's API endpoints
-    const currentDomain = window.location.origin;
-    const apiUrl = `${currentDomain}/api`;
-    console.log(`Production mode - using same domain API: ${apiUrl}`);
-    return apiUrl;
-  }
+  // Always use the production Vercel API for now
+  const vercelApi = 'https://studynovaai.vercel.app/api';
+  console.log(`Using Vercel production API: ${vercelApi}`);
+  return vercelApi;
 }
 
 export const config = {
