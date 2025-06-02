@@ -196,8 +196,8 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
               <div className="border-t border-border/50 my-2"></div>
               <div className="overflow-hidden transition-all duration-300 opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-[200px]">
                 <div className="flex items-center gap-2 px-3 py-1">
-                  <ShieldIcon,
-  SettingsIcon size={14} className="text-orange-500" />
+                  <ShieldIcon size={14} className="text-orange-500" />
+
                   <span className="text-xs font-medium text-orange-500 whitespace-nowrap">
                     Admin Tools
                   </span>
