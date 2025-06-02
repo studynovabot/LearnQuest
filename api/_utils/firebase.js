@@ -6,7 +6,7 @@ let firebaseApp = null;
 let db = null;
 
 export function initializeFirebase() {
-  if (firebaseApp) {
+  if (firebaseApp && db) {
     return { app: firebaseApp, db };
   }
 
@@ -28,8 +28,22 @@ export function initializeFirebase() {
       throw new Error('FIREBASE_PRIVATE_KEY environment variable is required');
     }
 
-    // Clean up the private key (remove extra quotes and fix newlines)
-    const cleanPrivateKey = privateKey.replace(/\\n/g, '\n');
+    // Clean up the private key
+    let cleanPrivateKey = privateKey;
+
+    // Remove quotes if they exist
+    if (cleanPrivateKey.startsWith('"') && cleanPrivateKey.endsWith('"')) {
+      cleanPrivateKey = cleanPrivateKey.slice(1, -1);
+    }
+
+    // Fix newlines
+    cleanPrivateKey = cleanPrivateKey.replace(/\\n/g, '\n');
+
+    // Validate private key format
+    if (!cleanPrivateKey.includes('-----BEGIN PRIVATE KEY-----') ||
+        !cleanPrivateKey.includes('-----END PRIVATE KEY-----')) {
+      throw new Error('Invalid private key format');
+    }
 
     const serviceAccount = {
       type: "service_account",
@@ -48,10 +62,9 @@ export function initializeFirebase() {
 
     db = getFirestore(firebaseApp);
 
-    console.log('✅ Firebase initialized successfully with project:', projectId);
     return { app: firebaseApp, db };
   } catch (error) {
-    console.error('❌ Firebase initialization failed:', error);
+    console.error('Firebase initialization failed:', error.message);
     throw error;
   }
 }

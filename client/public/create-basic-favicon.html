@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Basic Favicon</title>
+</head>
+<body>
+    <h1>Creating Basic Favicon Files</h1>
+    <p>This will create basic favicon files for immediate use.</p>
+    
+    <canvas id="favicon32" width="32" height="32" style="border: 1px solid #ccc;"></canvas>
+    <br>
+    <button onclick="downloadFavicon()">Download as favicon.ico</button>
+    <button onclick="downloadPNG()">Download as PNG</button>
+    
+    <script>
+        // Create a simple favicon
+        const canvas = document.getElementById('favicon32');
+        const ctx = canvas.getContext('2d');
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, 32, 32);
+        
+        // Create gradient
+        const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+        gradient.addColorStop(0, '#60a5fa');
+        gradient.addColorStop(1, '#3b82f6');
+        
+        // Draw background circle
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(16, 16, 15, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Draw border
+        ctx.strokeStyle = '#1e40af';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        
+        // Draw graduation cap
+        ctx.fillStyle = '#ffffff';
+        
+        // Cap base
+        ctx.beginPath();
+        ctx.ellipse(16, 14, 8, 2, 0, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Cap top
+        ctx.beginPath();
+        ctx.moveTo(8, 10);
+        ctx.lineTo(24, 10);
+        ctx.lineTo(22, 6);
+        ctx.lineTo(10, 6);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Tassel
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(22, 6);
+        ctx.lineTo(26, 2);
+        ctx.stroke();
+        
+        // Tassel end
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.arc(26, 2, 1, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Add "N" for Nova
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 8px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('N', 16, 20);
+        
+        function downloadFavicon() {
+            // Convert canvas to ICO format (simplified)
+            const link = document.createElement('a');
+            link.download = 'favicon.ico';
+            link.href = canvas.toDataURL('image/x-icon');
+            link.click();
+        }
+        
+        function downloadPNG() {
+            const link = document.createElement('a');
+            link.download = 'favicon-32x32.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Auto-create basic files
+        setTimeout(() => {
+            // Create basic favicon data
+            const faviconData = canvas.toDataURL('image/png');
+            console.log('Basic favicon created. Use the download buttons to save files.');
+        }, 100);
+    </script>
+</body>
+</html>

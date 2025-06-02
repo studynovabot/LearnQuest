@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Favicon Creator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .favicon-preview { display: inline-block; margin: 10px; text-align: center; }
+        .favicon-preview canvas { border: 2px solid #ddd; border-radius: 4px; }
+        .favicon-preview p { margin: 5px 0; font-size: 12px; color: #666; }
+        .download-btn { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .download-btn:hover { background: #2563eb; }
+        .instructions { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 4px; padding: 15px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Nova AI Favicon Creator</h1>
+        <p>Generate all required favicon sizes for the Nova AI LearnQuest application.</p>
+        
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li>Click "Generate All Favicons" to create the icons</li>
+                <li>Right-click on each canvas and "Save image as..." with the exact filename shown</li>
+                <li>Save all files to the <code>client/public/</code> directory</li>
+                <li>The favicon.ico will be generated automatically from the 32x32 version</li>
+            </ol>
+        </div>
+        
+        <button class="download-btn" onclick="generateAllFavicons()">🚀 Generate All Favicons</button>
+        <button class="download-btn" onclick="downloadAll()">📥 Download All as ZIP</button>
+        
+        <div id="favicon-container"></div>
+    </div>
+
+    <script>
+        function createFaviconCanvas(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const center = size / 2;
+            
+            // Clear canvas with transparent background
+            ctx.clearRect(0, 0, size, size);
+            
+            // Create gradient background
+            const gradient = ctx.createRadialGradient(center, center, 0, center, center, center);
+            gradient.addColorStop(0, '#60a5fa');
+            gradient.addColorStop(1, '#3b82f6');
+            
+            // Draw background circle
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(center, center, center - 1, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Add subtle border
+            ctx.strokeStyle = '#1e40af';
+            ctx.lineWidth = Math.max(1, size * 0.02);
+            ctx.stroke();
+            
+            // Draw graduation cap icon
+            ctx.fillStyle = '#ffffff';
+            
+            // Graduation cap base
+            const capWidth = size * 0.5;
+            const capHeight = size * 0.15;
+            const capX = center - capWidth / 2;
+            const capY = center - size * 0.1;
+            
+            ctx.beginPath();
+            ctx.ellipse(center, capY, capWidth / 2, capHeight / 2, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Graduation cap top
+            ctx.beginPath();
+            ctx.moveTo(center - capWidth * 0.4, center - size * 0.3);
+            ctx.lineTo(center + capWidth * 0.4, center - size * 0.3);
+            ctx.lineTo(center + capWidth * 0.3, center - size * 0.45);
+            ctx.lineTo(center - capWidth * 0.3, center - size * 0.45);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Tassel
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = Math.max(2, size * 0.04);
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(center + capWidth * 0.3, center - size * 0.45);
+            ctx.lineTo(center + capWidth * 0.45, center - size * 0.6);
+            ctx.stroke();
+            
+            // Tassel end
+            ctx.fillStyle = '#fbbf24';
+            ctx.beginPath();
+            ctx.arc(center + capWidth * 0.45, center - size * 0.6, size * 0.04, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Add "N" for Nova
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${size * 0.25}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('N', center, center + size * 0.15);
+            
+            return canvas;
+        }
+        
+        function generateAllFavicons() {
+            const container = document.getElementById('favicon-container');
+            container.innerHTML = '';
+            
+            const sizes = [
+                { size: 16, name: 'favicon-16x16.png' },
+                { size: 32, name: 'favicon-32x32.png' },
+                { size: 48, name: 'favicon-48x48.png' },
+                { size: 96, name: 'favicon-96x96.png' },
+                { size: 192, name: 'android-chrome-192x192.png' },
+                { size: 512, name: 'android-chrome-512x512.png' },
+                { size: 180, name: 'apple-touch-icon.png' },
+                { size: 152, name: 'apple-touch-icon-152x152.png' },
+                { size: 144, name: 'apple-touch-icon-144x144.png' },
+                { size: 120, name: 'apple-touch-icon-120x120.png' },
+                { size: 114, name: 'apple-touch-icon-114x114.png' },
+                { size: 76, name: 'apple-touch-icon-76x76.png' },
+                { size: 72, name: 'apple-touch-icon-72x72.png' },
+                { size: 60, name: 'apple-touch-icon-60x60.png' },
+                { size: 57, name: 'apple-touch-icon-57x57.png' },
+                { size: 70, name: 'mstile-70x70.png' },
+                { size: 150, name: 'mstile-150x150.png' },
+                { size: 310, name: 'mstile-310x310.png' }
+            ];
+            
+            sizes.forEach(({ size, name }) => {
+                const canvas = createFaviconCanvas(size);
+                const preview = document.createElement('div');
+                preview.className = 'favicon-preview';
+                
+                const label = document.createElement('p');
+                label.textContent = `${size}x${size}`;
+                label.style.fontWeight = 'bold';
+                
+                const filename = document.createElement('p');
+                filename.textContent = name;
+                filename.style.fontSize = '10px';
+                filename.style.color = '#666';
+                
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'download-btn';
+                downloadBtn.textContent = 'Download';
+                downloadBtn.style.fontSize = '10px';
+                downloadBtn.style.padding = '4px 8px';
+                downloadBtn.onclick = () => downloadCanvas(canvas, name);
+                
+                preview.appendChild(label);
+                preview.appendChild(canvas);
+                preview.appendChild(filename);
+                preview.appendChild(downloadBtn);
+                container.appendChild(preview);
+            });
+            
+            // Generate favicon.ico instructions
+            const icoInstructions = document.createElement('div');
+            icoInstructions.innerHTML = `
+                <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 4px; padding: 15px; margin: 20px 0;">
+                    <h4>🔧 Creating favicon.ico:</h4>
+                    <p>1. Download the 32x32 PNG file above</p>
+                    <p>2. Use an online converter like <a href="https://convertio.co/png-ico/" target="_blank">convertio.co/png-ico/</a></p>
+                    <p>3. Upload the 32x32 PNG and convert to ICO format</p>
+                    <p>4. Save as <code>favicon.ico</code> in the client/public/ directory</p>
+                </div>
+            `;
+            container.appendChild(icoInstructions);
+        }
+        
+        function downloadCanvas(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        function downloadAll() {
+            alert('Individual downloads are recommended. Click "Generate All Favicons" first, then download each file individually.');
+        }
+        
+        // Auto-generate on page load
+        window.onload = generateAllFavicons;
+    </script>
+</body>
+</html>

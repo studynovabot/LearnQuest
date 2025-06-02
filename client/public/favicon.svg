@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" fill="url(#grad1)" stroke="#1e40af" stroke-width="1"/>
+  
+  <!-- Graduation cap -->
+  <g transform="translate(16,16)">
+    <!-- Cap base -->
+    <ellipse cx="0" cy="-2" rx="8" ry="2.5" fill="#ffffff"/>
+    <!-- Cap top -->
+    <path d="M -8,-4 L 8,-4 L 6,-7 L -6,-7 Z" fill="#ffffff"/>
+    <!-- Tassel -->
+    <line x1="6" y1="-7" x2="8" y2="-9" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="8" cy="-9" r="1" fill="#fbbf24"/>
+    
+    <!-- Book/Knowledge symbol -->
+    <rect x="-3" y="2" width="6" height="4" rx="0.5" fill="#ffffff" opacity="0.9"/>
+    <line x1="-2" y1="3" x2="2" y2="3" stroke="#3b82f6" stroke-width="0.5"/>
+    <line x1="-2" y1="4" x2="2" y2="4" stroke="#3b82f6" stroke-width="0.5"/>
+    <line x1="-2" y1="5" x2="1" y2="5" stroke="#3b82f6" stroke-width="0.5"/>
+  </g>
+</svg>
