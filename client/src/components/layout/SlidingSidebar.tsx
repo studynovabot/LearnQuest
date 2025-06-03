@@ -16,7 +16,8 @@ import {
   PaletteIcon,
   DatabaseIcon,
   ShieldIcon,
-  SettingsIcon
+  SettingsIcon,
+  BookIcon
 } from "@/components/ui/icons";
 
 interface SlidingSidebarProps {
@@ -53,7 +54,7 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       path: "/image-tools",
     },
     {
-      icon: MessageSquareIcon,
+      icon: MessageIcon,
       label: "AI Chat",
       path: "/chat",
     },

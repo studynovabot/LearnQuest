@@ -17,6 +17,7 @@ import Themes from "@/pages/Themes";
 import Subscription from "@/pages/Subscription";
 import FlowCharts from "@/pages/FlowCharts";
 import NCERTSolutions from "@/pages/NCERTSolutions";
+import TextbookSolutions from "@/pages/TextbookSolutions";
 import ImageTools from "@/pages/ImageTools";
 import PersonalizedAgent from "@/pages/PersonalizedAgent";
 import ContentManager from "@/pages/ContentManager";
@@ -89,6 +90,11 @@ function Router() {
       <Route path="/ncert-solutions">
         <MainLayout>
           <NCERTSolutions />
+        </MainLayout>
+      </Route>
+      <Route path="/textbook-solutions">
+        <MainLayout>
+          <TextbookSolutions />
         </MainLayout>
       </Route>
       <Route path="/image-tools">
