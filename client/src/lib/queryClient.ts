@@ -37,7 +37,10 @@ export async function apiRequest(
   // Get userId from localStorage if available
   const userId = getUserId() || 'guest';
   const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
+  
+  // Add both X-User-ID header and Authorization header for compatibility
   headers["X-User-ID"] = userId;
+  headers["Authorization"] = `Bearer ${userId}`;
 
   // Add debugging information
   console.log(`🌐 Making API request: ${method} ${url}`);
@@ -161,8 +164,11 @@ export const getQueryFn: <T>(options: {
     // Determine if this is a cross-origin request
     const isCrossOrigin = requestUrl.includes('http') && !requestUrl.includes(window.location.origin);
 
-    // Create headers object
-    const headers: Record<string, string> = { "X-User-ID": userId };
+    // Create headers object with both X-User-ID and Authorization headers
+    const headers: Record<string, string> = { 
+      "X-User-ID": userId,
+      "Authorization": `Bearer ${userId}`
+    };
 
     // Log the query details for debugging
     console.log('Query details:', {

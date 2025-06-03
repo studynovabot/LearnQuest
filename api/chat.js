@@ -144,6 +144,12 @@ async function generateAIResponse(content, agentId, userId = null, db = null) {
 // Get personalized context based on user performance data
 async function getPersonalizedContext(db, userId, subject, content) {
   try {
+    // Check if db is available
+    if (!db) {
+      console.log('Skipping personalized context - Firebase not available');
+      return '';
+    }
+
     // Extract question data to determine if this is a question
     const questionData = extractQuestionData(content);
     if (!questionData.isQuestion) {
@@ -151,14 +157,15 @@ async function getPersonalizedContext(db, userId, subject, content) {
     }
 
     // Get user performance data for the subject
-    const performanceRef = db.collection('user_performance').doc(`${userId}_${subject}`);
-    const performanceDoc = await performanceRef.get();
-    
-    if (!performanceDoc.exists) {
-      return ''; // No performance data available yet
-    }
-    
-    const performanceData = performanceDoc.data();
+    try {
+      const performanceRef = db.collection('user_performance').doc(`${userId}_${subject}`);
+      const performanceDoc = await performanceRef.get();
+      
+      if (!performanceDoc.exists) {
+        return ''; // No performance data available yet
+      }
+      
+      const performanceData = performanceDoc.data();
     
     // Get knowledge map for the subject
     const knowledgeMapRef = db.collection('user_knowledge_maps').doc(`${userId}_${subject}`);
@@ -1372,30 +1379,35 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get user ID from Authorization header
+    // Get user ID from Authorization header or X-User-ID header
+    let userId;
     const authHeader = req.headers.authorization;
-    if (!authHeader) {
+    const userIdHeader = req.headers['x-user-id'];
+    
+    if (authHeader) {
+      userId = authHeader.replace('Bearer ', '');
+    } else if (userIdHeader) {
+      userId = userIdHeader;
+    } else {
       return res.status(401).json({ error: 'Authorization header required' });
     }
 
-    const userId = authHeader.replace('Bearer ', '');
     if (!userId) {
       return res.status(401).json({ error: 'Invalid authorization token' });
     }
 
+    console.log(`📝 Processing chat message for user ${userId} with agent ${req.body.agentId || 'default'}`);
+
     // Initialize Firebase
+    let db;
     try {
       initializeFirebase();
+      db = getFirestoreDb();
     } catch (firebaseError) {
       console.error('⚠️ Firebase initialization error:', firebaseError);
-      return res.status(500).json({
-        error: true,
-        message: 'Failed to initialize database',
-        details: firebaseError.message
-      });
+      console.log('⚠️ Continuing without Firebase - some features will be limited');
+      // Continue without Firebase - we'll handle this case below
     }
-
-    const db = getFirestoreDb();
 
     // Get request body
     const { 
@@ -1424,10 +1436,10 @@ export default async function handler(req, res) {
 
     console.log(`📝 Processing chat message for user ${userId} with agent ${agentId || 'default'}`);
 
-    // Generate AI response with personalized context
+    // Generate AI response with personalized context (if db is available)
     const aiResponse = await generateAIResponse(content, agentId, userId, db);
 
-    // Track user interaction for performance metrics
+    // Track user interaction for performance metrics (only if db is available)
     const subject = getSubjectFromAgent(agentId);
     
     // Extract question data to determine if this is a question
@@ -1472,12 +1484,22 @@ export default async function handler(req, res) {
       attemptCount: attemptCount || 1
     };
 
-    // Track the interaction with enhanced analytics
-    const interactionId = await trackUserInteraction(db, interaction);
+    // Track the interaction with enhanced analytics (only if db is available)
+    let interactionId = `interaction_${Date.now()}`;
+    if (db) {
+      try {
+        interactionId = await trackUserInteraction(db, interaction);
+      } catch (trackError) {
+        console.error('Error tracking user interaction:', trackError);
+        // Continue without tracking
+      }
+    } else {
+      console.log('Skipping interaction tracking - Firebase not available');
+    }
 
-    // Get personalized recommendations if this was a question
+    // Get personalized recommendations if this was a question and db is available
     let recommendations = null;
-    if (isQuestion) {
+    if (isQuestion && db) {
       try {
         // Get quick recommendations based on this interaction
         const { generatePersonalizedRecommendations } = await import('./_utils/learning-engine.js');

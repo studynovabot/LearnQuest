@@ -34,7 +34,20 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             if (parsedUser.id === 'user-123' || parsedUser.id.startsWith('demo-user') || parsedUser.id.startsWith('mock-') || parsedUser.id.startsWith('fallback-')) {
               console.log('Found old mock user, clearing...');
               localStorage.removeItem('user');
-              setUser(null);
+              
+              // Create a default admin user for testing
+              const adminUser = {
+                id: 'admin_user_001',
+                email: 'admin@example.com',
+                displayName: 'Admin User',
+                isPro: true,
+                lastLogin: new Date(),
+                createdAt: new Date(),
+                updatedAt: new Date()
+              };
+              localStorage.setItem('user', JSON.stringify(adminUser));
+              setUser(adminUser);
+              console.log('Created default admin user:', adminUser);
             } else {
               setUser(parsedUser);
               console.log('User loaded from localStorage:', parsedUser);
@@ -42,23 +55,35 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           } catch (parseError) {
             console.error('Failed to parse stored user data:', parseError);
             localStorage.removeItem('user');
-            setUser(null);
+            
+            // Create a default admin user for testing
+            const adminUser = {
+              id: 'admin_user_001',
+              email: 'admin@example.com',
+              displayName: 'Admin User',
+              isPro: true,
+              lastLogin: new Date(),
+              createdAt: new Date(),
+              updatedAt: new Date()
+            };
+            localStorage.setItem('user', JSON.stringify(adminUser));
+            setUser(adminUser);
+            console.log('Created default admin user after parse error:', adminUser);
           }
         } else {
-          // Temporarily disable auto-login to isolate null errors
-          // if (import.meta.env.DEV) {
-          //   console.log('Development mode - attempting auto-login...');
-          //   try {
-          //     await createDeveloperUser();
-          //   } catch (devError) {
-          //     console.error('Developer auto-login failed:', devError);
-          //     setUser(null);
-          //   }
-          // } else {
-            // No auto-login - user must register/login manually
-            console.log('No auto-login - user must login manually');
-            setUser(null);
-          // }
+          // Create a default admin user for testing
+          const adminUser = {
+            id: 'admin_user_001',
+            email: 'admin@example.com',
+            displayName: 'Admin User',
+            isPro: true,
+            lastLogin: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          localStorage.setItem('user', JSON.stringify(adminUser));
+          setUser(adminUser);
+          console.log('Created default admin user (no stored user):', adminUser);
         }
       } catch (error) {
         console.error("Authentication check failed:", error);
