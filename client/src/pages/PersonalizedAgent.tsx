@@ -50,92 +50,135 @@ const PersonalizedAgent = () => {
   const [recommendations, setRecommendations] = useState<StudyRecommendation[]>([]);
   const [insights, setInsights] = useState<PersonalizedInsight[]>([]);
   const [overallProgress, setOverallProgress] = useState(0);
-
-  // Sample data based on user performance
-  const sampleWeakAreas: WeakArea[] = [
-    {
-      subject: 'Mathematics',
-      topic: 'Quadratic Equations',
-      accuracy: 45,
-      lastAttempt: '2 days ago',
-      recommendedActions: [
-        'Practice more word problems',
-        'Review factorization methods',
-        'Watch tutorial videos'
-      ]
-    },
-    {
-      subject: 'Science',
-      topic: 'Chemical Bonding',
-      accuracy: 60,
-      lastAttempt: '1 week ago',
-      recommendedActions: [
-        'Study ionic vs covalent bonds',
-        'Practice Lewis structures',
-        'Take practice quiz'
-      ]
-    }
-  ];
-
-  const sampleRecommendations: StudyRecommendation[] = [
-    {
-      id: '1',
-      title: 'Focus on Algebra Fundamentals',
-      description: 'Your recent performance shows gaps in basic algebraic operations. Strengthening these will improve your overall math scores.',
-      priority: 'high',
-      estimatedTime: 30,
-      type: 'practice'
-    },
-    {
-      id: '2',
-      title: 'Review Photosynthesis Process',
-      description: 'You scored well on plant nutrition but missed some photosynthesis details. A quick review will solidify your understanding.',
-      priority: 'medium',
-      estimatedTime: 15,
-      type: 'review'
-    },
-    {
-      id: '3',
-      title: 'Explore Advanced Physics Concepts',
-      description: 'You\'re excelling in basic physics. Ready to tackle more advanced topics like electromagnetic induction?',
-      priority: 'low',
-      estimatedTime: 45,
-      type: 'learn'
-    }
-  ];
-
-  const sampleInsights: PersonalizedInsight[] = [
-    {
-      type: 'strength',
-      title: 'Strong in Visual Learning',
-      description: 'You perform 23% better when concepts include diagrams and visual aids.',
-      actionable: true
-    },
-    {
-      type: 'weakness',
-      title: 'Struggles with Time Management',
-      description: 'You tend to spend too much time on easier questions, leaving less time for challenging ones.',
-      actionable: true
-    },
-    {
-      type: 'improvement',
-      title: 'Math Performance Trending Up',
-      description: 'Your math scores have improved by 15% over the last month. Keep up the great work!',
-      actionable: false
-    },
-    {
-      type: 'goal',
-      title: 'Target: 85% in Science',
-      description: 'You\'re currently at 78% in Science. Focus on weak areas to reach your 85% goal.',
-      actionable: true
-    }
-  ];
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    setWeakAreas(sampleWeakAreas);
-    setRecommendations(sampleRecommendations);
-    setInsights(sampleInsights);
-    setOverallProgress(72);
+    const fetchPersonalizedData = async () => {
+      if (!user?.id) return;
+      
+      setIsDataLoading(true);
+      setHasError(false);
+      
+      try {
+        // First, try to seed test data
+        const seedResponse = await fetch('/api/seed-data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.id}`
+          }
+        });
+
+        if (!seedResponse.ok) {
+          console.warn('Failed to seed test data:', await seedResponse.json());
+        }
+
+        // Fetch general recommendations
+        const generalRecommendationsResponse = await fetch('/api/learning-recommendations?type=general', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.id}`
+          }
+        });
+        
+        if (!generalRecommendationsResponse.ok) {
+          throw new Error('Failed to fetch recommendations');
+        }
+        
+        const generalData = await generalRecommendationsResponse.json();
+        
+        if (generalData.success && generalData.recommendations) {
+          const transformedRecommendations = generalData.recommendations
+            .filter(rec => rec.type !== 'streak')
+            .map(rec => ({
+              id: Math.random().toString(36).substr(2, 9),
+              title: rec.title,
+              description: rec.description,
+              priority: rec.priority || 'medium',
+              estimatedTime: 30,
+              type: rec.type === 'knowledge_gap' ? 'practice' :
+                    rec.type === 'strength' ? 'learn' : 'review'
+            }));
+          
+          setRecommendations(transformedRecommendations);
+        }
+
+        // Fetch insights
+        const insightsResponse = await fetch('/api/learning-recommendations?type=insights', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.id}`
+          }
+        });
+        
+        if (!insightsResponse.ok) {
+          throw new Error('Failed to fetch insights');
+        }
+        
+        const insightsData = await insightsResponse.json();
+        
+        if (insightsData.success && insightsData.insights) {
+          const transformedInsights = insightsData.insights.map(insight => ({
+            type: insight.type as 'strength' | 'weakness' | 'improvement' | 'goal',
+            title: insight.title,
+            description: insight.description,
+            actionable: insight.actionable || false
+          }));
+          
+          setInsights(transformedInsights);
+          
+          const progressInsight = insightsData.insights.find(i => i.type === 'progress');
+          if (progressInsight?.progress) {
+            setOverallProgress(progressInsight.progress);
+          }
+        }
+
+        // Fetch weak areas
+        const weakAreasResponse = await fetch('/api/learning-recommendations?type=subject&subject=all', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.id}`
+          }
+        });
+        
+        if (!weakAreasResponse.ok) {
+          throw new Error('Failed to fetch weak areas');
+        }
+        
+        const weakAreasData = await weakAreasResponse.json();
+        
+        if (weakAreasData.success && weakAreasData.recommendations) {
+          const transformedWeakAreas = weakAreasData.recommendations
+            .filter(rec => rec.type === 'knowledge_gap')
+            .map(rec => ({
+              subject: rec.items[0].subject,
+              topic: rec.items[0].concept,
+              accuracy: rec.items[0].mastery,
+              lastAttempt: 'Recently',
+              recommendedActions: rec.items[0].suggestedAction.split(', ')
+            }));
+          
+          setWeakAreas(transformedWeakAreas);
+        }
+
+      } catch (error) {
+        console.error('Error fetching personalized data:', error);
+        setHasError(true);
+        toast({
+          title: 'Error',
+          description: 'Failed to load personalized data. Please try again later.',
+          variant: 'destructive'
+        });
+      } finally {
+        setIsDataLoading(false);
+      }
+    };
+
+    fetchPersonalizedData();
 
     // Add welcome message
     setChatHistory([
@@ -146,7 +189,34 @@ const PersonalizedAgent = () => {
         timestamp: new Date()
       }
     ]);
-  }, [user]);
+  }, [user, toast]);
+
+  // Add loading and error states to the UI
+  if (isDataLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Loading your personalized learning data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center space-y-4">
+          <AlertTriangleIcon className="h-12 w-12 text-destructive mx-auto" />
+          <h2 className="text-xl font-semibold">Failed to Load Data</h2>
+          <p className="text-muted-foreground">There was an error loading your personalized data.</p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const sendMessage = async () => {
     if (!message.trim()) return;
