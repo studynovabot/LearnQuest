@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change beforePath="$PROJECT_DIR$/api/delete-account.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/delete-account.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/flash-notes.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev-server.js" beforeDir="false" afterPath="$PROJECT_DIR$/dev-server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,6 +74,8 @@
       <workItem from="1748924943429" duration="2053000" />
       <workItem from="1748927098284" duration="2099000" />
       <workItem from="1748941744289" duration="672000" />
+      <workItem from="1748950555093" duration="397000" />
+      <workItem from="1748951040172" duration="285000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -657,18 +658,17 @@
   <component name="ai.zencoder.plugin.rag.state">
     <option name="indexedFilesMap">
       <map>
-        <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1748927407498" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1748929452594" />
+        <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1748950858289" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1748950858289" />
         <entry key="$PROJECT_DIR$/api/chat.js" value="1748927969920" />
-        <entry key="$PROJECT_DIR$/api/delete-account.js" value="1748942466395" />
-        <entry key="$PROJECT_DIR$/api/flash-notes.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/delete-account.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" value="1748929206006" />
         <entry key="$PROJECT_DIR$/dev-server.js" value="1748942466395" />
       </map>
     </option>
-    <option name="lastCommitHash" value="df57a9bd610d74af1092448c4faf0b24de45dfec" />
-    <option name="lastIndexTimestamp" value="1748942466395" />
-    <option name="repoAccumulatedChanges" value="27" />
+    <option name="lastCommitHash" value="cb0406c8ba4d3a57ca1dc8722e777c35d4662a36" />
+    <option name="lastIndexTimestamp" value="1748950858289" />
+    <option name="repoAccumulatedChanges" value="54" />
     <option name="repoTotalFiles" value="222" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />
