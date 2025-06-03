@@ -1350,3 +1350,175 @@ function checkForGenericResponse(content) {
     content.toLowerCase().includes(phrase.toLowerCase())
   );
 }
+
+// Main handler function for the chat API
+export default async function handler(req, res) {
+  // Handle CORS
+  const corsResult = handleCors(req, res);
+  if (corsResult) return corsResult;
+
+  console.log('🚀 Chat API called with method:', req.method);
+
+  if (req.method !== 'POST') {
+    console.log('❌ Method not allowed:', req.method);
+    return res.status(405).json({
+      error: true,
+      message: 'Method not allowed',
+      details: `${req.method} is not supported, use POST`
+    });
+  }
+
+  try {
+    // Get user ID from Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Authorization header required' });
+    }
+
+    const userId = authHeader.replace('Bearer ', '');
+    if (!userId) {
+      return res.status(401).json({ error: 'Invalid authorization token' });
+    }
+
+    // Initialize Firebase
+    try {
+      initializeFirebase();
+    } catch (firebaseError) {
+      console.error('⚠️ Firebase initialization error:', firebaseError);
+      return res.status(500).json({
+        error: true,
+        message: 'Failed to initialize database',
+        details: firebaseError.message
+      });
+    }
+
+    const db = getFirestoreDb();
+
+    // Get request body
+    const { 
+      content, 
+      agentId, 
+      sessionId, 
+      timeSpent, 
+      correct, 
+      confidenceScore,
+      device,
+      platform,
+      promptTokens,
+      completionTokens,
+      totalTokens,
+      processingTime,
+      attemptCount
+    } = req.body;
+
+    if (!content) {
+      return res.status(400).json({
+        error: true,
+        message: 'Missing required fields',
+        details: 'Content is required'
+      });
+    }
+
+    console.log(`📝 Processing chat message for user ${userId} with agent ${agentId || 'default'}`);
+
+    // Generate AI response with personalized context
+    const aiResponse = await generateAIResponse(content, agentId, userId, db);
+
+    // Track user interaction for performance metrics
+    const subject = getSubjectFromAgent(agentId);
+    
+    // Extract question data to determine if this is a question
+    const questionData = extractQuestionData(content);
+    const isQuestion = questionData.isQuestion;
+    
+    // Calculate XP based on interaction type and complexity
+    let xpEarned = aiResponse.xpAwarded || 5;
+    if (isQuestion) {
+      // Award more XP for questions, especially complex ones
+      const complexityMultiplier = 
+        questionData.complexity === 'hard' ? 2.0 : 
+        questionData.complexity === 'medium' ? 1.5 : 
+        1.2;
+      
+      xpEarned = Math.round(xpEarned * complexityMultiplier);
+      
+      // Bonus XP for correct answers
+      if (correct === true) {
+        xpEarned += 2;
+      }
+    }
+    
+    const interaction = {
+      userId,
+      sessionId: sessionId || `session_${Date.now()}`,
+      content,
+      response: aiResponse.content,
+      subject,
+      agentId,
+      correct: correct !== undefined ? correct : true, // Use provided value or assume correct for chat
+      timeSpent: timeSpent || 0,
+      xpEarned,
+      model: aiResponse.model || 'unknown',
+      confidenceScore,
+      device: device || 'unknown',
+      platform: platform || 'web',
+      promptTokens: promptTokens || 0,
+      completionTokens: completionTokens || 0,
+      totalTokens: totalTokens || 0,
+      processingTime: processingTime || 0,
+      attemptCount: attemptCount || 1
+    };
+
+    // Track the interaction with enhanced analytics
+    const interactionId = await trackUserInteraction(db, interaction);
+
+    // Get personalized recommendations if this was a question
+    let recommendations = null;
+    if (isQuestion) {
+      try {
+        // Get quick recommendations based on this interaction
+        const { generatePersonalizedRecommendations } = await import('./_utils/learning-engine.js');
+        const recommendationResult = await generatePersonalizedRecommendations(db, userId, subject);
+        
+        if (recommendationResult.success) {
+          // Include only the most relevant recommendation
+          const topRecommendation = recommendationResult.recommendations[0];
+          if (topRecommendation) {
+            recommendations = {
+              type: topRecommendation.type,
+              title: topRecommendation.title,
+              description: topRecommendation.description,
+              items: topRecommendation.items.slice(0, 1) // Just the top item
+            };
+          }
+        }
+      } catch (recError) {
+        console.error('Error generating recommendations:', recError);
+        // Continue without recommendations
+      }
+    }
+
+    // Return enhanced response
+    return res.status(200).json({
+      success: true,
+      message: aiResponse.content,
+      xpAwarded: xpEarned,
+      model: aiResponse.model || 'unknown',
+      interactionId,
+      isQuestion,
+      questionData: isQuestion ? {
+        category: questionData.category,
+        complexity: questionData.complexity,
+        conceptTags: questionData.conceptTags
+      } : null,
+      recommendations
+    });
+  } catch (error) {
+    console.error('💥 Unexpected error:', error);
+    return res.status(500).json({
+      error: true,
+      message: 'An unexpected error occurred',
+      details: error.message
+    });
+  }
+}
