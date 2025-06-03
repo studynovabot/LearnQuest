@@ -96,9 +96,14 @@ async function generateAIResponse(content, agentId, userId = null, db = null) {
 
   console.log(`🚀 generateAIResponse called for agent ${agent} with content: "${content}"`);
 
-  // Get API keys
-  const groqApiKey = process.env.GROQ_API_KEY || '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';
-  const togetherApiKey = process.env.TOGETHER_AI_API_KEY || 'tgp_v1_yFrvJxVO3yzNPiosWhOZYeg0_BjLlBQDruWAiwSi5bs';
+  // Get API keys - using the correct keys from .env.local
+  const groqApiKey = process.env.GROQ_API_KEY || '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';
+  const togetherApiKey = process.env.TOGETHER_AI_API_KEY || '386f94fa38882002186da7d11fa278a2bdb729dcda437ef07b8b0f14e1fc2';
+
+  console.log('🔑 Using API keys:', { 
+    groqKeyAvailable: !!groqApiKey,
+    togetherKeyAvailable: !!togetherApiKey 
+  });
 
   // Get personalized context if user ID and database are provided
   let personalizedContext = '';
@@ -407,8 +412,6 @@ async function tryTogetherAPI(content, systemPrompt, apiKey) {
   const errorText = await response.text();
   throw new Error(`Together AI failed: ${response.status} - ${errorText}`);
 }
-
-
 
 // Verify API key is working
 async function verifyApiKey() {
@@ -959,7 +962,7 @@ function calculateDetailedPerformance(currentData, newInteraction, recentInterac
       (complexityCorrect / complexityInteractions.length) * 100;
   }
   
-  // Calculate learning curve (trend over time)
+  // Calculate learning curve (trend analysis)
   const learningCurve = calculateLearningCurve(recentInteractions, newInteraction);
   
   // Calculate engagement metrics

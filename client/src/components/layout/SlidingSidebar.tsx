@@ -58,6 +58,11 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       label: "AI Chat",
       path: "/chat",
     },
+    {
+      icon: SettingsIcon,
+      label: "Settings",
+      path: "/settings",
+    },
   ];
 
   // Admin-only navigation items

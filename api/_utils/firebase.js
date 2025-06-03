@@ -1,78 +1,40 @@
 // Firebase utilities for Vercel serverless functions
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 
-let firebaseApp = null;
-let db = null;
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || 'studynovabot.firebaseapp.com',
+  projectId: process.env.FIREBASE_PROJECT_ID || 'studynovabot',
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'studynovabot.appspot.com',
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '250481817155',
+  appId: process.env.FIREBASE_APP_ID || '1:250481817155:web:16ef3bbdb36bbc375dc6f6'
+};
 
+// Initialize Firebase
 export function initializeFirebase() {
-  if (firebaseApp && db) {
-    return { app: firebaseApp, db };
-  }
-
   try {
-    // Check if Firebase is already initialized
-    const existingApps = getApps();
-    if (existingApps.length > 0) {
-      firebaseApp = existingApps[0];
-      db = getFirestore(firebaseApp);
-      return { app: firebaseApp, db };
+    if (!getApps().length) {
+      console.log('🔥 Initializing Firebase with config:', {
+        authDomain: firebaseConfig.authDomain,
+        projectId: firebaseConfig.projectId
+      });
+      return initializeApp(firebaseConfig);
     }
-
-    // Use environment variables for Firebase credentials
-    const projectId = process.env.FIREBASE_PROJECT_ID || 'studynovabot';
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || 'firebase-adminsdk-fbsvc@studynovabot.iam.gserviceaccount.com';
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
-
-    if (!privateKey) {
-      throw new Error('FIREBASE_PRIVATE_KEY environment variable is required');
-    }
-
-    // Clean up the private key
-    let cleanPrivateKey = privateKey;
-
-    // Remove quotes if they exist
-    if (cleanPrivateKey.startsWith('"') && cleanPrivateKey.endsWith('"')) {
-      cleanPrivateKey = cleanPrivateKey.slice(1, -1);
-    }
-
-    // Fix newlines
-    cleanPrivateKey = cleanPrivateKey.replace(/\\n/g, '\n');
-
-    // Validate private key format
-    if (!cleanPrivateKey.includes('-----BEGIN PRIVATE KEY-----') ||
-        !cleanPrivateKey.includes('-----END PRIVATE KEY-----')) {
-      throw new Error('Invalid private key format');
-    }
-
-    const serviceAccount = {
-      type: "service_account",
-      project_id: projectId,
-      private_key: cleanPrivateKey,
-      client_email: clientEmail,
-      auth_uri: "https://accounts.google.com/o/oauth2/auth",
-      token_uri: "https://oauth2.googleapis.com/token",
-      auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs"
-    };
-
-    firebaseApp = initializeApp({
-      credential: cert(serviceAccount),
-      projectId: projectId
-    });
-
-    db = getFirestore(firebaseApp);
-
-    return { app: firebaseApp, db };
+    return getApps()[0];
   } catch (error) {
-    console.error('Firebase initialization failed:', error.message);
+    console.error('❌ Error initializing Firebase:', error);
     throw error;
   }
 }
 
+// Get Firestore instance
 export function getFirestoreDb() {
-  if (!db) {
-    const { db: database } = initializeFirebase();
-    return database;
+  try {
+    const app = initializeFirebase();
+    return getFirestore(app);
+  } catch (error) {
+    console.error('❌ Error getting Firestore instance:', error);
+    throw error;
   }
-  return db;
 }
