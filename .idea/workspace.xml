@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change beforePath="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/chat.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +71,7 @@
       <workItem from="1748879574571" duration="526000" />
       <workItem from="1748880447809" duration="757000" />
       <workItem from="1748924943429" duration="2053000" />
-      <workItem from="1748927098284" duration="882000" />
+      <workItem from="1748927098284" duration="2099000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -658,13 +656,14 @@
     <option name="indexedFilesMap">
       <map>
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1748927407498" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1748927671055" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1748929452594" />
         <entry key="$PROJECT_DIR$/api/chat.js" value="1748927969920" />
+        <entry key="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" value="1748929206006" />
       </map>
     </option>
-    <option name="lastCommitHash" value="86cb7af70deff41b6b708b723e2b7aa6760cd0d1" />
-    <option name="lastIndexTimestamp" value="1748927969920" />
-    <option name="repoAccumulatedChanges" value="2" />
+    <option name="lastCommitHash" value="c34ba9953c53ff0a571271bf1ea7792fb2c60cd9" />
+    <option name="lastIndexTimestamp" value="1748929452594" />
+    <option name="repoAccumulatedChanges" value="12" />
     <option name="repoTotalFiles" value="222" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />
