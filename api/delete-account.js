@@ -48,38 +48,20 @@ export default async function handler(req, res) {
       // Start batch deletion process
       const batch = db.batch();
 
-      // Delete user document
-      batch.delete(db.collection('users').doc(userId));
-
-      // Delete user's chat history (if exists)
+      // Delete user's chat history
       const chatQuery = await db.collection('chats').where('userId', '==', userId).get();
       chatQuery.docs.forEach(doc => {
         batch.delete(doc.ref);
       });
 
-      // Delete user's flash notes (if exists)
-      const flashNotesQuery = await db.collection('flashNotes').where('userId', '==', userId).get();
-      flashNotesQuery.docs.forEach(doc => {
+      // Delete user's content uploads
+      const uploadsQuery = await db.collection('contentUploads').where('userId', '==', userId).get();
+      uploadsQuery.docs.forEach(doc => {
         batch.delete(doc.ref);
       });
 
-      // Delete user's uploaded content (if exists)
-      const contentQuery = await db.collection('userContent').where('userId', '==', userId).get();
-      contentQuery.docs.forEach(doc => {
-        batch.delete(doc.ref);
-      });
-
-      // Delete user's preferences (if exists)
-      const preferencesQuery = await db.collection('userPreferences').where('userId', '==', userId).get();
-      preferencesQuery.docs.forEach(doc => {
-        batch.delete(doc.ref);
-      });
-
-      // Delete user's subscription data (if exists)
-      const subscriptionQuery = await db.collection('subscriptions').where('userId', '==', userId).get();
-      subscriptionQuery.docs.forEach(doc => {
-        batch.delete(doc.ref);
-      });
+      // Delete user document
+      batch.delete(userDoc.ref);
 
       // Create deletion log for audit purposes
       const deletionLog = {

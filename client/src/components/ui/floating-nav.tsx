@@ -32,15 +32,10 @@ const FloatingNav: React.FC<FloatingNavProps> = ({
   // Navigation items
   const navItems = [
     { icon: HomeIcon, label: "Home", path: "/" },
-    { icon: MessageIcon, label: "Chat", path: "/chat" },
-    { icon: FlashlightIcon, label: "Flash Notes", path: "/flash-notes" },
-    { icon: BookOpenIcon, label: "NCERT", path: "/ncert-solutions" },
-    { icon: ImageIcon, label: "Images", path: "/image-tools" },
-    { icon: SparklesIcon, label: "AI Agent", path: "/personalized-agent" },
-    { icon: UploadIcon, label: "Content", path: "/content-manager" },
-    { icon: CreditCardIcon,
-  SettingsIcon, label: "Premium", path: "/subscription" },
-    { icon: SettingsIcon, label: "Settings", path: "/settings" },
+    { icon: BookOpenIcon, label: "NCERT Solutions", path: "/ncert-solutions" },
+    { icon: BookIcon, label: "Textbook Solutions", path: "/textbook-solutions" },
+    { icon: ImageIcon, label: "Image Tools", path: "/image-tools" },
+    { icon: BrainCircuitIcon, label: "AI Chat", path: "/chat" },
   ];
 
   // Auto-hide on scroll for bottom variant

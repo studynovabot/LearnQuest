@@ -99,7 +99,7 @@ export const insertChatMessageSchema = chatMessageSchema.omit({ id: true, create
 export const educationalContentSchema = z.object({
   id: z.string(),
   title: z.string(),
-  type: z.enum(['flash-notes', 'flow-charts', 'ncert-solutions', 'textbook-solutions']),
+  type: z.enum(['flow-charts', 'ncert-solutions', 'textbook-solutions']),
   board: z.string(), // CBSE, ICSE, etc.
   class: z.string(), // 6, 7, 8, 9, 10, 11, 12
   subject: z.string(),
@@ -128,7 +128,7 @@ export const contentUploadSchema = z.object({
   mimeType: z.string(),
   uploadPath: z.string(),
   downloadUrl: z.string(),
-  type: z.enum(['flash-notes', 'flow-charts', 'ncert-solutions', 'textbook-solutions']),
+  type: z.enum(['flow-charts', 'ncert-solutions', 'textbook-solutions']),
   board: z.string(),
   class: z.string(),
   subject: z.string(),
@@ -193,3 +193,13 @@ export const insertContentSearchSchema = contentSearchSchema.omit({
 export type InsertEducationalContent = z.infer<typeof insertEducationalContentSchema>;
 export type InsertContentUpload = z.infer<typeof insertContentUploadSchema>;
 export type InsertContentSearch = z.infer<typeof insertContentSearchSchema>;
+
+export const contentTypeSchema = z.object({
+  type: z.enum(['flow-charts', 'ncert-solutions', 'textbook-solutions']),
+  // ... existing code ...
+});
+
+export const contentRequestSchema = z.object({
+  type: z.enum(['flow-charts', 'ncert-solutions', 'textbook-solutions']),
+  // ... existing code ...
+});

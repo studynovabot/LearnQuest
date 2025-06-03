@@ -91,16 +91,6 @@ app.all('/api/content-manager', async (req, res) => {
   }
 });
 
-// Flash notes endpoint
-app.all('/api/flash-notes', async (req, res) => {
-  const handler = await loadApiFunction('flash-notes');
-  if (handler) {
-    handler(req, res);
-  } else {
-    res.status(500).json({ error: 'Flash notes function not found' });
-  }
-});
-
 // Flow charts endpoint
 app.all('/api/flow-charts', async (req, res) => {
   const handler = await loadApiFunction('flow-charts');

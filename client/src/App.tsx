@@ -24,10 +24,11 @@ import ContentManager from "@/pages/ContentManager";
 import DocumentSearch from "@/pages/DocumentSearch";
 import VectorUploadPage from "@/pages/VectorUploadPage";
 import AdminRoute from "@/components/AdminRoute";
-import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import MainLayout from "./components/layout/MainLayout";
 // import { Analytics } from "@vercel/analytics/react";
 // import { SpeedInsights } from "@vercel/speed-insights/react";
 
@@ -96,6 +97,11 @@ function Router() {
       <Route path="/ncert-solutions">
         <MainLayout>
           <NCERTSolutions />
+        </MainLayout>
+      </Route>
+      <Route path="/textbook-solutions">
+        <MainLayout>
+          <TextbookSolutions />
         </MainLayout>
       </Route>
       <Route path="/image-tools">

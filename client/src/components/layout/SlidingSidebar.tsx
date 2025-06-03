@@ -17,7 +17,8 @@ import {
   PaletteIcon,
   DatabaseIcon,
   ShieldIcon,
-  SettingsIcon
+  SettingsIcon,
+  MessageSquareIcon
 } from "@/components/ui/icons";
 
 interface SlidingSidebarProps {
@@ -37,57 +38,27 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       icon: HomeIcon,
       label: "Home",
       path: "/",
-      description: "Dashboard"
-    },
-    {
-      icon: MessageIcon,
-      label: "Chat",
-      path: "/chat",
-      description: "AI Tutors"
-    },
-    {
-      icon: FlashlightIcon,
-      label: "Flash Notes",
-      path: "/flash-notes",
-      description: "Quick Notes"
     },
     {
       icon: BookOpenIcon,
       label: "NCERT Solutions",
       path: "/ncert-solutions",
-      description: "Study Materials"
+    },
+    {
+      icon: BookIcon,
+      label: "Textbook Solutions",
+      path: "/textbook-solutions",
     },
     {
       icon: ImageIcon,
       label: "Image Tools",
       path: "/image-tools",
-      description: "OCR & Generation"
     },
     {
-      icon: SparklesIcon,
-      label: "Personalized Agent",
-      path: "/personalized-agent",
-      description: "AI Assistant"
+      icon: MessageSquareIcon,
+      label: "AI Chat",
+      path: "/chat",
     },
-
-    {
-      icon: PaletteIcon,
-      label: "Themes",
-      path: "/themes",
-      description: "Customize UI"
-    },
-    {
-      icon: CreditCardIcon,
-      label: "Subscription",
-      path: "/subscription",
-      description: "Premium Plans"
-    },
-    {
-      icon: SettingsIcon,
-      label: "Settings",
-      path: "/settings",
-      description: "Account Settings"
-    }
   ];
 
   // Admin-only navigation items
@@ -187,9 +158,6 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
                     )}>
                       {item.label}
                     </span>
-                    <p className="text-xs text-muted-foreground whitespace-nowrap">
-                      {item.description}
-                    </p>
                   </div>
                 </button>
               </Link>

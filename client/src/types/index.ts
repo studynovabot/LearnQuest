@@ -66,12 +66,13 @@ export interface EducationalContent {
 
 export interface ContentUpload {
   id: string;
+  title: string;
+  type: 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
   originalFileName: string;
   fileSize: number;
   mimeType: string;
   uploadPath: string;
   downloadUrl: string;
-  type: 'flash-notes' | 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
   board: string;
   class: string;
   subject: string;
@@ -93,6 +94,11 @@ export interface ContentFilter {
   difficulty?: string;
   status?: string;
   search?: string;
+}
+
+export interface ContentRequest {
+  type: 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
+  // ... existing code ...
 }
 
 

@@ -86,16 +86,16 @@ function generateProcessingPrompt(text, type, board, classNum, subject, chapter)
   `;
 
   switch (type) {
-    case 'flash-notes':
+    case 'flow-charts':
       return basePrompt + `
       {
-        "title": "Chapter/Topic Title",
-        "keyPoints": ["Point 1", "Point 2", "Point 3"],
-        "definitions": [{"term": "Term", "definition": "Definition"}],
-        "formulas": [{"name": "Formula Name", "formula": "Mathematical Formula", "description": "Usage"}],
-        "examples": [{"question": "Example Question", "solution": "Step by step solution"}],
-        "difficulty": "easy|medium|hard",
-        "estimatedTime": 15
+        "title": "Flow Chart Title",
+        "description": "Brief description",
+        "steps": [
+          {"step": 1, "title": "Step Title", "description": "Step Description", "connections": ["next_step_id"]},
+          {"step": 2, "title": "Step Title", "description": "Step Description", "connections": ["next_step_id"]}
+        ],
+        "concepts": ["Concept 1", "Concept 2"]
       }`;
       
     case 'ncert-solutions':
@@ -114,25 +114,16 @@ function generateProcessingPrompt(text, type, board, classNum, subject, chapter)
         ]
       }`;
       
-    case 'flow-charts':
+    case 'textbook-solutions':
       return basePrompt + `
       {
-        "title": "Flow Chart Title",
-        "description": "Brief description",
-        "steps": [
-          {"step": 1, "title": "Step Title", "description": "Step Description", "connections": ["next_step_id"]},
-          {"step": 2, "title": "Step Title", "description": "Step Description", "connections": ["next_step_id"]}
-        ],
-        "concepts": ["Concept 1", "Concept 2"]
-      }`;
-      
-    default:
-      return basePrompt + `
-      {
-        "title": "Content Title",
+        "title": "Textbook Solutions",
         "content": "Organized content",
         "sections": [{"heading": "Section Title", "content": "Section Content"}]
       }`;
+      
+    default:
+      throw new Error('Invalid content type');
   }
 }
 
@@ -158,12 +149,16 @@ function createStructuredContent(content, type) {
   const lines = content.split('\n').filter(line => line.trim());
   
   switch (type) {
-    case 'flash-notes':
+    case 'flow-charts':
       return {
-        title: lines[0] || 'Flash Notes',
-        keyPoints: lines.slice(1, 6),
-        difficulty: 'medium',
-        estimatedTime: 15
+        title: lines[0] || 'Flow Chart',
+        description: lines[1] || 'Flow chart description',
+        steps: lines.slice(2).map((line, index) => ({
+          step: index + 1,
+          title: line,
+          description: line,
+          connections: []
+        }))
       };
       
     case 'ncert-solutions':
@@ -176,16 +171,11 @@ function createStructuredContent(content, type) {
         }]
       };
       
-    case 'flow-charts':
+    case 'textbook-solutions':
       return {
-        title: lines[0] || 'Flow Chart',
-        description: lines[1] || 'Flow chart description',
-        steps: lines.slice(2).map((line, index) => ({
-          step: index + 1,
-          title: line,
-          description: line,
-          connections: []
-        }))
+        title: lines[0] || 'Textbook Solutions',
+        content: content,
+        sections: [{ heading: 'Content', content: content }]
       };
       
     default:
@@ -217,9 +207,9 @@ export function validateProcessedContent(content, type) {
   }
   
   switch (type) {
-    case 'flash-notes':
-      if (!content.keyPoints || !Array.isArray(content.keyPoints)) {
-        errors.push('Key points are required for flash notes');
+    case 'flow-charts':
+      if (!content.steps || !Array.isArray(content.steps)) {
+        errors.push('Steps are required for flow charts');
       }
       break;
       
@@ -229,10 +219,8 @@ export function validateProcessedContent(content, type) {
       }
       break;
       
-    case 'flow-charts':
-      if (!content.steps || !Array.isArray(content.steps)) {
-        errors.push('Steps are required for flow charts');
-      }
+    case 'textbook-solutions':
+      // No additional validation needed for textbook solutions
       break;
   }
   

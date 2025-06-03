@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 interface UploadedContent {
   id: string;
   filename: string;
-  type: 'flash-notes' | 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
+  type: 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
   board: string;
   class: string;
   subject: string;
@@ -59,10 +59,9 @@ const ContentManager = () => {
   const classes = ['6', '7', '8', '9', '10', '11', '12'];
   const subjects = ['Mathematics', 'Science', 'English', 'History', 'Geography', 'Physics', 'Chemistry', 'Biology', 'Computer Science', 'Economics'];
   const contentTypes = [
-    { value: 'flash-notes', label: 'Flash Notes' },
     { value: 'flow-charts', label: 'Flow Charts' },
     { value: 'ncert-solutions', label: 'NCERT Solutions' },
-    { value: 'textbook-solutions', label: 'Textbook Solutions' }
+    { value: 'textbook-solutions', label: 'Textbook Solutions' },
   ];
   const statusOptions = [
     { value: '', label: 'All Status' },
