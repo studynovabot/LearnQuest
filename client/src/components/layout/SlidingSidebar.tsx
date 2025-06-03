@@ -68,7 +68,7 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       label: "Settings",
       path: "/settings",
     },
-  };
+  ];
 
   // Admin-only navigation items
   const adminNavigationItems = [
