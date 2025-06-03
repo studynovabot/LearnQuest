@@ -15,7 +15,6 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Settings from "@/pages/Settings";
 import Themes from "@/pages/Themes";
 import Subscription from "@/pages/Subscription";
-import FlashNotes from "@/pages/FlashNotes";
 import FlowCharts from "@/pages/FlowCharts";
 import NCERTSolutions from "@/pages/NCERTSolutions";
 import ImageTools from "@/pages/ImageTools";
@@ -24,11 +23,10 @@ import ContentManager from "@/pages/ContentManager";
 import DocumentSearch from "@/pages/DocumentSearch";
 import VectorUploadPage from "@/pages/VectorUploadPage";
 import AdminRoute from "@/components/AdminRoute";
+import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import MainLayout from "./components/layout/MainLayout";
 // import { Analytics } from "@vercel/analytics/react";
 // import { SpeedInsights } from "@vercel/speed-insights/react";
 
@@ -83,12 +81,6 @@ function Router() {
           <Subscription />
         </MainLayout>
       </Route>
-
-      <Route path="/flash-notes">
-        <MainLayout>
-          <FlashNotes />
-        </MainLayout>
-      </Route>
       <Route path="/flow-charts">
         <MainLayout>
           <FlowCharts />
@@ -97,11 +89,6 @@ function Router() {
       <Route path="/ncert-solutions">
         <MainLayout>
           <NCERTSolutions />
-        </MainLayout>
-      </Route>
-      <Route path="/textbook-solutions">
-        <MainLayout>
-          <TextbookSolutions />
         </MainLayout>
       </Route>
       <Route path="/image-tools">
@@ -128,7 +115,6 @@ function Router() {
           </AdminRoute>
         </MainLayout>
       </Route>
-
       <Route path="/document-search">
         <MainLayout>
           <DocumentSearch />

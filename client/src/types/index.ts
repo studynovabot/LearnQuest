@@ -42,7 +42,7 @@ export interface ChatMessage {
 export interface EducationalContent {
   id: string;
   title: string;
-  type: 'flash-notes' | 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
+  type: 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
   board: string; // CBSE, ICSE, etc.
   class: string; // 6, 7, 8, 9, 10, 11, 12
   subject: string;

@@ -8,7 +8,6 @@ import { isAdmin, shouldShowAdminFeature, ADMIN_FEATURES } from "@/lib/adminConf
 import {
   HomeIcon,
   MessageIcon,
-  FlashlightIcon,
   BookOpenIcon,
   ImageIcon,
   SparklesIcon,
@@ -17,8 +16,7 @@ import {
   PaletteIcon,
   DatabaseIcon,
   ShieldIcon,
-  SettingsIcon,
-  MessageSquareIcon
+  SettingsIcon
 } from "@/components/ui/icons";
 
 interface SlidingSidebarProps {
