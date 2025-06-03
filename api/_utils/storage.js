@@ -73,6 +73,74 @@ export class FirebaseStorage {
 
     return updatedDoc.data();
   }
+
+  async getUserById(userId) {
+    const db = this.getFirestoreDb();
+    const doc = await db.collection('users').doc(userId).get();
+
+    if (!doc.exists) {
+      return null;
+    }
+
+    return doc.data();
+  }
+
+  async updateUserPassword(userId, hashedPassword) {
+    const db = this.getFirestoreDb();
+    const userRef = db.collection('users').doc(userId);
+
+    await userRef.update({
+      password: hashedPassword,
+      updatedAt: new Date(),
+      passwordChangedAt: new Date()
+    });
+
+    return true;
+  }
+
+  async deleteUser(userId) {
+    const db = this.getFirestoreDb();
+    const batch = db.batch();
+
+    // Get user data first
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      throw new Error('User not found');
+    }
+    const userData = userDoc.data();
+
+    // Delete user's chat history
+    const chatQuery = await db.collection('chats').where('userId', '==', userId).get();
+    chatQuery.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+
+    // Delete user's content uploads
+    const uploadsQuery = await db.collection('contentUploads').where('userId', '==', userId).get();
+    uploadsQuery.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+
+    // Delete user document
+    batch.delete(userDoc.ref);
+
+    // Create deletion log for audit purposes
+    const deletionLog = {
+      userId: userId,
+      userEmail: userData.email,
+      deletedAt: new Date(),
+      deletionReason: 'User requested account deletion',
+      userRole: userData.role || 'user',
+      accountCreatedAt: userData.createdAt || null
+    };
+
+    batch.set(db.collection('deletionLogs').doc(), deletionLog);
+
+    // Execute batch deletion
+    await batch.commit();
+
+    return true;
+  }
 }
 
 // Export singleton instance
