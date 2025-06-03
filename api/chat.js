@@ -1,6 +1,59 @@
 // Vercel serverless function for AI chat
 import { handleCors } from './_utils/cors.js';
 import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
+import { getSubjectFromAgent, extractQuestionData } from './_utils/question-utils.js';
+import { trackUserInteraction } from './_utils/analytics.js';
+
+// Agent prompts for different tutors
+const AGENT_PROMPTS = {
+  // Default AI tutor (Nova)
+  '1': `You are Nova, an AI study buddy designed to help students learn effectively. 
+Your goal is to provide clear, accurate, and helpful explanations that promote understanding.
+
+Guidelines:
+- Be friendly, supportive, and encouraging
+- Explain concepts in simple terms, using analogies when helpful
+- Break down complex topics into manageable parts
+- Provide examples to illustrate concepts
+- Ask questions to check understanding
+- Correct misconceptions gently
+- Adapt your explanations based on the student's needs
+- Use emojis occasionally to make your responses engaging 📚✨
+
+Remember that you're a helpful learning companion. Make learning enjoyable and accessible!`,
+
+  // Math tutor
+  '2': `You are MathMaster, an AI math tutor specializing in mathematics education.
+Your goal is to help students understand mathematical concepts and solve problems.
+
+Guidelines:
+- Explain mathematical concepts clearly and precisely
+- Show step-by-step solutions to problems
+- Use proper mathematical notation when helpful
+- Provide multiple approaches to solving problems when applicable
+- Connect concepts to real-world applications
+- Identify common misconceptions and address them
+- Encourage mathematical thinking and problem-solving skills
+- Use visual explanations when helpful (described in text)
+
+Remember to be patient and supportive, as math can be challenging for many students.`,
+
+  // Science tutor
+  '3': `You are ScienceGuide, an AI science tutor with expertise across scientific disciplines.
+Your goal is to help students understand scientific concepts, theories, and applications.
+
+Guidelines:
+- Explain scientific concepts accurately and clearly
+- Connect theory to real-world applications and examples
+- Describe scientific processes step-by-step
+- Clarify common misconceptions in science
+- Encourage scientific thinking and inquiry
+- Explain the scientific method and its application
+- Use analogies to make complex concepts more accessible
+- Incorporate recent scientific developments when relevant
+
+Remember to foster curiosity and critical thinking in your explanations.`
+};
 
 // Export test endpoint for development environment
 export const testEndpoint = process.env.NODE_ENV === 'development' ? async (req, res) => {
@@ -63,6 +116,90 @@ const INITIAL_TIMEOUT = 30000; // 30 seconds
 // Helper function to delay between retries
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Try Groq API for chat completion
+async function tryGroqAPI(content, systemPrompt, apiKey) {
+  try {
+    console.log('🔍 Making Groq API request...');
+    
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'llama3-70b-8192',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: content }
+        ],
+        temperature: 0.7,
+        max_tokens: 1024
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Groq API error:', errorText);
+      throw new Error(`Groq API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Groq API response received');
+    
+    return {
+      content: data.choices[0].message.content,
+      xpAwarded: 10,
+      model: 'groq-llama3-70b'
+    };
+  } catch (error) {
+    console.error('❌ Groq API error:', error);
+    throw error;
+  }
+}
+
+// Try Together AI for chat completion
+async function tryTogetherAPI(content, systemPrompt, apiKey) {
+  try {
+    console.log('🔍 Making Together AI API request...');
+    
+    const response = await fetch('https://api.together.xyz/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: content }
+        ],
+        temperature: 0.7,
+        max_tokens: 1024
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Together AI API error:', errorText);
+      throw new Error(`Together AI API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Together AI API response received');
+    
+    return {
+      content: data.choices[0].message.content,
+      xpAwarded: 8,
+      model: 'together-mixtral-8x7b'
+    };
+  } catch (error) {
+    console.error('❌ Together AI API error:', error);
+    throw error;
+  }
+}
+
 // Verify Groq API connection
 async function verifyGroqAPI(apiKey) {
   try {
@@ -98,12 +235,21 @@ async function generateAIResponse(content, agentId, userId = null, db = null) {
 
   // Get API keys - using the correct keys from .env.local
   const groqApiKey = process.env.GROQ_API_KEY || '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';
-  const togetherApiKey = process.env.TOGETHER_AI_API_KEY || '386f94fa38882002186da7d11fa278a2bdb729dcda437ef07b8b0f14e1fc2';
+  const togetherApiKey = process.env.TOGETHER_AI_API_KEY || '386f94fa38882002186da7d11fa278a2bdb729dcda437ef07b8b0f14e1fc2ee7';
 
   console.log('🔑 Using API keys:', { 
     groqKeyAvailable: !!groqApiKey,
     togetherKeyAvailable: !!togetherApiKey 
   });
+  
+  // Check if API keys are valid
+  if (!groqApiKey || groqApiKey.length < 20) {
+    console.error('❌ Invalid Groq API key');
+  }
+  
+  if (!togetherApiKey || togetherApiKey.length < 20) {
+    console.error('❌ Invalid Together AI API key');
+  }
 
   // Get personalized context if user ID and database are provided
   let personalizedContext = '';
@@ -156,8 +302,8 @@ async function getPersonalizedContext(db, userId, subject, content) {
       return ''; // No personalization needed for non-questions
     }
 
-    // Get user performance data for the subject
     try {
+      // Get user performance data for the subject
       const performanceRef = db.collection('user_performance').doc(`${userId}_${subject}`);
       const performanceDoc = await performanceRef.get();
       
@@ -167,90 +313,94 @@ async function getPersonalizedContext(db, userId, subject, content) {
       
       const performanceData = performanceDoc.data();
     
-    // Get knowledge map for the subject
-    const knowledgeMapRef = db.collection('user_knowledge_maps').doc(`${userId}_${subject}`);
-    const knowledgeMapDoc = await knowledgeMapRef.get();
-    
-    let knowledgeMap = null;
-    if (knowledgeMapDoc.exists) {
-      knowledgeMap = knowledgeMapDoc.data();
-    }
-    
-    // Build personalized context
-    let context = 'STUDENT PERFORMANCE CONTEXT (Use this to personalize your response):\n';
-    
-    // Add overall performance metrics
-    context += `- Overall accuracy in ${subject}: ${Math.round(performanceData.averageAccuracy)}%\n`;
-    context += `- Progress level: ${performanceData.progress}%\n`;
-    context += `- Performance status: ${performanceData.status}\n`;
-    
-    // Add complexity-specific information if available
-    if (performanceData.accuracyByComplexity) {
-      const { easy, medium, hard } = performanceData.accuracyByComplexity;
-      context += '- Accuracy by difficulty level:\n';
+      // Get knowledge map for the subject
+      const knowledgeMapRef = db.collection('user_knowledge_maps').doc(`${userId}_${subject}`);
+      const knowledgeMapDoc = await knowledgeMapRef.get();
       
-      if (easy !== null) context += `  * Easy questions: ${Math.round(easy)}%\n`;
-      if (medium !== null) context += `  * Medium questions: ${Math.round(medium)}%\n`;
-      if (hard !== null) context += `  * Hard questions: ${Math.round(hard)}%\n`;
-    }
-    
-    // Add learning curve information
-    if (performanceData.learningCurve && performanceData.learningCurve.slope !== 0) {
-      const trend = performanceData.learningCurve.slope > 0 ? 'improving' : 'declining';
-      context += `- Learning trend: ${trend}\n`;
-    }
-    
-    // Add knowledge map information if available
-    if (knowledgeMap && knowledgeMap.concepts) {
-      // Check if any concepts in the question match the knowledge map
-      const matchingConcepts = [];
-      
-      if (questionData.conceptTags) {
-        questionData.conceptTags.forEach(tag => {
-          if (knowledgeMap.concepts[tag]) {
-            matchingConcepts.push({
-              concept: tag,
-              mastery: knowledgeMap.concepts[tag].mastery,
-              interactions: knowledgeMap.concepts[tag].totalInteractions
-            });
-          }
-        });
+      let knowledgeMap = null;
+      if (knowledgeMapDoc.exists) {
+        knowledgeMap = knowledgeMapDoc.data();
       }
       
-      if (matchingConcepts.length > 0) {
-        context += '- Relevant concept knowledge:\n';
+      // Build personalized context
+      let context = 'STUDENT PERFORMANCE CONTEXT (Use this to personalize your response):\n';
+      
+      // Add overall performance metrics
+      context += `- Overall accuracy in ${subject}: ${Math.round(performanceData.averageAccuracy)}%\n`;
+      context += `- Progress level: ${performanceData.progress}%\n`;
+      context += `- Performance status: ${performanceData.status}\n`;
+      
+      // Add complexity-specific information if available
+      if (performanceData.accuracyByComplexity) {
+        const { easy, medium, hard } = performanceData.accuracyByComplexity;
+        context += '- Accuracy by difficulty level:\n';
         
-        matchingConcepts.forEach(concept => {
-          const masteryLevel = concept.mastery < 30 ? 'low' : 
-                              (concept.mastery < 70 ? 'moderate' : 'high');
+        if (easy !== null) context += `  * Easy questions: ${Math.round(easy)}%\n`;
+        if (medium !== null) context += `  * Medium questions: ${Math.round(medium)}%\n`;
+        if (hard !== null) context += `  * Hard questions: ${Math.round(hard)}%\n`;
+      }
+      
+      // Add learning curve information
+      if (performanceData.learningCurve && performanceData.learningCurve.slope !== 0) {
+        const trend = performanceData.learningCurve.slope > 0 ? 'improving' : 'declining';
+        context += `- Learning trend: ${trend}\n`;
+      }
+      
+      // Add knowledge map information if available
+      if (knowledgeMap && knowledgeMap.concepts) {
+        // Check if any concepts in the question match the knowledge map
+        const matchingConcepts = [];
+        
+        if (questionData.conceptTags) {
+          questionData.conceptTags.forEach(tag => {
+            if (knowledgeMap.concepts[tag]) {
+              matchingConcepts.push({
+                concept: tag,
+                mastery: knowledgeMap.concepts[tag].mastery,
+                interactions: knowledgeMap.concepts[tag].totalInteractions
+              });
+            }
+          });
+        }
+        
+        if (matchingConcepts.length > 0) {
+          context += '- Relevant concept knowledge:\n';
           
-          context += `  * ${concept.concept}: ${masteryLevel} mastery (${Math.round(concept.mastery)}%)\n`;
-        });
-        
-        // Add learning suggestions based on mastery levels
-        const lowMasteryConcepts = matchingConcepts.filter(c => c.mastery < 40);
-        if (lowMasteryConcepts.length > 0) {
-          context += '- Learning suggestions:\n';
-          context += `  * Focus on explaining these concepts in simple terms: ${lowMasteryConcepts.map(c => c.concept).join(', ')}\n`;
-          context += '  * Use analogies and examples to reinforce understanding\n';
+          matchingConcepts.forEach(concept => {
+            const masteryLevel = concept.mastery < 30 ? 'low' : 
+                                (concept.mastery < 70 ? 'moderate' : 'high');
+            
+            context += `  * ${concept.concept}: ${masteryLevel} mastery (${Math.round(concept.mastery)}%)\n`;
+          });
+          
+          // Add learning suggestions based on mastery levels
+          const lowMasteryConcepts = matchingConcepts.filter(c => c.mastery < 40);
+          if (lowMasteryConcepts.length > 0) {
+            context += '- Learning suggestions:\n';
+            context += `  * Focus on explaining these concepts in simple terms: ${lowMasteryConcepts.map(c => c.concept).join(', ')}\n`;
+            context += '  * Use analogies and examples to reinforce understanding\n';
+          }
         }
       }
+      
+      // Add adaptive difficulty recommendation
+      const recommendedDifficulty = getRecommendedDifficulty(performanceData);
+      context += `- Recommended explanation complexity: ${recommendedDifficulty}\n`;
+      
+      if (recommendedDifficulty === 'easy') {
+        context += '  * Use simpler language and more basic examples\n';
+        context += '  * Break down complex concepts into smaller steps\n';
+      } else if (recommendedDifficulty === 'hard') {
+        context += '  * Can use more technical terminology\n';
+        context += '  * Can explore deeper connections between concepts\n';
+        context += '  * Challenge with thought-provoking questions\n';
+      }
+      
+      return context;
+    } catch (dbError) {
+      console.error('Error accessing Firestore data:', dbError);
+      return ''; // Return empty context if there's an error
     }
-    
-    // Add adaptive difficulty recommendation
-    const recommendedDifficulty = getRecommendedDifficulty(performanceData);
-    context += `- Recommended explanation complexity: ${recommendedDifficulty}\n`;
-    
-    if (recommendedDifficulty === 'easy') {
-      context += '  * Use simpler language and more basic examples\n';
-      context += '  * Break down complex concepts into smaller steps\n';
-    } else if (recommendedDifficulty === 'hard') {
-      context += '  * Can use more technical terminology\n';
-      context += '  * Can explore deeper connections between concepts\n';
-      context += '  * Challenge with thought-provoking questions\n';
-    }
-    
-    return context;
   } catch (error) {
     console.error('Error generating personalized context:', error);
     return ''; // Return empty string on error

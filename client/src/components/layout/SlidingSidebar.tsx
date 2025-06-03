@@ -59,11 +59,16 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       path: "/chat",
     },
     {
+      icon: PaletteIcon,
+      label: "Themes",
+      path: "/themes",
+    },
+    {
       icon: SettingsIcon,
       label: "Settings",
       path: "/settings",
     },
-  ];
+  };
 
   // Admin-only navigation items
   const adminNavigationItems = [

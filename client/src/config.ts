@@ -6,7 +6,7 @@ function getApiUrl() {
     return import.meta.env.VITE_API_URL;
   }
 
-  // Always use the production Vercel API for now
+  // Always use the production Vercel API
   const vercelApi = 'https://studynovaai.vercel.app/api';
   console.log(`Using Vercel production API: ${vercelApi}`);
   return vercelApi;
