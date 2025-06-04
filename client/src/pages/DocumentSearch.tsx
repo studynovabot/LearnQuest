@@ -31,7 +31,7 @@ const DocumentSearch: React.FC = () => {
         <meta name="description" content="Search through your uploaded documents and study materials with AI-powered vector search." />
       </Helmet>
       
-      <NCERTSolutionsComponent userId={user.uid} />
+      <NCERTSolutionsComponent userId={user.id} />
     </>
   );
 };

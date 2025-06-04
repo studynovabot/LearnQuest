@@ -90,16 +90,23 @@ const PersonalizedAgent = () => {
         const generalData = await generalRecommendationsResponse.json();
         
         if (generalData.success && generalData.recommendations) {
-          const transformedRecommendations = generalData.recommendations
-            .filter(rec => rec.type !== 'streak')
-            .map(rec => ({
+          interface RecommendationItem {
+            type: string;
+            title: string;
+            description: string;
+            priority?: 'high' | 'medium' | 'low';
+          }
+          
+          const transformedRecommendations = (generalData.recommendations as RecommendationItem[])
+            .filter((rec: RecommendationItem) => rec.type !== 'streak')
+            .map((rec: RecommendationItem) => ({
               id: Math.random().toString(36).substr(2, 9),
               title: rec.title,
               description: rec.description,
               priority: rec.priority || 'medium',
               estimatedTime: 30,
-              type: rec.type === 'knowledge_gap' ? 'practice' :
-                    rec.type === 'strength' ? 'learn' : 'review'
+              type: (rec.type === 'knowledge_gap' ? 'practice' :
+                    rec.type === 'strength' ? 'learn' : 'review') as 'practice' | 'review' | 'learn'
             }));
           
           setRecommendations(transformedRecommendations);
@@ -121,7 +128,15 @@ const PersonalizedAgent = () => {
         const insightsData = await insightsResponse.json();
         
         if (insightsData.success && insightsData.insights) {
-          const transformedInsights = insightsData.insights.map(insight => ({
+          interface InsightItem {
+            type: string;
+            title: string;
+            description: string;
+            actionable?: boolean;
+            progress?: number;
+          }
+          
+          const transformedInsights = (insightsData.insights as InsightItem[]).map((insight: InsightItem) => ({
             type: insight.type as 'strength' | 'weakness' | 'improvement' | 'goal',
             title: insight.title,
             description: insight.description,
@@ -130,7 +145,7 @@ const PersonalizedAgent = () => {
           
           setInsights(transformedInsights);
           
-          const progressInsight = insightsData.insights.find(i => i.type === 'progress');
+          const progressInsight = (insightsData.insights as InsightItem[]).find((i: InsightItem) => i.type === 'progress');
           if (progressInsight?.progress) {
             setOverallProgress(progressInsight.progress);
           }
@@ -152,9 +167,19 @@ const PersonalizedAgent = () => {
         const weakAreasData = await weakAreasResponse.json();
         
         if (weakAreasData.success && weakAreasData.recommendations) {
-          const transformedWeakAreas = weakAreasData.recommendations
-            .filter(rec => rec.type === 'knowledge_gap')
-            .map(rec => ({
+          interface WeakAreaItem {
+            type: string;
+            items: Array<{
+              subject: string;
+              concept: string;
+              mastery: number;
+              suggestedAction: string;
+            }>;
+          }
+          
+          const transformedWeakAreas = (weakAreasData.recommendations as WeakAreaItem[])
+            .filter((rec: WeakAreaItem) => rec.type === 'knowledge_gap')
+            .map((rec: WeakAreaItem) => ({
               subject: rec.items[0].subject,
               topic: rec.items[0].concept,
               accuracy: rec.items[0].mastery,

@@ -8,6 +8,7 @@ export interface SimpleDocument {
     title: string;
     subject: string;
     chapter?: string;
+    page?: number;
     fileType: string;
     uploadedAt: string;
     userId: string;
@@ -102,8 +103,12 @@ export class SimpleVectorDB {
     const querySet = new Set(queryWords);
     const contentSet = new Set(contentWords);
     
-    const intersection = new Set([...querySet].filter(x => contentSet.has(x)));
-    const union = new Set([...querySet, ...contentSet]);
+    // Convert Sets to arrays before using spread operator
+    const queryArray = Array.from(querySet);
+    const contentArray = Array.from(contentSet);
+    
+    const intersection = new Set(queryArray.filter(x => contentSet.has(x)));
+    const union = new Set([...queryArray, ...contentArray]);
     
     const jaccardSimilarity = intersection.size / union.size;
     

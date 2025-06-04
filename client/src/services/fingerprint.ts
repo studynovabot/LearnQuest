@@ -23,7 +23,7 @@ export async function getDeviceFingerprint(): Promise<FingerprintResult> {
     // Load FingerprintJS
     const fp = await FingerprintJS.load({
       // Use privacy-focused configuration
-      monitoring: false, // Disable monitoring for privacy
+      // Note: 'monitoring' is not a valid option in the current version
       debug: false
     });
 

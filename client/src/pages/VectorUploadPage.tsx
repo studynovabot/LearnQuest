@@ -166,7 +166,7 @@ const VectorUploadPage: React.FC = () => {
 
           <TabsContent value="upload" className="space-y-6">
             <VectorUpload
-              userId={user?.uid || 'demo-user'}
+              userId={user?.id || 'demo-user'}
               userEmail={user?.email || ''}
               onUploadComplete={handleUploadComplete}
             />

@@ -46,11 +46,11 @@ export function useAdvancedTheme() {
     }
 
     // Check if any input is currently focused to prevent interruption
-    const activeElement = document.activeElement;
+    const activeElement = document.activeElement as HTMLElement | null;
     const isInputFocused = activeElement && (
       activeElement.tagName === 'INPUT' ||
       activeElement.tagName === 'TEXTAREA' ||
-      activeElement.contentEditable === 'true'
+      (activeElement.hasAttribute('contenteditable') && activeElement.getAttribute('contenteditable') === 'true')
     );
 
     // If an input is focused, defer theme application to prevent focus loss

@@ -19,144 +19,106 @@ const PremiumInput = React.forwardRef<HTMLInputElement, PremiumInputProps>(
     label,
     error,
     icon,
-    variant = "glass",
-    floatingLabel = true,
+    variant = "default",
+    floatingLabel = false,
     ...props
   }, ref) => {
     const [isFocused, setIsFocused] = React.useState(false);
-    const [hasValue, setHasValue] = React.useState(false);
     const [showPassword, setShowPassword] = React.useState(false);
-    const inputRef = React.useRef<HTMLInputElement>(null);
+    const [hasValue, setHasValue] = React.useState(false);
+    const { theme: memoizedTheme } = useAdvancedTheme();
 
-    const { selectedTheme } = useAdvancedTheme();
+    const inputType = type === "password" && showPassword ? "text" : type;
+    const showToggle = type === "password";
 
-    // Memoize theme to prevent unnecessary re-renders
-    const memoizedTheme = React.useMemo(() => selectedTheme, [selectedTheme]);
-
-    // Combine refs
-    React.useImperativeHandle(ref, () => inputRef.current!);
-
-    React.useEffect(() => {
-      setHasValue(!!props.value || !!props.defaultValue);
-    }, [props.value, props.defaultValue]);
-
-    const isPasswordType = type === "password";
-    const inputType = isPasswordType && showPassword ? "text" : type;
-
-    const getThemeAwareVariantClasses = React.useMemo(() => {
-      const baseClasses = {
-        default: "bg-background border border-input",
-        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(memoizedTheme)}`,
-        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(memoizedTheme)} border ${getThemeAwareBorderColor(memoizedTheme)}`
-      };
-      return baseClasses;
-    }, [memoizedTheme]);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setHasValue(!!e.target.value);
+      if (props.onChange) {
+        props.onChange(e);
+      }
+    };
 
     return (
-      <div className={cn("relative", className)}>
+      <div className={cn("relative w-full", className)}>
+        {label && !floatingLabel && (
+          <label className="block text-sm font-medium mb-1 text-foreground">
+            {label}
+          </label>
+        )}
         <div className="relative">
-          {/* Icon */}
           {icon && (
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground z-10">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               {icon}
             </div>
           )}
-
-          {/* Input */}
           <input
-            ref={inputRef}
+            ref={ref}
             type={inputType}
             className={cn(
-              "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300 theme-transition",
-              "focus:outline-none focus:ring-2",
-              "placeholder:text-muted-foreground",
-              getThemeAwareVariantClasses[variant],
-              icon && "pl-10",
-              (isPasswordType || floatingLabel) && "pr-10",
+              "w-full px-4 py-3 rounded-lg border bg-background text-foreground",
+              "focus:outline-none focus:ring-2 transition-all duration-200",
+              "placeholder:text-muted-foreground/50",
+              icon ? "pl-10" : "pl-4",
+              showToggle ? "pr-10" : "pr-4",
+              variant === "glass" && getThemeAwareGlassClasses(memoizedTheme),
+              variant === "gradient" && getThemeAwareFormGradient(memoizedTheme),
               isFocused && variant === "glass" && getThemeAwareFocusGlow(memoizedTheme),
               getThemeAwareFocusRing(memoizedTheme),
-              error && "border-red-500 focus:ring-red-500/50"
+              error && "border-red-500 focus:ring-red-500/50",
+              className
             )}
-            onFocus={(e) => {
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
               setIsFocused(true);
-              props.onFocus?.(e);
+              if (props.onFocus) props.onFocus(e);
             }}
-            onBlur={(e) => {
+            onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
               setIsFocused(false);
-              props.onBlur?.(e);
+              if (props.onBlur) props.onBlur(e);
             }}
-            onChange={(e) => {
-              setHasValue(!!e.target.value);
-              props.onChange?.(e);
-            }}
+            onChange={handleChange}
             {...props}
-            placeholder={floatingLabel ? "" : props.placeholder}
           />
-
-          {/* Floating Label */}
-          {floatingLabel && label && (
-            <motion.label
-              className={cn(
-                "absolute left-3 pointer-events-none transition-all duration-300",
-                "text-muted-foreground",
-                icon && "left-10",
-                (isFocused || hasValue)
-                  ? "top-0 text-xs bg-background px-2 text-primary font-medium"
-                  : "top-1/2 transform -translate-y-1/2 text-sm"
-              )}
-              animate={{
-                y: (isFocused || hasValue) ? -12 : 0,
-                scale: (isFocused || hasValue) ? 0.85 : 1,
-              }}
-              transition={{ duration: 0.2 }}
+          {showToggle && (
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {label}
-            </motion.label>
+              {showPassword ? (
+                <EyeOffIcon className="w-5 h-5" />
+              ) : (
+                <EyeIcon className="w-5 h-5" />
+              )}
+            </button>
           )}
-
-          {/* Regular Label */}
-          {!floatingLabel && label && (
-            <label className="block text-sm font-medium text-foreground mb-2">
+          {floatingLabel && label && (
+            <label
+              className={cn(
+                "absolute left-3 px-1 transition-all duration-200 pointer-events-none",
+                hasValue || isFocused
+                  ? "-top-2.5 text-xs bg-background text-primary"
+                  : "top-1/2 -translate-y-1/2 text-muted-foreground",
+                icon ? "left-10" : "left-3"
+              )}
+            >
               {label}
             </label>
           )}
-
-          {/* Password Toggle */}
-          {isPasswordType && (
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
-            </button>
-          )}
         </div>
-
-        {/* Error Message */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mt-2 text-sm text-red-500"
-            >
-              {error}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {error && (
+          <p className="mt-1 text-sm text-red-500">{error}</p>
+        )}
       </div>
     );
   }
 );
 
-PremiumInput.displayName = "PremiumInput";
-
 interface PremiumSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   options: { value: string; label: string }[];
+  value: string;
   variant?: "default" | "glass" | "gradient";
   floatingLabel?: boolean;
 }
@@ -167,67 +129,69 @@ const PremiumSelect = React.forwardRef<HTMLSelectElement, PremiumSelectProps>(
     label,
     error,
     options,
-    variant = "glass",
-    floatingLabel = true,
+    variant = "default",
+    floatingLabel = false,
     ...props
   }, ref) => {
     const [isFocused, setIsFocused] = React.useState(false);
-    const [hasValue, setHasValue] = React.useState(false);
-    const { selectedTheme } = useAdvancedTheme();
-
-    // Memoize theme to prevent unnecessary re-renders
-    const memoizedTheme = React.useMemo(() => selectedTheme, [selectedTheme]);
+    const [hasValue, setHasValue] = React.useState(!!props.value);
+    const { theme: memoizedTheme } = useAdvancedTheme();
 
     React.useEffect(() => {
-      setHasValue(!!props.value || !!props.defaultValue);
-    }, [props.value, props.defaultValue]);
+      setHasValue(!!props.value);
+    }, [props.value]);
 
-    const getThemeAwareSelectVariantClasses = React.useMemo(() => {
-      const baseClasses = {
-        default: "bg-background border border-input text-foreground",
-        glass: `glass-card border-glass-border-strong text-foreground ${getThemeAwareGlassClasses(memoizedTheme)}`,
-        gradient: `bg-gradient-to-r text-foreground ${getThemeAwareFormGradient(memoizedTheme)} border ${getThemeAwareBorderColor(memoizedTheme)}`
-      };
-      return baseClasses;
-    }, [memoizedTheme]);
+    const getThemeAwareSelectVariantClasses = {
+      default: "bg-background border-border",
+      glass: cn(
+        "backdrop-blur-md bg-white/10 border-white/20",
+        "hover:bg-white/15 focus:bg-white/15"
+      ),
+      gradient: cn(
+        "bg-gradient-to-r from-primary/5 to-secondary/5",
+        "border-primary/20 hover:border-primary/30"
+      )
+    };
 
     return (
-      <div className={cn("relative", className)}>
+      <div className={cn("relative w-full", className)}>
+        {label && !floatingLabel && (
+          <label className="block text-sm font-medium mb-1 text-foreground">
+            {label}
+          </label>
+        )}
         <div className="relative">
-          <motion.select
+          <select
             ref={ref}
             className={cn(
-              "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300 theme-transition",
+              "w-full px-4 py-3 pr-10 rounded-lg border bg-background text-foreground",
               "focus:outline-none focus:ring-2",
               "appearance-none cursor-pointer",
-              "text-foreground", // Ensure text is visible in both themes
-              "[&>option]:text-foreground [&>option]:bg-background", // Style options for visibility
-              "[&>option]:dark:text-white [&>option]:dark:bg-gray-800", // Dark mode option styling
-              "[&>option]:light:text-gray-900 [&>option]:light:bg-white", // Light mode option styling
+              "text-foreground",
+              "[&>option]:text-foreground [&>option]:bg-background",
+              "[&>option]:dark:text-white [&>option]:dark:bg-gray-800",
+              "[&>option]:light:text-gray-900 [&>option]:light:bg-white",
               getThemeAwareSelectVariantClasses[variant],
               isFocused && variant === "glass" && getThemeAwareFocusGlow(memoizedTheme),
               getThemeAwareFocusRing(memoizedTheme),
               error && "border-red-500 focus:ring-red-500/50"
             )}
-            onFocus={(e) => {
+            onFocus={(e: React.FocusEvent<HTMLSelectElement>) => {
               setIsFocused(true);
-              props.onFocus?.(e);
+              if (props.onFocus) props.onFocus(e);
             }}
-            onBlur={(e) => {
+            onBlur={(e: React.FocusEvent<HTMLSelectElement>) => {
               setIsFocused(false);
-              props.onBlur?.(e);
+              if (props.onBlur) props.onBlur(e);
             }}
-            onChange={(e) => {
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
               setHasValue(!!e.target.value);
-              props.onChange?.(e);
+              if (props.onChange) props.onChange(e);
             }}
             {...props}
           >
             {!hasValue && (
-              <option
-                value=""
-                className="text-foreground bg-background dark:text-white dark:bg-gray-800"
-              >
+              <option value="" className="text-foreground bg-background dark:text-white dark:bg-gray-800">
                 Select an option
               </option>
             )}
@@ -240,55 +204,44 @@ const PremiumSelect = React.forwardRef<HTMLSelectElement, PremiumSelectProps>(
                 {option.label}
               </option>
             ))}
-          </motion.select>
-
-          {/* Floating Label */}
-          {floatingLabel && label && (
-            <motion.label
-              className={cn(
-                "absolute left-3 pointer-events-none transition-all duration-300",
-                "text-muted-foreground",
-                (isFocused || hasValue)
-                  ? "top-0 text-xs bg-background px-2 text-primary font-medium"
-                  : "top-1/2 transform -translate-y-1/2 text-sm"
-              )}
-              animate={{
-                y: (isFocused || hasValue) ? -12 : 0,
-                scale: (isFocused || hasValue) ? 0.85 : 1,
-              }}
-              transition={{ duration: 0.2 }}
+          </select>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+            <svg
+              width="12"
+              height="8"
+              viewBox="0 0 12 8"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              {label}
-            </motion.label>
-          )}
-
-          {/* Dropdown Arrow */}
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                d="M1 1.5L6 6.5L11 1.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </div>
-        </div>
-
-        {/* Error Message */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mt-2 text-sm text-red-500"
+          {floatingLabel && label && (
+            <label
+              className={cn(
+                "absolute left-3 px-1 transition-all duration-200 pointer-events-none",
+                hasValue || isFocused
+                  ? "-top-2.5 text-xs bg-background text-primary"
+                  : "top-1/2 -translate-y-1/2 text-muted-foreground"
+              )}
             >
-              {error}
-            </motion.div>
+              {label}
+            </label>
           )}
-        </AnimatePresence>
+        </div>
+        {error && (
+          <p className="mt-1 text-sm text-red-500">{error}</p>
+        )}
       </div>
     );
   }
 );
-
-PremiumSelect.displayName = "PremiumSelect";
 
 interface PremiumTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -302,189 +255,123 @@ const PremiumTextarea = React.forwardRef<HTMLTextAreaElement, PremiumTextareaPro
     className,
     label,
     error,
-    variant = "glass",
-    floatingLabel = true,
+    variant = "default",
+    floatingLabel = false,
     ...props
   }, ref) => {
     const [isFocused, setIsFocused] = React.useState(false);
     const [hasValue, setHasValue] = React.useState(false);
-    const { selectedTheme } = useAdvancedTheme();
+    const { theme: memoizedTheme } = useAdvancedTheme();
 
-    // Memoize theme to prevent unnecessary re-renders
-    const memoizedTheme = React.useMemo(() => selectedTheme, [selectedTheme]);
-
-    React.useEffect(() => {
-      setHasValue(!!props.value || !!props.defaultValue);
-    }, [props.value, props.defaultValue]);
-
-    const getThemeAwareTextareaVariantClasses = React.useMemo(() => {
-      const baseClasses = {
-        default: "bg-background border border-input",
-        glass: `glass-card border-glass-border-strong ${getThemeAwareGlassClasses(memoizedTheme)}`,
-        gradient: `bg-gradient-to-r ${getThemeAwareFormGradient(memoizedTheme)} border ${getThemeAwareBorderColor(memoizedTheme)}`
-      };
-      return baseClasses;
-    }, [memoizedTheme]);
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setHasValue(!!e.target.value);
+      if (props.onChange) {
+        props.onChange(e);
+      }
+    };
 
     return (
-      <div className={cn("relative", className)}>
+      <div className={cn("relative w-full", className)}>
+        {label && !floatingLabel && (
+          <label className="block text-sm font-medium mb-1 text-foreground">
+            {label}
+          </label>
+        )}
         <div className="relative">
-          <motion.textarea
+          <textarea
             ref={ref}
             className={cn(
-              "w-full rounded-xl px-4 py-3 text-sm transition-all duration-300 theme-transition",
-              "focus:outline-none focus:ring-2",
-              "placeholder:text-muted-foreground resize-none",
-              getThemeAwareTextareaVariantClasses[variant],
+              "w-full px-4 py-3 rounded-lg border bg-background text-foreground min-h-[100px]",
+              "focus:outline-none focus:ring-2 transition-all duration-200",
+              "placeholder:text-muted-foreground/50 resize-y",
+              variant === "glass" && getThemeAwareGlassClasses(memoizedTheme),
+              variant === "gradient" && getThemeAwareFormGradient(memoizedTheme),
               isFocused && variant === "glass" && getThemeAwareFocusGlow(memoizedTheme),
               getThemeAwareFocusRing(memoizedTheme),
               error && "border-red-500 focus:ring-red-500/50"
             )}
-            onFocus={(e) => {
+            onFocus={(e: React.FocusEvent<HTMLTextAreaElement>) => {
               setIsFocused(true);
-              props.onFocus?.(e);
+              if (props.onFocus) props.onFocus(e);
             }}
-            onBlur={(e) => {
+            onBlur={(e: React.FocusEvent<HTMLTextAreaElement>) => {
               setIsFocused(false);
-              props.onBlur?.(e);
+              if (props.onBlur) props.onBlur(e);
             }}
-            onChange={(e) => {
-              setHasValue(!!e.target.value);
-              props.onChange?.(e);
-            }}
+            onChange={handleChange}
             {...props}
-            placeholder={floatingLabel ? "" : props.placeholder}
           />
-
-          {/* Floating Label */}
           {floatingLabel && label && (
-            <motion.label
+            <label
               className={cn(
-                "absolute left-3 pointer-events-none transition-all duration-300",
-                "text-muted-foreground",
-                (isFocused || hasValue)
-                  ? "top-0 text-xs bg-background px-2 text-primary font-medium"
-                  : "top-4 text-sm"
+                "absolute left-3 px-1 transition-all duration-200 pointer-events-none",
+                hasValue || isFocused
+                  ? "-top-2.5 text-xs bg-background text-primary"
+                  : "top-3 text-muted-foreground"
               )}
-              animate={{
-                y: (isFocused || hasValue) ? -12 : 0,
-                scale: (isFocused || hasValue) ? 0.85 : 1,
-              }}
-              transition={{ duration: 0.2 }}
             >
               {label}
-            </motion.label>
+            </label>
           )}
         </div>
-
-        {/* Error Message */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mt-2 text-sm text-red-500"
-            >
-              {error}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {error && (
+          <p className="mt-1 text-sm text-red-500">{error}</p>
+        )}
       </div>
     );
   }
 );
 
-PremiumTextarea.displayName = "PremiumTextarea";
-
 // Theme-aware styling functions for forms
-const getThemeAwareGlassClasses = (theme: string): string => {
-  switch (theme) {
-    case 'ocean-blue':
-      return 'hover:bg-blue-500/5 focus-within:bg-blue-500/5';
-    case 'forest-green':
-      return 'hover:bg-green-500/5 focus-within:bg-green-500/5';
-    case 'sunset-orange':
-      return 'hover:bg-orange-500/5 focus-within:bg-orange-500/5';
-    case 'purple-galaxy':
-      return 'hover:bg-purple-500/5 focus-within:bg-purple-500/5';
-    case 'minimalist-gray':
-      return 'hover:bg-gray-500/5 focus-within:bg-gray-500/5';
-    default:
-      return 'hover:bg-primary/5 focus-within:bg-primary/5';
-  }
+const getThemeAwareGlassClasses = (theme: string | undefined): string => {
+  return cn(
+    "backdrop-blur-md border-white/20",
+    !theme || theme === "dark"
+      ? "bg-white/5 hover:bg-white/10 focus:bg-white/10"
+      : "bg-black/5 hover:bg-black/10 focus:bg-black/10"
+  );
 };
 
-const getThemeAwareFormGradient = (theme: string): string => {
-  switch (theme) {
-    case 'ocean-blue':
-      return 'from-blue-500/5 to-cyan-500/5';
-    case 'forest-green':
-      return 'from-green-500/5 to-emerald-500/5';
-    case 'sunset-orange':
-      return 'from-orange-500/5 to-yellow-500/5';
-    case 'purple-galaxy':
-      return 'from-purple-500/5 to-pink-500/5';
-    case 'minimalist-gray':
-      return 'from-gray-500/5 to-slate-500/5';
-    default:
-      return 'from-primary/5 to-secondary/5';
-  }
+const getThemeAwareFormGradient = (theme: string | undefined): string => {
+  return cn(
+    "bg-gradient-to-r from-primary/5 to-secondary/5",
+    !theme || theme === "dark"
+      ? "border-primary/20 hover:border-primary/30"
+      : "border-primary/30 hover:border-primary/40"
+  );
 };
 
-const getThemeAwareBorderColor = (theme: string): string => {
-  switch (theme) {
-    case 'ocean-blue':
-      return 'border-blue-500/20';
-    case 'forest-green':
-      return 'border-green-500/20';
-    case 'sunset-orange':
-      return 'border-orange-500/20';
-    case 'purple-galaxy':
-      return 'border-purple-500/20';
-    case 'minimalist-gray':
-      return 'border-gray-500/20';
-    default:
-      return 'border-primary/20';
-  }
+const getThemeAwareBorderColor = (theme: string | undefined): string => {
+  return !theme || theme === "dark"
+    ? "border-white/10"
+    : "border-gray-200";
 };
 
-const getThemeAwareFocusGlow = (theme: string): string => {
-  switch (theme) {
-    case 'ocean-blue':
-      return 'shadow-glow-blue';
-    case 'forest-green':
-      return 'shadow-glow-green';
-    case 'sunset-orange':
-      return 'shadow-glow-orange';
-    case 'purple-galaxy':
-      return 'shadow-glow';
-    case 'minimalist-gray':
-      return 'shadow-md';
-    default:
-      return 'shadow-glow';
-  }
+const getThemeAwareFocusGlow = (theme: string | undefined): string => {
+  return cn(
+    "shadow-glow",
+    !theme || theme === "dark"
+      ? "shadow-blue-500/20"
+      : "shadow-blue-400/30"
+  );
 };
 
-const getThemeAwareFocusRing = (theme: string): string => {
-  switch (theme) {
-    case 'ocean-blue':
-      return 'focus:ring-blue-500/50';
-    case 'forest-green':
-      return 'focus:ring-green-500/50';
-    case 'sunset-orange':
-      return 'focus:ring-orange-500/50';
-    case 'purple-galaxy':
-      return 'focus:ring-purple-500/50';
-    case 'minimalist-gray':
-      return 'focus:ring-gray-500/50';
-    default:
-      return 'focus:ring-primary/50';
-  }
+const getThemeAwareFocusRing = (theme: string | undefined): string => {
+  return cn(
+    "focus:ring-2 focus:ring-offset-2 focus:ring-offset-background",
+    !theme || theme === "dark"
+      ? "focus:ring-blue-500/50"
+      : "focus:ring-blue-400/50"
+  );
 };
 
 export {
   PremiumInput,
   PremiumSelect,
   PremiumTextarea,
+  getThemeAwareGlassClasses,
+  getThemeAwareFormGradient,
+  getThemeAwareBorderColor,
+  getThemeAwareFocusGlow,
+  getThemeAwareFocusRing,
 };

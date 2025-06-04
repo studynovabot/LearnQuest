@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, SyntheticEvent } from 'react';
 import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from "@/components/ui/premium-card";
@@ -24,7 +24,12 @@ const ImageTools = () => {
 
   // Text to Image states
   const [textPrompt, setTextPrompt] = useState('');
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generatedImage, setGeneratedImage] = useState<string>('');
+  
+  // Helper function to get current timestamp as string
+  const getTimestamp = (): string => {
+    return Date.now().toString();
+  };
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Debug log for generatedImage state changes
@@ -367,11 +372,11 @@ const ImageTools = () => {
                               alt="Generated"
                               className="w-full max-w-lg mx-auto block rounded-xl shadow-premium"
                               onLoad={() => console.log('Image loaded successfully:', generatedImage)}
-                              onError={(e) => {
+                              onError={(e: SyntheticEvent<HTMLImageElement>) => {
                                 console.error('Image failed to load:', e, generatedImage);
                                 const imgElement = e.target as HTMLImageElement;
-                                if (imgElement && !imgElement.src.includes('?cache=')) {
-                                  imgElement.src = `${generatedImage}?cache=${Date.now()}`;
+                                if (imgElement && generatedImage && !imgElement.src.includes('?cache=')) {
+                                  imgElement.src = `${generatedImage}?cache=${getTimestamp()}`;
                                 }
                               }}
                               style={{
@@ -648,11 +653,13 @@ const ImageTools = () => {
                           <PremiumCard variant="glass" className="p-4">
                             <p className="text-sm font-medium text-muted-foreground mb-3">Original:</p>
                             <div className="relative group">
-                              <img
-                                src={sourceImage}
-                                alt="Original"
-                                className="w-full rounded-xl shadow-premium"
-                              />
+                              {sourceImage && (
+                                <img
+                                  src={sourceImage}
+                                  alt="Original"
+                                  className="w-full rounded-xl shadow-premium"
+                                />
+                              )}
                             </div>
                           </PremiumCard>
 

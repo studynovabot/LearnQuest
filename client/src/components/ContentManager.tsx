@@ -56,12 +56,17 @@ const ContentManager: React.FC<ContentManagerProps> = ({ userId }) => {
   const loadUploadStats = async () => {
     try {
       const result = await pdfProcessor.getUserDocuments(userId, 1, 1000);
-      const subjects = [...new Set(result.documents.map(doc => doc.metadata.subject))];
+      const subjectSet = new Set<string>();
+      result.documents.forEach(doc => {
+        if (doc.metadata.subject) {
+          subjectSet.add(doc.metadata.subject);
+        }
+      });
       
       setUploadStats({
         totalDocuments: result.total,
         totalChunks: result.documents.length,
-        subjects: subjects
+        subjects: Array.from(subjectSet)
       });
     } catch (error) {
       console.error('Error loading stats:', error);

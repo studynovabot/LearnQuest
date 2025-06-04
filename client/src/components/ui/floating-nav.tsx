@@ -7,11 +7,11 @@ import {
   MessageIcon,
   FlashlightIcon,
   BookOpenIcon,
+  BookIcon,
   ImageIcon,
   SparklesIcon,
   UploadIcon,
   CreditCardIcon,
-  SettingsIcon,
   SettingsIcon
 } from "@/components/ui/icons";
 
@@ -35,7 +35,7 @@ const FloatingNav: React.FC<FloatingNavProps> = ({
     { icon: BookOpenIcon, label: "NCERT Solutions", path: "/ncert-solutions" },
     { icon: BookIcon, label: "Textbook Solutions", path: "/textbook-solutions" },
     { icon: ImageIcon, label: "Image Tools", path: "/image-tools" },
-    { icon: BrainCircuitIcon, label: "AI Chat", path: "/chat" },
+    { icon: MessageIcon, label: "AI Chat", path: "/chat" },
   ];
 
   // Auto-hide on scroll for bottom variant
