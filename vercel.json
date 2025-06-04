@@ -26,7 +26,6 @@
     }
   ],
   "routes": [
-    // API routes
     {
       "src": "/api/(.*)",
       "dest": "/api/$1",
@@ -36,7 +35,6 @@
         "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept"
       }
     },
-    // Static assets with cache
     {
       "src": "/assets/(.*)",
       "headers": {
@@ -44,7 +42,9 @@
       },
       "continue": true
     },
-    // All other routes should serve index.html for client-side routing
+    {
+      "handle": "filesystem"
+    },
     {
       "src": "/(.*)",
       "dest": "/index.html",
