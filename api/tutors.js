@@ -1,7 +1,14 @@
 // Vercel serverless function for AI tutors
 import { handleCors } from './_utils/cors.js';
+import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
 
 export default async function handler(req, res) {
+  // Initialize response headers
+  const headers = {
+    'Content-Type': 'application/json',
+    'Cache-Control': 's-maxage=60, stale-while-revalidate'
+  };
+
   try {
     // Handle CORS
     handleCors(req, res);
@@ -11,11 +18,18 @@ export default async function handler(req, res) {
 
     // Only allow GET requests
     if (req.method !== 'GET') {
-      return res.status(405).json({ error: 'Method not allowed' });
+      return res.status(405).json({ 
+        error: 'Method not allowed',
+        message: 'Only GET requests are supported for this endpoint.'
+      });
     }
 
-    console.log('📚 Returning 15 default tutors');
-    // Return all AI tutors - all unlocked by default now
+    // Initialize Firebase (will use existing instance if already initialized)
+    initializeFirebase();
+    
+    console.log('📚 Fetching tutors data');
+    
+    // Use hardcoded tutors as fallback
     const tutors = [
       {
         id: 1,
@@ -124,23 +138,29 @@ export default async function handler(req, res) {
       }
     ];
 
-    console.log('📚 Returning fallback tutors data');
+    console.log('📚 Returning tutors data');
     
-    // Use the response object properly
-    res.status(200).json(tutors);
-    return;
+    // Return the response with proper headers
+    return res.status(200).set(headers).json({
+      success: true,
+      data: tutors,
+      count: tutors.length,
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
     console.error('❌ Tutors API error:', error);
     
-    // Ensure response object exists before using it
-    if (res && typeof res.status === 'function') {
-      res.status(500).json({ 
-        error: 'Failed to fetch tutors', 
-        details: error.message 
-      });
-    } else {
-      console.error('Critical: Response object not available');
-    }
-    return;
+    // Log detailed error information
+    const errorId = `err_${Date.now()}`;
+    console.error(`Error ID: ${errorId}`, error);
+    
+    // Return a structured error response
+    return res.status(500).set(headers).json({
+      success: false,
+      error: 'Failed to fetch tutors',
+      message: error.message || 'An unexpected error occurred',
+      errorId: errorId,
+      timestamp: new Date().toISOString()
+    });
   }
 }
