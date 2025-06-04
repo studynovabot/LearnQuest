@@ -1,6 +1,5 @@
 // Vercel serverless function for AI tutors
 import { handleCors } from './_utils/cors.js';
-import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
 
 export default async function handler(req, res) {
   try {
@@ -15,10 +14,7 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    console.log('📚 Fetching tutors from Firebase...');
-
-    // Skip Firebase and use only the original 15 tutors to avoid duplicates
-    console.log('📚 Using original 15 tutors (skipping Firebase to avoid duplicates)');
+    console.log('📚 Returning 15 default tutors');
     // Return all AI tutors - all unlocked by default now
     const tutors = [
       {
