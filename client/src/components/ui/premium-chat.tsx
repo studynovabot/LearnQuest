@@ -16,7 +16,7 @@ interface PremiumChatBubbleProps {
 }
 
 const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
-  message,
+  message: messageProp, // Renamed prop to avoid conflict
   isUser = false,
   timestamp,
   isTyping = false,
@@ -26,6 +26,12 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
   const [displayedText, setDisplayedText] = React.useState("");
   const [isComplete, setIsComplete] = React.useState(false);
   const { themeConfig, selectedTheme } = useAdvancedTheme();
+
+  // Ensure message is a string and log a warning if it's not initially
+  if (typeof messageProp !== 'string') {
+    console.warn('PremiumChatBubble received non-string message prop. Type:', typeof messageProp, 'Value:', messageProp);
+  }
+  const message = messageProp || ""; // Default to empty string
 
   // Enhanced typewriter effect with theme-aware timing
   React.useEffect(() => {
@@ -42,7 +48,7 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
     const typingSpeed = selectedTheme === 'minimalist-gray' ? 20 : 30; // Faster for minimalist theme
 
     const timer = setInterval(() => {
-      if (index < message.length) {
+      if (index < message.length) { // 'message' is now guaranteed to be a string
         setDisplayedText(message.slice(0, index + 1));
         index++;
       } else {
@@ -52,7 +58,7 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
     }, typingSpeed);
 
     return () => clearInterval(timer);
-  }, [message, isUser, isTyping, selectedTheme]);
+  }, [message, isUser, isTyping, selectedTheme]); // Use the derived 'message' in dependencies
 
   return (
     <motion.div
