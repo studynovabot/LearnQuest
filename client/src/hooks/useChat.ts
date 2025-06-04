@@ -102,9 +102,15 @@ export function useChat() {
 
             const assistantMessage = await response.json();
 
+            // Ensure content is a string and provide a fallback if it's not or is empty
+            const messageContent = typeof assistantMessage.content === 'string' && assistantMessage.content.trim() !== ''
+              ? assistantMessage.content
+              : "I'm sorry, I couldn't generate a response this time. Please try asking something else.";
+
             // Add the assistant's response to local state
             setLocalMessages((prev) => [...prev, {
               ...assistantMessage,
+              content: messageContent, // Use the validated/fallback content
               timestamp: assistantMessage.timestamp || Date.now()
             }]);
 
