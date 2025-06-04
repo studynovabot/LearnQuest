@@ -4,20 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ContentManager.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/ContentManager.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/floating-nav.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/ui/floating-nav.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/premium-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/ui/premium-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/hooks/useAdvancedTheme.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/hooks/useAdvancedTheme.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/simpleVectorDB.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/lib/simpleVectorDB.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/DocumentSearch.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/DocumentSearch.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/ImageTools.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/ImageTools.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/VectorUploadPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/VectorUploadPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/services/fingerprint.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/services/fingerprint.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/tsconfig.json" afterDir="false" />
-    </list>
+    <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

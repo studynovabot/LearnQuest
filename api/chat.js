@@ -243,12 +243,15 @@ async function generateAIResponse(content, agentId, userId = null, db = null) {
   });
   
   // Check if API keys are valid
-  if (!groqApiKey || groqApiKey.length < 20) {
-    console.error('❌ Invalid Groq API key');
+  const isGroqKeyValid = groqApiKey && groqApiKey.length >= 20;
+  const isTogetherKeyValid = togetherApiKey && togetherApiKey.length >= 20;
+  
+  if (!isGroqKeyValid) {
+    console.error('❌ Invalid or missing Groq API key');
   }
   
-  if (!togetherApiKey || togetherApiKey.length < 20) {
-    console.error('❌ Invalid Together AI API key');
+  if (!isTogetherKeyValid) {
+    console.error('❌ Invalid or missing Together AI API key');
   }
 
   // Get personalized context if user ID and database are provided
@@ -267,24 +270,45 @@ async function generateAIResponse(content, agentId, userId = null, db = null) {
     ? `${systemPrompt}\n\n${personalizedContext}`
     : systemPrompt;
 
-  // Try Groq API first, then fallback to Together AI
-  try {
-    console.log('🔍 Trying Groq API...');
-    return await tryGroqAPI(content, enhancedSystemPrompt, groqApiKey);
-  } catch (groqError) {
-    console.log('⚠️ Groq API failed, trying Together AI fallback...', groqError.message);
+  // Try available APIs with better error handling
+  if (isGroqKeyValid) {
     try {
+      console.log('🔍 Trying Groq API...');
+      return await tryGroqAPI(content, enhancedSystemPrompt, groqApiKey);
+    } catch (groqError) {
+      console.log('⚠️ Groq API failed:', groqError.message);
+      if (isTogetherKeyValid) {
+        console.log('Trying Together AI fallback...');
+        try {
+          return await tryTogetherAPI(content, enhancedSystemPrompt, togetherApiKey);
+        } catch (togetherError) {
+          console.error('❌ Together AI also failed:', togetherError.message);
+        }
+      }
+    }
+  } else if (isTogetherKeyValid) {
+    // Only Together AI key is valid
+    try {
+      console.log('🔍 Trying Together AI API...');
       return await tryTogetherAPI(content, enhancedSystemPrompt, togetherApiKey);
     } catch (togetherError) {
-      console.error('❌ Both APIs failed');
-      // Return a helpful fallback response with study buddy personality
-      return {
-        content: `Hey there! 😅 I'm having a little trouble connecting to my brain right now (technical difficulties!). This happens sometimes when lots of students are asking awesome questions! 🤖💭 Could you try asking me again in just a moment? I promise I'll be back to help you learn amazing things! ✨📚`,
-        xpAwarded: 5,
-        model: 'fallback'
-      };
+      console.error('❌ Together AI failed:', togetherError.message);
     }
   }
+
+  // Fallback response if all API calls fail or no valid keys
+  console.error('❌ All API calls failed or no valid API keys available');
+  return {
+    content: "Hey there! 👋 I'm having some trouble connecting to my AI services right now. " +
+            "This can happen when there's high demand or temporary issues. Here's what you can do:\n\n" +
+            "1. Try asking your question again in a minute\n" +
+            "2. Check out our study resources in the meantime\n" +
+            "3. Let us know if the issue continues\n\n" +
+            "Thanks for your patience! 🙏",
+    xpAwarded: 5,
+    model: 'fallback',
+    error: 'All API calls failed or no valid API keys available'
+  };
 }
 
 // Get personalized context based on user performance data
@@ -1690,10 +1714,24 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('💥 Unexpected error:', error);
+    // Log additional error details for debugging
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      code: error.code,
+      requestId: req.headers['x-request-id'] || 'unknown',
+      timestamp: new Date().toISOString()
+    });
+    
+    // Return a more informative error response
     return res.status(500).json({
       error: true,
-      message: 'An unexpected error occurred',
-      details: error.message
+      message: 'We encountered an unexpected error while processing your request',
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Please try again in a moment',
+      requestId: req.headers['x-request-id'] || 'unknown',
+      timestamp: new Date().toISOString(),
+      supportContact: 'support@studynovaai.vercel.app'
     });
   }
 }
