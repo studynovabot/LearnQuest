@@ -89,9 +89,11 @@ async function tryGroqAPI(content, systemPrompt, apiKey) {
 
   const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
   const model = 'llama-3-70b-8192'; // Primary model (llama-3.3-70b-versatile)
-  const fallbackModel = 'llama-3-8b-8192'; // Fallback model (llama-3.1-8b-instant)
+  const fallbackModel = 'llama3-8b-8192'; // Fallback model (llama-3.1-8b-instant)
 
-  try {
+  try {git add .
+git commit -m "Fix chat API implementation"
+git push
     console.log(`[Groq API] Attempting to call with model ${model}`);
     const response = await fetch(GROQ_API_URL, {
       method: 'POST',
@@ -357,238 +359,113 @@ function checkForGenericResponse(text) {
   return genericPhrases.some(phrase => lowerText.includes(phrase));
 }
 
-// AI response generator with Groq integration, Together AI fallback, and performance-based personalization
-async function generateAIResponse(content, agentId, userId = null, db = null) {
-  console.log(`[API Chat DEBUG] generateAIResponse START - Agent ID: ${agentId}, User ID: ${userId}, Query: "${content ? content.substring(0, 50) : 'N/A'}"`);
-  let aiText = null;
-  let modelUsed = 'unknown';
-
-  const agent = agentId || '1';
-  const systemPrompt = AGENT_PROMPTS[agent] || AGENT_PROMPTS['1'];
-
-  console.log(`🚀 generateAIResponse called for agent ${agent} with content: "${content}"`);
-
-  // Get API keys - using the correct keys from .env.local
-  const groqKey = process.env.GROQ_API_KEY || '';
-  const togetherKey = process.env.TOGETHER_API_KEY || '';
-  const openRouterKey = process.env.OPENROUTER_API_KEY || '';
-  const fireworksKey = process.env.FIREWORKS_API_KEY || '';
-  const deepInfraKey = process.env.DEEPINFRA_API_KEY || '';
-
-  console.log(`[API] Groq API key present: ${!!groqKey}`);
-  console.log(`[API] Together API key present: ${!!togetherKey}`);
-  console.log(`[API] OpenRouter API key present: ${!!openRouterKey}`);
-  console.log(`[API] Fireworks API key present: ${!!fireworksKey}`);
-  console.log(`[API] DeepInfra API key present: ${!!deepInfraKey}`);
-
-  try {
-    // Get personalized context if user ID and database are provided
-    let personalizedContext = '';
-    if (userId && db) {
-      try {
-        personalizedContext = await getPersonalizedContext(db, userId, getSubjectFromAgent(agentId), content);
-      } catch (contextError) {
-        console.error('⚠️ Error getting personalized context:', contextError);
-        // Continue without personalized context
-      }
-    }
-
-    // Enhanced system prompt with personalized context
-    const enhancedSystemPrompt = personalizedContext 
-      ? `${systemPrompt}\n\n${personalizedContext}`
-      : systemPrompt;
-
-    // Try available APIs with better error handling and sequential fallback
-    if (groqKey) {
-      console.log('🔍 Trying Groq API...');
-      aiText = await tryGroqAPI(content, enhancedSystemPrompt, groqKey);
-      if (aiText && !checkForGenericResponse(aiText)) {
-        modelUsed = 'groq';
-      } else {
-        console.log('[API Chat DEBUG] Groq failed or generic, trying next API...');
-      }
-    }
-
-    if (!aiText || checkForGenericResponse(aiText)) {
-      if (togetherKey) {
-        console.log('🔍 Trying Together AI API...');
-        aiText = await tryTogetherAPI(content, enhancedSystemPrompt, togetherKey);
-        if (aiText && !checkForGenericResponse(aiText)) {
-          modelUsed = 'together';
-        } else {
-          console.log('[API Chat DEBUG] Together AI failed or generic, trying next API...');
-        }
-      }
-    }
-
-    if (!aiText || checkForGenericResponse(aiText)) {
-      if (openRouterKey) {
-        console.log('🔍 Trying OpenRouter API...');
-        aiText = await tryOpenRouterAPI(content, enhancedSystemPrompt, openRouterKey);
-        if (aiText && !checkForGenericResponse(aiText)) {
-          modelUsed = 'openrouter';
-        } else {
-          console.log('[API Chat DEBUG] OpenRouter API failed or generic, trying next API...');
-        }
-      }
-    }
-
-    if (!aiText || checkForGenericResponse(aiText)) {
-      if (fireworksKey) {
-        console.log('🔍 Trying Fireworks API...');
-        aiText = await tryFireworksAPI(content, enhancedSystemPrompt, fireworksKey);
-        if (aiText && !checkForGenericResponse(aiText)) {
-          modelUsed = 'fireworks';
-        } else {
-          console.log('[API Chat DEBUG] Fireworks API failed or generic, trying next API...');
-        }
-      }
-    }
-
-    if (!aiText || checkForGenericResponse(aiText)) {
-      if (deepInfraKey) {
-        console.log('🔍 Trying DeepInfra API...');
-        aiText = await tryDeepInfraAPI(content, enhancedSystemPrompt, deepInfraKey);
-        if (aiText && !checkForGenericResponse(aiText)) {
-          modelUsed = 'deepinfra';
-        } else {
-          console.log('[API Chat DEBUG] DeepInfra API failed or generic, using final fallback message.');
-        }
-      }
-    }
-
-    // Final check for generic response or empty response
-    if (!aiText || (typeof aiText === 'string' && aiText.trim() === '') || (typeof aiText === 'string' && checkForGenericResponse(aiText))) {
-      console.log('[API Chat DEBUG] All APIs failed or gave generic/empty responses. Using final fallback message.');
-      aiText = "I'm sorry, I'm having a bit of trouble connecting with my knowledge base at the moment. Could you please try asking again in a little while?";
-      modelUsed = 'fallback_internal';
-    }
-    console.log('[API Chat DEBUG] Final aiText after API calls and fallbacks:', typeof aiText === 'string' ? aiText.substring(0, 100) : aiText);
-
-    // Generate recommendations if AI response is successful
-    let personalizedRecommendations = [];
-    if (process.env.NODE_ENV !== 'test' && userId && db) {
-      try {
-        // Assuming generatePersonalizedRecommendations is defined elsewhere or will be implemented
-        // For now, let's just log a message if it's not defined to avoid errors
-        if (typeof generatePersonalizedRecommendations === 'function') {
-          const userPerformance = await getUserPerformanceData(db, userId);
-          personalizedRecommendations = await generatePersonalizedRecommendations(userPerformance, content);
-        } else {
-          console.warn('generatePersonalizedRecommendations function is not defined.');
-        }
-      } catch (error) {
-        console.error('Error generating personalized recommendations:', error);
-      }
-    }
-
-    if (aiText && modelUsed !== 'fallback_internal' && modelUsed !== 'error_internal') {
-      // Include only the most relevant recommendation
-      const topRecommendation = personalizedRecommendations[0];
-      if (topRecommendation) {
-        return {
-          content: aiText,
-          xpAwarded: Math.floor(Math.random() * 10) + 20,
-          model: modelUsed,
-          recommendations: {
-            type: topRecommendation.type,
-            title: topRecommendation.title,
-            description: topRecommendation.description,
-            items: topRecommendation.items.slice(0, 1) // Just the top item
-          }
-        };
-      } else {
-        // If no recommendations, return just the AI text
-        return {
-          content: aiText,
-          xpAwarded: Math.floor(Math.random() * 10) + 20,
-          model: modelUsed,
-          recommendations: null
-        };
-      }
-    } else {
-      // This block handles cases where aiText is null/empty/generic after all attempts
-      return {
-        content: aiText || "I'm sorry, I'm having a bit of trouble connecting with my knowledge base at the moment. Could you please try asking again in a little while?",
-        xpAwarded: 5,
-        model: modelUsed,
-        error: 'All API calls failed or no valid API keys available'
-      };
-    }
-  } catch (error) {
-    console.error('❌ Error in generateAIResponse:', error);
-    return {
-      content: "I'm really sorry, but an unexpected error occurred while trying to get a response. Please try again later!",
-      xpAwarded: 0,
-      model: 'error_catch',
-      error: error.message
-    };
-  }
-}
-
-// Placeholder for generatePersonalizedRecommendations if not already defined
-// This is to prevent errors if the function is not yet fully implemented elsewhere
-async function generatePersonalizedRecommendations(userPerformance, content) {
-  console.warn('[AI STUB] generatePersonalizedRecommendations called, returning empty recommendations.');
-  return [];
-}
-
-// Award XP for interaction
-let xpAwarded = 0;
-
-// Main handler function for the chat API
+// Main API handler
 async function handler(req, res) {
   // Handle CORS
-  const corsResult = handleCors(req, res);
-  if (corsResult) return corsResult;
-
-  console.log('[API Chat DEBUG] Handler: Request received - Method:', req.method, 'Body keys:', req.body ? Object.keys(req.body) : 'No body');
-
+  handleCors(req, res);
   if (req.method === 'OPTIONS') {
-    return res.status(204).end();
+    return res.status(200).end();
   }
 
+  // Only allow POST requests
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Parse request body
+  const { content, agentId, userId } = req.body;
+
+  // Validate required parameters
+  if (!content || !agentId || !userId) {
+    return res.status(400).json({ 
+      error: 'Missing required parameters: content, agentId, or userId' 
+    });
+  }
+
+  // Get API keys from environment
+  const GROQ_API_KEY = process.env.GROQ_API_KEY;
+  const TOGETHER_API_KEY = process.env.TOGETHER_API_KEY;
+
+  if (!GROQ_API_KEY && !TOGETHER_API_KEY) {
+    return res.status(500).json({ 
+      error: 'No AI API keys configured on server' 
+    });
   }
 
   try {
-    const { content: userMessage, agentId, userId, context: clientContext } = req.body;
-    console.log('[API Chat DEBUG] Handler: Parsed body - UserMessage:', userMessage ? userMessage.substring(0,50) : 'N/A', 'AgentID:', agentId, 'UserID:', userId);
+    // Initialize Firebase
+    await initializeFirebase();
+    const db = getFirestoreDb();
 
-    if (!userMessage || !agentId) {
-      console.log('[API Chat DEBUG] Handler: Missing userMessage or agentId');
-      return res.status(400).json({ error: 'Missing message content or agent ID' });
-    }
-
-    // Initialize Firebase (if not already initialized)
-    const db = getFirestoreDb(initializeFirebase());
-
-    // Generate AI response
-    const { content: aiContent, model, recommendations, xpAwarded } = await generateAIResponse(userMessage, agentId, userId, db);
-    console.log('[API Chat DEBUG] Handler: Response from generateAIResponse - aiContent:', typeof aiContent === 'string' ? aiContent.substring(0,100) : aiContent, 'Model:', model);
-
+    // Get the subject from agent ID
+    const subject = getSubjectFromAgent(agentId);
+    
+    // Get personalized context
+    const personalizedContext = await getPersonalizedContext(db, userId, subject, content);
+    
+    // Get the system prompt for the agent
+    const systemPrompt = AGENT_PROMPTS[agentId] || AGENT_PROMPTS['1'];
+    
+    // Prepare the full content with context
+    const fullContent = `${personalizedContext}\n\n${content}`;
+    
     // Track user interaction
-    if (userId) {
-      await trackUserInteraction(db, userId, agentId, userMessage, aiContent || '', model, recommendations, xpAwarded);
+    await trackUserInteraction(db, userId, {
+      type: 'chat_message',
+      agentId,
+      content,
+      timestamp: new Date().toISOString()
+    });
+
+    // Try calling AI APIs with retries
+    let aiResponse = null;
+    let retries = 0;
+    let timeout = INITIAL_TIMEOUT;
+    
+    while (retries < MAX_RETRIES && !aiResponse) {
+      try {
+        // Try Groq API first if key is available
+        if (GROQ_API_KEY) {
+          aiResponse = await tryGroqAPI(fullContent, systemPrompt, GROQ_API_KEY);
+        }
+        
+        // If Groq fails, try Together API
+        if (!aiResponse && TOGETHER_API_KEY) {
+          aiResponse = await tryTogetherAPI(fullContent, systemPrompt, TOGETHER_API_KEY);
+        }
+        
+        // If we got a response, break out of the loop
+        if (aiResponse) break;
+        
+      } catch (error) {
+        console.error(`Attempt ${retries + 1} failed:`, error);
+      }
+      
+      // Wait before retrying with exponential backoff
+      retries++;
+      if (retries < MAX_RETRIES) {
+        console.log(`Retrying in ${timeout / 1000} seconds...`);
+        await delay(timeout);
+        timeout *= 2; // Exponential backoff
+      }
     }
 
-    const finalResponsePayload = {
-      role: 'assistant',
-      content: aiContent, // This is the crucial part
-      recommendations,
-      xpAwarded,
-      model,
-      timestamp: Date.now(),
-    };
+    if (!aiResponse) {
+      return res.status(500).json({ 
+        error: 'Failed to get response from AI services after multiple attempts' 
+      });
+    }
 
-    console.log('[API Chat DEBUG] Handler: Sending 200 response with payload - Content:', typeof finalResponsePayload.content === 'string' ? finalResponsePayload.content.substring(0,100) : finalResponsePayload.content);
-    return res.status(200).json(finalResponsePayload);
-
+    // Return the successful response
+    res.status(200).json({ response: aiResponse });
+    
   } catch (error) {
-    console.error('[API Chat DEBUG] Handler: Unhandled error in handler:', error.message, error.stack);
-    return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    console.error('Server error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error', 
+      details: error.message 
+    });
   }
 }
 
-export { handler };
+export default handler;
