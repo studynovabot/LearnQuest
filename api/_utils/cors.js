@@ -10,7 +10,8 @@ export function setCorsHeaders(res, origin = null) {
     'https://studynova.vercel.app',
     'https://learnquest.vercel.app',
     'https://studynovaai.vercel.app',
-    'https://studynovabot.vercel.app'
+    'https://studynovabot.vercel.app',
+    'https://studynovaai.vercel.app' // Added production domain
   ];
 
   const requestOrigin = origin || 'http://localhost:3004';
