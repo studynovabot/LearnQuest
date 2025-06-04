@@ -1,7 +1,7 @@
 // Firebase utilities for Vercel serverless functions
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { firebaseConfig } from '../../firebase-config';
+import { firebaseConfig } from '../../firebase-config.js';
 
 let firebaseApp;
 let firestoreDb;
@@ -10,10 +10,11 @@ let firestoreDb;
 export async function initializeFirebase() {
   if (!firebaseApp) {
     try {
-      console.log('🔥 Initializing Firebase with config:', firebaseConfig);
+      // Only log non-sensitive config info
+      console.log('🔥 Initializing Firebase for project:', firebaseConfig.projectId);
       firebaseApp = initializeApp(firebaseConfig);
     } catch (error) {
-      console.error('❌ Firebase initialization error:', error);
+      console.error('❌ Firebase initialization error:', error.message);
       throw error;
     }
   }
@@ -22,29 +23,13 @@ export async function initializeFirebase() {
 
 // Get Firestore instance
 export function getFirestoreDb() {
-  if (process.env.NODE_ENV === 'test') {
-    const mockDb = {
-      collection: jest.fn().mockReturnThis(),
-      doc: jest.fn().mockReturnThis(),
-      get: jest.fn().mockResolvedValue({ 
-        exists: true, 
-        data: () => ({ /* mock data */ }) 
-      })
-    };
-    
-    return {
-      initializeFirebase: jest.fn(),
-      getFirestoreDb: () => mockDb,
-      getUserPerformanceData: async () => ({ /* mock data */ })
-    };
+  if (!firestoreDb) {
+    if (!firebaseApp) {
+      throw new Error('Firebase not initialized');
+    }
+    firestoreDb = getFirestore(firebaseApp);
   }
-  try {
-    const app = initializeFirebase();
-    return getFirestore(app);
-  } catch (error) {
-    console.error('❌ Error getting Firestore instance:', error);
-    throw error;
-  }
+  return firestoreDb;
 }
 
 export async function getUserPerformanceData(db, userId) {
