@@ -6,10 +6,17 @@ function getApiUrl() {
     return import.meta.env.VITE_API_URL;
   }
 
-  // Always use the production Vercel API
-  const vercelApi = 'https://studynovaai.vercel.app/api';
-  console.log(`Using Vercel production API: ${vercelApi}`);
-  return vercelApi;
+  // In production, use relative URLs to avoid CORS issues
+  if (import.meta.env.PROD) {
+    const relativeApi = '/api';
+    console.log(`Using relative API path: ${relativeApi}`);
+    return relativeApi;
+  }
+
+  // For development, use localhost
+  const localApi = 'http://localhost:5000/api';
+  console.log(`Using local development API: ${localApi}`);
+  return localApi;
 }
 
 export const config = {
@@ -19,6 +26,6 @@ export const config = {
   // Disable mock data since we're using real Vercel backend
   useMockData: false,
 
-  // Disable mock fallback since Vercel is reliable
-  enableMockFallback: false
+  // Enable mock fallback for development only
+  enableMockFallback: import.meta.env.DEV
 };

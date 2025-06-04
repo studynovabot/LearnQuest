@@ -9,19 +9,7 @@
       }
     },
     {
-      "src": "api/auth.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "api/chat.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "api/tutors.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "api/user-profile.js",
+      "src": "api/**/*.js",
       "use": "@vercel/node"
     }
   ],
