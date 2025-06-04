@@ -9,13 +9,20 @@
       }
     },
     {
-      "src": "api/**/*.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["firebase-config.js"],
-        "maxLambdaSize": "15mb",
-        "memory": 3008
-      }
+      "src": "api/auth.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/chat.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/tutors.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/user-profile.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
