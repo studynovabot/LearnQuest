@@ -4,78 +4,6 @@ import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
 import { getSubjectFromAgent, extractQuestionData } from './_utils/question-utils.js';
 import { trackUserInteraction } from './_utils/analytics.js';
 
-// Agent prompts for different tutors
-const AGENT_PROMPTS = {
-  // Default AI tutor (Nova)
-  '1': `You are Nova, an AI study buddy designed to help students learn effectively. 
-Your goal is to provide clear, accurate, and helpful explanations that promote understanding.
-
-Guidelines:
-- Be friendly, supportive, and encouraging
-- Explain concepts in simple terms, using analogies when helpful
-- Break down complex topics into manageable parts
-- Provide examples to illustrate concepts
-- Ask questions to check understanding
-- Correct misconceptions gently
-- Adapt your explanations based on the student's needs
-- Use emojis occasionally to make your responses engaging 📚✨
-
-Remember that you're a helpful learning companion. Make learning enjoyable and accessible!`,
-
-  // Math tutor
-  '2': `You are MathMaster, an AI math tutor specializing in mathematics education.
-Your goal is to help students understand mathematical concepts and solve problems.
-
-Guidelines:
-- Explain mathematical concepts clearly and precisely
-- Show step-by-step solutions to problems
-- Use proper mathematical notation when helpful
-- Provide multiple approaches to solving problems when applicable
-- Connect concepts to real-world applications
-- Identify common misconceptions and address them
-- Encourage mathematical thinking and problem-solving skills
-- Use visual explanations when helpful (described in text)
-
-Remember to be patient and supportive, as math can be challenging for many students.`,
-
-  // Science tutor
-  '3': `You are ScienceGuide, an AI science tutor with expertise across scientific disciplines.
-Your goal is to help students understand scientific concepts, theories, and applications.
-
-Guidelines:
-- Explain scientific concepts accurately and clearly
-- Connect theory to real-world applications and examples
-- Describe scientific processes step-by-step
-- Clarify common misconceptions in science
-- Encourage scientific thinking and inquiry
-- Explain the scientific method and its application
-- Use analogies to make complex concepts more accessible
-- Incorporate recent scientific developments when relevant
-
-Remember to foster curiosity and critical thinking in your explanations.`
-};
-
-// Export test endpoint for development environment
-export const testEndpoint = process.env.NODE_ENV === 'development' ? async (req, res) => {
-  try {
-    const results = await testTutorResponses();
-    return res.status(200).json({
-      success: true,
-      results,
-      summary: {
-        total: results.length,
-        successful: results.filter(r => r.success).length,
-        realResponses: results.filter(r => r.success && r.isRealResponse).length
-      }
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  }
-} : null;
-
 // Agent-specific system prompts for all 15 AI tutors - Engaging Study Buddy Style
 const AGENT_PROMPTS = {
   '1': `You are Nova AI, your friendly study buddy! 🌟 You're like that super helpful friend who's always excited to learn new things together. Be warm, encouraging, and conversational. Use emojis naturally throughout your responses (💡✨📚🤔). Always ask follow-up questions to keep the conversation going, offer to explain things differently if needed, and celebrate the student's curiosity. Start responses with phrases like "Great question!" or "Ooh, I love this topic!" Make every interaction feel like chatting with a supportive friend who genuinely cares about their learning journey!`,
@@ -116,89 +44,7 @@ const INITIAL_TIMEOUT = 30000; // 30 seconds
 // Helper function to delay between retries
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Try Groq API for chat completion
-async function tryGroqAPI(content, systemPrompt, apiKey) {
-  try {
-    console.log('🔍 Making Groq API request...');
-    
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'llama3-70b-8192',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content }
-        ],
-        temperature: 0.7,
-        max_tokens: 1024
-      })
-    });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Groq API error:', errorText);
-      throw new Error(`Groq API error: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    console.log('✅ Groq API response received');
-    
-    return {
-      content: data.choices[0].message.content,
-      xpAwarded: 10,
-      model: 'groq-llama3-70b'
-    };
-  } catch (error) {
-    console.error('❌ Groq API error:', error);
-    throw error;
-  }
-}
-
-// Try Together AI for chat completion
-async function tryTogetherAPI(content, systemPrompt, apiKey) {
-  try {
-    console.log('🔍 Making Together AI API request...');
-    
-    const response = await fetch('https://api.together.xyz/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content }
-        ],
-        temperature: 0.7,
-        max_tokens: 1024
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Together AI API error:', errorText);
-      throw new Error(`Together AI API error: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    console.log('✅ Together AI API response received');
-    
-    return {
-      content: data.choices[0].message.content,
-      xpAwarded: 8,
-      model: 'together-mixtral-8x7b'
-    };
-  } catch (error) {
-    console.error('❌ Together AI API error:', error);
-    throw error;
-  }
-}
 
 // Verify Groq API connection
 async function verifyGroqAPI(apiKey) {
@@ -621,6 +467,7 @@ async function verifyApiKey() {
   return results;
 }
 
+// Main handler function for the chat API
 export default async function handler(req, res) {
   // Handle CORS
   const corsResult = handleCors(req, res);
@@ -637,242 +484,188 @@ export default async function handler(req, res) {
     });
   }
 
+  try {
+    // Get user ID from Authorization header or X-User-ID header
+    let userId;
+    const authHeader = req.headers.authorization;
+    const userIdHeader = req.headers['x-user-id'];
+    
+    if (authHeader) {
+      userId = authHeader.replace('Bearer ', '');
+    } else if (userIdHeader) {
+      userId = userIdHeader;
+    } else {
+      return res.status(401).json({ error: 'Authorization header required' });
+    }
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Invalid authorization token' });
+    }
+
+    console.log(`📝 Processing chat message for user ${userId} with agent ${req.body.agentId || 'default'}`);
+
+    // Initialize Firebase
+    let db;
     try {
-      console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
+      initializeFirebase();
+      db = getFirestoreDb();
+    } catch (firebaseError) {
+      console.error('⚠️ Firebase initialization error:', firebaseError);
+      console.log('⚠️ Continuing without Firebase - some features will be limited');
+      // Continue without Firebase - we'll handle this case below
+    }
 
-      const { content, agentId, userId } = req.body;
-      const actualUserId = userId || req.headers['x-user-id'] || 'demo-user';
+    // Get request body
+    const { 
+      content, 
+      agentId, 
+      sessionId, 
+      timeSpent, 
+      correct, 
+      confidenceScore,
+      device,
+      platform,
+      promptTokens,
+      completionTokens,
+      totalTokens,
+      processingTime,
+      attemptCount
+    } = req.body;
 
-      // Validate request body
-      if (!content) {
-        console.log('❌ No content provided in request');
-        return res.status(400).json({
-          error: true,
-          message: 'No content provided',
-          details: 'The content field is required in the request body'
-        });
-      }
-
-      // Skip API verification - let the generateAIResponse function handle fallbacks
-
-      console.log(`🤖 Processing request for agent ${agentId} with content: "${content}"`);
-
-      // Initialize Firebase (but don't fail if it errors)
-      let db = null;
-      try {
-        initializeFirebase();
-        db = getFirestoreDb();
-        console.log('✅ Firebase initialized successfully');
-      } catch (firebaseError) {
-        console.error('⚠️ Firebase initialization error:', firebaseError);
-        // Continue without Firebase
-      }
-
-      // Generate AI response
-      try {
-        console.log('🎯 Generating AI response...');
-        const { content: responseContent, xpAwarded, model } = await generateAIResponse(content, agentId);
-        console.log(`✅ AI response generated successfully using model: ${model}`);
-
-        // Track user interaction (but don't fail if it errors)
-        if (db) {
-          try {
-            const subject = getSubjectFromAgent(agentId);
-            await trackUserInteraction(db, {
-              userId: actualUserId,
-              subject: subject,
-              action: 'chat_interaction',
-              agentId: agentId || '1',
-              difficulty: 'medium',
-              correct: true,
-              timeSpent: 0,
-              xpEarned: xpAwarded,
-              model: model
-            });
-            console.log('✅ User interaction tracked successfully');
-          } catch (trackingError) {
-            console.error('⚠️ Error tracking user interaction:', trackingError);
-            // Continue even if tracking fails
-          }
-        }
-
-        // Create response object
-        const assistantResponse = {
-          id: `assistant-${Date.now()}`,
-          content: responseContent,
-          role: 'assistant',
-          createdAt: new Date().toISOString(),
-          userId: 'system',
-          agentId: agentId || '1',
-          xpAwarded,
-          model,
-          error: false
-        };
-
-        console.log('📤 Sending response:', JSON.stringify(assistantResponse, null, 2));
-        return res.status(200).json(assistantResponse);
-
-      } catch (aiError) {
-        console.error('❌ AI response generation error:', aiError);
-        return res.status(500).json({
-          error: true,
-          message: 'Failed to generate AI response',
-          details: aiError.message,
-          errorType: 'AI_GENERATION_ERROR'
-        });
-      }
-
-    } catch (error) {
-      console.error('💥 Unexpected error:', error);
-      return res.status(500).json({
+    if (!content) {
+      return res.status(400).json({
         error: true,
-        message: 'An unexpected error occurred',
-        details: error.message,
-        errorType: 'UNEXPECTED_ERROR'
+        message: 'Missing required fields',
+        details: 'Content is required'
       });
     }
-}
 
-// Map agent IDs to subjects for performance tracking
-function getSubjectFromAgent(agentId) {
-  const agentSubjectMap = {
-    '1': 'General', // Nova
-    '2': 'Mathematics', // MathWiz
-    '3': 'Science', // ScienceBot
-    '4': 'Languages', // LinguaLearn
-    '5': 'History', // HistoryWise
-    '6': 'Geography', // GeoExplorer
-    '7': 'Physics', // PhysicsProf
-    '8': 'Chemistry', // ChemCoach
-    '9': 'Biology', // BioBuddy
-    '10': 'English', // EnglishExpert
-    '11': 'Computer Science', // CodeMaster
-    '12': 'Arts', // ArtAdvisor
-    '13': 'Music', // MusicMaestro
-    '14': 'Physical Education', // SportsScholar
-    '15': 'Personalized Learning' // PersonalAI
-  };
+    console.log(`📝 Processing chat message for user ${userId} with agent ${agentId || 'default'}`);
 
-  return agentSubjectMap[agentId] || 'General';
-}
+    // Generate AI response with personalized context (if db is available)
+    const aiResponse = await generateAIResponse(content, agentId, userId, db);
 
-// Track user interaction for performance calculation with enhanced data collection
-async function trackUserInteraction(db, interaction) {
-  try {
-    // Extract question data from content if available
-    const questionData = extractQuestionData(interaction.content);
+    // Track user interaction for performance metrics (only if db is available)
+    const subject = getSubjectFromAgent(agentId);
     
-    // Create enhanced interaction record with detailed metrics
-    const enhancedInteraction = {
-      ...interaction,
-      timestamp: new Date(),
-      sessionId: interaction.sessionId || `session_${Date.now()}`,
-      interactionType: questionData.isQuestion ? 'question_answer' : 'chat_interaction',
-      questionData: questionData.isQuestion ? {
-        question: questionData.question,
+    // Extract question data to determine if this is a question
+    const questionData = extractQuestionData(content);
+    const isQuestion = questionData.isQuestion;
+    
+    // Calculate XP based on interaction type and complexity
+    let xpEarned = aiResponse.xpAwarded || 5;
+    if (isQuestion) {
+      // Award more XP for questions, especially complex ones
+      const complexityMultiplier = 
+        questionData.complexity === 'hard' ? 2.0 : 
+        questionData.complexity === 'medium' ? 1.5 : 
+        1.2;
+      
+      xpEarned = Math.round(xpEarned * complexityMultiplier);
+      
+      // Bonus XP for correct answers
+      if (correct === true) {
+        xpEarned += 2;
+      }
+    }
+    
+    const interaction = {
+      userId,
+      sessionId: sessionId || `session_${Date.now()}`,
+      content,
+      response: aiResponse.content,
+      subject,
+      agentId,
+      correct: correct !== undefined ? correct : true, // Use provided value or assume correct for chat
+      timeSpent: timeSpent || 0,
+      xpEarned,
+      model: aiResponse.model || 'unknown',
+      confidenceScore,
+      device: device || 'unknown',
+      platform: platform || 'web',
+      promptTokens: promptTokens || 0,
+      completionTokens: completionTokens || 0,
+      totalTokens: totalTokens || 0,
+      processingTime: processingTime || 0,
+      attemptCount: attemptCount || 1
+    };
+
+    // Track the interaction with enhanced analytics (only if db is available)
+    let interactionId = `interaction_${Date.now()}`;
+    if (db) {
+      try {
+        interactionId = await trackUserInteraction(db, interaction);
+      } catch (trackError) {
+        console.error('Error tracking user interaction:', trackError);
+        // Continue without tracking
+      }
+    } else {
+      console.log('Skipping interaction tracking - Firebase not available');
+    }
+
+    // Get personalized recommendations if this was a question and db is available
+    let recommendations = null;
+    if (isQuestion && db) {
+      try {
+        // Get quick recommendations based on this interaction
+        const { generatePersonalizedRecommendations } = await import('./_utils/learning-engine.js');
+        const recommendationResult = await generatePersonalizedRecommendations(db, userId, subject);
+        
+        if (recommendationResult.success) {
+          // Include only the most relevant recommendation
+          const topRecommendation = recommendationResult.recommendations[0];
+          if (topRecommendation) {
+            recommendations = {
+              type: topRecommendation.type,
+              title: topRecommendation.title,
+              description: topRecommendation.description,
+              items: topRecommendation.items.slice(0, 1) // Just the top item
+            };
+          }
+        }
+      } catch (recError) {
+        console.error('Error generating recommendations:', recError);
+        // Continue without recommendations
+      }
+    }
+
+    // Return enhanced response
+    return res.status(200).json({
+      success: true,
+      message: aiResponse.content,
+      xpAwarded: xpEarned,
+      model: aiResponse.model || 'unknown',
+      interactionId,
+      isQuestion,
+      questionData: isQuestion ? {
         category: questionData.category,
         complexity: questionData.complexity,
         conceptTags: questionData.conceptTags
       } : null,
-      responseTime: interaction.timeSpent || 0,
-      attemptCount: interaction.attemptCount || 1,
-      accuracy: interaction.correct ? 100 : 0,
-      confidenceScore: interaction.confidenceScore || null,
-      device: interaction.device || 'unknown',
-      platform: interaction.platform || 'web',
-      // Store the interaction in a structured format for analysis
-      metadata: {
-        aiModel: interaction.model || 'unknown',
-        promptTokens: interaction.promptTokens || 0,
-        completionTokens: interaction.completionTokens || 0,
-        totalTokens: interaction.totalTokens || 0,
-        processingTime: interaction.processingTime || 0
-      }
-    };
-
-    // Save enhanced interaction to database
-    const interactionRef = await db.collection('user_interactions').add(enhancedInteraction);
-    console.log(`✅ Enhanced interaction tracked with ID: ${interactionRef.id}`);
-
-    // Update user's subject performance with detailed analytics
-    await updateUserSubjectPerformance(db, interaction.userId, interaction.subject, enhancedInteraction);
-    
-    // Store interaction in user's learning history for persistence across sessions
-    await updateUserLearningHistory(db, interaction.userId, interaction.subject, enhancedInteraction, interactionRef.id);
-    
-    return interactionRef.id;
+      recommendations
+    });
   } catch (error) {
-    console.error('Error tracking user interaction:', error);
-    throw error;
+    console.error('💥 Unexpected error:', error);
+    // Log additional error details for debugging
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      code: error.code,
+      requestId: req.headers['x-request-id'] || 'unknown',
+      timestamp: new Date().toISOString()
+    });
+    
+    // Return a more informative error response
+    return res.status(500).json({
+      error: true,
+      message: 'We encountered an unexpected error while processing your request',
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Please try again in a moment',
+      requestId: req.headers['x-request-id'] || 'unknown',
+      timestamp: new Date().toISOString(),
+      supportContact: 'support@studynovaai.vercel.app'
+    });
   }
-}
-
-// Extract question data from content using NLP patterns
-function extractQuestionData(content) {
-  if (!content || typeof content !== 'string') {
-    return { isQuestion: false };
-  }
-
-  // Check if content contains a question
-  const questionPatterns = [
-    /\?$/, // Ends with question mark
-    /^(what|how|why|when|where|who|which|can|could|would|should|is|are|do|does|did)/i, // Starts with question word
-    /(explain|describe|define|calculate|solve|find|determine)/i // Contains instruction words
-  ];
-  
-  const isQuestion = questionPatterns.some(pattern => pattern.test(content.trim()));
-  
-  if (!isQuestion) {
-    return { isQuestion: false };
-  }
-  
-  // Attempt to categorize the question
-  const categoryPatterns = [
-    { pattern: /(math|calculate|equation|formula|solve for|triangle|circle|algebra|geometry|calculus)/i, category: 'Mathematics' },
-    { pattern: /(physics|force|motion|energy|gravity|momentum|velocity|acceleration)/i, category: 'Physics' },
-    { pattern: /(chemistry|chemical|reaction|molecule|atom|element|compound|acid|base)/i, category: 'Chemistry' },
-    { pattern: /(biology|cell|organism|gene|species|ecosystem|plant|animal)/i, category: 'Biology' },
-    { pattern: /(history|century|war|civilization|king|queen|empire|revolution)/i, category: 'History' },
-    { pattern: /(geography|map|country|continent|ocean|river|mountain|climate)/i, category: 'Geography' },
-    { pattern: /(grammar|sentence|verb|noun|adjective|adverb|tense|punctuation)/i, category: 'English' },
-    { pattern: /(code|program|function|algorithm|variable|loop|class|object)/i, category: 'Computer Science' }
-  ];
-  
-  let category = 'General';
-  for (const { pattern, category: cat } of categoryPatterns) {
-    if (pattern.test(content)) {
-      category = cat;
-      break;
-    }
-  }
-  
-  // Estimate complexity based on content length and keywords
-  let complexity = 'medium';
-  const complexityWords = [
-    { words: ['simple', 'basic', 'easy', 'elementary'], level: 'easy' },
-    { words: ['advanced', 'complex', 'difficult', 'challenging', 'analyze', 'evaluate', 'synthesize'], level: 'hard' }
-  ];
-  
-  for (const { words, level } of complexityWords) {
-    if (words.some(word => content.toLowerCase().includes(word))) {
-      complexity = level;
-      break;
-    }
-  }
-  
-  // Extract potential concept tags
-  const words = content.toLowerCase().split(/\s+/);
-  const stopWords = ['a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'to', 'of', 'and', 'in', 'that', 'have', 'with', 'this', 'from', 'by', 'for', 'not', 'or', 'as', 'what', 'how', 'why', 'when', 'where', 'who', 'which'];
-  const filteredWords = words.filter(word => !stopWords.includes(word) && word.length > 3);
-  const conceptTags = [...new Set(filteredWords)].slice(0, 5); // Take up to 5 unique non-stop words as concept tags
-  
-  return {
-    isQuestion: true,
-    question: content.trim(),
-    category,
-    complexity,
-    conceptTags
-  };
 }
 
 // Update user's learning history for persistence across sessions
@@ -1533,205 +1326,4 @@ function checkForGenericResponse(content) {
   return genericPhrases.some(phrase =>
     content.toLowerCase().includes(phrase.toLowerCase())
   );
-}
-
-// Main handler function for the chat API
-export default async function handler(req, res) {
-  // Handle CORS
-  const corsResult = handleCors(req, res);
-  if (corsResult) return corsResult;
-
-  console.log('🚀 Chat API called with method:', req.method);
-
-  if (req.method !== 'POST') {
-    console.log('❌ Method not allowed:', req.method);
-    return res.status(405).json({
-      error: true,
-      message: 'Method not allowed',
-      details: `${req.method} is not supported, use POST`
-    });
-  }
-
-  try {
-    // Get user ID from Authorization header or X-User-ID header
-    let userId;
-    const authHeader = req.headers.authorization;
-    const userIdHeader = req.headers['x-user-id'];
-    
-    if (authHeader) {
-      userId = authHeader.replace('Bearer ', '');
-    } else if (userIdHeader) {
-      userId = userIdHeader;
-    } else {
-      return res.status(401).json({ error: 'Authorization header required' });
-    }
-
-    if (!userId) {
-      return res.status(401).json({ error: 'Invalid authorization token' });
-    }
-
-    console.log(`📝 Processing chat message for user ${userId} with agent ${req.body.agentId || 'default'}`);
-
-    // Initialize Firebase
-    let db;
-    try {
-      initializeFirebase();
-      db = getFirestoreDb();
-    } catch (firebaseError) {
-      console.error('⚠️ Firebase initialization error:', firebaseError);
-      console.log('⚠️ Continuing without Firebase - some features will be limited');
-      // Continue without Firebase - we'll handle this case below
-    }
-
-    // Get request body
-    const { 
-      content, 
-      agentId, 
-      sessionId, 
-      timeSpent, 
-      correct, 
-      confidenceScore,
-      device,
-      platform,
-      promptTokens,
-      completionTokens,
-      totalTokens,
-      processingTime,
-      attemptCount
-    } = req.body;
-
-    if (!content) {
-      return res.status(400).json({
-        error: true,
-        message: 'Missing required fields',
-        details: 'Content is required'
-      });
-    }
-
-    console.log(`📝 Processing chat message for user ${userId} with agent ${agentId || 'default'}`);
-
-    // Generate AI response with personalized context (if db is available)
-    const aiResponse = await generateAIResponse(content, agentId, userId, db);
-
-    // Track user interaction for performance metrics (only if db is available)
-    const subject = getSubjectFromAgent(agentId);
-    
-    // Extract question data to determine if this is a question
-    const questionData = extractQuestionData(content);
-    const isQuestion = questionData.isQuestion;
-    
-    // Calculate XP based on interaction type and complexity
-    let xpEarned = aiResponse.xpAwarded || 5;
-    if (isQuestion) {
-      // Award more XP for questions, especially complex ones
-      const complexityMultiplier = 
-        questionData.complexity === 'hard' ? 2.0 : 
-        questionData.complexity === 'medium' ? 1.5 : 
-        1.2;
-      
-      xpEarned = Math.round(xpEarned * complexityMultiplier);
-      
-      // Bonus XP for correct answers
-      if (correct === true) {
-        xpEarned += 2;
-      }
-    }
-    
-    const interaction = {
-      userId,
-      sessionId: sessionId || `session_${Date.now()}`,
-      content,
-      response: aiResponse.content,
-      subject,
-      agentId,
-      correct: correct !== undefined ? correct : true, // Use provided value or assume correct for chat
-      timeSpent: timeSpent || 0,
-      xpEarned,
-      model: aiResponse.model || 'unknown',
-      confidenceScore,
-      device: device || 'unknown',
-      platform: platform || 'web',
-      promptTokens: promptTokens || 0,
-      completionTokens: completionTokens || 0,
-      totalTokens: totalTokens || 0,
-      processingTime: processingTime || 0,
-      attemptCount: attemptCount || 1
-    };
-
-    // Track the interaction with enhanced analytics (only if db is available)
-    let interactionId = `interaction_${Date.now()}`;
-    if (db) {
-      try {
-        interactionId = await trackUserInteraction(db, interaction);
-      } catch (trackError) {
-        console.error('Error tracking user interaction:', trackError);
-        // Continue without tracking
-      }
-    } else {
-      console.log('Skipping interaction tracking - Firebase not available');
-    }
-
-    // Get personalized recommendations if this was a question and db is available
-    let recommendations = null;
-    if (isQuestion && db) {
-      try {
-        // Get quick recommendations based on this interaction
-        const { generatePersonalizedRecommendations } = await import('./_utils/learning-engine.js');
-        const recommendationResult = await generatePersonalizedRecommendations(db, userId, subject);
-        
-        if (recommendationResult.success) {
-          // Include only the most relevant recommendation
-          const topRecommendation = recommendationResult.recommendations[0];
-          if (topRecommendation) {
-            recommendations = {
-              type: topRecommendation.type,
-              title: topRecommendation.title,
-              description: topRecommendation.description,
-              items: topRecommendation.items.slice(0, 1) // Just the top item
-            };
-          }
-        }
-      } catch (recError) {
-        console.error('Error generating recommendations:', recError);
-        // Continue without recommendations
-      }
-    }
-
-    // Return enhanced response
-    return res.status(200).json({
-      success: true,
-      message: aiResponse.content,
-      xpAwarded: xpEarned,
-      model: aiResponse.model || 'unknown',
-      interactionId,
-      isQuestion,
-      questionData: isQuestion ? {
-        category: questionData.category,
-        complexity: questionData.complexity,
-        conceptTags: questionData.conceptTags
-      } : null,
-      recommendations
-    });
-  } catch (error) {
-    console.error('💥 Unexpected error:', error);
-    // Log additional error details for debugging
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-      code: error.code,
-      requestId: req.headers['x-request-id'] || 'unknown',
-      timestamp: new Date().toISOString()
-    });
-    
-    // Return a more informative error response
-    return res.status(500).json({
-      error: true,
-      message: 'We encountered an unexpected error while processing your request',
-      details: process.env.NODE_ENV === 'development' ? error.message : 'Please try again in a moment',
-      requestId: req.headers['x-request-id'] || 'unknown',
-      timestamp: new Date().toISOString(),
-      supportContact: 'support@studynovaai.vercel.app'
-    });
-  }
 }
