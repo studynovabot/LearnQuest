@@ -91,9 +91,7 @@ async function tryGroqAPI(content, systemPrompt, apiKey) {
   const model = 'llama-3-70b-8192'; // Primary model (llama-3.3-70b-versatile)
   const fallbackModel = 'llama3-8b-8192'; // Fallback model (llama-3.1-8b-instant)
 
-  try {git add .
-git commit -m "Fix chat API implementation"
-git push
+  try {
     console.log(`[Groq API] Attempting to call with model ${model}`);
     const response = await fetch(GROQ_API_URL, {
       method: 'POST',
@@ -451,6 +449,7 @@ async function handler(req, res) {
     }
 
     if (!aiResponse) {
+      console.error('All AI API attempts failed');
       return res.status(500).json({ 
         error: 'Failed to get response from AI services after multiple attempts' 
       });
@@ -460,7 +459,7 @@ async function handler(req, res) {
     res.status(200).json({ response: aiResponse });
     
   } catch (error) {
-    console.error('Server error:', error);
+    console.error('Server error:', error.message, error.stack);
     res.status(500).json({ 
       error: 'Internal server error', 
       details: error.message 
