@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
+      "src": "client/package.json",
       "use": "@vercel/static-build",
       "config": {
         "distDir": "dist"
@@ -26,6 +26,7 @@
     }
   ],
   "routes": [
+    // API routes
     {
       "src": "/api/(.*)",
       "dest": "/api/$1",
@@ -35,10 +36,20 @@
         "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept"
       }
     },
+    // Static assets with cache
+    {
+      "src": "/assets/(.*)",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      },
+      "continue": true
+    },
+    // All other routes should serve index.html for client-side routing
     {
       "src": "/(.*)",
       "dest": "/index.html",
       "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
         "X-Content-Type-Options": "nosniff",
         "X-Frame-Options": "DENY",
         "X-XSS-Protection": "1; mode=block"
