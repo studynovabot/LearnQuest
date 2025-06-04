@@ -79,7 +79,8 @@
     "vaul": "^1.1.2",
     "vite": "^5.4.19",
     "wouter": "^3.7.0",
-    "zod": "^3.24.4"
+    "zod": "^3.24.4",
+    "@vitejs/plugin-react": "^4.2.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
@@ -93,7 +94,6 @@
     "@types/react-dom": "^18.2.19",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
-    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
     "dotenv": "^16.5.0",
     "eslint": "^8.56.0",
