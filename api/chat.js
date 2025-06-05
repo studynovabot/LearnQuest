@@ -365,13 +365,18 @@ async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Only allow POST requests
-  if (req.method !== 'POST') {
+  // Allow both GET and POST requests
+  let content, agentId, userId;
+  
+  if (req.method === 'POST') {
+    // Parse request body for POST requests
+    ({ content, agentId, userId } = req.body);
+  } else if (req.method === 'GET') {
+    // Parse query parameters for GET requests
+    ({ content, agentId, userId } = req.query);
+  } else {
     return res.status(405).json({ error: 'Method not allowed' });
   }
-
-  // Parse request body
-  const { content, agentId, userId } = req.body;
 
   // Validate required parameters
   if (!content || !agentId || !userId) {

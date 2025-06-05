@@ -154,31 +154,48 @@ export function useChat() {
             console.log(`Making API request to /api/chat with agent ID: ${activeAgent?.id || '1'}`);
             
             // Add a timestamp to prevent caching
-            const response = await apiRequest("POST", `/api/chat?t=${Date.now()}`, {
-              content,
-              agentId: activeAgent?.id || '1', // Default to the first agent if none is selected
-              userId: user?.id, // Pass user ID for performance tracking
-            });
+            // Try GET method first since the server might not support POST
+            let response;
+            try {
+              // First try with GET method
+              response = await apiRequest("GET", `/api/chat?t=${Date.now()}&content=${encodeURIComponent(content)}&agentId=${activeAgent?.id || '1'}&userId=${user?.id || 'guest'}`, undefined);
+            } catch (getError) {
+              console.log("GET request failed, falling back to POST method");
+              // If GET fails, try with POST method
+              response = await apiRequest("POST", `/api/chat?t=${Date.now()}`, {
+                content,
+                agentId: activeAgent?.id || '1', // Default to the first agent if none is selected
+                userId: user?.id, // Pass user ID for performance tracking
+              });
+            }
 
             clearTimeout(timeoutId);
 
-            // Handle 405 Method Not Allowed specifically - this means the API endpoint doesn't support POST
+            // Handle 405 Method Not Allowed specifically - this means the API endpoint doesn't support the current method
             if (response.status === 405) {
-              console.log("Chat API returned 405 Method Not Allowed - using local response generation");
+              console.log("Chat API returned 405 Method Not Allowed - trying alternative method");
               
-              // Generate a local response based on the agent and user message
-              const localResponseContent = generateLocalResponse(activeAgent?.name || "Nova AI", content);
+              // If we're already on the last retry, use local response generation
+              if (retryCount >= maxRetries - 1) {
+                console.log("All API methods failed - using local response generation");
+                
+                // Generate a local response based on the agent and user message
+                const localResponseContent = generateLocalResponse(activeAgent?.name || "Nova AI", content);
+                
+                // Add the locally generated response to the chat
+                setLocalMessages((prev) => [...prev, {
+                  id: Date.now(),
+                  content: localResponseContent,
+                  role: 'assistant',
+                  timestamp: Date.now()
+                }]);
+                
+                success = true;
+                break;
+              }
               
-              // Add the locally generated response to the chat
-              setLocalMessages((prev) => [...prev, {
-                id: Date.now(),
-                content: localResponseContent,
-                role: 'assistant',
-                timestamp: Date.now()
-              }]);
-              
-              success = true;
-              break;
+              // Otherwise, continue to the next retry which will try a different method
+              continue;
             }
 
             if (!response.ok) {

@@ -50,6 +50,24 @@ export async function apiRequest(
   console.log(`👤 User ID: ${userId}`);
   console.log(`📋 Headers:`, headers);
   console.log(`📦 Data:`, data);
+  
+  // For GET requests with data, convert data to query parameters
+  if (method === 'GET' && data && typeof data === 'object') {
+    const params = new URLSearchParams();
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params.append(key, String(value));
+      }
+    });
+    
+    // Append parameters to URL
+    const separator = url.includes('?') ? '&' : '?';
+    url = `${url}${separator}${params.toString()}`;
+    
+    // Clear data since we've moved it to the URL
+    data = undefined;
+    console.log(`🔄 Converted data to query params: ${url}`);
+  }
 
   try {
     // Ensure URL has the correct format
