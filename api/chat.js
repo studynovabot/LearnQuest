@@ -361,27 +361,48 @@ function checkForGenericResponse(text) {
 async function handler(req, res) {
   // Handle CORS
   handleCors(req, res);
+  
+  // Always set content type to JSON
+  res.setHeader('Content-Type', 'application/json');
+  
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return res.status(200).json({ status: 'ok' });
   }
 
   // Allow both GET and POST requests
   let content, agentId, userId;
   
-  if (req.method === 'POST') {
-    // Parse request body for POST requests
-    ({ content, agentId, userId } = req.body);
-  } else if (req.method === 'GET') {
-    // Parse query parameters for GET requests
-    ({ content, agentId, userId } = req.query);
-  } else {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  try {
+    if (req.method === 'POST') {
+      // Parse request body for POST requests
+      if (req.body) {
+        content = req.body.content;
+        agentId = req.body.agentId;
+        userId = req.body.userId;
+      }
+    } else if (req.method === 'GET') {
+      // Parse query parameters for GET requests
+      content = req.query.content;
+      agentId = req.query.agentId;
+      userId = req.query.userId;
+      
+      console.log('GET request parameters:', { content, agentId, userId });
+    } else {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
 
-  // Validate required parameters
-  if (!content || !agentId || !userId) {
-    return res.status(400).json({ 
-      error: 'Missing required parameters: content, agentId, or userId' 
+    // Validate required parameters
+    if (!content || !agentId || !userId) {
+      return res.status(400).json({ 
+        error: 'Missing required parameters: content, agentId, or userId',
+        received: { content, agentId, userId }
+      });
+    }
+  } catch (error) {
+    console.error('Error parsing request:', error);
+    return res.status(400).json({
+      error: 'Invalid request format',
+      details: error.message
     });
   }
 
@@ -456,18 +477,31 @@ async function handler(req, res) {
     if (!aiResponse) {
       console.error('All AI API attempts failed');
       return res.status(500).json({ 
-        error: 'Failed to get response from AI services after multiple attempts' 
+        error: true,
+        message: 'Failed to get response from AI services after multiple attempts',
+        fallback: {
+          response: "I'm having trouble connecting to my knowledge base right now. Could you please try again in a moment?"
+        }
       });
     }
 
     // Return the successful response
-    res.status(200).json({ response: aiResponse });
+    return res.status(200).json({ 
+      error: false,
+      response: aiResponse,
+      timestamp: new Date().toISOString()
+    });
     
   } catch (error) {
     console.error('Server error:', error.message, error.stack);
-    res.status(500).json({ 
-      error: 'Internal server error', 
-      details: error.message 
+    // Always ensure we return valid JSON even in case of errors
+    return res.status(500).json({ 
+      error: true,
+      message: 'Internal server error', 
+      details: error.message,
+      fallback: {
+        response: "I'm having trouble processing your request right now. Please try again later."
+      }
     });
   }
 }

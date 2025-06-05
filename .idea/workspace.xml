@@ -10,6 +10,9 @@
       <change beforePath="$PROJECT_DIR$/api/chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/chat.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/hooks/useChat.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/hooks/useChat.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/lib/queryClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/lib/queryClient.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/cors.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/cors.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,29 +36,45 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.zencoder-patch-add-chat-message-raw-content&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.zencoder-patch-chat-storage-migration&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.zencoder-patch-generate-chat-message-id&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.zencoder-patch-migrate-custom-instruction&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;E:\\IntelliJ IDEA 2025.1.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "JavaScript Debug.localhost:5000.executor": "Debug",
+    "JavaScript Debug.localhost:8080.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.zencoder-patch-add-chat-message-raw-content": "true",
+    "RunOnceActivity.zencoder-patch-chat-storage-migration": "true",
+    "RunOnceActivity.zencoder-patch-generate-chat-message-id": "true",
+    "RunOnceActivity.zencoder-patch-migrate-custom-instruction": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "E:\\IntelliJ IDEA 2025.1.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="RunManager" selected="JavaScript Debug.localhost:5000">
+    <configuration name="localhost:5000" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:5000">
+      <method v="2" />
+    </configuration>
+    <configuration name="localhost:8080" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:8080/">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.localhost:5000" />
+        <item itemvalue="JavaScript Debug.localhost:8080" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -98,7 +117,9 @@
       <workItem from="1749046541104" duration="8093000" />
       <workItem from="1749104784466" duration="308000" />
       <workItem from="1749105283683" duration="5711000" />
-      <workItem from="1749111293533" duration="765000" />
+      <workItem from="1749111293533" duration="1966000" />
+      <workItem from="1749113426131" duration="39000" />
+      <workItem from="1749139214454" duration="1105000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -682,10 +703,10 @@
     <option name="indexedFilesMap">
       <map>
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749111905390" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749111905390" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749140118982" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749140118982" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
-        <entry key="$PROJECT_DIR$/api/chat.js" value="1749056522548" />
+        <entry key="$PROJECT_DIR$/api/chat.js" value="1749139862551" />
         <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/image-generation.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1749056522548" />
@@ -696,18 +717,23 @@
         <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749110092207" />
         <entry key="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" value="1749107092617" />
         <entry key="$PROJECT_DIR$/client/src/config.ts" value="1749110402774" />
-        <entry key="$PROJECT_DIR$/client/src/hooks/useChat.ts" value="1749110092207" />
-        <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749110402774" />
+        <entry key="$PROJECT_DIR$/client/src/hooks/useChat.ts" value="1749112520742" />
+        <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749112520742" />
         <entry key="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" value="1748929206006" />
         <entry key="$PROJECT_DIR$/dev-server.js" value="1748942466395" />
+        <entry key="$PROJECT_DIR$/package-lock.json" value="1749113106086" />
+        <entry key="$PROJECT_DIR$/package.json" value="1749113106086" />
+        <entry key="$PROJECT_DIR$/serve-test.js" value="1749139557739" />
         <entry key="$PROJECT_DIR$/simple-dev-server.js" value="1749110402774" />
-        <entry key="$PROJECT_DIR$/utils/cors.js" value="1749107391134" />
+        <entry key="$PROJECT_DIR$/test-api.html" value="1749139557739" />
+        <entry key="$PROJECT_DIR$/test-chat-api.js" value="1749113106086" />
+        <entry key="$PROJECT_DIR$/utils/cors.js" value="1749139557739" />
         <entry key="$PROJECT_DIR$/vercel.json" value="1749059820467" />
       </map>
     </option>
-    <option name="lastCommitHash" value="7158f25f4b333214399dbc82932cdfbb9dfd3607" />
-    <option name="lastIndexTimestamp" value="1749111905390" />
-    <option name="repoAccumulatedChanges" value="185" />
+    <option name="lastCommitHash" value="cb3936de91ea5cf8ad4af39077b53c4b386f8b4e" />
+    <option name="lastIndexTimestamp" value="1749140118982" />
+    <option name="repoAccumulatedChanges" value="209" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />
