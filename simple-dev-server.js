@@ -11,25 +11,31 @@ const PORT = 5000;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'],
-  credentials: true
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173', '*'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'Accept', 'Origin', 'X-Requested-With']
 }));
 app.use(express.json());
 
-// Simple CORS handler
-function simpleCors(req, res, next) {
+// Enhanced CORS handler
+function enhancedCors(req, res, next) {
+  // Allow requests from any origin
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID, Accept');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID, Accept, Origin, X-Requested-With');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
 
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.setHeader('Content-Type', 'application/json');
     return res.status(200).json({ status: 'ok' });
   }
+  
   next();
 }
 
-app.use(simpleCors);
+app.use(enhancedCors);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -85,8 +91,31 @@ app.get('/api/tutors', (req, res) => {
   }
 });
 
+// Chat endpoint - GET method for compatibility
+app.get('/api/chat', (req, res) => {
+  // Always set Content-Type to application/json first
+  res.setHeader('Content-Type', 'application/json');
+  
+  // Return a helpful message for GET requests
+  return res.status(200).json({
+    message: "Chat API is available. Please use POST method with content, agentId, and userId in the request body.",
+    documentation: "See the API documentation for more details on how to use this endpoint.",
+    example: {
+      method: "POST",
+      body: {
+        content: "Hello, I need help with math",
+        agentId: "2",
+        userId: "user123"
+      }
+    }
+  });
+});
+
 // Chat endpoint - simplified version
 app.post('/api/chat', async (req, res) => {
+  // Always set Content-Type to application/json first
+  res.setHeader('Content-Type', 'application/json');
+  
   try {
     console.log('📨 Chat request received:', req.body);
 
@@ -123,53 +152,71 @@ app.post('/api/chat', async (req, res) => {
 
     const systemPrompt = agentPrompts[agentId] || agentPrompts['1'];
 
-    // Make API call to Groq
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${groqApiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content }
-        ],
-        max_tokens: 500,
-        temperature: 0.3
-      })
-    });
+    try {
+      // Make API call to Groq
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-8b-instant',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: content }
+          ],
+          max_tokens: 500,
+          temperature: 0.3
+        })
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      const assistantResponse = {
+      if (response.ok) {
+        const data = await response.json();
+        const assistantResponse = {
+          id: `assistant-${Date.now()}`,
+          content: data.choices[0].message.content,
+          role: 'assistant',
+          createdAt: new Date().toISOString(),
+          userId: 'system',
+          agentId: agentId || '1',
+          xpAwarded: Math.floor(Math.random() * 10) + 20,
+          model: 'llama-3.1-8b-instant',
+          error: false
+        };
+
+        console.log('✅ Response generated successfully');
+        return res.status(200).json(assistantResponse);
+      } else {
+        const error = await response.text();
+        console.error('❌ Groq API error:', error);
+        return res.status(500).json({
+          error: true,
+          message: 'Failed to generate response',
+          details: error
+        });
+      }
+    } catch (apiError) {
+      console.error('❌ API call error:', apiError);
+      
+      // Provide a fallback response if the API call fails
+      const fallbackResponse = {
         id: `assistant-${Date.now()}`,
-        content: data.choices[0].message.content,
+        content: "I'm having trouble connecting to my knowledge base right now. Could you please try again in a moment?",
         role: 'assistant',
         createdAt: new Date().toISOString(),
         userId: 'system',
         agentId: agentId || '1',
-        xpAwarded: Math.floor(Math.random() * 10) + 20,
-        model: 'llama-3.1-8b-instant',
+        xpAwarded: 5,
+        model: 'fallback',
         error: false
       };
-
-      console.log('✅ Response generated successfully');
-      res.json(assistantResponse);
-    } else {
-      const error = await response.text();
-      console.error('❌ Groq API error:', error);
-      res.status(500).json({
-        error: true,
-        message: 'Failed to generate response',
-        details: error
-      });
+      
+      return res.status(200).json(fallbackResponse);
     }
-
   } catch (error) {
     console.error('❌ Chat error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: 'Internal server error',
       details: error.message

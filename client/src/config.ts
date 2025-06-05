@@ -6,10 +6,12 @@ function getApiUrl() {
     return import.meta.env.VITE_API_URL;
   }
 
-  // In production, use relative URLs to avoid CORS issues
+  // In production, use the actual deployed API URL
   if (import.meta.env.PROD) {
-    const relativeApi = '/api';
-    console.log(`Using relative API path: ${relativeApi}`);
+    // Use the current origin with /api path
+    const origin = window.location.origin;
+    const relativeApi = `${origin}/api`;
+    console.log(`Using production API path: ${relativeApi}`);
     return relativeApi;
   }
 

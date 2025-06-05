@@ -63,17 +63,21 @@ export async function apiRequest(
           // Use the full URL directly
           requestUrl = `${config.apiUrl}${url.replace('/api/', '/')}`;
         } 
-        // For production with relative paths
-        else if (config.apiUrl === '/api') {
-          // Keep the URL as is for relative paths in production
+        // For production with absolute paths
+        else if (config.apiUrl.includes('http')) {
+          // Use the full URL from config
+          const endpoint = url.replace('/api/', '/');
+          requestUrl = `${config.apiUrl}${endpoint}`;
+        }
+        // For relative paths (should not happen with our new config)
+        else {
+          // Keep the URL as is for relative paths
           requestUrl = url;
         }
-        // For custom API URLs
-        else {
-          // config.apiUrl already includes /api, so we need to remove /api from the url
-          const cleanUrl = url.replace('/api/', '/');
-          requestUrl = `${config.apiUrl}${cleanUrl}`;
-        }
+      } else {
+        // If no config.apiUrl is set, use the current origin
+        const origin = window.location.origin;
+        requestUrl = `${origin}${url}`;
       }
     }
     // Otherwise make sure URLs are properly formatted
