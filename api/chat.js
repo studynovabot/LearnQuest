@@ -359,22 +359,25 @@ function checkForGenericResponse(text) {
 
 // Main API handler
 async function handler(req, res) {
-  // Handle CORS
-  handleCors(req, res);
-  
-  // Always set content type to JSON
-  res.setHeader('Content-Type', 'application/json');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).json({ status: 'ok' });
-  }
-
-  // Allow both GET and POST requests
-  let content, agentId, userId;
-  
   try {
+    // Handle CORS first
+    handleCors(req, res);
+    
+    // Always set content type to JSON
+    res.setHeader('Content-Type', 'application/json');
+    
+    if (req.method === 'OPTIONS') {
+      return res.status(200).json({ status: 'ok' });
+    }
+
+    // Allow both GET and POST requests
+    let content, agentId, userId;
+    
+    console.log(`Received ${req.method} request to /api/chat`);
+    
     if (req.method === 'POST') {
       // Parse request body for POST requests
+      console.log('POST request body:', req.body);
       if (req.body) {
         content = req.body.content;
         agentId = req.body.agentId;
@@ -402,7 +405,12 @@ async function handler(req, res) {
     console.error('Error parsing request:', error);
     return res.status(400).json({
       error: 'Invalid request format',
-      details: error.message
+      details: error.message,
+      received: { 
+        method: req.method,
+        body: req.body,
+        query: req.query
+      }
     });
   }
 
@@ -495,6 +503,8 @@ async function handler(req, res) {
   } catch (error) {
     console.error('Server error:', error.message, error.stack);
     // Always ensure we return valid JSON even in case of errors
+    res.setHeader('Content-Type', 'application/json');
+    
     return res.status(500).json({ 
       error: true,
       message: 'Internal server error', 

@@ -5,14 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/chat.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/hooks/useChat.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/hooks/useChat.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/queryClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/lib/queryClient.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/tutors.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/tutors.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/cors.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/cors.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vercel.json" beforeDir="false" afterPath="$PROJECT_DIR$/vercel.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,7 +116,7 @@
       <workItem from="1749105283683" duration="5711000" />
       <workItem from="1749111293533" duration="1966000" />
       <workItem from="1749113426131" duration="39000" />
-      <workItem from="1749139214454" duration="1105000" />
+      <workItem from="1749139214454" duration="1558000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -703,8 +700,8 @@
     <option name="indexedFilesMap">
       <map>
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749140118982" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749140118982" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749140382883" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749140722440" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/chat.js" value="1749139862551" />
         <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
@@ -723,17 +720,17 @@
         <entry key="$PROJECT_DIR$/dev-server.js" value="1748942466395" />
         <entry key="$PROJECT_DIR$/package-lock.json" value="1749113106086" />
         <entry key="$PROJECT_DIR$/package.json" value="1749113106086" />
-        <entry key="$PROJECT_DIR$/serve-test.js" value="1749139557739" />
+        <entry key="$PROJECT_DIR$/serve-test.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/simple-dev-server.js" value="1749110402774" />
-        <entry key="$PROJECT_DIR$/test-api.html" value="1749139557739" />
-        <entry key="$PROJECT_DIR$/test-chat-api.js" value="1749113106086" />
+        <entry key="$PROJECT_DIR$/test-api.html" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/test-chat-api.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/utils/cors.js" value="1749139557739" />
         <entry key="$PROJECT_DIR$/vercel.json" value="1749059820467" />
       </map>
     </option>
-    <option name="lastCommitHash" value="cb3936de91ea5cf8ad4af39077b53c4b386f8b4e" />
-    <option name="lastIndexTimestamp" value="1749140118982" />
-    <option name="repoAccumulatedChanges" value="209" />
+    <option name="lastCommitHash" value="bd82a7c6c45f032b8462cf24e48bbfa5e95464f8" />
+    <option name="lastIndexTimestamp" value="1749140722440" />
+    <option name="repoAccumulatedChanges" value="221" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />

@@ -3,17 +3,18 @@ import { handleCors } from '../utils/cors.js';
 import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
 
 export default async function handler(req, res) {
-  // Always set Content-Type to application/json first thing
-  res.setHeader('Content-Type', 'application/json');
-  
-  // Initialize other response headers
-  const headers = {
-    'Cache-Control': 's-maxage=60, stale-while-revalidate'
-  };
-
   try {
-    // Handle CORS - make sure this doesn't override our Content-Type
+    // Handle CORS first
     handleCors(req, res);
+    
+    // Always set Content-Type to application/json
+    res.setHeader('Content-Type', 'application/json');
+    
+    // Initialize other response headers
+    const headers = {
+      'Cache-Control': 's-maxage=60, stale-while-revalidate'
+    };
+    
     if (req.method === 'OPTIONS') {
       return res.status(200).json({ status: 'ok' });
     }

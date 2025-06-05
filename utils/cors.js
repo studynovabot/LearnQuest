@@ -11,19 +11,14 @@ export function setCorsHeaders(res, origin = null) {
     'https://learnquest.vercel.app',
     'https://studynovaai.vercel.app',
     'https://studynovabot.vercel.app',
-    'https://studynovaai.vercel.app', // Added production domain
-    '*' // Allow all origins as fallback
+    'https://studynovaai.vercel.app'
   ];
 
-  // If origin is not provided or not in the allowed list, use * as fallback
-  const requestOrigin = origin || '*';
-  
-  // For development or when no specific origin is provided, allow any origin
-  const isDevelopment = requestOrigin.includes('localhost');
-  
-  // Use '*' for all origins to prevent CORS issues
-  // This is more permissive but ensures the API works in all environments
-  const allowOrigin = '*';
+  // If origin is provided and in the allowed list, use it; otherwise use '*'
+  let allowOrigin = '*';
+  if (origin && allowedOrigins.includes(origin)) {
+    allowOrigin = origin;
+  }
 
   // Set CORS headers without overriding Content-Type
   res.setHeader('Access-Control-Allow-Origin', allowOrigin);
@@ -43,7 +38,10 @@ export function handleCors(req, res, handler = null) {
   setCorsHeaders(res, origin);
 
   // Always ensure Content-Type is set to application/json
-  res.setHeader('Content-Type', 'application/json');
+  // But don't override if it's already set
+  if (!res.getHeader('Content-Type')) {
+    res.setHeader('Content-Type', 'application/json');
+  }
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
