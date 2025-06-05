@@ -109,7 +109,12 @@ async function tryGroqAPI(content, systemPrompt, apiKey) {
         max_tokens: 32768
       }),
     });
-
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('text/html')) {
+      const html = await response.text();
+      console.error('[Groq API] Received HTML instead of JSON:', html.substring(0, 200));
+      return null;
+    }
     if (!response.ok) {
       // Try fallback model if primary fails
       console.log(`[Groq API] Primary model failed with status ${response.status}, trying fallback ${fallbackModel}`);
@@ -129,13 +134,17 @@ async function tryGroqAPI(content, systemPrompt, apiKey) {
           max_tokens: 8192
         }),
       });
-
-      if (!fallbackResponse.ok) {
-        const errorBody = await fallbackResponse.text();
-        console.error(`[Groq API] Fallback model failed with status ${fallbackResponse.status}. Body: ${errorBody}`);
+      const fallbackContentType = fallbackResponse.headers.get('content-type');
+      if (fallbackContentType && fallbackContentType.includes('text/html')) {
+        const html = await fallbackResponse.text();
+        console.error('[Groq API] Fallback returned HTML instead of JSON:', html.substring(0, 200));
         return null;
       }
-
+      if (!fallbackResponse.ok) {
+        const errorBody = await fallbackResponse.text();
+        console.error(`[Groq API] Fallback model failed with status ${fallbackResponse.status}. Body: ${errorBody.substring(0,200)}`);
+        return null;
+      }
       const fallbackData = await fallbackResponse.json();
       if (fallbackData.choices?.[0]?.message?.content) {
         console.log('[Groq API] Successfully received response from fallback model');
@@ -144,13 +153,11 @@ async function tryGroqAPI(content, systemPrompt, apiKey) {
       console.error('[Groq API] Error: Invalid response structure from fallback model', fallbackData);
       return null;
     }
-
     const data = await response.json();
     if (data.choices?.[0]?.message?.content) {
       console.log('[Groq API] Successfully received response from primary model');
       return data.choices[0].message.content; // Return only content
     }
-    
     console.error('[Groq API] Error: Invalid response structure from primary model', data);
     return null;
   } catch (error) {
@@ -186,13 +193,17 @@ async function tryTogetherAPI(content, systemPrompt, apiKey) {
         max_tokens: 4096
       }),
     });
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`[Together API] Failed with status ${response.status}. Body: ${errorBody}`);
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('text/html')) {
+      const html = await response.text();
+      console.error('[Together API] Received HTML instead of JSON:', html.substring(0, 200));
       return null;
     }
-
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`[Together API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
+      return null;
+    }
     const data = await response.json();
     if (data.choices?.[0]?.message?.content) {
       console.log('[Together API] Successfully received response');
@@ -211,35 +222,39 @@ async function tryOpenRouterAPI(content, systemPrompt, apiKey) {
     console.error('[OpenRouter API] Error: API key is missing.');
     return null;
   }
-  const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-  const model = "mistralai/mixtral-8x7b-instruct";
-  
+
+  const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+  const model = 'openrouter-llama3-70b';
+
   try {
     console.log(`[OpenRouter API] Attempting to call with model ${model}`);
-    const response = await fetch(OPENROUTER_URL, {
-      method: "POST",
+    const response = await fetch(OPENROUTER_API_URL, {
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://studynovabot.com",
-        "X-Title": "StudyNovaBot"
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model,
         messages: [
-          {role: "system", content: systemPrompt},
-          {role: "user", content: content}
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: content },
         ],
+        temperature: 0.7,
         max_tokens: 4096
-      })
+      }),
     });
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`[OpenRouter API] Failed with status ${response.status}. Body: ${errorBody}`);
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('text/html')) {
+      const html = await response.text();
+      console.error('[OpenRouter API] Received HTML instead of JSON:', html.substring(0, 200));
       return null;
     }
-    
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`[OpenRouter API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
+      return null;
+    }
     const data = await response.json();
     if (data.choices?.[0]?.message?.content) {
       console.log('[OpenRouter API] Successfully received response');
@@ -248,7 +263,7 @@ async function tryOpenRouterAPI(content, systemPrompt, apiKey) {
     console.error('[OpenRouter API] Error: Invalid response structure', data);
     return null;
   } catch (error) {
-    console.error("[OpenRouter API] Network error:", error);
+    console.error('[OpenRouter API] Network error:', error);
     return null;
   }
 }
@@ -258,32 +273,39 @@ async function tryFireworksAPI(content, systemPrompt, apiKey) {
     console.error('[Fireworks API] Error: API key is missing.');
     return null;
   }
-  const FIREWORKS_URL = "https://api.fireworks.ai/inference/v1/chat/completions";
-  const model = "accounts/fireworks/models/mixtral-8x7b-instruct";
-  
+
+  const FIREWORKS_API_URL = 'https://api.fireworks.ai/v1/chat/completions';
+  const model = 'accounts/fireworks/models/llama-v3-70b-instruct';
+
   try {
     console.log(`[Fireworks API] Attempting to call with model ${model}`);
-    const response = await fetch(FIREWORKS_URL, {
-      method: "POST",
+    const response = await fetch(FIREWORKS_API_URL, {
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model,
         messages: [
-          {role: "system", content: systemPrompt},
-          {role: "user", content: content}
-        ]
-      })
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: content },
+        ],
+        temperature: 0.7,
+        max_tokens: 4096
+      }),
     });
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`[Fireworks API] Failed with status ${response.status}. Body: ${errorBody}`);
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('text/html')) {
+      const html = await response.text();
+      console.error('[Fireworks API] Received HTML instead of JSON:', html.substring(0, 200));
       return null;
     }
-    
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`[Fireworks API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
+      return null;
+    }
     const data = await response.json();
     if (data.choices?.[0]?.message?.content) {
       console.log('[Fireworks API] Successfully received response');
@@ -292,7 +314,7 @@ async function tryFireworksAPI(content, systemPrompt, apiKey) {
     console.error('[Fireworks API] Error: Invalid response structure', data);
     return null;
   } catch (error) {
-    console.error("[Fireworks API] Network error:", error);
+    console.error('[Fireworks API] Network error:', error);
     return null;
   }
 }
@@ -302,32 +324,39 @@ async function tryDeepInfraAPI(content, systemPrompt, apiKey) {
     console.error('[DeepInfra API] Error: API key is missing.');
     return null;
   }
-  const DEEPINFRA_URL = "https://api.deepinfra.com/v1/openai/chat/completions";
-  const model = "mistralai/Mixtral-8x7B-Instruct-v0.1";
+
+  const DEEPINFRA_API_URL = 'https://api.deepinfra.com/v1/openai/chat/completions';
+  const model = 'meta-llama/llama-3-70b-instruct';
 
   try {
     console.log(`[DeepInfra API] Attempting to call with model ${model}`);
-    const response = await fetch(DEEPINFRA_URL, {
-      method: "POST",
+    const response = await fetch(DEEPINFRA_API_URL, {
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model,
         messages: [
-          {role: "system", content: systemPrompt},
-          {role: "user", content: content}
-        ]
-      })
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: content },
+        ],
+        temperature: 0.7,
+        max_tokens: 4096
+      }),
     });
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`[DeepInfra API] Failed with status ${response.status}. Body: ${errorBody}`);
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('text/html')) {
+      const html = await response.text();
+      console.error('[DeepInfra API] Received HTML instead of JSON:', html.substring(0, 200));
       return null;
     }
-    
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`[DeepInfra API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
+      return null;
+    }
     const data = await response.json();
     if (data.choices?.[0]?.message?.content) {
       console.log('[DeepInfra API] Successfully received response');
@@ -336,7 +365,7 @@ async function tryDeepInfraAPI(content, systemPrompt, apiKey) {
     console.error('[DeepInfra API] Error: Invalid response structure', data);
     return null;
   } catch (error) {
-    console.error("[DeepInfra API] Network error:", error);
+    console.error('[DeepInfra API] Network error:', error);
     return null;
   }
 }
