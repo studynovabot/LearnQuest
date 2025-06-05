@@ -1,7 +1,7 @@
 // Vercel serverless function for vector database document upload
-import { handleCors } from './_utils/cors.js';
-import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
-import { pineconeService, generateSimpleEmbedding } from './_utils/pinecone.js';
+import { handleCors } from '../utils/cors.js';
+import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
+import { pineconeService, generateSimpleEmbedding } from '../utils/pinecone.js';
 
 // Admin configuration
 const ADMIN_EMAIL = 'thakurranveersingh505@gmail.com';

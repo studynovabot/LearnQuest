@@ -42,6 +42,11 @@ app.get('/api/health', (req, res) => {
 
 // Tutors endpoint
 app.get('/api/tutors', (req, res) => {
+  // Always set Content-Type to application/json first
+  res.setHeader('Content-Type', 'application/json');
+  
+  console.log('📚 Tutors endpoint called');
+  
   const tutors = [
     { id: 1, name: "Nova AI", subject: "General Assistant", iconName: "sparkles", color: "blue" },
     { id: 2, name: "Math Mentor", subject: "Mathematics", iconName: "calculator", color: "purple" },
@@ -60,7 +65,13 @@ app.get('/api/tutors', (req, res) => {
     { id: 15, name: "Motivational Mentor", subject: "Personal Development", iconName: "smile", color: "rose" }
   ];
 
-  res.json(tutors);
+  // Return a properly formatted response with success field
+  return res.status(200).json({
+    success: true,
+    data: tutors,
+    count: tutors.length,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Chat endpoint - simplified version

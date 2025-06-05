@@ -11,12 +11,19 @@ export function setCorsHeaders(res, origin = null) {
     'https://learnquest.vercel.app',
     'https://studynovaai.vercel.app',
     'https://studynovabot.vercel.app',
-    'https://studynovaai.vercel.app' // Added production domain
+    'https://studynovaai.vercel.app', // Added production domain
+    '*' // Allow all origins as fallback
   ];
 
-  const requestOrigin = origin || 'http://localhost:3004';
-  const allowOrigin = allowedOrigins.includes(requestOrigin) ? requestOrigin : allowedOrigins[1];
+  // If origin is not provided or not in the allowed list, use * as fallback
+  const requestOrigin = origin || 'http://localhost:5173';
+  
+  // For development, allow any origin to prevent CORS issues
+  const isDevelopment = requestOrigin.includes('localhost');
+  const allowOrigin = isDevelopment ? requestOrigin : 
+                     (allowedOrigins.includes(requestOrigin) ? requestOrigin : '*');
 
+  // Set CORS headers without overriding Content-Type
   res.setHeader('Access-Control-Allow-Origin', allowOrigin);
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');

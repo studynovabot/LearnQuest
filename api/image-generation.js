@@ -1,6 +1,6 @@
 // Vercel serverless function for AI image generation using Starry AI
-import { handleCors } from './_utils/cors.js';
-import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
+import { handleCors } from '../utils/cors.js';
+import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
 
 export default function handler(req, res) {
   return handleCors(req, res, async (req, res) => {

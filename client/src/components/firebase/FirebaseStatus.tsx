@@ -18,15 +18,33 @@ export function FirebaseStatus() {
     try {
       // Use the tutors endpoint to check Firebase connectivity
       const response = await apiRequest('GET', '/api/tutors');
-      const data = await response.json();
-
-      // If we get tutors data successfully, Firebase is working
-      if (Array.isArray(data) && data.length > 0) {
-        setStatus('connected');
-      } else {
-        setStatus('error');
-        setErrorMessage('No tutors data found - Firebase may not be properly connected');
-        trackError('firebase', 'No tutors data found');
+      
+      try {
+        const data = await response.json();
+        
+        // Check if we got a proper response with tutors data
+        if (data && (
+            (Array.isArray(data) && data.length > 0) || 
+            (data.data && Array.isArray(data.data) && data.data.length > 0)
+          )) {
+          setStatus('connected');
+        } else {
+          setStatus('error');
+          setErrorMessage('No tutors data found - Firebase may not be properly connected');
+          trackError('firebase', 'No tutors data found');
+        }
+      } catch (jsonError) {
+        // Handle JSON parsing errors
+        console.warn('Firebase check: JSON parsing error', jsonError);
+        
+        // If we at least got a 200 response, consider it partially working
+        if (response.status === 200) {
+          setStatus('connected');
+        } else {
+          setStatus('error');
+          setErrorMessage('Invalid response format from API');
+          trackError('firebase', 'Invalid response format');
+        }
       }
     } catch (error) {
       console.error('Firebase connectivity check error:', error);

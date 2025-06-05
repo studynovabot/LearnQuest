@@ -1,5 +1,5 @@
-import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
-import { sanitizeUserData } from './_utils/privacy.js';
+import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
+import { sanitizeUserData } from '../utils/privacy.js';
 
 export default async function handler(req, res) {
   // Set CORS headers

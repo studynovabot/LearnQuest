@@ -1,7 +1,7 @@
 // Clean authentication system for LearnQuest
-import { handleCors } from './_utils/cors.js';
-import { initializeFirebase } from './_utils/firebase.js';
-import { storage } from './_utils/storage.js';
+import { handleCors } from '../utils/cors.js';
+import { initializeFirebase } from '../utils/firebase.js';
+import { storage } from '../utils/storage.js';
 import bcrypt from 'bcryptjs';
 
 export default function handler(req, res) {

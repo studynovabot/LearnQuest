@@ -2,10 +2,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Vercel serverless function for AI chat
-import { handleCors } from './_utils/cors.js';
-import { initializeFirebase, getFirestoreDb, getUserPerformanceData } from './_utils/firebase.js';
-import { getSubjectFromAgent, extractQuestionData } from './_utils/question-utils.js';
-import { trackUserInteraction } from './_utils/analytics.js';
+import { handleCors } from '../utils/cors.js';
+import { initializeFirebase, getFirestoreDb, getUserPerformanceData } from '../utils/firebase.js';
+import { getSubjectFromAgent, extractQuestionData } from '../utils/question-utils.js';
+import { trackUserInteraction } from '../utils/analytics.js';
 
 // Agent-specific system prompts for all 15 AI tutors - Engaging Study Buddy Style
 const AGENT_PROMPTS = {

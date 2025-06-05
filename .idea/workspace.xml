@@ -5,8 +5,40 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change beforePath="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/admin-auth.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/analytics.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/cors.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/file-storage.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/firebase.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/learning-engine.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/otp-service.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/pdf-processor.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/pinecone.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/privacy.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/question-utils.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/seed-data.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/storage.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/_utils/trial-abuse-prevention.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/chat.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/health.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/image-analysis.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/image-analysis.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/image-generation.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/image-generation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/ncert-solutions.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/ncert-solutions.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/student-analytics.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/student-analytics.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/tutors.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/tutors.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/user-profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/user-profile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/vector-upload.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/vector-upload.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/site.webmanifest" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/site.webmanifest" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/lib/queryClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/lib/queryClient.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/vercel.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/simple-dev-server.js" beforeDir="false" afterPath="$PROJECT_DIR$/simple-dev-server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test-api.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vercel.json" beforeDir="false" afterPath="$PROJECT_DIR$/vercel.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,29 +62,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.zencoder-patch-add-chat-message-raw-content": "true",
-    "RunOnceActivity.zencoder-patch-chat-storage-migration": "true",
-    "RunOnceActivity.zencoder-patch-generate-chat-message-id": "true",
-    "RunOnceActivity.zencoder-patch-migrate-custom-instruction": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "E:\\IntelliJ IDEA 2025.1.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.zencoder-patch-add-chat-message-raw-content&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.zencoder-patch-chat-storage-migration&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.zencoder-patch-generate-chat-message-id&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.zencoder-patch-migrate-custom-instruction&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;E:\\IntelliJ IDEA 2025.1.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -92,7 +124,9 @@
       <workItem from="1749045050082" duration="594000" />
       <workItem from="1749045680447" duration="36000" />
       <workItem from="1749045764551" duration="595000" />
-      <workItem from="1749046541104" duration="808000" />
+      <workItem from="1749046541104" duration="8093000" />
+      <workItem from="1749104784466" duration="308000" />
+      <workItem from="1749105283683" duration="966000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -676,16 +710,48 @@
     <option name="indexedFilesMap">
       <map>
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749053844481" />
-        <entry key="$PROJECT_DIR$/api/chat.js" value="1748927969920" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749105964023" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749105964023" />
+        <entry key="$PROJECT_DIR$/api/_utils/admin-auth.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/analytics.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/cors.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/file-storage.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/firebase.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/learning-engine.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/otp-service.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/pdf-processor.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/pinecone.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/privacy.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/question-utils.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/seed-data.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/storage.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/_utils/trial-abuse-prevention.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
+        <entry key="$PROJECT_DIR$/api/chat.js" value="1749056522548" />
+        <entry key="$PROJECT_DIR$/api/health.js" value="1749054720881" />
+        <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
+        <entry key="$PROJECT_DIR$/api/image-generation.js" value="1749056522548" />
+        <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1749056522548" />
+        <entry key="$PROJECT_DIR$/api/student-analytics.js" value="1749056522548" />
+        <entry key="$PROJECT_DIR$/api/tutors.js" value="1749106192956" />
+        <entry key="$PROJECT_DIR$/api/user-profile.js" value="1749056522548" />
+        <entry key="$PROJECT_DIR$/api/vector-upload.js" value="1749056522548" />
+        <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749061922959" />
+        <entry key="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" value="1749106192956" />
+        <entry key="$PROJECT_DIR$/client/src/config.ts" value="1749106192956" />
+        <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749106192956" />
         <entry key="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" value="1748929206006" />
+        <entry key="$PROJECT_DIR$/client/vercel.json" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/dev-server.js" value="1748942466395" />
+        <entry key="$PROJECT_DIR$/simple-dev-server.js" value="1749106192956" />
+        <entry key="$PROJECT_DIR$/test-api.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/vercel.json" value="1749059820467" />
       </map>
     </option>
-    <option name="lastCommitHash" value="9ec1f3389f831ff77f992e82ada7cf8f3aaddbb2" />
-    <option name="lastIndexTimestamp" value="1749053844481" />
-    <option name="repoAccumulatedChanges" value="94" />
-    <option name="repoTotalFiles" value="222" />
+    <option name="lastCommitHash" value="33c723c44096e217fafa5a74fb916d555553873d" />
+    <option name="lastIndexTimestamp" value="1749106192956" />
+    <option name="repoAccumulatedChanges" value="72" />
+    <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />
   </component>

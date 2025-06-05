@@ -13,7 +13,8 @@ function getApiUrl() {
     return relativeApi;
   }
 
-  // For development, use localhost
+  // For development, always use the full URL with http://localhost:5000/api
+  // This ensures we're making requests to the actual dev server
   const localApi = 'http://localhost:5000/api';
   console.log(`Using local development API: ${localApi}`);
   return localApi;

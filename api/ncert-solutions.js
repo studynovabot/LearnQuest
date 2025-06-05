@@ -1,6 +1,6 @@
 // Vercel serverless function for NCERT solutions
-import { handleCors } from './_utils/cors.js';
-import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
+import { handleCors } from '../utils/cors.js';
+import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
 
 // Sample NCERT solutions data
 const NCERT_SOLUTIONS_DATA = [

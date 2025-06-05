@@ -4,14 +4,9 @@
     {
       "src": "client/package.json",
       "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "config": { "distDir": "dist" }
     },
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
+    { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
     {
@@ -23,19 +18,12 @@
         "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept"
       }
     },
-    {
-      "src": "/assets/(.*)",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      },
-      "continue": true
-    },
-    {
-      "handle": "filesystem"
-    },
+    { "src": "/favicon.ico", "dest": "/client/favicon.ico" },
+    { "src": "/assets/(.*)", "dest": "/client/assets/$1" },
+    { "handle": "filesystem" },
     {
       "src": "/(.*)",
-      "dest": "/index.html",
+      "dest": "/client/index.html",
       "headers": {
         "Cache-Control": "public, max-age=0, must-revalidate",
         "X-Content-Type-Options": "nosniff",

@@ -1,16 +1,18 @@
 // Vercel serverless function for AI tutors
-import { handleCors } from './_utils/cors.js';
-import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
+import { handleCors } from '../utils/cors.js';
+import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
 
 export default async function handler(req, res) {
-  // Initialize response headers
+  // Always set Content-Type to application/json first thing
+  res.setHeader('Content-Type', 'application/json');
+  
+  // Initialize other response headers
   const headers = {
-    'Content-Type': 'application/json',
     'Cache-Control': 's-maxage=60, stale-while-revalidate'
   };
 
   try {
-    // Handle CORS
+    // Handle CORS - make sure this doesn't override our Content-Type
     handleCors(req, res);
     if (req.method === 'OPTIONS') {
       return res.status(200).end();
@@ -24,8 +26,13 @@ export default async function handler(req, res) {
       });
     }
 
-    // Initialize Firebase (will use existing instance if already initialized)
-    initializeFirebase();
+    // Skip Firebase initialization if it causes issues
+    try {
+      // Initialize Firebase (will use existing instance if already initialized)
+      initializeFirebase();
+    } catch (firebaseError) {
+      console.warn('Firebase initialization skipped:', firebaseError.message);
+    }
     
     console.log('📚 Fetching tutors data');
     

@@ -1,12 +1,12 @@
 // Consolidated API endpoint for student performance analytics
-import { handleCors } from './_utils/cors.js';
-import { initializeFirebase, getFirestoreDb } from './_utils/firebase.js';
+import { handleCors } from '../utils/cors.js';
+import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
 import { 
   generatePersonalizedRecommendations, 
   getPersonalizedLearningPath,
   getDifficultyAdjustment,
   identifyKnowledgeInsights
-} from './_utils/learning-engine.js';
+} from '../utils/learning-engine.js';
 
 export default async function handler(req, res) {
   // Handle CORS
