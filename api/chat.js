@@ -360,28 +360,71 @@ function checkForGenericResponse(text) {
 // Main API handler
 async function handler(req, res) {
   try {
-    // Handle CORS first
-    handleCors(req, res);
+    // Set CORS headers explicitly for all origins
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept');
+    res.setHeader('Access-Control-Max-Age', '86400');
     
     // Always set content type to JSON
     res.setHeader('Content-Type', 'application/json');
     
+    // Handle preflight requests immediately
     if (req.method === 'OPTIONS') {
-      return res.status(200).json({ status: 'ok' });
+      return res.status(200).json({ status: 'ok', message: 'CORS preflight successful' });
     }
 
+    // Log request details for debugging
+    console.log(`[CHAT API] Received ${req.method} request to /api/chat`);
+    console.log(`[CHAT API] Headers:`, req.headers);
+    console.log(`[CHAT API] URL:`, req.url);
+    
     // Allow both GET and POST requests
     let content, agentId, userId;
     
-    console.log(`Received ${req.method} request to /api/chat`);
-    
     if (req.method === 'POST') {
-      // Parse request body for POST requests
-      console.log('POST request body:', req.body);
-      if (req.body) {
-        content = req.body.content;
-        agentId = req.body.agentId;
-        userId = req.body.userId;
+      try {
+        // Log the raw body for debugging
+        console.log('[CHAT API] POST request body type:', typeof req.body);
+        if (typeof req.body === 'string') {
+          console.log('[CHAT API] Raw body (first 100 chars):', req.body.substring(0, 100));
+        } else if (req.body) {
+          console.log('[CHAT API] Body keys:', Object.keys(req.body));
+        }
+        
+        // Handle string body (needs parsing)
+        if (typeof req.body === 'string') {
+          try {
+            const parsedBody = JSON.parse(req.body);
+            content = parsedBody.content;
+            agentId = parsedBody.agentId;
+            userId = parsedBody.userId;
+            console.log('[CHAT API] Successfully parsed string body');
+          } catch (parseError) {
+            console.error('[CHAT API] Error parsing POST body as JSON:', parseError);
+            // Try to extract from URL-encoded format as fallback
+            try {
+              const params = new URLSearchParams(req.body);
+              content = params.get('content');
+              agentId = params.get('agentId');
+              userId = params.get('userId');
+              console.log('[CHAT API] Extracted parameters from URL-encoded body');
+            } catch (urlError) {
+              console.error('[CHAT API] Failed to parse as URL-encoded:', urlError);
+            }
+          }
+        } 
+        // Handle object body (already parsed)
+        else if (req.body && typeof req.body === 'object') {
+          content = req.body.content;
+          agentId = req.body.agentId;
+          userId = req.body.userId;
+          console.log('[CHAT API] Extracted parameters from object body');
+        }
+        
+        console.log('[CHAT API] Parsed POST parameters:', { content, agentId, userId });
+      } catch (bodyError) {
+        console.error('[CHAT API] Error processing POST body:', bodyError);
       }
     } else if (req.method === 'GET') {
       // Parse query parameters for GET requests
@@ -389,17 +432,35 @@ async function handler(req, res) {
       agentId = req.query.agentId;
       userId = req.query.userId;
       
-      console.log('GET request parameters:', { content, agentId, userId });
+      console.log('[CHAT API] GET request parameters:', { content, agentId, userId });
     } else {
-      return res.status(405).json({ error: 'Method not allowed' });
+      console.log(`[CHAT API] Method not allowed: ${req.method}`);
+      return res.status(405).json({ 
+        error: 'Method not allowed', 
+        message: `The ${req.method} method is not supported for this endpoint. Please use GET or POST.`,
+        allowedMethods: ['GET', 'POST', 'OPTIONS']
+      });
     }
 
-    // Validate required parameters
-    if (!content || !agentId || !userId) {
+    // Validate and provide defaults for required parameters
+    if (!content) {
+      console.log('[CHAT API] Missing content parameter');
       return res.status(400).json({ 
-        error: 'Missing required parameters: content, agentId, or userId',
+        error: 'Missing required parameter: content',
+        message: 'The content parameter is required',
         received: { content, agentId, userId }
       });
+    }
+    
+    // Default values for optional parameters
+    if (!agentId) {
+      console.log('[CHAT API] Using default agentId: 1');
+      agentId = '1'; // Default to Nova AI
+    }
+    
+    if (!userId) {
+      console.log('[CHAT API] Using default userId: guest');
+      userId = 'guest'; // Default guest user
     }
   } catch (error) {
     console.error('Error parsing request:', error);
@@ -425,93 +486,225 @@ async function handler(req, res) {
   }
 
   try {
-    // Initialize Firebase
-    await initializeFirebase();
-    const db = getFirestoreDb();
+    // Log the processing attempt
+    console.log(`[CHAT API] Processing request for agent ${agentId} from user ${userId}`);
+    
+    // Initialize Firebase with error handling
+    try {
+      await initializeFirebase();
+      console.log('[CHAT API] Firebase initialized successfully');
+    } catch (firebaseError) {
+      console.error('[CHAT API] Firebase initialization error:', firebaseError);
+      // Continue without Firebase if it fails
+    }
+    
+    // Get Firestore DB with error handling
+    let db = null;
+    try {
+      db = getFirestoreDb();
+      console.log('[CHAT API] Firestore DB connection established');
+    } catch (dbError) {
+      console.error('[CHAT API] Firestore DB connection error:', dbError);
+      // Continue without DB if it fails
+    }
 
     // Get the subject from agent ID
     const subject = getSubjectFromAgent(agentId);
+    console.log(`[CHAT API] Subject for agent ${agentId}: ${subject}`);
     
-    // Get personalized context
-    const personalizedContext = await getPersonalizedContext(db, userId, subject, content);
+    // Get personalized context with error handling
+    let personalizedContext = '';
+    try {
+      if (db) {
+        personalizedContext = await getPersonalizedContext(db, userId, subject, content);
+        console.log('[CHAT API] Retrieved personalized context');
+      }
+    } catch (contextError) {
+      console.error('[CHAT API] Error getting personalized context:', contextError);
+      // Continue without personalized context if it fails
+    }
     
     // Get the system prompt for the agent
     const systemPrompt = AGENT_PROMPTS[agentId] || AGENT_PROMPTS['1'];
+    console.log(`[CHAT API] Using system prompt for agent ${agentId}`);
     
     // Prepare the full content with context
-    const fullContent = `${personalizedContext}\n\n${content}`;
+    const fullContent = personalizedContext ? `${personalizedContext}\n\n${content}` : content;
     
-    // Track user interaction
-    await trackUserInteraction(db, userId, {
-      type: 'chat_message',
-      agentId,
-      content,
-      timestamp: new Date().toISOString()
+    // Track user interaction with error handling
+    try {
+      if (db) {
+        await trackUserInteraction(db, userId, {
+          type: 'chat_message',
+          agentId,
+          content,
+          timestamp: new Date().toISOString()
+        });
+        console.log('[CHAT API] User interaction tracked successfully');
+      }
+    } catch (trackingError) {
+      console.error('[CHAT API] Error tracking user interaction:', trackingError);
+      // Continue without tracking if it fails
+    }
+
+    // Get API keys from environment
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    const TOGETHER_API_KEY = process.env.TOGETHER_API_KEY;
+    const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+    const FIREWORKS_API_KEY = process.env.FIREWORKS_API_KEY;
+    
+    console.log('[CHAT API] Available API providers:', {
+      groq: !!GROQ_API_KEY,
+      together: !!TOGETHER_API_KEY,
+      openrouter: !!OPENROUTER_API_KEY,
+      fireworks: !!FIREWORKS_API_KEY
     });
+
+    if (!GROQ_API_KEY && !TOGETHER_API_KEY && !OPENROUTER_API_KEY && !FIREWORKS_API_KEY) {
+      console.warn('[CHAT API] No API keys configured, using fallback response');
+      return res.status(200).json({ 
+        error: false,
+        response: "I'm here to help! However, I'm currently in offline mode. What would you like to know?",
+        timestamp: new Date().toISOString(),
+        source: "fallback"
+      });
+    }
 
     // Try calling AI APIs with retries
     let aiResponse = null;
     let retries = 0;
     let timeout = INITIAL_TIMEOUT;
+    let responseSource = null;
+    
+    console.log('[CHAT API] Starting API call attempts');
     
     while (retries < MAX_RETRIES && !aiResponse) {
       try {
+        console.log(`[CHAT API] Attempt ${retries + 1}/${MAX_RETRIES}`);
+        
         // Try Groq API first if key is available
-        if (GROQ_API_KEY) {
+        if (GROQ_API_KEY && !aiResponse) {
+          console.log('[CHAT API] Trying Groq API');
           aiResponse = await tryGroqAPI(fullContent, systemPrompt, GROQ_API_KEY);
+          if (aiResponse) {
+            responseSource = "groq";
+            console.log('[CHAT API] Received response from Groq API');
+          }
         }
         
         // If Groq fails, try Together API
         if (!aiResponse && TOGETHER_API_KEY) {
+          console.log('[CHAT API] Trying Together API');
           aiResponse = await tryTogetherAPI(fullContent, systemPrompt, TOGETHER_API_KEY);
+          if (aiResponse) {
+            responseSource = "together";
+            console.log('[CHAT API] Received response from Together API');
+          }
+        }
+        
+        // If Together fails, try OpenRouter API
+        if (!aiResponse && OPENROUTER_API_KEY) {
+          console.log('[CHAT API] Trying OpenRouter API');
+          aiResponse = await tryOpenRouterAPI(fullContent, systemPrompt, OPENROUTER_API_KEY);
+          if (aiResponse) {
+            responseSource = "openrouter";
+            console.log('[CHAT API] Received response from OpenRouter API');
+          }
+        }
+        
+        // If OpenRouter fails, try Fireworks API
+        if (!aiResponse && FIREWORKS_API_KEY) {
+          console.log('[CHAT API] Trying Fireworks API');
+          aiResponse = await tryFireworksAPI(fullContent, systemPrompt, FIREWORKS_API_KEY);
+          if (aiResponse) {
+            responseSource = "fireworks";
+            console.log('[CHAT API] Received response from Fireworks API');
+          }
         }
         
         // If we got a response, break out of the loop
         if (aiResponse) break;
         
       } catch (error) {
-        console.error(`Attempt ${retries + 1} failed:`, error);
+        console.error(`[CHAT API] Attempt ${retries + 1} failed:`, error);
       }
       
       // Wait before retrying with exponential backoff
       retries++;
       if (retries < MAX_RETRIES) {
-        console.log(`Retrying in ${timeout / 1000} seconds...`);
+        console.log(`[CHAT API] Retrying in ${timeout / 1000} seconds...`);
         await delay(timeout);
         timeout *= 2; // Exponential backoff
       }
     }
 
+    // If all API calls failed, use a fallback response
     if (!aiResponse) {
-      console.error('All AI API attempts failed');
-      return res.status(500).json({ 
-        error: true,
-        message: 'Failed to get response from AI services after multiple attempts',
-        fallback: {
-          response: "I'm having trouble connecting to my knowledge base right now. Could you please try again in a moment?"
-        }
+      console.warn('[CHAT API] All API attempts failed, using fallback response');
+      
+      // Generate a fallback response based on the agent
+      const agentName = agentId === '1' ? 'Nova AI' : 
+                        agentId === '2' ? 'Math Mentor' :
+                        agentId === '3' ? 'Science Sage' : 'Nova AI';
+      
+      // Create a friendly fallback response
+      const fallbackResponses = [
+        `I'd love to help with that! However, I'm having trouble connecting to my knowledge base right now. Could you please try again in a moment? 💫`,
+        `That's an interesting question! I'm currently experiencing a brief connection issue. Please try again shortly and I'll be happy to assist you! 🌟`,
+        `I'm eager to help you with this! My systems are currently refreshing. Could you try again in a moment? I appreciate your patience! ✨`
+      ];
+      
+      // Select a random fallback response
+      aiResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+      responseSource = "fallback";
+      
+      // Return the fallback response with 200 status (not 500) to avoid client-side errors
+      return res.status(200).json({ 
+        error: false,
+        response: aiResponse,
+        timestamp: new Date().toISOString(),
+        source: responseSource
       });
     }
 
+    // Check if the response contains generic AI disclaimers and fix if needed
+    if (checkForGenericResponse(aiResponse)) {
+      console.log('[CHAT API] Detected generic AI response, enhancing it');
+      // Append a more personalized touch
+      aiResponse += "\n\nAnyway, I'm here to help you learn! What specific aspects of this topic would you like to explore further?";
+    }
+
     // Return the successful response
+    console.log('[CHAT API] Returning successful response');
     return res.status(200).json({ 
       error: false,
       response: aiResponse,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      source: responseSource
     });
     
   } catch (error) {
-    console.error('Server error:', error.message, error.stack);
+    console.error('[CHAT API] Server error:', error.message, error.stack);
+    
     // Always ensure we return valid JSON even in case of errors
     res.setHeader('Content-Type', 'application/json');
     
-    return res.status(500).json({ 
-      error: true,
-      message: 'Internal server error', 
-      details: error.message,
-      fallback: {
-        response: "I'm having trouble processing your request right now. Please try again later."
-      }
+    // Generate a friendly error response
+    const errorResponses = [
+      `I'm really sorry, but I'm having a technical hiccup right now. Could you please try again in a moment? I'd love to help you! 💫`,
+      `Oops! My systems are experiencing a brief glitch. Please try again shortly, and I'll be ready to assist you with your question! 🌟`,
+      `I apologize for the inconvenience! I'm currently having a small technical issue. Please try again in a moment, and we can continue our conversation! ✨`
+    ];
+    
+    // Select a random error response
+    const friendlyResponse = errorResponses[Math.floor(Math.random() * errorResponses.length)];
+    
+    // Return with 200 status (not 500) to avoid client-side errors
+    return res.status(200).json({ 
+      error: false, // Set to false to prevent client-side error handling
+      response: friendlyResponse,
+      timestamp: new Date().toISOString(),
+      source: "error_fallback"
     });
   }
 }

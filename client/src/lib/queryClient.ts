@@ -68,6 +68,14 @@ export async function apiRequest(
     data = undefined;
     console.log(`🔄 Converted data to query params: ${url}`);
   }
+  
+  // Add cache-busting parameter to prevent caching issues
+  if (url.includes('/api/')) {
+    const cacheBuster = `_cb=${Date.now()}`;
+    const separator = url.includes('?') ? '&' : '?';
+    url = `${url}${separator}${cacheBuster}`;
+    console.log(`🔄 Added cache-busting parameter: ${url}`);
+  }
 
   try {
     // Ensure URL has the correct format
@@ -124,6 +132,20 @@ export async function apiRequest(
 
     while (retryCount < maxRetries) {
       try {
+        console.log(`API request attempt ${retryCount + 1}/${maxRetries}: ${method} ${requestUrl}`);
+        
+        // Set up timeout for the fetch request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+          console.log(`Request timeout for ${method} ${requestUrl}`);
+        }, 15000); // 15 second timeout
+        
+        // Merge the abort signal from options with our timeout signal
+        const signal = options?.signal 
+          ? AbortSignal.any([options.signal, controller.signal]) 
+          : controller.signal;
+        
         const res = await fetch(requestUrl, {
           method,
           headers,
@@ -132,17 +154,23 @@ export async function apiRequest(
           credentials: isCrossOrigin ? "include" : "same-origin",
           // Always use 'cors' mode for cross-origin requests
           mode: isCrossOrigin ? 'cors' : 'same-origin',
-          signal: options?.signal,
+          signal,
+          // Add cache: 'no-store' to prevent caching
+          cache: 'no-store'
         });
+        
+        // Clear the timeout since the request completed
+        clearTimeout(timeoutId);
 
         // Log response status
         console.log(`API response status: ${res.status} ${res.statusText} for ${method} ${requestUrl}`);
+        console.log(`Response headers:`, Object.fromEntries([...res.headers.entries()]));
 
         // For 404 errors, provide more detailed logging
         if (res.status === 404) {
           console.error(`404 Not Found: ${method} ${requestUrl}`, {
             headers: headers,
-            data: data ? JSON.stringify(data) : undefined
+            data: data ? JSON.stringify(data).substring(0, 100) : undefined
           });
 
           // Special handling for common API endpoints
@@ -152,6 +180,12 @@ export async function apiRequest(
           if (url.includes('/api/chat')) {
             throw new Error('Chat service is currently unavailable. Please try again later.');
           }
+        }
+        
+        // For 405 Method Not Allowed, provide helpful error
+        if (res.status === 405) {
+          console.error(`405 Method Not Allowed: ${method} ${requestUrl}`);
+          throw new Error(`The ${method} method is not allowed for ${url}. Please try a different method.`);
         }
 
         // If we get here, the request was successful
@@ -284,31 +318,32 @@ export const getQueryFn: <T>(options: {
           // First check the content type
           const contentType = res.headers.get('content-type');
           
-          // Special handling for tutors endpoint
-          if (requestUrl.includes('/tutors')) {
-            try {
-              // For tutors endpoint, always try to get the text first
-              const text = await res.text();
+          // Get the response text first to check for HTML
+          const text = await res.text();
+          
+          // Check if the text starts with HTML
+          if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+            console.warn(`Received HTML instead of JSON for endpoint: ${requestUrl}`);
+            
+            // Special handling for different endpoints
+            if (requestUrl.includes('/tutors')) {
+              console.log('Using fallback data for tutors endpoint');
               
-              // Check if the text starts with HTML
-              if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
-                console.warn('Received HTML instead of JSON for tutors endpoint');
-                
-                // Return a hardcoded fallback for tutors with all 15 tutors
-                return {
-                  success: true,
-                  data: [
-                    { id: 1, name: "Nova AI", subject: "General Assistant", iconName: "sparkles", color: "blue" },
-                    { id: 2, name: "Math Mentor", subject: "Mathematics", iconName: "calculator", color: "purple" },
-                    { id: 3, name: "Science Sage", subject: "Science", iconName: "flask", color: "green" },
-                    { id: 4, name: "Language Linguist", subject: "Languages", iconName: "languages", color: "orange" },
-                    { id: 5, name: "History Helper", subject: "History", iconName: "landmark", color: "amber" },
-                    { id: 6, name: "Geography Guide", subject: "Geography", iconName: "globe", color: "cyan" },
-                    { id: 7, name: "Physics Pro", subject: "Physics", iconName: "trending-up", color: "pink" },
-                    { id: 8, name: "Chemistry Champion", subject: "Chemistry", iconName: "flask", color: "emerald" },
-                    { id: 9, name: "Biology Buddy", subject: "Biology", iconName: "leaf", color: "indigo" },
-                    { id: 10, name: "English Expert", subject: "English", iconName: "book", color: "violet" },
-                    { id: 11, name: "Computer Coder", subject: "Computer Science", iconName: "code", color: "red" },
+              // Return a hardcoded fallback for tutors with all 15 tutors
+              return {
+                success: true,
+                data: [
+                  { id: 1, name: "Nova AI", subject: "General Assistant", iconName: "sparkles", color: "blue" },
+                  { id: 2, name: "Math Mentor", subject: "Mathematics", iconName: "calculator", color: "purple" },
+                  { id: 3, name: "Science Sage", subject: "Science", iconName: "flask", color: "green" },
+                  { id: 4, name: "Language Linguist", subject: "Languages", iconName: "languages", color: "orange" },
+                  { id: 5, name: "History Helper", subject: "History", iconName: "landmark", color: "amber" },
+                  { id: 6, name: "Geography Guide", subject: "Geography", iconName: "globe", color: "cyan" },
+                  { id: 7, name: "Physics Pro", subject: "Physics", iconName: "trending-up", color: "pink" },
+                  { id: 8, name: "Chemistry Champion", subject: "Chemistry", iconName: "flask", color: "emerald" },
+                  { id: 9, name: "Biology Buddy", subject: "Biology", iconName: "leaf", color: "indigo" },
+                  { id: 10, name: "English Expert", subject: "English", iconName: "book", color: "violet" },
+                  { id: 11, name: "Computer Coder", subject: "Computer Science", iconName: "code", color: "red" },
                     { id: 12, name: "Art Advisor", subject: "Arts", iconName: "palette", color: "teal" },
                     { id: 13, name: "Economics Expert", subject: "Economics", iconName: "trending-up", color: "yellow" },
                     { id: 14, name: "Psychology Pro", subject: "Psychology", iconName: "brain", color: "slate" },

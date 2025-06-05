@@ -10,9 +10,19 @@ function getApiUrl() {
   if (import.meta.env.PROD) {
     // Use the current origin with /api path
     const origin = window.location.origin;
-    const relativeApi = `${origin}/api`;
-    console.log(`Using production API path: ${relativeApi}`);
-    return relativeApi;
+    
+    // Check if we're on Vercel deployment
+    if (origin.includes('vercel.app')) {
+      // For Vercel deployments, use the same origin to avoid CORS issues
+      const relativeApi = `${origin}/api`;
+      console.log(`Using Vercel production API path: ${relativeApi}`);
+      return relativeApi;
+    } else {
+      // For other production environments
+      const relativeApi = `${origin}/api`;
+      console.log(`Using production API path: ${relativeApi}`);
+      return relativeApi;
+    }
   }
 
   // For development, always use the full URL with http://localhost:5000/api

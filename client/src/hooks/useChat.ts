@@ -157,33 +157,81 @@ export function useChat() {
             // Try GET method first since the server might not support POST
             let response;
             try {
-              // First try with GET method
-              response = await apiRequest("GET", `/api/chat?t=${Date.now()}&content=${encodeURIComponent(content)}&agentId=${activeAgent?.id || '1'}&userId=${user?.id || 'guest'}`, undefined);
+              console.log(`Attempting to send message to ${activeAgent?.name || 'Nova AI'} (ID: ${activeAgent?.id || '1'})`);
               
-              // Check if the response is HTML instead of JSON
-              const contentType = response.headers.get('content-type');
-              if (contentType && contentType.includes('text/html')) {
-                console.log("Received HTML response instead of JSON, using local response generation");
-                throw new Error("HTML response received");
-              }
-            } catch (getError) {
-              console.log("GET request failed, falling back to POST method");
+              // Try POST method first as it's more reliable for sending data
               try {
-                // If GET fails, try with POST method
+                console.log("Trying POST method first");
+                // Add a timestamp to prevent caching
                 response = await apiRequest("POST", `/api/chat?t=${Date.now()}`, {
                   content,
                   agentId: activeAgent?.id || '1', // Default to the first agent if none is selected
-                  userId: user?.id, // Pass user ID for performance tracking
+                  userId: user?.id || 'guest', // Pass user ID for performance tracking
                 });
                 
                 // Check if the response is HTML instead of JSON
                 const contentType = response.headers.get('content-type');
                 if (contentType && contentType.includes('text/html')) {
-                  console.log("Received HTML response instead of JSON, using local response generation");
-                  throw new Error("HTML response received");
+                  console.log("Received HTML response instead of JSON from POST, falling back to GET method");
+                  throw new Error("HTML response received from POST");
                 }
+                
+                console.log("POST method succeeded");
               } catch (postError) {
-                console.log("Both GET and POST methods failed, using local response generation");
+                console.log("POST request failed, falling back to GET method", postError);
+                
+                // If POST fails, try with GET method
+                console.log("Trying GET method as fallback");
+                response = await apiRequest("GET", `/api/chat?t=${Date.now()}&content=${encodeURIComponent(content)}&agentId=${activeAgent?.id || '1'}&userId=${user?.id || 'guest'}`, undefined);
+                
+                // Check if the response is HTML instead of JSON
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('text/html')) {
+                  console.log("Received HTML response instead of JSON from GET, using local response generation");
+                  throw new Error("HTML response received from GET");
+                }
+                
+                console.log("GET method succeeded");
+              }
+            } catch (apiError) {
+              console.log("Both POST and GET methods failed, trying fallback API endpoint", apiError);
+              
+              try {
+                // Try the fallback API endpoint which should always work
+                console.log("Trying fallback API endpoint");
+                const fallbackResponse = await apiRequest("GET", `/api/chat-fallback?t=${Date.now()}&content=${encodeURIComponent(content)}&agentId=${activeAgent?.id || '1'}&userId=${user?.id || 'guest'}`, undefined);
+                
+                // Parse the fallback response
+                const fallbackText = await fallbackResponse.text();
+                let fallbackData;
+                
+                try {
+                  fallbackData = JSON.parse(fallbackText);
+                  console.log("Successfully parsed fallback response:", fallbackData);
+                  
+                  // Add the fallback response to the chat
+                  setLocalMessages((prev) => [...prev, {
+                    id: Date.now(),
+                    content: fallbackData.response || "I'm having trouble connecting right now. Please try again later.",
+                    role: 'assistant',
+                    timestamp: Date.now()
+                  }]);
+                } catch (fallbackError) {
+                  console.error("Failed to parse fallback response:", fallbackError);
+                  
+                  // Generate a local response as last resort
+                  const localResponseContent = generateLocalResponse(activeAgent?.name || "Nova AI", content);
+                  
+                  // Add the locally generated response to the chat
+                  setLocalMessages((prev) => [...prev, {
+                    id: Date.now(),
+                    content: localResponseContent,
+                    role: 'assistant',
+                    timestamp: Date.now()
+                  }]);
+                }
+              } catch (fallbackApiError) {
+                console.error("Fallback API also failed, using local response generation", fallbackApiError);
                 
                 // Generate a local response based on the agent and user message
                 const localResponseContent = generateLocalResponse(activeAgent?.name || "Nova AI", content);
@@ -195,10 +243,10 @@ export function useChat() {
                   role: 'assistant',
                   timestamp: Date.now()
                 }]);
-                
-                success = true;
-                break;
               }
+              
+              success = true;
+              break;
             }
 
             clearTimeout(timeoutId);
@@ -248,9 +296,24 @@ export function useChat() {
             // Try to parse the response as JSON, with error handling
             let assistantMessage;
             try {
-              // First check if the response is HTML
+              // Log response headers for debugging
+              console.log("Response headers:", Object.fromEntries([...response.headers.entries()]));
+              
+              // Check content type header first
+              const contentType = response.headers.get('content-type');
+              if (contentType && !contentType.includes('application/json')) {
+                console.log(`Unexpected content type: ${contentType}, expected application/json`);
+              }
+              
+              // Get the response text
               const text = await response.text();
-              if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+              console.log(`Response text (first 100 chars): ${text.substring(0, 100)}`);
+              
+              // Check if the response is HTML
+              if (text.trim().startsWith('<!DOCTYPE') || 
+                  text.trim().startsWith('<html') || 
+                  text.includes('<head>') || 
+                  text.includes('<body>')) {
                 console.log("Received HTML instead of JSON, using local response generation");
                 
                 // Generate a local response based on the agent and user message
@@ -270,10 +333,28 @@ export function useChat() {
               
               // Try to parse as JSON
               try {
-                assistantMessage = JSON.parse(text);
+                // Trim the text to remove any whitespace that might cause parsing issues
+                const trimmedText = text.trim();
+                assistantMessage = JSON.parse(trimmedText);
+                console.log("Successfully parsed response as JSON:", assistantMessage);
               } catch (jsonError) {
                 console.error("Failed to parse response as JSON:", jsonError);
-                throw new Error("Invalid JSON response");
+                console.log("Raw response:", text);
+                
+                // Try to extract JSON from the response if it's embedded in other content
+                const jsonMatch = text.match(/\{.*\}/s);
+                if (jsonMatch) {
+                  try {
+                    console.log("Attempting to extract JSON from response");
+                    assistantMessage = JSON.parse(jsonMatch[0]);
+                    console.log("Successfully extracted JSON from response:", assistantMessage);
+                  } catch (extractError) {
+                    console.error("Failed to extract JSON from response:", extractError);
+                    throw new Error("Invalid JSON response");
+                  }
+                } else {
+                  throw new Error("Invalid JSON response");
+                }
               }
             } catch (parseError) {
               console.error("Error parsing response:", parseError);
