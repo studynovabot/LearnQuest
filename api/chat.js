@@ -184,7 +184,7 @@ async function tryTogetherAPI(content, systemPrompt, apiKey) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model,
+        model: model,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: content },
@@ -589,11 +589,29 @@ async function handler(req, res) {
 
     if (!GROQ_API_KEY && !TOGETHER_API_KEY && !OPENROUTER_API_KEY && !FIREWORKS_API_KEY) {
       console.warn('[CHAT API] No API keys configured, using fallback response');
+      
+      // Generate a fallback response based on the agent
+      const agentName = agentId === '1' ? 'Nova AI' : 
+                        agentId === '2' ? 'Math Mentor' :
+                        agentId === '3' ? 'Science Sage' : 'Nova AI';
+      
+      // Create a friendly fallback response
+      const fallbackResponses = [
+        `I'd love to help with that! However, I'm having trouble connecting to my knowledge base right now. Could you please try again in a moment? 💫`,
+        `That's an interesting question! I'm currently experiencing a brief connection issue. Please try again shortly and I'll be happy to assist you! 🌟`,
+        `I'm eager to help you with this! My systems are currently refreshing. Could you try again in a moment? I appreciate your patience! ✨`
+      ];
+      
+      // Select a random fallback response
+      const aiResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+      const responseSource = "fallback";
+      
+      // Return the fallback response with 200 status (not 500) to avoid client-side errors
       return res.status(200).json({ 
         error: false,
-        response: "I'm here to help! However, I'm currently in offline mode. What would you like to know?",
+        response: aiResponse,
         timestamp: new Date().toISOString(),
-        source: "fallback"
+        source: responseSource
       });
     }
 
@@ -712,10 +730,10 @@ async function handler(req, res) {
     });
     
   } catch (error) {
-    console.error('[CHAT API] Server error:', error.message, error.stack);
+    console.error('[CHAT API] Fatal server error:', error.message, error.stack);
     
     try {
-      // Always ensure we return valid JSON even in case of errors
+      // Always return a safe JSON response, never throw
       res.setHeader('Content-Type', 'application/json');
       
       // Generate a friendly error response
