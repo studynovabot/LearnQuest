@@ -141,10 +141,8 @@ export async function apiRequest(
           console.log(`Request timeout for ${method} ${requestUrl}`);
         }, 15000); // 15 second timeout
         
-        // Merge the abort signal from options with our timeout signal
-        const signal = options?.signal 
-          ? AbortSignal.any([options.signal, controller.signal]) 
-          : controller.signal;
+        // Use the timeout signal (we can't easily combine signals in all environments)
+        const signal = controller.signal;
         
         const res = await fetch(requestUrl, {
           method,
@@ -344,23 +342,24 @@ export const getQueryFn: <T>(options: {
                   { id: 9, name: "Biology Buddy", subject: "Biology", iconName: "leaf", color: "indigo" },
                   { id: 10, name: "English Expert", subject: "English", iconName: "book", color: "violet" },
                   { id: 11, name: "Computer Coder", subject: "Computer Science", iconName: "code", color: "red" },
-                    { id: 12, name: "Art Advisor", subject: "Arts", iconName: "palette", color: "teal" },
-                    { id: 13, name: "Economics Expert", subject: "Economics", iconName: "trending-up", color: "yellow" },
-                    { id: 14, name: "Psychology Pro", subject: "Psychology", iconName: "brain", color: "slate" },
-                    { id: 15, name: "Motivational Mentor", subject: "Personal Development", iconName: "smile", color: "rose" }
-                  ],
-                  count: 15,
-                  timestamp: new Date().toISOString()
-                };
-              }
+                  { id: 12, name: "Art Advisor", subject: "Arts", iconName: "palette", color: "teal" },
+                  { id: 13, name: "Economics Expert", subject: "Economics", iconName: "trending-up", color: "yellow" },
+                  { id: 14, name: "Psychology Pro", subject: "Psychology", iconName: "brain", color: "slate" },
+                  { id: 15, name: "Motivational Mentor", subject: "Personal Development", iconName: "smile", color: "rose" }
+                ],
+                count: 15,
+                timestamp: new Date().toISOString()
+              };
+            }
+            
+            // Try to parse as JSON
+            try {
+              return JSON.parse(text);
+            } catch (parseError) {
+              console.error('Failed to parse response as JSON:', parseError);
               
-              // Try to parse as JSON
-              try {
-                return JSON.parse(text);
-              } catch (parseError) {
-                console.error('Failed to parse tutors response as JSON:', parseError);
-                
-                // Return a hardcoded fallback for tutors with all 15 tutors
+              // Return a hardcoded fallback for tutors if it's the tutors endpoint
+              if (requestUrl.includes('/tutors')) {
                 return {
                   success: true,
                   data: [
@@ -384,18 +383,23 @@ export const getQueryFn: <T>(options: {
                   timestamp: new Date().toISOString()
                 };
               }
-            } catch (error) {
-              console.error('Error handling tutors response:', error);
-              throw error;
+              
+              // For other endpoints, throw the error
+              throw parseError;
             }
           }
           
           // For other endpoints, use standard JSON parsing
           if (contentType && contentType.includes('application/json')) {
-            return await res.json();
+            try {
+              // Try to parse the text we already have
+              return JSON.parse(text);
+            } catch (jsonError) {
+              console.error('Failed to parse JSON response:', jsonError);
+              throw new Error(`Failed to parse JSON response: ${jsonError.message}`);
+            }
           } else {
-            // If not JSON content type, try to get the text and parse it
-            const text = await res.text();
+            // If not JSON content type, try to parse the text we already have
             try {
               // Try to parse as JSON anyway
               return JSON.parse(text);

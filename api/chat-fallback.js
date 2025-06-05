@@ -2,7 +2,7 @@
 // This is used when the main chat API fails
 
 // Import CORS utility
-import { setCorsHeaders } from '../utils/cors.js';
+import { handleCors } from '../utils/cors.js';
 
 // Agent-specific fallback responses
 const AGENT_FALLBACKS = {
@@ -30,16 +30,12 @@ const AGENT_FALLBACKS = {
 
 // Main handler function
 export default function handler(req, res) {
-  // Set CORS headers
-  setCorsHeaders(res);
+  // Handle CORS and preflight requests
+  const corsResult = handleCors(req, res);
+  if (corsResult) return corsResult;
   
   // Set content type to JSON
   res.setHeader('Content-Type', 'application/json');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).json({ status: 'ok' });
-  }
   
   // Log the request
   console.log(`[CHAT-FALLBACK] Received ${req.method} request`);

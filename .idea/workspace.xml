@@ -5,14 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change afterPath="$PROJECT_DIR$/api/chat-fallback.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/chat.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/hooks/useChat.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/hooks/useChat.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/chat-fallback.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/chat-fallback.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/lib/queryClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/lib/queryClient.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vercel.json" beforeDir="false" afterPath="$PROJECT_DIR$/vercel.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +117,7 @@
       <workItem from="1749111293533" duration="1966000" />
       <workItem from="1749113426131" duration="39000" />
       <workItem from="1749139214454" duration="4710000" />
-      <workItem from="1749145652146" duration="898000" />
+      <workItem from="1749145652146" duration="1814000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -704,10 +701,11 @@
     <option name="indexedFilesMap">
       <map>
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749145988134" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749145988134" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749147224393" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749147224393" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
-        <entry key="$PROJECT_DIR$/api/chat.js" value="1749146265660" />
+        <entry key="$PROJECT_DIR$/api/chat-fallback.js" value="1749146870988" />
+        <entry key="$PROJECT_DIR$/api/chat.js" value="1749146585035" />
         <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/image-generation.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1749056522548" />
@@ -715,23 +713,24 @@
         <entry key="$PROJECT_DIR$/api/tutors.js" value="1749107391134" />
         <entry key="$PROJECT_DIR$/api/user-profile.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/vector-upload.js" value="1749056522548" />
+        <entry key="$PROJECT_DIR$/client/package.json" value="1749147224393" />
         <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749110092207" />
         <entry key="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" value="1749107092617" />
         <entry key="$PROJECT_DIR$/client/src/config.ts" value="1749146265660" />
-        <entry key="$PROJECT_DIR$/client/src/hooks/useChat.ts" value="1749112520742" />
-        <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749146265660" />
+        <entry key="$PROJECT_DIR$/client/src/hooks/useChat.ts" value="1749146585035" />
+        <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749146870988" />
         <entry key="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" value="1748929206006" />
         <entry key="$PROJECT_DIR$/dev-server.js" value="1748942466395" />
         <entry key="$PROJECT_DIR$/package-lock.json" value="1749113106086" />
         <entry key="$PROJECT_DIR$/package.json" value="1749113106086" />
         <entry key="$PROJECT_DIR$/simple-dev-server.js" value="1749110402774" />
         <entry key="$PROJECT_DIR$/utils/cors.js" value="1749139557739" />
-        <entry key="$PROJECT_DIR$/vercel.json" value="1749146265660" />
+        <entry key="$PROJECT_DIR$/vercel.json" value="1749146585035" />
       </map>
     </option>
-    <option name="lastCommitHash" value="1561a017421c33251664ea073ceecd723e5dc8d3" />
-    <option name="lastIndexTimestamp" value="1749146265660" />
-    <option name="repoAccumulatedChanges" value="16" />
+    <option name="lastCommitHash" value="3be9bd42dad9e7ec6c81c71f35c81123943f322d" />
+    <option name="lastIndexTimestamp" value="1749147224393" />
+    <option name="repoAccumulatedChanges" value="35" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />
