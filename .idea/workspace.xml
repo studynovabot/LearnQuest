@@ -8,9 +8,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/chat.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/tutors.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/tutors.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/queryClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/lib/queryClient.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vercel.json" beforeDir="false" afterPath="$PROJECT_DIR$/vercel.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +115,8 @@
       <workItem from="1749111293533" duration="1966000" />
       <workItem from="1749113426131" duration="39000" />
       <workItem from="1749139214454" duration="4710000" />
-      <workItem from="1749145652146" duration="2567000" />
+      <workItem from="1749145652146" duration="2942000" />
+      <workItem from="1749149022232" duration="781000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -702,11 +700,11 @@
     <option name="indexedFilesMap">
       <map>
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749148078389" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749148078389" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749149648059" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749149352569" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/chat-fallback.js" value="1749146870988" />
-        <entry key="$PROJECT_DIR$/api/chat.js" value="1749146585035" />
+        <entry key="$PROJECT_DIR$/api/chat.js" value="1749149648059" />
         <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/image-generation.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1749056522548" />
@@ -729,9 +727,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1749146585035" />
       </map>
     </option>
-    <option name="lastCommitHash" value="d206653b91bf82dcc330489928b36ce7cd824124" />
-    <option name="lastIndexTimestamp" value="1749148078389" />
-    <option name="repoAccumulatedChanges" value="42" />
+    <option name="lastCommitHash" value="beaa3c76d9c24aa765ce241c70ab5a3ccc207a55" />
+    <option name="lastIndexTimestamp" value="1749149648059" />
+    <option name="repoAccumulatedChanges" value="52" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />

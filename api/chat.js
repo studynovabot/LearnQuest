@@ -666,7 +666,8 @@ async function handler(req, res) {
     }
 
     // Check if the response contains generic AI disclaimers and fix if needed
-    if (checkForGenericResponse(aiResponse)) {
+    // Ensure aiResponse is a string before calling checkForGenericResponse
+    if (aiResponse && typeof aiResponse === 'string' && checkForGenericResponse(aiResponse)) {
       console.log('[CHAT API] Detected generic AI response, enhancing it');
       // Append a more personalized touch
       aiResponse += "\n\nAnyway, I'm here to help you learn! What specific aspects of this topic would you like to explore further?";
