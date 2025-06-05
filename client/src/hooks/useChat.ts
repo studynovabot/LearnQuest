@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChatMessage, AITutor } from "@/types";
 import { useToast } from "@/hooks/use-toast";
@@ -14,13 +14,34 @@ export function useChat() {
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]); // Local state for chat messages
 
   // Fetch tutors - always fetch from real backend
-  const { data: tutors = [], isLoading: isLoadingTutors } = useQuery<AITutor[]>({
+  const { data: tutorsResponse, isLoading: isLoadingTutors } = useQuery({
     queryKey: ["/api/tutors"],
     enabled: true, // Always enable fetching from real backend
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  // Extract tutors from the response, handling different response formats
+  const tutorsArray = useMemo(() => {
+    if (!tutorsResponse) return [];
+    
+    // Handle response format: { success: true, data: [...] }
+    if (tutorsResponse.success && Array.isArray(tutorsResponse.data)) {
+      return tutorsResponse.data;
+    }
+    
+    // Handle direct array response
+    if (Array.isArray(tutorsResponse)) {
+      return tutorsResponse;
+    }
+    
+    // Fallback to empty array if response format is unexpected
+    console.warn('Unexpected tutors response format:', tutorsResponse);
+    return [];
+  }, [tutorsResponse]);
+  
   // Separate tutors into unlocked and locked
-  const tutorsArray = Array.isArray(tutors) ? tutors : [];
   const unlockedAgents = tutorsArray; // All tutors are available now
   const lockedAgents: AITutor[] = []; // No locked tutors
 
