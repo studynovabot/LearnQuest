@@ -296,7 +296,20 @@ export const getQueryFn: <T>(options: {
             throw new Error('Task service is currently unavailable. Please try again later.');
           }
           if (requestUrl.includes('/api/chat')) {
+            console.error('Chat service is currently unavailable');
             throw new Error('Chat service is currently unavailable. Please try again later.');
+          }
+          
+          // Special handling for tutors endpoint - retry with a clean URL
+          if (requestUrl.includes('/api/tutors')) {
+            console.log('Tutors service returned 404, retrying with clean URL');
+            // Try a simpler URL without query parameters
+            const baseUrl = requestUrl.split('?')[0];
+            return fetch(`${baseUrl}?t=${Date.now()}`, {
+              method: 'GET',
+              headers,
+              cache: 'no-store'
+            });
           }
         }
 
@@ -308,6 +321,19 @@ export const getQueryFn: <T>(options: {
             statusText: res.statusText,
             body: text,
           });
+          
+          // Special handling for tutors endpoint with 500 error
+          if (res.status === 500 && requestUrl.includes('/api/tutors')) {
+            console.log('Tutors service returned 500, retrying with clean URL and different cache parameter');
+            // Try a simpler URL with a different cache-busting parameter
+            const baseUrl = requestUrl.split('?')[0];
+            return fetch(`${baseUrl}?nocache=${Date.now()}`, {
+              method: 'GET',
+              headers,
+              cache: 'no-store'
+            });
+          }
+          
           throw new Error(`${res.status}: ${text}`);
         }
 

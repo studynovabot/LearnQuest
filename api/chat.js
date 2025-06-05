@@ -360,22 +360,20 @@ function checkForGenericResponse(text) {
 // Main API handler
 async function handler(req, res) {
   try {
-    // Set CORS headers explicitly for all origins
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept');
-    res.setHeader('Access-Control-Max-Age', '86400');
+    // Use the CORS utility for consistent handling
+    const corsResult = handleCors(req, res);
+    if (corsResult) return corsResult;
     
     // Always set content type to JSON
     res.setHeader('Content-Type', 'application/json');
     
-    // Handle preflight requests immediately
-    if (req.method === 'OPTIONS') {
-      return res.status(200).json({ status: 'ok', message: 'CORS preflight successful' });
-    }
-
+    // Add cache control headers
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
     // Log request details for debugging
-    console.log(`[CHAT API] Received ${req.method} request to /api/chat`);
+    console.log(`[CHAT API] Received ${req.method} request to /api/chat at ${new Date().toISOString()}`);
     console.log(`[CHAT API] Headers:`, req.headers);
     console.log(`[CHAT API] URL:`, req.url);
     
@@ -686,26 +684,39 @@ async function handler(req, res) {
   } catch (error) {
     console.error('[CHAT API] Server error:', error.message, error.stack);
     
-    // Always ensure we return valid JSON even in case of errors
-    res.setHeader('Content-Type', 'application/json');
-    
-    // Generate a friendly error response
-    const errorResponses = [
-      `I'm really sorry, but I'm having a technical hiccup right now. Could you please try again in a moment? I'd love to help you! 💫`,
-      `Oops! My systems are experiencing a brief glitch. Please try again shortly, and I'll be ready to assist you with your question! 🌟`,
-      `I apologize for the inconvenience! I'm currently having a small technical issue. Please try again in a moment, and we can continue our conversation! ✨`
-    ];
-    
-    // Select a random error response
-    const friendlyResponse = errorResponses[Math.floor(Math.random() * errorResponses.length)];
-    
-    // Return with 200 status (not 500) to avoid client-side errors
-    return res.status(200).json({ 
-      error: false, // Set to false to prevent client-side error handling
-      response: friendlyResponse,
-      timestamp: new Date().toISOString(),
-      source: "error_fallback"
-    });
+    try {
+      // Always ensure we return valid JSON even in case of errors
+      res.setHeader('Content-Type', 'application/json');
+      
+      // Generate a friendly error response
+      const errorResponses = [
+        `I'm really sorry, but I'm having a technical hiccup right now. Could you please try again in a moment? I'd love to help you! 💫`,
+        `Oops! My systems are experiencing a brief glitch. Please try again shortly, and I'll be ready to assist you with your question! 🌟`,
+        `I apologize for the inconvenience! I'm currently having a small technical issue. Please try again in a moment, and we can continue our conversation! ✨`
+      ];
+      
+      // Select a random error response
+      const friendlyResponse = errorResponses[Math.floor(Math.random() * errorResponses.length)];
+      
+      // Return with 200 status (not 500) to avoid client-side errors
+      return res.status(200).json({ 
+        error: false, // Set to false to prevent client-side error handling
+        response: friendlyResponse,
+        timestamp: new Date().toISOString(),
+        source: "error_fallback"
+      });
+    } catch (finalError) {
+      // This is a last resort if even the error handler fails
+      console.error('[CHAT API] Critical error in error handler:', finalError);
+      
+      // Return the most minimal valid JSON possible
+      return res.status(200).json({
+        error: false,
+        response: "I'm having trouble connecting right now. Please try again in a moment.",
+        timestamp: new Date().toISOString(),
+        source: "critical_error_fallback"
+      });
+    }
   }
 }
 
