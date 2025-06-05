@@ -6,7 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/chat.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/analytics.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/analytics.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/firebase.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/firebase.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,7 +117,7 @@
       <workItem from="1749113426131" duration="39000" />
       <workItem from="1749139214454" duration="4710000" />
       <workItem from="1749145652146" duration="2942000" />
-      <workItem from="1749149022232" duration="1507000" />
+      <workItem from="1749149022232" duration="2517000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -699,11 +701,11 @@
     <option name="indexedFilesMap">
       <map>
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749150237078" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749149352569" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749151451556" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749151451556" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/chat-fallback.js" value="1749146870988" />
-        <entry key="$PROJECT_DIR$/api/chat.js" value="1749150528302" />
+        <entry key="$PROJECT_DIR$/api/chat.js" value="1749150861346" />
         <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/image-generation.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1749056522548" />
@@ -726,9 +728,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1749146585035" />
       </map>
     </option>
-    <option name="lastCommitHash" value="65ad43689a2c10eb233fe2d2aa5716d1543364f6" />
-    <option name="lastIndexTimestamp" value="1749150528302" />
-    <option name="repoAccumulatedChanges" value="57" />
+    <option name="lastCommitHash" value="2cd63362683923418d41ef00765eefdfb6129a9e" />
+    <option name="lastIndexTimestamp" value="1749151451556" />
+    <option name="repoAccumulatedChanges" value="63" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />

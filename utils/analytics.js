@@ -1,4 +1,5 @@
 // Analytics utilities for tracking user interactions
+import { collection, doc, getDoc, setDoc, updateDoc, addDoc } from 'firebase/firestore';
 
 /**
  * Track user interaction with the chat system
@@ -6,14 +7,14 @@
  * @param {object} interaction - Interaction data to track
  * @returns {Promise<string>} - The ID of the tracked interaction
  */
-export async function trackUserInteraction(db, interaction) {
+export async function trackUserInteraction(db, userId, interaction) {
   try {
     if (!db) {
       console.log('Skipping interaction tracking - no database provided');
       return `mock_interaction_${Date.now()}`;
     }
     
-    const { userId, agentId, content, response, subject, isQuestion, xpEarned } = interaction;
+    const { agentId, content, type, timestamp } = interaction;
     
     if (!userId || !content) {
       console.error('Missing required fields for tracking interaction');
@@ -25,33 +26,17 @@ export async function trackUserInteraction(db, interaction) {
       userId,
       agentId: agentId || '1',
       content: content.substring(0, 500), // Limit content length
-      responsePreview: response ? response.substring(0, 100) + '...' : 'No response',
-      subject: subject || 'general',
-      isQuestion: isQuestion || false,
-      xpEarned: xpEarned || 0,
-      timestamp: new Date(),
+      type: type || 'chat_message',
+      timestamp: timestamp || new Date().toISOString(),
       // Additional analytics data
-      contentLength: content.length,
-      responseLength: response ? response.length : 0,
-      processingTime: interaction.processingTime || 0,
-      attemptCount: interaction.attemptCount || 1
+      contentLength: content.length
     };
     
     // Add to interactions collection
-    const interactionsRef = db.collection('user_interactions');
-    const docRef = await interactionsRef.add(interactionData);
+    const interactionsRef = collection(db, 'user_interactions');
+    const docRef = await addDoc(interactionsRef, interactionData);
     
     console.log(`✅ Tracked interaction: ${docRef.id}`);
-    
-    // If this is a question, update user performance data
-    if (isQuestion) {
-      try {
-        await updateUserPerformance(db, userId, subject, xpEarned);
-      } catch (perfError) {
-        console.error('Error updating user performance:', perfError);
-        // Continue even if performance update fails
-      }
-    }
     
     return docRef.id;
   } catch (error) {
@@ -67,25 +52,30 @@ export async function trackUserInteraction(db, interaction) {
  * @param {string} subject - Subject of the interaction
  * @param {number} xpEarned - XP earned in this interaction
  */
-async function updateUserPerformance(db, userId, subject, xpEarned) {
+export async function updateUserPerformance(db, userId, subject, xpEarned) {
   try {
-    // Get or create user performance document
-    const performanceRef = db.collection('user_performance').doc(`${userId}_${subject}`);
-    const performanceDoc = await performanceRef.get();
+    if (!db) {
+      console.log('Skipping performance update - no database provided');
+      return;
+    }
     
-    if (!performanceDoc.exists) {
+    // Get or create user performance document
+    const performanceRef = doc(db, 'user_performance', `${userId}_${subject}`);
+    const performanceDoc = await getDoc(performanceRef);
+    
+    if (!performanceDoc.exists()) {
       // Create new performance document if it doesn't exist
-      await performanceRef.set({
+      await setDoc(performanceRef, {
         userId,
         subject,
-        totalXP: xpEarned,
+        totalXP: xpEarned || 0,
         interactionCount: 1,
         questionCount: 1,
         averageAccuracy: 100, // Default to 100% initially
         progress: 5, // Start with 5% progress
         status: 'beginner',
-        lastUpdated: new Date(),
-        createdAt: new Date()
+        lastUpdated: new Date().toISOString(),
+        createdAt: new Date().toISOString()
       });
     } else {
       // Update existing performance document
@@ -94,12 +84,12 @@ async function updateUserPerformance(db, userId, subject, xpEarned) {
       // Calculate new values
       const newInteractionCount = (performanceData.interactionCount || 0) + 1;
       const newQuestionCount = (performanceData.questionCount || 0) + 1;
-      const newTotalXP = (performanceData.totalXP || 0) + xpEarned;
+      const newTotalXP = (performanceData.totalXP || 0) + (xpEarned || 0);
       
       // Calculate progress (capped at 100%)
       const newProgress = Math.min(
         100, 
-        performanceData.progress + (xpEarned / 100) // Each 100 XP is roughly 1% progress
+        (performanceData.progress || 0) + ((xpEarned || 0) / 100) // Each 100 XP is roughly 1% progress
       );
       
       // Determine status based on progress
@@ -109,19 +99,19 @@ async function updateUserPerformance(db, userId, subject, xpEarned) {
       else if (newProgress >= 40) newStatus = 'intermediate';
       
       // Update the document
-      await performanceRef.update({
+      await updateDoc(performanceRef, {
         totalXP: newTotalXP,
         interactionCount: newInteractionCount,
         questionCount: newQuestionCount,
         progress: newProgress,
         status: newStatus,
-        lastUpdated: new Date()
+        lastUpdated: new Date().toISOString()
       });
     }
     
     console.log(`✅ Updated performance for user ${userId} in ${subject}`);
   } catch (error) {
     console.error('Error updating user performance:', error);
-    throw error;
+    // Don't throw the error to prevent API failures
   }
 }

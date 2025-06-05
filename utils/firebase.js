@@ -3,7 +3,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
-import { firebaseConfig } from '../../firebase-config';
+import { firebaseConfig } from '../firebase-config';
 
 // Initialize Firebase
 let firebaseApp;
@@ -78,6 +78,9 @@ export async function getUserPerformanceData(userId) {
   if (!db) return null;
   
   try {
+    // Import needed functions
+    const { doc, getDoc } = await import('firebase/firestore');
+    
     const docRef = doc(db, 'userPerformance', userId);
     const docSnap = await getDoc(docRef);
     
