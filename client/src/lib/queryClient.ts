@@ -41,6 +41,9 @@ export async function apiRequest(
   // Add both X-User-ID header and Authorization header for compatibility
   headers["X-User-ID"] = userId;
   headers["Authorization"] = `Bearer ${userId}`;
+  
+  // Explicitly request JSON response
+  headers["Accept"] = "application/json";
 
   // Add debugging information
   console.log(`🌐 Making API request: ${method} ${url}`);
@@ -197,7 +200,9 @@ export const getQueryFn: <T>(options: {
     // Create headers object with both X-User-ID and Authorization headers
     const headers: Record<string, string> = { 
       "X-User-ID": userId,
-      "Authorization": `Bearer ${userId}`
+      "Authorization": `Bearer ${userId}`,
+      // Explicitly request JSON response
+      "Accept": "application/json"
     };
 
     // Log the query details for debugging
@@ -207,7 +212,7 @@ export const getQueryFn: <T>(options: {
       isCrossOrigin
     });
 
-    // Set up retry logic for API requests
+    // For all endpoints, use retry logic
     const maxRetries = 3;
     let retryCount = 0;
     let lastError: Error | null = null;
@@ -252,32 +257,29 @@ export const getQueryFn: <T>(options: {
           throw new Error(`${res.status}: ${text}`);
         }
 
-        // Try to parse the response as JSON, with fallback for HTML responses
+        // Try to parse the response as JSON
         try {
-          return await res.json();
+          // First check the content type
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            return await res.json();
+          } else {
+            // If not JSON content type, try to get the text and parse it
+            const text = await res.text();
+            try {
+              // Try to parse as JSON anyway
+              return JSON.parse(text);
+            } catch (parseError) {
+              console.error('Failed to parse non-JSON response:', parseError);
+              throw new Error(`Expected JSON but got ${contentType || 'unknown content type'}`);
+            }
+          }
         } catch (jsonError) {
           console.error('Failed to parse response as JSON:', jsonError);
           
-          // If we received HTML instead of JSON, return a fallback response
-          if (jsonError instanceof SyntaxError && jsonError.message.includes('Unexpected token')) {
-            console.warn('Received HTML instead of JSON, using fallback data');
-            
-            // Check if this is the tutors endpoint
-            if (requestUrl.includes('/tutors')) {
-              return {
-                success: true,
-                data: [
-                  { id: 1, name: "Nova AI", subject: "General Assistant", iconName: "sparkles", color: "blue" },
-                  { id: 2, name: "Math Mentor", subject: "Mathematics", iconName: "calculator", color: "purple" },
-                  { id: 3, name: "Science Sage", subject: "Science", iconName: "flask", color: "green" },
-                  { id: 4, name: "Language Linguist", subject: "Languages", iconName: "languages", color: "orange" },
-                  { id: 5, name: "History Helper", subject: "History", iconName: "landmark", color: "amber" }
-                ],
-                count: 5,
-                timestamp: new Date().toISOString(),
-                fallback: true
-              };
-            }
+          // For tutors endpoint, provide a more specific error
+          if (requestUrl.includes('/tutors')) {
+            throw new Error('Failed to load tutors data. The API returned an invalid response format.');
           }
           
           // Re-throw the error for other cases

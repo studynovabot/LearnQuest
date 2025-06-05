@@ -24,9 +24,9 @@ export const config = {
   apiUrl: getApiUrl(),
   environment: import.meta.env.VITE_NODE_ENV || 'production',
 
-  // Disable mock data since we're using real Vercel backend
+  // Disable mock data
   useMockData: false,
 
-  // Enable mock fallback for development only
-  enableMockFallback: import.meta.env.DEV
+  // Disable mock fallback
+  enableMockFallback: false
 };

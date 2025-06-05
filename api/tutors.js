@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     // Handle CORS - make sure this doesn't override our Content-Type
     handleCors(req, res);
     if (req.method === 'OPTIONS') {
-      return res.status(200).end();
+      return res.status(200).json({ status: 'ok' });
     }
 
     // Only allow GET requests

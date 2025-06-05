@@ -1,7 +1,6 @@
 {
-  "name": "Nova AI - Your AI Study Buddy",
-  "short_name": "Nova AI",
-  "description": "An engaging educational platform with AI tutors, gamification, and learning tools.",
+  "name": "Nova AI",
+  "short_name": "Nova",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -37,7 +37,9 @@ export function handleCors(req, res, handler = null) {
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    return res.status(204).end();
+    // Always return JSON for OPTIONS requests
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(200).json({ status: 'ok' });
   }
 
   // If no handler provided, just return null (for manual handling)

@@ -7,38 +7,12 @@
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/admin-auth.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/analytics.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/cors.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/file-storage.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/firebase.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/learning-engine.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/otp-service.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/pdf-processor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/pinecone.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/privacy.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/question-utils.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/seed-data.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/storage.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/_utils/trial-abuse-prevention.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/chat.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/health.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/image-analysis.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/image-analysis.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/image-generation.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/image-generation.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/ncert-solutions.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/ncert-solutions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/student-analytics.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/student-analytics.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/tutors.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/tutors.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/user-profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/user-profile.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/vector-upload.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/vector-upload.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/public/site.webmanifest" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/site.webmanifest" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/config.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/lib/queryClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/lib/queryClient.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/vercel.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/simple-dev-server.js" beforeDir="false" afterPath="$PROJECT_DIR$/simple-dev-server.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test-api.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vercel.json" beforeDir="false" afterPath="$PROJECT_DIR$/vercel.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/cors.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/cors.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +100,7 @@
       <workItem from="1749045764551" duration="595000" />
       <workItem from="1749046541104" duration="8093000" />
       <workItem from="1749104784466" duration="308000" />
-      <workItem from="1749105283683" duration="966000" />
+      <workItem from="1749105283683" duration="2139000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -710,8 +684,8 @@
     <option name="indexedFilesMap">
       <map>
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749105964023" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749105964023" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749107092617" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749107092617" />
         <entry key="$PROJECT_DIR$/api/_utils/admin-auth.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/_utils/analytics.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/_utils/cors.js" value="9223372036854775807" />
@@ -728,29 +702,31 @@
         <entry key="$PROJECT_DIR$/api/_utils/trial-abuse-prevention.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/chat.js" value="1749056522548" />
-        <entry key="$PROJECT_DIR$/api/health.js" value="1749054720881" />
+        <entry key="$PROJECT_DIR$/api/health.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/image-generation.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/student-analytics.js" value="1749056522548" />
-        <entry key="$PROJECT_DIR$/api/tutors.js" value="1749106192956" />
+        <entry key="$PROJECT_DIR$/api/tutors.js" value="1749107391134" />
         <entry key="$PROJECT_DIR$/api/user-profile.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/vector-upload.js" value="1749056522548" />
-        <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749061922959" />
-        <entry key="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" value="1749106192956" />
-        <entry key="$PROJECT_DIR$/client/src/config.ts" value="1749106192956" />
-        <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749106192956" />
+        <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749107092617" />
+        <entry key="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" value="1749107092617" />
+        <entry key="$PROJECT_DIR$/client/src/config.ts" value="1749107391134" />
+        <entry key="$PROJECT_DIR$/client/src/lib/mockApiHandler.ts" value="1749107092617" />
+        <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749107391134" />
         <entry key="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" value="1748929206006" />
         <entry key="$PROJECT_DIR$/client/vercel.json" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/dev-server.js" value="1748942466395" />
-        <entry key="$PROJECT_DIR$/simple-dev-server.js" value="1749106192956" />
+        <entry key="$PROJECT_DIR$/simple-dev-server.js" value="1749107391134" />
         <entry key="$PROJECT_DIR$/test-api.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/utils/cors.js" value="1749107391134" />
         <entry key="$PROJECT_DIR$/vercel.json" value="1749059820467" />
       </map>
     </option>
-    <option name="lastCommitHash" value="33c723c44096e217fafa5a74fb916d555553873d" />
-    <option name="lastIndexTimestamp" value="1749106192956" />
-    <option name="repoAccumulatedChanges" value="72" />
+    <option name="lastCommitHash" value="2b3111a018873f9b0f48e344a762492c318075f8" />
+    <option name="lastIndexTimestamp" value="1749107391134" />
+    <option name="repoAccumulatedChanges" value="135" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />

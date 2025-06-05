@@ -20,10 +20,11 @@ app.use(express.json());
 function simpleCors(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID, Accept');
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(200).json({ status: 'ok' });
   }
   next();
 }
@@ -65,13 +66,23 @@ app.get('/api/tutors', (req, res) => {
     { id: 15, name: "Motivational Mentor", subject: "Personal Development", iconName: "smile", color: "rose" }
   ];
 
-  // Return a properly formatted response with success field
-  return res.status(200).json({
-    success: true,
-    data: tutors,
-    count: tutors.length,
-    timestamp: new Date().toISOString()
-  });
+  try {
+    // Return a properly formatted response with success field
+    return res.status(200).json({
+      success: true,
+      data: tutors,
+      count: tutors.length,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error sending tutors response:', error);
+    // Ensure we still send a valid JSON response even if there's an error
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
 });
 
 // Chat endpoint - simplified version
