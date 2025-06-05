@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change beforePath="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/site.webmanifest" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/site.webmanifest" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/hooks/useChat.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/hooks/useChat.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/queryClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/lib/queryClient.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +96,7 @@
       <workItem from="1749045764551" duration="595000" />
       <workItem from="1749046541104" duration="8093000" />
       <workItem from="1749104784466" duration="308000" />
-      <workItem from="1749105283683" duration="2826000" />
+      <workItem from="1749105283683" duration="4363000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -679,8 +680,8 @@
     <option name="indexedFilesMap">
       <map>
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749107092617" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749107092617" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749109490811" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749109490811" />
         <entry key="$PROJECT_DIR$/api/_utils/admin-auth.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/_utils/analytics.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/_utils/cors.js" value="9223372036854775807" />
@@ -705,9 +706,10 @@
         <entry key="$PROJECT_DIR$/api/tutors.js" value="1749107391134" />
         <entry key="$PROJECT_DIR$/api/user-profile.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/vector-upload.js" value="1749056522548" />
-        <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749107092617" />
+        <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749108590574" />
         <entry key="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" value="1749107092617" />
         <entry key="$PROJECT_DIR$/client/src/config.ts" value="1749107391134" />
+        <entry key="$PROJECT_DIR$/client/src/hooks/useChat.ts" value="1749108590574" />
         <entry key="$PROJECT_DIR$/client/src/lib/mockApiHandler.ts" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749107391134" />
         <entry key="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" value="1748929206006" />
@@ -719,9 +721,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1749059820467" />
       </map>
     </option>
-    <option name="lastCommitHash" value="4e59f1919fd562f1f3ad6cd3e28ed9e59f01587b" />
-    <option name="lastIndexTimestamp" value="1749107472395" />
-    <option name="repoAccumulatedChanges" value="144" />
+    <option name="lastCommitHash" value="31ca518e30d59f40a7e1404195b9b12ef15367c2" />
+    <option name="lastIndexTimestamp" value="1749109490811" />
+    <option name="repoAccumulatedChanges" value="159" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />

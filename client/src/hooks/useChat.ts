@@ -13,8 +13,16 @@ export function useChat() {
   const [activeAgent, setActiveAgent] = useState<AITutor | null>(null);
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]); // Local state for chat messages
 
+  // Define the expected tutors response type
+  interface TutorsResponse {
+    success?: boolean;
+    data?: AITutor[];
+    count?: number;
+    timestamp?: string;
+  }
+
   // Fetch tutors - always fetch from real backend
-  const { data: tutorsResponse, isLoading: isLoadingTutors } = useQuery({
+  const { data: tutorsResponse, isLoading: isLoadingTutors } = useQuery<TutorsResponse | AITutor[]>({
     queryKey: ["/api/tutors"],
     enabled: true, // Always enable fetching from real backend
     retry: 3,
@@ -27,8 +35,8 @@ export function useChat() {
     if (!tutorsResponse) return [];
     
     // Handle response format: { success: true, data: [...] }
-    if (tutorsResponse.success && Array.isArray(tutorsResponse.data)) {
-      return tutorsResponse.data;
+    if (typeof tutorsResponse === 'object' && 'success' in tutorsResponse && 'data' in tutorsResponse) {
+      return Array.isArray(tutorsResponse.data) ? tutorsResponse.data : [];
     }
     
     // Handle direct array response
