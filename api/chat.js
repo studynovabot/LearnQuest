@@ -1,11 +1,9 @@
+// Comprehensive version of the chat API using all available providers
 import dotenv from 'dotenv';
 dotenv.config();
 
 // Vercel serverless function for AI chat
 import { handleCors } from '../utils/cors.js';
-import { initializeFirebase, getFirestoreDb, getUserPerformanceData } from '../utils/firebase.js';
-import { getSubjectFromAgent, extractQuestionData } from '../utils/question-utils.js';
-import { trackUserInteraction } from '../utils/analytics.js';
 
 // Agent-specific system prompts for all 15 AI tutors - Engaging Study Buddy Style
 const AGENT_PROMPTS = {
@@ -47,40 +45,30 @@ const INITIAL_TIMEOUT = 30000; // 30 seconds
 // Helper function to delay between retries
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Verify Groq API connection
-async function verifyGroqAPI(apiKey) {
-  try {
-    const response = await fetch('https://api.groq.com/openai/v1/models', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('✅ Groq API connection successful. Available models:', data);
-      return { success: true, models: data };
-    } else {
-      const error = await response.text();
-      console.error('❌ Groq API connection failed:', error);
-      return { success: false, error };
-    }
-  } catch (error) {
-    console.error('❌ Groq API verification error:', error);
-    return { success: false, error: error.message };
-  }
+// Get subject from agent ID
+function getSubjectFromAgent(agentId) {
+  const subjectMap = {
+    '1': 'general',
+    '2': 'mathematics',
+    '3': 'science',
+    '4': 'language',
+    '5': 'history',
+    '6': 'geography',
+    '7': 'physics',
+    '8': 'chemistry',
+    '9': 'biology',
+    '10': 'english',
+    '11': 'programming',
+    '12': 'art',
+    '13': 'music',
+    '14': 'sports',
+    '15': 'motivation'
+  };
+  
+  return subjectMap[agentId] || 'general';
 }
 
-// Placeholder implementations for core AI helper functions
-
-async function getPersonalizedContext(db, userId, subject, content) {
-  console.warn('[AI STUB] getPersonalizedContext called, returning empty context.');
-  // In a real implementation, this would fetch user-specific context from Firebase/DB.
-  return ''; 
-}
-
+// Try Groq API
 async function tryGroqAPI(content, systemPrompt, apiKey) {
   if (!apiKey) {
     console.error('[Groq API] Error: API key is missing.');
@@ -88,11 +76,11 @@ async function tryGroqAPI(content, systemPrompt, apiKey) {
   }
 
   const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-  const model = 'llama-3-70b-8192'; // Primary model (llama-3.3-70b-versatile)
-  const fallbackModel = 'llama3-8b-8192'; // Fallback model (llama-3.1-8b-instant)
-
+  const model = 'llama3-8b-8192'; // Use the 8B model for faster responses
+  
   try {
     console.log(`[Groq API] Attempting to call with model ${model}`);
+    const startTime = Date.now();
     const response = await fetch(GROQ_API_URL, {
       method: 'POST',
       headers: {
@@ -106,66 +94,39 @@ async function tryGroqAPI(content, systemPrompt, apiKey) {
           { role: 'user', content: content },
         ],
         temperature: 0.7,
-        max_tokens: 32768
+        max_tokens: 1000
       }),
     });
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('text/html')) {
-      const html = await response.text();
-      console.error('[Groq API] Received HTML instead of JSON:', html.substring(0, 200));
-      return null;
-    }
+    const endTime = Date.now();
+    const responseTime = endTime - startTime;
+    
     if (!response.ok) {
-      // Try fallback model if primary fails
-      console.log(`[Groq API] Primary model failed with status ${response.status}, trying fallback ${fallbackModel}`);
-      const fallbackResponse = await fetch(GROQ_API_URL, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: fallbackModel,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: content },
-          ],
-          temperature: 0.7,
-          max_tokens: 8192
-        }),
-      });
-      const fallbackContentType = fallbackResponse.headers.get('content-type');
-      if (fallbackContentType && fallbackContentType.includes('text/html')) {
-        const html = await fallbackResponse.text();
-        console.error('[Groq API] Fallback returned HTML instead of JSON:', html.substring(0, 200));
-        return null;
-      }
-      if (!fallbackResponse.ok) {
-        const errorBody = await fallbackResponse.text();
-        console.error(`[Groq API] Fallback model failed with status ${fallbackResponse.status}. Body: ${errorBody.substring(0,200)}`);
-        return null;
-      }
-      const fallbackData = await fallbackResponse.json();
-      if (fallbackData.choices?.[0]?.message?.content) {
-        console.log('[Groq API] Successfully received response from fallback model');
-        return fallbackData.choices[0].message.content; // Return only content
-      }
-      console.error('[Groq API] Error: Invalid response structure from fallback model', fallbackData);
-      return null;
+      const errorBody = await response.text();
+      console.error(`[Groq API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
+      return { success: false, error: errorBody, responseTime };
     }
+    
     const data = await response.json();
     if (data.choices?.[0]?.message?.content) {
-      console.log('[Groq API] Successfully received response from primary model');
-      return data.choices[0].message.content; // Return only content
+      console.log(`[Groq API] Successfully received response (${responseTime}ms)`);
+      return { 
+        success: true, 
+        response: data.choices[0].message.content,
+        responseTime,
+        provider: 'groq',
+        model
+      };
     }
-    console.error('[Groq API] Error: Invalid response structure from primary model', data);
-    return null;
+    
+    console.error('[Groq API] Error: Invalid response structure', data);
+    return { success: false, error: 'Invalid response structure', responseTime };
   } catch (error) {
     console.error('[Groq API] Network error:', error);
-    return null;
+    return { success: false, error: error.message };
   }
 }
 
+// Try Together API
 async function tryTogetherAPI(content, systemPrompt, apiKey) {
   if (!apiKey) {
     console.error('[Together API] Error: API key is missing.');
@@ -173,10 +134,11 @@ async function tryTogetherAPI(content, systemPrompt, apiKey) {
   }
 
   const TOGETHER_API_URL = 'https://api.together.xyz/v1/chat/completions';
-  const model = 'meta-llama/Llama-3-70b-chat-hf';
+  const model = 'meta-llama/Llama-3-8b-chat-hf'; // Use 8B model for faster responses
 
   try {
     console.log(`[Together API] Attempting to call with model ${model}`);
+    const startTime = Date.now();
     const response = await fetch(TOGETHER_API_URL, {
       method: 'POST',
       headers: {
@@ -190,33 +152,39 @@ async function tryTogetherAPI(content, systemPrompt, apiKey) {
           { role: 'user', content: content },
         ],
         temperature: 0.7,
-        max_tokens: 4096
+        max_tokens: 1000
       }),
     });
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('text/html')) {
-      const html = await response.text();
-      console.error('[Together API] Received HTML instead of JSON:', html.substring(0, 200));
-      return null;
-    }
+    const endTime = Date.now();
+    const responseTime = endTime - startTime;
+    
     if (!response.ok) {
       const errorBody = await response.text();
       console.error(`[Together API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
-      return null;
+      return { success: false, error: errorBody, responseTime };
     }
+    
     const data = await response.json();
     if (data.choices?.[0]?.message?.content) {
-      console.log('[Together API] Successfully received response');
-      return data.choices[0].message.content; // Return only content
+      console.log(`[Together API] Successfully received response (${responseTime}ms)`);
+      return { 
+        success: true, 
+        response: data.choices[0].message.content,
+        responseTime,
+        provider: 'together',
+        model
+      };
     }
+    
     console.error('[Together API] Error: Invalid response structure', data);
-    return null;
+    return { success: false, error: 'Invalid response structure', responseTime };
   } catch (error) {
     console.error('[Together API] Network error:', error);
-    return null;
+    return { success: false, error: error.message };
   }
 }
 
+// Try OpenRouter API
 async function tryOpenRouterAPI(content, systemPrompt, apiKey) {
   if (!apiKey) {
     console.error('[OpenRouter API] Error: API key is missing.');
@@ -224,61 +192,71 @@ async function tryOpenRouterAPI(content, systemPrompt, apiKey) {
   }
 
   const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-  const model = 'openrouter-llama3-70b';
+  const model = 'openrouter/auto'; // Use auto-routing for best performance
 
   try {
     console.log(`[OpenRouter API] Attempting to call with model ${model}`);
+    const startTime = Date.now();
     const response = await fetch(OPENROUTER_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://studynovaai.vercel.app/',
+        'X-Title': 'StudyNova AI'
       },
       body: JSON.stringify({
-        model,
+        model: model,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: content },
         ],
         temperature: 0.7,
-        max_tokens: 4096
+        max_tokens: 1000
       }),
     });
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('text/html')) {
-      const html = await response.text();
-      console.error('[OpenRouter API] Received HTML instead of JSON:', html.substring(0, 200));
-      return null;
-    }
+    const endTime = Date.now();
+    const responseTime = endTime - startTime;
+    
     if (!response.ok) {
       const errorBody = await response.text();
       console.error(`[OpenRouter API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
-      return null;
+      return { success: false, error: errorBody, responseTime };
     }
+    
     const data = await response.json();
     if (data.choices?.[0]?.message?.content) {
-      console.log('[OpenRouter API] Successfully received response');
-      return data.choices[0].message.content; // Return only content
+      console.log(`[OpenRouter API] Successfully received response (${responseTime}ms)`);
+      return { 
+        success: true, 
+        response: data.choices[0].message.content,
+        responseTime,
+        provider: 'openrouter',
+        model: data.model || model
+      };
     }
+    
     console.error('[OpenRouter API] Error: Invalid response structure', data);
-    return null;
+    return { success: false, error: 'Invalid response structure', responseTime };
   } catch (error) {
     console.error('[OpenRouter API] Network error:', error);
-    return null;
+    return { success: false, error: error.message };
   }
 }
 
+// Try Fireworks API
 async function tryFireworksAPI(content, systemPrompt, apiKey) {
   if (!apiKey) {
     console.error('[Fireworks API] Error: API key is missing.');
     return null;
   }
 
-  const FIREWORKS_API_URL = 'https://api.fireworks.ai/v1/chat/completions';
-  const model = 'accounts/fireworks/models/llama-v3-70b-instruct';
+  const FIREWORKS_API_URL = 'https://api.fireworks.ai/inference/v1/chat/completions';
+  const model = 'accounts/fireworks/models/llama-v3-8b-instruct'; // Use 8B model for faster responses
 
   try {
     console.log(`[Fireworks API] Attempting to call with model ${model}`);
+    const startTime = Date.now();
     const response = await fetch(FIREWORKS_API_URL, {
       method: 'POST',
       headers: {
@@ -286,39 +264,45 @@ async function tryFireworksAPI(content, systemPrompt, apiKey) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model,
+        model: model,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: content },
         ],
         temperature: 0.7,
-        max_tokens: 4096
+        max_tokens: 1000
       }),
     });
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('text/html')) {
-      const html = await response.text();
-      console.error('[Fireworks API] Received HTML instead of JSON:', html.substring(0, 200));
-      return null;
-    }
+    const endTime = Date.now();
+    const responseTime = endTime - startTime;
+    
     if (!response.ok) {
       const errorBody = await response.text();
       console.error(`[Fireworks API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
-      return null;
+      return { success: false, error: errorBody, responseTime };
     }
+    
     const data = await response.json();
     if (data.choices?.[0]?.message?.content) {
-      console.log('[Fireworks API] Successfully received response');
-      return data.choices[0].message.content; // Return only content
+      console.log(`[Fireworks API] Successfully received response (${responseTime}ms)`);
+      return { 
+        success: true, 
+        response: data.choices[0].message.content,
+        responseTime,
+        provider: 'fireworks',
+        model
+      };
     }
+    
     console.error('[Fireworks API] Error: Invalid response structure', data);
-    return null;
+    return { success: false, error: 'Invalid response structure', responseTime };
   } catch (error) {
     console.error('[Fireworks API] Network error:', error);
-    return null;
+    return { success: false, error: error.message };
   }
 }
 
+// Try DeepInfra API
 async function tryDeepInfraAPI(content, systemPrompt, apiKey) {
   if (!apiKey) {
     console.error('[DeepInfra API] Error: API key is missing.');
@@ -326,10 +310,11 @@ async function tryDeepInfraAPI(content, systemPrompt, apiKey) {
   }
 
   const DEEPINFRA_API_URL = 'https://api.deepinfra.com/v1/openai/chat/completions';
-  const model = 'meta-llama/llama-3-70b-instruct';
+  const model = 'meta-llama/Llama-3-8b-chat-hf'; // Use 8B model for faster responses
 
   try {
     console.log(`[DeepInfra API] Attempting to call with model ${model}`);
+    const startTime = Date.now();
     const response = await fetch(DEEPINFRA_API_URL, {
       method: 'POST',
       headers: {
@@ -337,36 +322,41 @@ async function tryDeepInfraAPI(content, systemPrompt, apiKey) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model,
+        model: model,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: content },
         ],
         temperature: 0.7,
-        max_tokens: 4096
+        max_tokens: 1000
       }),
     });
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('text/html')) {
-      const html = await response.text();
-      console.error('[DeepInfra API] Received HTML instead of JSON:', html.substring(0, 200));
-      return null;
-    }
+    const endTime = Date.now();
+    const responseTime = endTime - startTime;
+    
     if (!response.ok) {
       const errorBody = await response.text();
       console.error(`[DeepInfra API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
-      return null;
+      return { success: false, error: errorBody, responseTime };
     }
+    
     const data = await response.json();
     if (data.choices?.[0]?.message?.content) {
-      console.log('[DeepInfra API] Successfully received response');
-      return data.choices[0].message.content; // Return only content
+      console.log(`[DeepInfra API] Successfully received response (${responseTime}ms)`);
+      return { 
+        success: true, 
+        response: data.choices[0].message.content,
+        responseTime,
+        provider: 'deepinfra',
+        model
+      };
     }
+    
     console.error('[DeepInfra API] Error: Invalid response structure', data);
-    return null;
+    return { success: false, error: 'Invalid response structure', responseTime };
   } catch (error) {
     console.error('[DeepInfra API] Network error:', error);
-    return null;
+    return { success: false, error: error.message };
   }
 }
 
@@ -403,8 +393,6 @@ async function handler(req, res) {
     
     // Log request details for debugging
     console.log(`[CHAT API] Received ${req.method} request to /api/chat at ${new Date().toISOString()}`);
-    console.log(`[CHAT API] Headers:`, req.headers);
-    console.log(`[CHAT API] URL:`, req.url);
     
     // Allow both GET and POST requests
     let content, agentId, userId;
@@ -413,11 +401,6 @@ async function handler(req, res) {
       try {
         // Log the raw body for debugging
         console.log('[CHAT API] POST request body type:', typeof req.body);
-        if (typeof req.body === 'string') {
-          console.log('[CHAT API] Raw body (first 100 chars):', req.body.substring(0, 100));
-        } else if (req.body) {
-          console.log('[CHAT API] Body keys:', Object.keys(req.body));
-        }
         
         // Handle string body (needs parsing)
         if (typeof req.body === 'string') {
@@ -489,111 +472,42 @@ async function handler(req, res) {
       console.log('[CHAT API] Using default userId: guest');
       userId = 'guest'; // Default guest user
     }
-  } catch (error) {
-    console.error('Error parsing request:', error);
-    return res.status(400).json({
-      error: 'Invalid request format',
-      details: error.message,
-      received: { 
-        method: req.method,
-        body: req.body,
-        query: req.query
-      }
-    });
-  }
 
-  // Get API keys from environment
-  const GROQ_API_KEY = process.env.GROQ_API_KEY;
-  const TOGETHER_API_KEY = process.env.TOGETHER_API_KEY;
+    // Get API keys from environment
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    const TOGETHER_API_KEY = process.env.TOGETHER_AI_API_KEY; // Note the different env var name
+    const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+    const FIREWORKS_API_KEY = process.env.FIREWORKS_API_KEY;
+    const DEEPINFRA_API_KEY = process.env.DEEPINFRA_API_KEY;
 
-  if (!GROQ_API_KEY && !TOGETHER_API_KEY) {
-    return res.status(500).json({ 
-      error: 'No AI API keys configured on server' 
-    });
-  }
+    if (!GROQ_API_KEY && !TOGETHER_API_KEY && !OPENROUTER_API_KEY && !FIREWORKS_API_KEY && !DEEPINFRA_API_KEY) {
+      return res.status(500).json({ 
+        error: 'No AI API keys configured on server' 
+      });
+    }
 
-  try {
     // Log the processing attempt
     console.log(`[CHAT API] Processing request for agent ${agentId} from user ${userId}`);
     
-    // Initialize Firebase with error handling
-    try {
-      await initializeFirebase();
-      console.log('[CHAT API] Firebase initialized successfully');
-    } catch (firebaseError) {
-      console.error('[CHAT API] Firebase initialization error:', firebaseError);
-      // Continue without Firebase if it fails
-    }
-    
-    // Get Firestore DB with error handling
-    let db = null;
-    try {
-      db = getFirestoreDb();
-      console.log('[CHAT API] Firestore DB connection established');
-    } catch (dbError) {
-      console.error('[CHAT API] Firestore DB connection error:', dbError);
-      // Continue without DB if it fails
-    }
-
     // Get the subject from agent ID
     const subject = getSubjectFromAgent(agentId);
     console.log(`[CHAT API] Subject for agent ${agentId}: ${subject}`);
-    
-    // Get personalized context with error handling
-    let personalizedContext = '';
-    try {
-      if (db) {
-        personalizedContext = await getPersonalizedContext(db, userId, subject, content);
-        console.log('[CHAT API] Retrieved personalized context');
-      }
-    } catch (contextError) {
-      console.error('[CHAT API] Error getting personalized context:', contextError);
-      // Continue without personalized context if it fails
-    }
     
     // Get the system prompt for the agent
     const systemPrompt = AGENT_PROMPTS[agentId] || AGENT_PROMPTS['1'];
     console.log(`[CHAT API] Using system prompt for agent ${agentId}`);
     
-    // Prepare the full content with context
-    const fullContent = personalizedContext ? `${personalizedContext}\n\n${content}` : content;
-    
-    // Track user interaction with error handling
-    try {
-      if (db) {
-        await trackUserInteraction(db, userId, {
-          type: 'chat_message',
-          agentId,
-          content,
-          timestamp: new Date().toISOString()
-        });
-        console.log('[CHAT API] User interaction tracked successfully');
-      }
-    } catch (trackingError) {
-      console.error('[CHAT API] Error tracking user interaction:', trackingError);
-      // Continue without tracking if it fails
-    }
-
     // Get API keys from environment
-    const GROQ_API_KEY = process.env.GROQ_API_KEY;
-    const TOGETHER_API_KEY = process.env.TOGETHER_API_KEY;
-    const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-    const FIREWORKS_API_KEY = process.env.FIREWORKS_API_KEY;
-    
     console.log('[CHAT API] Available API providers:', {
       groq: !!GROQ_API_KEY,
       together: !!TOGETHER_API_KEY,
       openrouter: !!OPENROUTER_API_KEY,
-      fireworks: !!FIREWORKS_API_KEY
+      fireworks: !!FIREWORKS_API_KEY,
+      deepinfra: !!DEEPINFRA_API_KEY
     });
 
-    if (!GROQ_API_KEY && !TOGETHER_API_KEY && !OPENROUTER_API_KEY && !FIREWORKS_API_KEY) {
+    if (!GROQ_API_KEY && !TOGETHER_API_KEY && !OPENROUTER_API_KEY && !FIREWORKS_API_KEY && !DEEPINFRA_API_KEY) {
       console.warn('[CHAT API] No API keys configured, using fallback response');
-      
-      // Generate a fallback response based on the agent
-      const agentName = agentId === '1' ? 'Nova AI' : 
-                        agentId === '2' ? 'Math Mentor' :
-                        agentId === '3' ? 'Science Sage' : 'Nova AI';
       
       // Create a friendly fallback response
       const fallbackResponses = [
@@ -604,93 +518,43 @@ async function handler(req, res) {
       
       // Select a random fallback response
       const aiResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-      const responseSource = "fallback";
       
       // Return the fallback response with 200 status (not 500) to avoid client-side errors
       return res.status(200).json({ 
         error: false,
         response: aiResponse,
         timestamp: new Date().toISOString(),
-        source: responseSource
+        source: "fallback"
       });
     }
 
-    // Try calling AI APIs with retries
-    let aiResponse = null;
-    let retries = 0;
-    let timeout = INITIAL_TIMEOUT;
-    let responseSource = null;
+    // Try calling all AI APIs in parallel and collect results
+    console.log('[CHAT API] Starting API call attempts for all providers');
     
-    console.log('[CHAT API] Starting API call attempts');
+    const apiResults = [];
     
-    while (retries < MAX_RETRIES && !aiResponse) {
-      try {
-        console.log(`[CHAT API] Attempt ${retries + 1}/${MAX_RETRIES}`);
-        
-        // Try Groq API first if key is available
-        if (GROQ_API_KEY && !aiResponse) {
-          console.log('[CHAT API] Trying Groq API');
-          aiResponse = await tryGroqAPI(fullContent, systemPrompt, GROQ_API_KEY);
-          if (aiResponse) {
-            responseSource = "groq";
-            console.log('[CHAT API] Received response from Groq API');
-          }
-        }
-        
-        // If Groq fails, try Together API
-        if (!aiResponse && TOGETHER_API_KEY) {
-          console.log('[CHAT API] Trying Together API');
-          aiResponse = await tryTogetherAPI(fullContent, systemPrompt, TOGETHER_API_KEY);
-          if (aiResponse) {
-            responseSource = "together";
-            console.log('[CHAT API] Received response from Together API');
-          }
-        }
-        
-        // If Together fails, try OpenRouter API
-        if (!aiResponse && OPENROUTER_API_KEY) {
-          console.log('[CHAT API] Trying OpenRouter API');
-          aiResponse = await tryOpenRouterAPI(fullContent, systemPrompt, OPENROUTER_API_KEY);
-          if (aiResponse) {
-            responseSource = "openrouter";
-            console.log('[CHAT API] Received response from OpenRouter API');
-          }
-        }
-        
-        // If OpenRouter fails, try Fireworks API
-        if (!aiResponse && FIREWORKS_API_KEY) {
-          console.log('[CHAT API] Trying Fireworks API');
-          aiResponse = await tryFireworksAPI(fullContent, systemPrompt, FIREWORKS_API_KEY);
-          if (aiResponse) {
-            responseSource = "fireworks";
-            console.log('[CHAT API] Received response from Fireworks API');
-          }
-        }
-        
-        // If we got a response, break out of the loop
-        if (aiResponse) break;
-        
-      } catch (error) {
-        console.error(`[CHAT API] Attempt ${retries + 1} failed:`, error);
-      }
-      
-      // Wait before retrying with exponential backoff
-      retries++;
-      if (retries < MAX_RETRIES) {
-        console.log(`[CHAT API] Retrying in ${timeout / 1000} seconds...`);
-        await delay(timeout);
-        timeout *= 2; // Exponential backoff
-      }
-    }
-
-    // If all API calls failed, use a fallback response
-    if (!aiResponse) {
+    // Try all providers in parallel
+    const [groqResult, togetherResult, openRouterResult, fireworksResult, deepInfraResult] = await Promise.all([
+      GROQ_API_KEY ? tryGroqAPI(content, systemPrompt, GROQ_API_KEY) : null,
+      TOGETHER_API_KEY ? tryTogetherAPI(content, systemPrompt, TOGETHER_API_KEY) : null,
+      OPENROUTER_API_KEY ? tryOpenRouterAPI(content, systemPrompt, OPENROUTER_API_KEY) : null,
+      FIREWORKS_API_KEY ? tryFireworksAPI(content, systemPrompt, FIREWORKS_API_KEY) : null,
+      DEEPINFRA_API_KEY ? tryDeepInfraAPI(content, systemPrompt, DEEPINFRA_API_KEY) : null
+    ]);
+    
+    // Collect successful results
+    if (groqResult && groqResult.success) apiResults.push(groqResult);
+    if (togetherResult && togetherResult.success) apiResults.push(togetherResult);
+    if (openRouterResult && openRouterResult.success) apiResults.push(openRouterResult);
+    if (fireworksResult && fireworksResult.success) apiResults.push(fireworksResult);
+    if (deepInfraResult && deepInfraResult.success) apiResults.push(deepInfraResult);
+    
+    // Log results
+    console.log(`[CHAT API] API results: ${apiResults.length} successful responses`);
+    
+    // If no successful results, use fallback
+    if (apiResults.length === 0) {
       console.warn('[CHAT API] All API attempts failed, using fallback response');
-      
-      // Generate a fallback response based on the agent
-      const agentName = agentId === '1' ? 'Nova AI' : 
-                        agentId === '2' ? 'Math Mentor' :
-                        agentId === '3' ? 'Science Sage' : 'Nova AI';
       
       // Create a friendly fallback response
       const fallbackResponses = [
@@ -700,33 +564,55 @@ async function handler(req, res) {
       ];
       
       // Select a random fallback response
-      aiResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-      responseSource = "fallback";
+      const aiResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
       
       // Return the fallback response with 200 status (not 500) to avoid client-side errors
       return res.status(200).json({ 
         error: false,
         response: aiResponse,
         timestamp: new Date().toISOString(),
-        source: responseSource
+        source: "fallback",
+        allResults: {
+          groq: groqResult,
+          together: togetherResult,
+          openrouter: openRouterResult,
+          fireworks: fireworksResult,
+          deepinfra: deepInfraResult
+        }
       });
     }
 
+    // Sort results by response time (fastest first)
+    apiResults.sort((a, b) => a.responseTime - b.responseTime);
+    
+    // Use the fastest response
+    const bestResult = apiResults[0];
+    console.log(`[CHAT API] Using fastest response from ${bestResult.provider} (${bestResult.responseTime}ms)`);
+    
     // Check if the response contains generic AI disclaimers and fix if needed
-    // Ensure aiResponse is a string before calling checkForGenericResponse
+    let aiResponse = bestResult.response;
     if (aiResponse && typeof aiResponse === 'string' && checkForGenericResponse(aiResponse)) {
       console.log('[CHAT API] Detected generic AI response, enhancing it');
       // Append a more personalized touch
       aiResponse += "\n\nAnyway, I'm here to help you learn! What specific aspects of this topic would you like to explore further?";
     }
 
-    // Return the successful response
+    // Return the successful response with all results for comparison
     console.log('[CHAT API] Returning successful response');
     return res.status(200).json({ 
       error: false,
       response: aiResponse,
       timestamp: new Date().toISOString(),
-      source: responseSource
+      source: bestResult.provider,
+      model: bestResult.model,
+      responseTime: bestResult.responseTime,
+      allResults: {
+        groq: groqResult,
+        together: togetherResult,
+        openrouter: openRouterResult,
+        fireworks: fireworksResult,
+        deepinfra: deepInfraResult
+      }
     });
     
   } catch (error) {
