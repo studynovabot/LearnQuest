@@ -168,7 +168,18 @@ const Settings = () => {
           try {
             // Try to parse as JSON
             const errorData = JSON.parse(text);
-            errorMessage = errorData.error || errorMessage;
+            
+            // Handle the new error format
+            if (errorData.error && typeof errorData.error === 'object') {
+              errorMessage = errorData.error.message || errorMessage;
+              
+              // Include details if available
+              if (errorData.error.details) {
+                errorMessage += `: ${errorData.error.details}`;
+              }
+            } else if (errorData.error && typeof errorData.error === 'string') {
+              errorMessage = errorData.error;
+            }
           } catch (e) {
             // If not JSON, use the text as is
             errorMessage = text;

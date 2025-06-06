@@ -1,28 +1,43 @@
 import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
 import { sanitizeUserData } from '../utils/privacy.js';
+import { loadEnvVariables } from '../utils/env-loader.js';
+
+// Ensure environment variables are loaded
+loadEnvVariables();
 
 export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
   try {
-    // Initialize Firebase
+    // Initialize Firebase - ensure it's properly initialized
     const app = initializeFirebase();
     if (!app) {
       console.error('Failed to initialize Firebase app');
-      return res.status(500).json({ error: 'Failed to initialize Firebase' });
+      return res.status(500).json({ 
+        error: { 
+          code: "500", 
+          message: "Failed to initialize Firebase. Check your Firebase configuration." 
+        } 
+      });
     }
     
+    // Get Firestore DB instance
     const db = getFirestoreDb();
     if (!db) {
       console.error('Failed to get Firestore database instance');
-      return res.status(500).json({ error: 'Failed to connect to database' });
+      return res.status(500).json({ 
+        error: { 
+          code: "500", 
+          message: "Failed to connect to database. Firestore may not be properly configured." 
+        } 
+      });
     }
 
     // Get user ID from Authorization header
@@ -42,21 +57,56 @@ export default async function handler(req, res) {
         // Import Firestore functions
         const { doc, getDoc } = await import('firebase/firestore');
         
-        // Get user document
-        const userDocRef = doc(db, 'users', userId);
-        const userDocSnap = await getDoc(userDocRef);
-        
-        if (!userDocSnap.exists()) {
-          return res.status(404).json({ error: 'User not found' });
+        // Verify Firestore is initialized
+        if (!db) {
+          console.error('Firestore not initialized when trying to get user profile');
+          return res.status(500).json({ 
+            error: { 
+              code: "500", 
+              message: "Database connection error", 
+              details: "Could not connect to Firestore database" 
+            } 
+          });
         }
-
-        const userData = userDocSnap.data();
-        const sanitizedUser = sanitizeUserData(userData);
         
-        return res.status(200).json(sanitizedUser);
+        try {
+          // Get user document
+          const userDocRef = doc(db, 'users', userId);
+          const userDocSnap = await getDoc(userDocRef);
+          
+          if (!userDocSnap.exists()) {
+            return res.status(404).json({ 
+              error: { 
+                code: "404", 
+                message: "User not found", 
+                details: `No user found with ID: ${userId}` 
+              } 
+            });
+          }
+  
+          const userData = userDocSnap.data();
+          const sanitizedUser = sanitizeUserData(userData);
+          
+          return res.status(200).json(sanitizedUser);
+        } catch (firestoreError) {
+          console.error('Firestore operation error:', firestoreError);
+          return res.status(500).json({ 
+            error: { 
+              code: "500", 
+              message: "Database operation failed", 
+              details: firestoreError.message || "Error performing Firestore operation" 
+            } 
+          });
+        }
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        return res.status(500).json({ error: 'Failed to fetch user profile', details: error.message });
+        return res.status(500).json({ 
+          error: { 
+            code: "500", 
+            message: "Failed to fetch user profile", 
+            details: error.message || "Unknown error occurred" 
+          } 
+        });
       }
     }
 
@@ -90,47 +140,82 @@ export default async function handler(req, res) {
         // Import Firestore functions
         const { doc, getDoc, updateDoc, collection, Timestamp } = await import('firebase/firestore');
         
-        // Check if user exists
-        const userDocRef = doc(db, 'users', userId);
-        const userDocSnap = await getDoc(userDocRef);
-        
-        if (!userDocSnap.exists()) {
-          return res.status(404).json({ error: 'User not found' });
-        }
-
-        // Prepare update data
-        const updateData = {
-          displayName: displayName.trim(),
-          updatedAt: Timestamp.now()
-        };
-
-        // Add optional fields if provided
-        if (className) {
-          updateData.className = className;
+        // Verify Firestore is initialized
+        if (!db) {
+          console.error('Firestore not initialized when trying to update user profile');
+          return res.status(500).json({ 
+            error: { 
+              code: "500", 
+              message: "Database connection error", 
+              details: "Could not connect to Firestore database" 
+            } 
+          });
         }
         
-        if (board) {
-          updateData.board = board;
+        try {
+          // Check if user exists
+          const userDocRef = doc(db, 'users', userId);
+          const userDocSnap = await getDoc(userDocRef);
+          
+          if (!userDocSnap.exists()) {
+            return res.status(404).json({ 
+              error: { 
+                code: "404", 
+                message: "User not found", 
+                details: `No user found with ID: ${userId}` 
+              } 
+            });
+          }
+  
+          // Prepare update data
+          const updateData = {
+            displayName: displayName.trim(),
+            updatedAt: Timestamp.now()
+          };
+  
+          // Add optional fields if provided
+          if (className) {
+            updateData.className = className;
+          }
+          
+          if (board) {
+            updateData.board = board;
+          }
+  
+          // Update user document
+          await updateDoc(userDocRef, updateData);
+  
+          // Fetch updated user data
+          const updatedUserDocSnap = await getDoc(userDocRef);
+          const updatedUserData = updatedUserDocSnap.data();
+          const sanitizedUser = sanitizeUserData(updatedUserData);
+  
+          console.log(`✅ User profile updated successfully for user: ${userId}`);
+          
+          return res.status(200).json({
+            message: 'Profile updated successfully',
+            user: sanitizedUser
+          });
+        } catch (firestoreError) {
+          console.error('Firestore operation error:', firestoreError);
+          return res.status(500).json({ 
+            error: { 
+              code: "500", 
+              message: "Database operation failed", 
+              details: firestoreError.message || "Error performing Firestore operation" 
+            } 
+          });
         }
-
-        // Update user document
-        await updateDoc(userDocRef, updateData);
-
-        // Fetch updated user data
-        const updatedUserDocSnap = await getDoc(userDocRef);
-        const updatedUserData = updatedUserDocSnap.data();
-        const sanitizedUser = sanitizeUserData(updatedUserData);
-
-        console.log(`✅ User profile updated successfully for user: ${userId}`);
-        
-        return res.status(200).json({
-          message: 'Profile updated successfully',
-          user: sanitizedUser
-        });
 
       } catch (error) {
         console.error('Error updating user profile:', error);
-        return res.status(500).json({ error: 'Failed to update user profile' });
+        return res.status(500).json({ 
+          error: { 
+            code: "500", 
+            message: "Failed to update user profile", 
+            details: error.message || "Unknown error occurred" 
+          } 
+        });
       }
     }
 
@@ -139,6 +224,12 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('User profile API error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ 
+      error: { 
+        code: "500", 
+        message: "A server error has occurred", 
+        details: error.message || "Unknown internal server error" 
+      } 
+    });
   }
 }

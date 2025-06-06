@@ -3,7 +3,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
-import { firebaseConfig } from '../firebase-config';
+import { firebaseConfig } from '../firebase-config.js';
 
 // Initialize Firebase
 let firebaseApp;
@@ -16,6 +16,20 @@ export function initializeFirebase() {
     try {
       // Check if Firebase is already initialized to prevent duplicate apps
       if (getApps().length === 0) {
+        // Validate Firebase config before initializing
+        if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+          console.error('❌ Firebase configuration is incomplete:', 
+            JSON.stringify({
+              apiKeyPresent: !!firebaseConfig.apiKey,
+              projectIdPresent: !!firebaseConfig.projectId,
+              authDomainPresent: !!firebaseConfig.authDomain,
+              storageBucketPresent: !!firebaseConfig.storageBucket,
+              appIdPresent: !!firebaseConfig.appId
+            })
+          );
+          return null;
+        }
+        
         // Create a new app instance
         firebaseApp = initializeApp(firebaseConfig);
         console.log('🔥 Firebase initialized successfully');
@@ -27,7 +41,8 @@ export function initializeFirebase() {
     } catch (error) {
       console.error('❌ Firebase initialization error:', error);
       // Don't throw error to prevent app from crashing
-      // Just log the error and continue without Firebase
+      // Just log the error and return null
+      return null;
     }
   }
   return firebaseApp;
@@ -35,16 +50,34 @@ export function initializeFirebase() {
 
 // Get Firestore instance
 export function getFirestoreDb() {
-  if (!firestoreDb && firebaseApp) {
-    try {
-      firestoreDb = getFirestore(firebaseApp);
-    } catch (error) {
-      console.error('❌ Firestore initialization error:', error);
-      // Return null instead of throwing to prevent app crashes
+  // If Firebase app is not initialized, we can't get Firestore
+  if (!firebaseApp) {
+    console.error('❌ Cannot initialize Firestore: Firebase app is not initialized');
+    return null;
+  }
+  
+  // If Firestore is already initialized, return it
+  if (firestoreDb) {
+    return firestoreDb;
+  }
+  
+  // Initialize Firestore
+  try {
+    firestoreDb = getFirestore(firebaseApp);
+    
+    // Verify that Firestore was initialized correctly
+    if (!firestoreDb) {
+      console.error('❌ Firestore initialization failed: getFirestore returned null or undefined');
       return null;
     }
+    
+    console.log('📄 Firestore initialized successfully');
+    return firestoreDb;
+  } catch (error) {
+    console.error('❌ Firestore initialization error:', error);
+    // Return null instead of throwing to prevent app crashes
+    return null;
   }
-  return firestoreDb;
 }
 
 // Get Auth instance
