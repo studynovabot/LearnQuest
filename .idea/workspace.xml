@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/tutors.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/tutors.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/premium-chat.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/ui/premium-chat.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/hooks/useChat.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/hooks/useChat.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/queryClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/lib/queryClient.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/ChatAgents.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/ChatAgents.tsx" afterDir="false" />
-    </list>
+    <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -122,7 +114,7 @@
       <workItem from="1749145652146" duration="2942000" />
       <workItem from="1749149022232" duration="5243000" />
       <workItem from="1749190457823" duration="381000" />
-      <workItem from="1749191171922" duration="1626000" />
+      <workItem from="1749191171922" duration="2335000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -707,8 +699,8 @@
       <map>
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749192095268" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749192095268" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749192994999" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749192994999" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/chat.js" value="1749153829847" />
         <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
@@ -737,9 +729,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1749146585035" />
       </map>
     </option>
-    <option name="lastCommitHash" value="a1ed4e0d5c270bbe6f04a3ac9f48ba9ca82f9056" />
-    <option name="lastIndexTimestamp" value="1749192698909" />
-    <option name="repoAccumulatedChanges" value="132" />
+    <option name="lastCommitHash" value="790942eab8a5a2bd6b8c4a37bf5115db4398b6da" />
+    <option name="lastIndexTimestamp" value="1749193059937" />
+    <option name="repoAccumulatedChanges" value="142" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />

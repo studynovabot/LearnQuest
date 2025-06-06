@@ -33,16 +33,9 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
   }
   const message = messageProp || ""; // Default to empty string
 
-  // Fast word-by-word typewriter effect with option to skip animation for long messages
+  // Word-by-word typewriter effect
   React.useEffect(() => {
     if (isUser || isTyping) {
-      setDisplayedText(message);
-      setIsComplete(true);
-      return;
-    }
-
-    // Skip animation for very long messages (over 500 characters)
-    if (message.length > 500) {
       setDisplayedText(message);
       setIsComplete(true);
       return;
@@ -51,23 +44,18 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
     setDisplayedText("");
     setIsComplete(false);
 
-    // Split the message into chunks (multiple words)
+    // Split the message into words
     const words = message.split(/(\s+)/); // Split by whitespace but keep the whitespace
     let wordIndex = 0;
     
-    // Very fast typing speed for chunk-by-chunk animation
-    const typingSpeed = 3; // Extremely fast typing speed
-    const wordsPerInterval = 5; // Display multiple words at once for faster rendering
+    // Moderate typing speed for word-by-word animation
+    const typingSpeed = 40; // Moderate typing speed for visible word-by-word effect
 
     const timer = setInterval(() => {
       if (wordIndex < words.length) {
-        // Add multiple words at once to the displayed text
-        let newText = '';
-        for (let i = 0; i < wordsPerInterval && wordIndex + i < words.length; i++) {
-          newText += words[wordIndex + i];
-        }
-        setDisplayedText(prev => prev + newText);
-        wordIndex += wordsPerInterval;
+        // Add one word at a time to the displayed text
+        setDisplayedText(prev => prev + words[wordIndex]);
+        wordIndex++;
       } else {
         setIsComplete(true);
         clearInterval(timer);
