@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -111,43 +112,34 @@ const Settings = () => {
     
     setSaving(true);
     try {
-      // Use the full URL to the API endpoint
-      const apiUrl = `${window.location.origin}/api/user-profile`;
-      console.log('Making profile update request to:', apiUrl);
+      console.log('Updating profile with data:', {
+        displayName: profile.displayName,
+        className: profile.className,
+        board: profile.board
+      });
       
-      const response = await fetch(apiUrl, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.id}`
-        },
-        body: JSON.stringify({
-          displayName: profile.displayName,
-          className: profile.className,
-          board: profile.board
-        })
+      // Use the apiRequest function instead of fetch
+      const response = await apiRequest('PUT', '/api/user-profile', {
+        displayName: profile.displayName,
+        className: profile.className,
+        board: profile.board
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Profile update successful:', result);
-        await refreshUser();
-        toast({
-          title: 'Profile Updated',
-          description: 'Your profile has been successfully updated.',
-        });
-      } else {
-        // Try to get error details from response
-        let errorMessage = 'Failed to update profile';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorMessage;
-          console.error('Profile update error:', errorData);
-        } catch (e) {
-          console.error('Could not parse error response:', e);
-        }
-        throw new Error(errorMessage);
-      }
+      // Check if response is OK
+      await throwIfResNotOk(response);
+      
+      // Parse the response
+      const result = await response.json();
+      console.log('Profile update successful:', result);
+      
+      // Refresh user data
+      await refreshUser();
+      
+      // Show success message
+      toast({
+        title: 'Profile Updated',
+        description: 'Your profile has been successfully updated.',
+      });
     } catch (error) {
       console.error('Profile update error:', error);
       toast({
@@ -159,6 +151,36 @@ const Settings = () => {
       setSaving(false);
     }
   };
+  
+  // Helper function to throw an error if the response is not OK
+  async function throwIfResNotOk(res: Response) {
+    if (!res.ok) {
+      let errorMessage = `Error ${res.status}: Failed to update profile`;
+      try {
+        const text = await res.text();
+        console.error("Response error details:", {
+          status: res.status,
+          statusText: res.statusText,
+          body: text,
+        });
+        
+        if (text && text.length > 0) {
+          try {
+            // Try to parse as JSON
+            const errorData = JSON.parse(text);
+            errorMessage = errorData.error || errorMessage;
+          } catch (e) {
+            // If not JSON, use the text as is
+            errorMessage = text;
+          }
+        }
+      } catch (e) {
+        console.error('Could not read error response:', e);
+      }
+      
+      throw new Error(errorMessage);
+    }
+  }
 
   // Handle password change
   const handlePasswordChange = async () => {
@@ -196,33 +218,31 @@ const Settings = () => {
 
     setSaving(true);
     try {
-      const response = await fetch('/api/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user?.id}`
-        },
-        body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
-        })
+      console.log('Changing password...');
+      
+      // Use the apiRequest function instead of fetch
+      const response = await apiRequest('POST', '/api/change-password', {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
       });
 
-      if (response.ok) {
-        setPasswordData({
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
-        });
-        toast({
-          title: 'Password Changed',
-          description: 'Your password has been successfully updated.',
-        });
-      } else {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to change password');
-      }
+      // Check if response is OK
+      await throwIfResNotOk(response);
+      
+      // Reset password fields
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      
+      // Show success message
+      toast({
+        title: 'Password Changed',
+        description: 'Your password has been successfully updated.',
+      });
     } catch (error) {
+      console.error('Password change error:', error);
       toast({
         title: 'Password Change Failed',
         description: error instanceof Error ? error.message : 'Failed to change password. Please try again.',
@@ -239,27 +259,27 @@ const Settings = () => {
     
     setLoading(true);
     try {
-      const response = await fetch('/api/delete-account', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${user.id}`
-        }
-      });
+      console.log('Deleting account...');
+      
+      // Use the apiRequest function instead of fetch
+      const response = await apiRequest('DELETE', '/api/delete-account');
 
-      if (response.ok) {
-        toast({
-          title: 'Account Deleted',
-          description: 'Your account has been permanently deleted.',
-        });
-        // Redirect to login page
-        window.location.href = '/login';
-      } else {
-        throw new Error('Failed to delete account');
-      }
+      // Check if response is OK
+      await throwIfResNotOk(response);
+      
+      // Show success message
+      toast({
+        title: 'Account Deleted',
+        description: 'Your account has been permanently deleted.',
+      });
+      
+      // Redirect to login page
+      window.location.href = '/login';
     } catch (error) {
+      console.error('Account deletion error:', error);
       toast({
         title: 'Deletion Failed',
-        description: 'Failed to delete your account. Please try again.',
+        description: error instanceof Error ? error.message : 'Failed to delete your account. Please try again.',
         variant: 'destructive'
       });
     } finally {
