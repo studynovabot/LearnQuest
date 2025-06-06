@@ -119,11 +119,26 @@ const Settings = () => {
       });
       
       // Use the apiRequest function instead of fetch
-      const response = await apiRequest('PUT', '/api/user-profile', {
+      let response = await apiRequest('PUT', '/api/user-profile', {
         displayName: profile.displayName,
         className: profile.className,
         board: profile.board
       });
+
+      // Check if we got a 404 (user not found) error
+      if (response.status === 404) {
+        console.log('User not found, retrying after a short delay...');
+        
+        // Wait a moment for the user to be created
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Retry the request
+        response = await apiRequest('PUT', '/api/user-profile', {
+          displayName: profile.displayName,
+          className: profile.className,
+          board: profile.board
+        });
+      }
 
       // Check if response is OK
       await throwIfResNotOk(response);
@@ -177,9 +192,14 @@ const Settings = () => {
               if (errorData.error.details) {
                 errorMessage += `: ${errorData.error.details}`;
                 
-                // Special handling for permission errors
-                if (errorData.error.details.includes("Missing or insufficient permissions")) {
+                // Special handling for specific errors
+                if (errorData.error.details && errorData.error.details.includes("Missing or insufficient permissions")) {
                   errorMessage = "Profile update failed: You don't have permission to update your profile. This may be due to Firebase security rules when testing locally.";
+                }
+                
+                // Handle user not found error
+                if (errorData.error.code === "404" && errorData.error.message === "User not found") {
+                  errorMessage = "Your profile is being created. Please wait a moment and try again.";
                 }
               }
             } else if (errorData.error && typeof errorData.error === 'string') {

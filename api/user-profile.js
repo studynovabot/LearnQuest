@@ -71,17 +71,42 @@ export default async function handler(req, res) {
           const userDocRef = db.collection('users').doc(userId);
           const userDocSnap = await userDocRef.get();
           
+          let userData;
+          
+          // If user doesn't exist, create a new user document
           if (!userDocSnap.exists) {
-            return res.status(404).json({ 
-              error: { 
-                code: "404", 
-                message: "User not found", 
-                details: `No user found with ID: ${userId}` 
-              } 
-            });
+            console.log(`User ${userId} not found in GET request. Creating new user document.`);
+            
+            // Create default user data
+            const newUserData = {
+              userId: userId,
+              displayName: 'New User',
+              email: `${userId}@example.com`, // Placeholder email
+              role: 'user',
+              isPro: false,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            };
+            
+            // Create the user document
+            try {
+              await userDocRef.set(newUserData);
+              console.log(`✅ New user created with ID: ${userId} during GET request`);
+              userData = newUserData;
+            } catch (createError) {
+              console.error('Error creating new user during GET:', createError);
+              return res.status(500).json({ 
+                error: { 
+                  code: "500", 
+                  message: "Failed to create user", 
+                  details: createError.message || "Error creating new user document" 
+                } 
+              });
+            }
+          } else {
+            userData = userDocSnap.data();
           }
   
-          const userData = userDocSnap.data();
           const sanitizedUser = sanitizeUserData(userData);
           
           return res.status(200).json(sanitizedUser);
@@ -169,14 +194,44 @@ export default async function handler(req, res) {
           const userDocRef = db.collection('users').doc(userId);
           const userDocSnap = await userDocRef.get();
           
+          // If user doesn't exist, create a new user document
           if (!userDocSnap.exists) {
-            return res.status(404).json({ 
-              error: { 
-                code: "404", 
-                message: "User not found", 
-                details: `No user found with ID: ${userId}` 
-              } 
-            });
+            console.log(`User ${userId} not found. Creating new user document.`);
+            
+            // Create default user data
+            const newUserData = {
+              userId: userId,
+              displayName: displayName.trim() || 'User',
+              email: `${userId}@example.com`, // Placeholder email
+              role: 'user',
+              isPro: false,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            };
+            
+            // Add optional fields if provided
+            if (className) {
+              newUserData.className = className;
+            }
+            
+            if (board) {
+              newUserData.board = board;
+            }
+            
+            // Create the user document
+            try {
+              await userDocRef.set(newUserData);
+              console.log(`✅ New user created with ID: ${userId}`);
+            } catch (createError) {
+              console.error('Error creating new user:', createError);
+              return res.status(500).json({ 
+                error: { 
+                  code: "500", 
+                  message: "Failed to create user", 
+                  details: createError.message || "Error creating new user document" 
+                } 
+              });
+            }
           }
   
           // Prepare update data

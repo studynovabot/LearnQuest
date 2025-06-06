@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/user-profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/user-profile.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/Settings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Settings.tsx" afterDir="false" />
-    </list>
+    <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -120,7 +115,7 @@
       <workItem from="1749149022232" duration="5243000" />
       <workItem from="1749190457823" duration="381000" />
       <workItem from="1749191171922" duration="3509000" />
-      <workItem from="1749194931718" duration="4018000" />
+      <workItem from="1749194931718" duration="4454000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -737,9 +732,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1749146585035" />
       </map>
     </option>
-    <option name="lastCommitHash" value="bfe335f9bcfcabb18f36af76e70f76222b507f28" />
-    <option name="lastIndexTimestamp" value="1749199574204" />
-    <option name="repoAccumulatedChanges" value="189" />
+    <option name="lastCommitHash" value="4297c00b70ad5cb036ebc5376684e59adc717f66" />
+    <option name="lastIndexTimestamp" value="1749199809450" />
+    <option name="repoAccumulatedChanges" value="196" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />
