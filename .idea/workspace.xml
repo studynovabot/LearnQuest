@@ -9,10 +9,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/user-profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/user-profile.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/pages/Settings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Settings.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/firebase-config.js" beforeDir="false" afterPath="$PROJECT_DIR$/firebase-config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/firebase.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/firebase.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,7 +120,7 @@
       <workItem from="1749149022232" duration="5243000" />
       <workItem from="1749190457823" duration="381000" />
       <workItem from="1749191171922" duration="3509000" />
-      <workItem from="1749194931718" duration="2519000" />
+      <workItem from="1749194931718" duration="4018000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -709,8 +705,8 @@
       <map>
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749197332009" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749198090407" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749199278340" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749199278340" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/chat.js" value="1749153829847" />
         <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
@@ -718,7 +714,7 @@
         <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/student-analytics.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/tutors.js" value="1749192394666" />
-        <entry key="$PROJECT_DIR$/api/user-profile.js" value="1749196133668" />
+        <entry key="$PROJECT_DIR$/api/user-profile.js" value="1749199574204" />
         <entry key="$PROJECT_DIR$/api/vector-upload.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/client/package.json" value="1749147224393" />
         <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749110092207" />
@@ -729,7 +725,7 @@
         <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749192394666" />
         <entry key="$PROJECT_DIR$/client/src/pages/ChatAgents.tsx" value="1749192698909" />
         <entry key="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" value="1748929206006" />
-        <entry key="$PROJECT_DIR$/client/src/pages/Settings.tsx" value="1749195832013" />
+        <entry key="$PROJECT_DIR$/client/src/pages/Settings.tsx" value="1749198973432" />
         <entry key="$PROJECT_DIR$/dev-server.js" value="1748942466395" />
         <entry key="$PROJECT_DIR$/firebase-config.js" value="1749195832013" />
         <entry key="$PROJECT_DIR$/package-lock.json" value="1749196433376" />
@@ -741,9 +737,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1749146585035" />
       </map>
     </option>
-    <option name="lastCommitHash" value="927d8f5f7b77a65dd072443575eaf2b04fc6ee19" />
-    <option name="lastIndexTimestamp" value="1749198090407" />
-    <option name="repoAccumulatedChanges" value="174" />
+    <option name="lastCommitHash" value="bfe335f9bcfcabb18f36af76e70f76222b507f28" />
+    <option name="lastIndexTimestamp" value="1749199574204" />
+    <option name="repoAccumulatedChanges" value="189" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />

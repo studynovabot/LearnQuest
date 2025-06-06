@@ -1,4 +1,4 @@
-import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
+import { initializeFirebaseAdmin, getFirestoreAdminDb } from '../utils/firebase-admin.js';
 import { sanitizeUserData } from '../utils/privacy.js';
 import { loadEnvVariables } from '../utils/env-loader.js';
 
@@ -16,26 +16,26 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Initialize Firebase - ensure it's properly initialized
-    const app = initializeFirebase();
-    if (!app) {
-      console.error('Failed to initialize Firebase app');
+    // Initialize Firebase Admin - ensure it's properly initialized
+    const adminApp = initializeFirebaseAdmin();
+    if (!adminApp) {
+      console.error('Failed to initialize Firebase Admin app');
       return res.status(500).json({ 
         error: { 
           code: "500", 
-          message: "Failed to initialize Firebase. Check your Firebase configuration." 
+          message: "Failed to initialize Firebase Admin. Check your Firebase configuration and service account." 
         } 
       });
     }
     
-    // Get Firestore DB instance
-    const db = getFirestoreDb();
+    // Get Firestore Admin DB instance
+    const db = getFirestoreAdminDb();
     if (!db) {
-      console.error('Failed to get Firestore database instance');
+      console.error('Failed to get Firestore Admin database instance');
       return res.status(500).json({ 
         error: { 
           code: "500", 
-          message: "Failed to connect to database. Firestore may not be properly configured." 
+          message: "Failed to connect to database. Firestore Admin may not be properly configured." 
         } 
       });
     }
@@ -54,27 +54,24 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       // Get user profile
       try {
-        // Import Firestore functions
-        const { doc, getDoc } = await import('firebase/firestore');
-        
-        // Verify Firestore is initialized
+        // Verify Firestore Admin is initialized
         if (!db) {
-          console.error('Firestore not initialized when trying to get user profile');
+          console.error('Firestore Admin not initialized when trying to get user profile');
           return res.status(500).json({ 
             error: { 
               code: "500", 
               message: "Database connection error", 
-              details: "Could not connect to Firestore database" 
+              details: "Could not connect to Firestore Admin database" 
             } 
           });
         }
         
         try {
-          // Get user document
-          const userDocRef = doc(db, 'users', userId);
-          const userDocSnap = await getDoc(userDocRef);
+          // Get user document using Firestore Admin
+          const userDocRef = db.collection('users').doc(userId);
+          const userDocSnap = await userDocRef.get();
           
-          if (!userDocSnap.exists()) {
+          if (!userDocSnap.exists) {
             return res.status(404).json({ 
               error: { 
                 code: "404", 
@@ -90,13 +87,31 @@ export default async function handler(req, res) {
           return res.status(200).json(sanitizedUser);
         } catch (firestoreError) {
           console.error('Firestore operation error:', firestoreError);
-          return res.status(500).json({ 
-            error: { 
-              code: "500", 
-              message: "Database operation failed", 
-              details: firestoreError.message || "Error performing Firestore operation" 
-            } 
-          });
+          
+          // Check for permission errors
+          const errorMessage = firestoreError.message || "";
+          const isPermissionError = errorMessage.includes("permission") || 
+                                   errorMessage.includes("unauthorized") || 
+                                   errorMessage.includes("access") ||
+                                   errorMessage.includes("permission_denied");
+          
+          if (isPermissionError) {
+            return res.status(500).json({ 
+              error: { 
+                code: "500", 
+                message: "Database operation failed", 
+                details: "Missing or insufficient permissions. This may be due to Firebase security rules." 
+              } 
+            });
+          } else {
+            return res.status(500).json({ 
+              error: { 
+                code: "500", 
+                message: "Database operation failed", 
+                details: firestoreError.message || "Error performing Firestore operation" 
+              } 
+            });
+          }
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -137,27 +152,24 @@ export default async function handler(req, res) {
       }
 
       try {
-        // Import Firestore functions
-        const { doc, getDoc, updateDoc, collection, Timestamp } = await import('firebase/firestore');
-        
-        // Verify Firestore is initialized
+        // Verify Firestore Admin is initialized
         if (!db) {
-          console.error('Firestore not initialized when trying to update user profile');
+          console.error('Firestore Admin not initialized when trying to update user profile');
           return res.status(500).json({ 
             error: { 
               code: "500", 
               message: "Database connection error", 
-              details: "Could not connect to Firestore database" 
+              details: "Could not connect to Firestore Admin database" 
             } 
           });
         }
         
         try {
-          // Check if user exists
-          const userDocRef = doc(db, 'users', userId);
-          const userDocSnap = await getDoc(userDocRef);
+          // Check if user exists using Firestore Admin
+          const userDocRef = db.collection('users').doc(userId);
+          const userDocSnap = await userDocRef.get();
           
-          if (!userDocSnap.exists()) {
+          if (!userDocSnap.exists) {
             return res.status(404).json({ 
               error: { 
                 code: "404", 
@@ -170,7 +182,7 @@ export default async function handler(req, res) {
           // Prepare update data
           const updateData = {
             displayName: displayName.trim(),
-            updatedAt: Timestamp.now()
+            updatedAt: new Date() // Firestore Admin uses native Date objects
           };
   
           // Add optional fields if provided
@@ -182,11 +194,11 @@ export default async function handler(req, res) {
             updateData.board = board;
           }
   
-          // Update user document
-          await updateDoc(userDocRef, updateData);
+          // Update user document using Firestore Admin
+          await userDocRef.update(updateData);
   
           // Fetch updated user data
-          const updatedUserDocSnap = await getDoc(userDocRef);
+          const updatedUserDocSnap = await userDocRef.get();
           const updatedUserData = updatedUserDocSnap.data();
           const sanitizedUser = sanitizeUserData(updatedUserData);
   
@@ -198,13 +210,31 @@ export default async function handler(req, res) {
           });
         } catch (firestoreError) {
           console.error('Firestore operation error:', firestoreError);
-          return res.status(500).json({ 
-            error: { 
-              code: "500", 
-              message: "Database operation failed", 
-              details: firestoreError.message || "Error performing Firestore operation" 
-            } 
-          });
+          
+          // Check for permission errors
+          const errorMessage = firestoreError.message || "";
+          const isPermissionError = errorMessage.includes("permission") || 
+                                   errorMessage.includes("unauthorized") || 
+                                   errorMessage.includes("access") ||
+                                   errorMessage.includes("permission_denied");
+          
+          if (isPermissionError) {
+            return res.status(500).json({ 
+              error: { 
+                code: "500", 
+                message: "Database operation failed", 
+                details: "Missing or insufficient permissions. This may be due to Firebase security rules." 
+              } 
+            });
+          } else {
+            return res.status(500).json({ 
+              error: { 
+                code: "500", 
+                message: "Database operation failed", 
+                details: firestoreError.message || "Error performing Firestore operation" 
+              } 
+            });
+          }
         }
 
       } catch (error) {

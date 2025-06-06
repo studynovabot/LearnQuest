@@ -176,6 +176,11 @@ const Settings = () => {
               // Include details if available
               if (errorData.error.details) {
                 errorMessage += `: ${errorData.error.details}`;
+                
+                // Special handling for permission errors
+                if (errorData.error.details.includes("Missing or insufficient permissions")) {
+                  errorMessage = "Profile update failed: You don't have permission to update your profile. This may be due to Firebase security rules when testing locally.";
+                }
               }
             } else if (errorData.error && typeof errorData.error === 'string') {
               errorMessage = errorData.error;
