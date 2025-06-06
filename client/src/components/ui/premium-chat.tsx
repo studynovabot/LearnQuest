@@ -33,9 +33,16 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
   }
   const message = messageProp || ""; // Default to empty string
 
-  // Enhanced typewriter effect with theme-aware timing
+  // Fast word-by-word typewriter effect with option to skip animation for long messages
   React.useEffect(() => {
     if (isUser || isTyping) {
+      setDisplayedText(message);
+      setIsComplete(true);
+      return;
+    }
+
+    // Skip animation for very long messages (over 500 characters)
+    if (message.length > 500) {
       setDisplayedText(message);
       setIsComplete(true);
       return;
@@ -44,13 +51,23 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
     setDisplayedText("");
     setIsComplete(false);
 
-    let index = 0;
-    const typingSpeed = selectedTheme === 'minimalist-gray' ? 20 : 30; // Faster for minimalist theme
+    // Split the message into chunks (multiple words)
+    const words = message.split(/(\s+)/); // Split by whitespace but keep the whitespace
+    let wordIndex = 0;
+    
+    // Very fast typing speed for chunk-by-chunk animation
+    const typingSpeed = 3; // Extremely fast typing speed
+    const wordsPerInterval = 5; // Display multiple words at once for faster rendering
 
     const timer = setInterval(() => {
-      if (index < message.length) { // 'message' is now guaranteed to be a string
-        setDisplayedText(message.slice(0, index + 1));
-        index++;
+      if (wordIndex < words.length) {
+        // Add multiple words at once to the displayed text
+        let newText = '';
+        for (let i = 0; i < wordsPerInterval && wordIndex + i < words.length; i++) {
+          newText += words[wordIndex + i];
+        }
+        setDisplayedText(prev => prev + newText);
+        wordIndex += wordsPerInterval;
       } else {
         setIsComplete(true);
         clearInterval(timer);
@@ -134,17 +151,7 @@ const PremiumChatBubble: React.FC<PremiumChatBubbleProps> = ({
             )}
           </div>
 
-          {/* Timestamp */}
-          {timestamp && isComplete && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-xs opacity-70 mt-1"
-            >
-              {timestamp}
-            </motion.div>
-          )}
+          {/* Timestamp removed as per user request */}
         </div>
       </motion.div>
 

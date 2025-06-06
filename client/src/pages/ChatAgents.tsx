@@ -400,7 +400,6 @@ const ChatAgents = () => {
                                 key={message.id}
                                 message={message.content}
                                 isUser={message.role === "user"}
-                                timestamp={new Date(message.timestamp || Date.now()).toLocaleTimeString()}
                                 className={cn(
                                   isMobile ? "max-w-[90%]" : "max-w-[85%]"
                                 )}
