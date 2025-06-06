@@ -111,7 +111,11 @@ const Settings = () => {
     
     setSaving(true);
     try {
-      const response = await fetch('/api/user-profile', {
+      // Use the full URL to the API endpoint
+      const apiUrl = `${window.location.origin}/api/user-profile`;
+      console.log('Making profile update request to:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -125,18 +129,30 @@ const Settings = () => {
       });
 
       if (response.ok) {
+        const result = await response.json();
+        console.log('Profile update successful:', result);
         await refreshUser();
         toast({
           title: 'Profile Updated',
           description: 'Your profile has been successfully updated.',
         });
       } else {
-        throw new Error('Failed to update profile');
+        // Try to get error details from response
+        let errorMessage = 'Failed to update profile';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+          console.error('Profile update error:', errorData);
+        } catch (e) {
+          console.error('Could not parse error response:', e);
+        }
+        throw new Error(errorMessage);
       }
     } catch (error) {
+      console.error('Profile update error:', error);
       toast({
         title: 'Update Failed',
-        description: 'Failed to update your profile. Please try again.',
+        description: error instanceof Error ? error.message : 'Failed to update your profile. Please try again.',
         variant: 'destructive'
       });
     } finally {
@@ -623,10 +639,10 @@ const Settings = () => {
                         <AlertDialogDescription>
                           This action cannot be undone. This will permanently delete your account
                           and remove all your data from our servers including:
-                          <br />• All your chat history
-                          <br />• Flash notes and saved content
-                          <br />• Account preferences and settings
-                          <br />• Subscription information
+                          <br />ï¿½ All your chat history
+                          <br />ï¿½ Flash notes and saved content
+                          <br />ï¿½ Account preferences and settings
+                          <br />ï¿½ Subscription information
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>

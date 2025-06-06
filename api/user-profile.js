@@ -13,8 +13,17 @@ export default async function handler(req, res) {
 
   try {
     // Initialize Firebase
-    initializeFirebase();
+    const app = initializeFirebase();
+    if (!app) {
+      console.error('Failed to initialize Firebase app');
+      return res.status(500).json({ error: 'Failed to initialize Firebase' });
+    }
+    
     const db = getFirestoreDb();
+    if (!db) {
+      console.error('Failed to get Firestore database instance');
+      return res.status(500).json({ error: 'Failed to connect to database' });
+    }
 
     // Get user ID from Authorization header
     const authHeader = req.headers.authorization;
@@ -30,19 +39,24 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       // Get user profile
       try {
-        const userDoc = await db.collection('users').doc(userId).get();
+        // Import Firestore functions
+        const { doc, getDoc } = await import('firebase/firestore');
         
-        if (!userDoc.exists) {
+        // Get user document
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+        
+        if (!userDocSnap.exists()) {
           return res.status(404).json({ error: 'User not found' });
         }
 
-        const userData = userDoc.data();
+        const userData = userDocSnap.data();
         const sanitizedUser = sanitizeUserData(userData);
         
         return res.status(200).json(sanitizedUser);
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        return res.status(500).json({ error: 'Failed to fetch user profile' });
+        return res.status(500).json({ error: 'Failed to fetch user profile', details: error.message });
       }
     }
 
@@ -73,17 +87,21 @@ export default async function handler(req, res) {
       }
 
       try {
-        // Check if user exists
-        const userDoc = await db.collection('users').doc(userId).get();
+        // Import Firestore functions
+        const { doc, getDoc, updateDoc, collection, Timestamp } = await import('firebase/firestore');
         
-        if (!userDoc.exists) {
+        // Check if user exists
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+        
+        if (!userDocSnap.exists()) {
           return res.status(404).json({ error: 'User not found' });
         }
 
         // Prepare update data
         const updateData = {
           displayName: displayName.trim(),
-          updatedAt: new Date()
+          updatedAt: Timestamp.now()
         };
 
         // Add optional fields if provided
@@ -96,11 +114,11 @@ export default async function handler(req, res) {
         }
 
         // Update user document
-        await db.collection('users').doc(userId).update(updateData);
+        await updateDoc(userDocRef, updateData);
 
         // Fetch updated user data
-        const updatedUserDoc = await db.collection('users').doc(userId).get();
-        const updatedUserData = updatedUserDoc.data();
+        const updatedUserDocSnap = await getDoc(userDocRef);
+        const updatedUserData = updatedUserDocSnap.data();
         const sanitizedUser = sanitizeUserData(updatedUserData);
 
         console.log(`✅ User profile updated successfully for user: ${userId}`);
