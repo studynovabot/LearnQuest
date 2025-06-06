@@ -7,6 +7,7 @@
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/config/themes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/config/themes.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +51,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ai.zencoder.plugin.settings&quot;,
     &quot;ts.external.directory.path&quot;: &quot;E:\\IntelliJ IDEA 2025.1.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -118,7 +119,8 @@
       <workItem from="1749149022232" duration="5243000" />
       <workItem from="1749190457823" duration="381000" />
       <workItem from="1749191171922" duration="3509000" />
-      <workItem from="1749194931718" duration="5281000" />
+      <workItem from="1749194931718" duration="6771000" />
+      <workItem from="1749203894523" duration="2066000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -140,6 +142,10 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="u" />
     <option name="LAST_COMMIT_MESSAGE" value="u" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
   <component name="ai.zencoder.plugin.mcp">
     <option name="internalToolsState" value="{&quot;fetch_webpage&quot;:true,&quot;web_search&quot;:true,&quot;ExecuteShellCommand&quot;:true,&quot;file_search&quot;:true,&quot;str_replace_editor&quot;:true,&quot;fulltext_search&quot;:true,&quot;RequirementsTool&quot;:true}" />
@@ -703,8 +709,8 @@
       <map>
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749200775712" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749200775712" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749205714269" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749205714269" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/chat.js" value="1749153829847" />
         <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
@@ -719,11 +725,13 @@
         <entry key="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" value="1749107092617" />
         <entry key="$PROJECT_DIR$/client/src/components/ui/premium-chat.tsx" value="1749193596216" />
         <entry key="$PROJECT_DIR$/client/src/config.ts" value="1749146265660" />
+        <entry key="$PROJECT_DIR$/client/src/config/themes.ts" value="1749205406851" />
+        <entry key="$PROJECT_DIR$/client/src/context/UserContext.tsx" value="1749201077415" />
         <entry key="$PROJECT_DIR$/client/src/hooks/useChat.ts" value="1749192394666" />
         <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749192394666" />
         <entry key="$PROJECT_DIR$/client/src/pages/ChatAgents.tsx" value="1749192698909" />
         <entry key="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" value="1748929206006" />
-        <entry key="$PROJECT_DIR$/client/src/pages/Settings.tsx" value="1749200477482" />
+        <entry key="$PROJECT_DIR$/client/src/pages/Settings.tsx" value="1749201077415" />
         <entry key="$PROJECT_DIR$/dev-server.js" value="1748942466395" />
         <entry key="$PROJECT_DIR$/firebase-config.js" value="1749195832013" />
         <entry key="$PROJECT_DIR$/package-lock.json" value="1749196433376" />
@@ -735,9 +743,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1749146585035" />
       </map>
     </option>
-    <option name="lastCommitHash" value="991fc477f9b33e4ec2da8df98f946f86c8b3155f" />
-    <option name="lastIndexTimestamp" value="1749200775712" />
-    <option name="repoAccumulatedChanges" value="202" />
+    <option name="lastCommitHash" value="2922986511cdebd60b1a0e0dedc36f817995674b" />
+    <option name="lastIndexTimestamp" value="1749205714269" />
+    <option name="repoAccumulatedChanges" value="227" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />
