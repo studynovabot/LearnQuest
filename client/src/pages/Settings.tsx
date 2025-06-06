@@ -86,9 +86,10 @@ const Settings = () => {
     securityNotifications: true
   });
 
-  // Load user data on component mount
+  // Load user data on component mount or when user changes
   useEffect(() => {
     if (user) {
+      console.log('Updating profile state from user data:', user);
       setProfile({
         displayName: user.displayName || '',
         email: user.email || '',
@@ -100,7 +101,7 @@ const Settings = () => {
         lastLogin: user.lastLogin?.toString()
       });
     }
-  }, [user]);
+  }, [user]); // This will re-run whenever the user object changes
 
   // Educational boards and classes
   const boards = ['CBSE', 'ICSE', 'State Board', 'IB', 'Cambridge', 'Other'];
@@ -147,8 +148,44 @@ const Settings = () => {
       const result = await response.json();
       console.log('Profile update successful:', result);
       
-      // Refresh user data
+      // Update the user in localStorage directly
+      if (user && result.user) {
+        try {
+          // Get the current user from localStorage
+          const storedUserStr = localStorage.getItem('user');
+          if (storedUserStr) {
+            const storedUser = JSON.parse(storedUserStr);
+            
+            // Update the user with the new profile data
+            const updatedUser = {
+              ...storedUser,
+              displayName: result.user.displayName || storedUser.displayName,
+              className: result.user.className || storedUser.className,
+              board: result.user.board || storedUser.board,
+              updatedAt: new Date()
+            };
+            
+            // Save the updated user back to localStorage
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            console.log('Updated user in localStorage:', updatedUser);
+          }
+        } catch (error) {
+          console.error('Error updating user in localStorage:', error);
+        }
+      }
+      
+      // Refresh user data from the server
       await refreshUser();
+      
+      // Update the local profile state with the new data
+      if (user) {
+        setProfile({
+          ...profile,
+          displayName: result.user.displayName || profile.displayName,
+          className: result.user.className || profile.className,
+          board: result.user.board || profile.board
+        });
+      }
       
       // Show success message
       toast({

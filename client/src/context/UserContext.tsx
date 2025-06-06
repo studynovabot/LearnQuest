@@ -277,23 +277,76 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const refreshUser = async (): Promise<void> => {
     try {
       setLoading(true);
-      // Mock refresh - replace with actual API call
-      // const response = await api.get('/auth/me');
-
-      // For now, just use the stored user
+      console.log('🔄 Refreshing user data...');
+      
+      // Get the current user ID
       const storedUser = localStorage.getItem('user');
-      if (storedUser) {
+      if (!storedUser) {
+        console.error('No user found in localStorage during refresh');
+        return;
+      }
+      
+      let userId: string;
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        userId = parsedUser.id;
+        if (!userId) {
+          throw new Error('No user ID found in stored user data');
+        }
+      } catch (parseError) {
+        console.error('Failed to parse stored user data in refresh:', parseError);
+        localStorage.removeItem('user');
+        setUser(null);
+        return;
+      }
+      
+      // Fetch the latest user profile from the server
+      try {
+        console.log(`Fetching user profile for ID: ${userId}`);
+        const response = await fetch(`${config.apiUrl}/user-profile`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userId}`,
+            'X-User-ID': userId
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user profile: ${response.status} ${response.statusText}`);
+        }
+        
+        // Parse the response
+        const userData = await response.json();
+        console.log('✅ User profile fetched successfully:', userData);
+        
+        // Update the stored user with the new data
+        const updatedUser = {
+          ...JSON.parse(storedUser), // Keep existing fields
+          ...userData, // Update with new profile data
+          updatedAt: new Date() // Update the timestamp
+        };
+        
+        // Update localStorage and state
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        console.log('✅ User data refreshed successfully');
+      } catch (fetchError) {
+        console.error('Error fetching user profile:', fetchError);
+        
+        // If we can't fetch the profile, at least update the UI with the stored user
         try {
           setUser(JSON.parse(storedUser));
+          console.log('⚠️ Using stored user data as fallback');
         } catch (parseError) {
-          console.error('Failed to parse stored user data in refresh:', parseError);
+          console.error('Failed to parse stored user data:', parseError);
           localStorage.removeItem('user');
           setUser(null);
         }
       }
     } catch (error) {
       console.error("Failed to refresh user:", error);
-      // If refresh fails, log the user out
+      // If refresh fails completely, log the user out
       logout();
     } finally {
       setLoading(false);
