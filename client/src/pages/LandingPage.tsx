@@ -28,8 +28,8 @@ const LandingPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>LearnQuest - Your AI Study Companion</title>
-        <meta name="description" content="LearnQuest helps students master any subject with personalized AI tutors, interactive learning tools, and comprehensive study materials." />
+        <title>Study Nova - Your AI Study Companion</title>
+        <meta name="description" content="Study Nova helps students master any subject with personalized AI tutors, interactive learning tools, and comprehensive study materials." />
       </Helmet>
 
       <div className="flex flex-col min-h-screen bg-background">
@@ -38,7 +38,7 @@ const LandingPage: React.FC = () => {
           <div className="container flex h-16 items-center justify-between px-4 md:px-6">
             <div className="flex items-center gap-2">
               <BookOpen className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">LearnQuest</span>
+              <span className="text-xl font-bold">Study Nova</span>
             </div>
             <nav className="hidden md:flex gap-6">
               <a href="#features" className="text-sm font-medium hover:text-primary">
@@ -82,7 +82,7 @@ const LandingPage: React.FC = () => {
             <div className="flex flex-col items-center text-center space-y-4 md:space-y-8 max-w-3xl mx-auto">
               <div className="space-y-3">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                  LearnQuest thinks like you, adapts to your learning style instantly
+                  Study Nova thinks like you, adapts to your learning style instantly
                 </h1>
                 <p className="text-muted-foreground md:text-xl max-w-[700px] mx-auto">
                   Access AI tutors, educational content, and personalized learning tools with our premium platform designed for academic excellence.
@@ -125,7 +125,7 @@ const LandingPage: React.FC = () => {
         <section className="w-full py-8 md:py-12 bg-muted/30">
           <div className="container px-4 md:px-6">
             <h2 className="text-2xl font-bold text-center mb-8">
-              AI tutor trusted by thousands of students
+              Study Nova AI tutor trusted by thousands of students
             </h2>
             <div className="flex flex-col space-y-4">
               <div className="text-center">
@@ -149,7 +149,7 @@ const LandingPage: React.FC = () => {
                   Delegate your learning tasks end-to-end
                 </h2>
                 <p className="text-muted-foreground md:text-xl/relaxed">
-                  Just describe what you need to learn — LearnQuest AI plans, explains, and helps you master the topic. It works like a personal tutor in your device, integrating with your curriculum and learning style.
+                  Just describe what you need to learn — Study Nova AI plans, explains, and helps you master the topic. It works like a personal tutor in your device, integrating with your curriculum and learning style.
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2">
@@ -278,16 +278,16 @@ const LandingPage: React.FC = () => {
                   See how students use AI tutor in real studies
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Watch use cases of LearnQuest AI autonomously solving students' problems while they focus on understanding.
+                  Watch use cases of Study Nova AI autonomously solving students' problems while they focus on understanding.
                 </p>
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-12">
               <div className="flex flex-col justify-between space-y-4 rounded-xl border p-6 shadow-sm">
                 <div className="space-y-2">
-                  <h3 className="font-bold">LearnQuest AI saved me hours of study time</h3>
+                  <h3 className="font-bold">Study Nova AI saved me hours of study time</h3>
                   <p className="text-muted-foreground">
-                    "LearnQuest has completely transformed how I study. The AI tutors explain concepts in a way that's easy to understand, and the NCERT solutions have been a lifesaver for my exams."
+                    "Study Nova has completely transformed how I study. The AI tutors explain concepts in a way that's easy to understand, and the NCERT solutions have been a lifesaver for my exams."
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -306,7 +306,7 @@ const LandingPage: React.FC = () => {
                 <div className="space-y-2">
                   <h3 className="font-bold">My grades improved dramatically</h3>
                   <p className="text-muted-foreground">
-                    "As a parent, I'm impressed with how LearnQuest has helped my daughter improve her grades. The personalized approach and detailed explanations have made a huge difference."
+                    "As a parent, I'm impressed with how Study Nova has helped my daughter improve her grades. The personalized approach and detailed explanations have made a huge difference."
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -350,7 +350,7 @@ const LandingPage: React.FC = () => {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  With AI tutor, transform how you learn
+                  With Study Nova AI tutor, transform how you learn
                 </h2>
               </div>
             </div>
@@ -359,14 +359,14 @@ const LandingPage: React.FC = () => {
                 <Brain className="h-12 w-12 text-primary" />
                 <h3 className="text-xl font-bold">Understands your context</h3>
                 <p className="text-muted-foreground">
-                  LearnQuest analyzes your curriculum and learning style to deliver accurate, context-aware explanations and solutions.
+                  Study Nova analyzes your curriculum and learning style to deliver accurate, context-aware explanations and solutions.
                 </p>
               </div>
               <div className="flex flex-col items-center text-center space-y-3 p-6">
                 <Lightbulb className="h-12 w-12 text-primary" />
                 <h3 className="text-xl font-bold">Learns and evolves with you</h3>
                 <p className="text-muted-foreground">
-                  The more you use it, the smarter it gets. LearnQuest adapts to your learning pace and preferences.
+                  The more you use it, the smarter it gets. Study Nova adapts to your learning pace and preferences.
                 </p>
               </div>
               <div className="flex flex-col items-center text-center space-y-3 p-6">
@@ -520,7 +520,7 @@ const LandingPage: React.FC = () => {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Try LearnQuest now
+                  Try Study Nova now
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Free to start. Fully powered AI tutor for students. Upgrade to Pro for unlimited access.
@@ -683,7 +683,7 @@ const LandingPage: React.FC = () => {
                   Ready to transform your learning experience?
                 </h2>
                 <p className="max-w-[900px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Join thousands of students who are achieving academic excellence with LearnQuest.
+                  Join thousands of students who are achieving academic excellence with Study Nova.
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -712,7 +712,7 @@ const LandingPage: React.FC = () => {
           <div className="container flex flex-col items-center justify-center gap-4 md:flex-row md:gap-8 px-4 md:px-6">
             <div className="flex items-center gap-2">
               <BookOpen className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">LearnQuest</span>
+              <span className="text-xl font-bold">Study Nova</span>
             </div>
             <nav className="flex gap-4 sm:gap-6">
               <Link href="/privacy-policy" className="text-xs hover:underline underline-offset-4">
@@ -727,7 +727,7 @@ const LandingPage: React.FC = () => {
             </nav>
             <div className="flex items-center gap-4">
               <p className="text-xs text-muted-foreground">
-                © 2024 LearnQuest. All rights reserved.
+                © 2024 Study Nova. All rights reserved.
               </p>
             </div>
           </div>
