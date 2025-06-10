@@ -147,22 +147,19 @@ const AITutors = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05, duration: 0.2 }}
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.98 }}
+
             >
               <Link href="/chat">
                 <div className={cn(
                   "premium-card p-4 flex flex-col items-center cursor-pointer",
-                  "hover:shadow-premium-lg transition-all duration-300",
                   getGlowClass(agent.color)
                 )}>
-                  {/* Animated background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-primary/5 opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+                  {/* Removed animated background */}
 
                   {/* Icon container with gradient */}
                   <div className={cn(
                     "w-16 h-16 rounded-full mb-3 flex items-center justify-center overflow-hidden relative",
-                    "shadow-premium hover:shadow-glow transition-all duration-300",
+                    "shadow-premium",
                     getAgentColorClass(agent.color)
                   )}>
                     <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>

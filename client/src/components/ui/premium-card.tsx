@@ -20,7 +20,7 @@ const PremiumCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(
     glow = false,
     glowColor = "default",
     animate = true,
-    hover = true,
+    hover = false,
     children,
     ...props
   }, ref) => {
@@ -65,12 +65,7 @@ const PremiumCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(
           {children}
         </div>
 
-        {/* Animated background for glass variants */}
-        {(variant === "glass" || variant === "glass-strong") && (
-          <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-purple-500/5 animate-pulse-subtle" />
-          </div>
-        )}
+        {/* Removed animated background for glass variants */}
       </div>
     );
 

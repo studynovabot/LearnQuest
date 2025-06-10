@@ -122,8 +122,7 @@ const SubjectOverview = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.3 }}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  className="glass-card p-4 rounded-xl hover:shadow-premium transition-all duration-300"
+                  className="glass-card p-4 rounded-xl"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
