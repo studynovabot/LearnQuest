@@ -21,8 +21,10 @@ import {
   Zap
 } from "lucide-react";
 import { Helmet } from "react-helmet";
+import { useUserContext } from "@/context/UserContext";
 
 const LandingPage: React.FC = () => {
+  const { user } = useUserContext();
   return (
     <>
       <Helmet>
@@ -50,16 +52,26 @@ const LandingPage: React.FC = () => {
               </a>
             </nav>
             <div className="flex items-center gap-4">
-              <Link href="/login">
-                <Button variant="outline" size="sm">
-                  Log in
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button size="sm" className="bg-primary hover:bg-primary/90">
-                  Sign up
-                </Button>
-              </Link>
+              {user ? (
+                <Link href="/app">
+                  <Button size="sm" className="bg-primary hover:bg-primary/90">
+                    Go to App
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="outline" size="sm">
+                      Log in
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button size="sm" className="bg-primary hover:bg-primary/90">
+                      Sign up
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </header>
@@ -82,17 +94,28 @@ const LandingPage: React.FC = () => {
                 <span className="px-3 py-1 text-sm bg-muted rounded-full">Comprehensive</span>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Link href="/register">
-                  <Button size="lg" className="gap-1.5 bg-primary hover:bg-primary/90">
-                    Start for free
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button size="lg" variant="outline">
-                    Log in
-                  </Button>
-                </Link>
+                {user ? (
+                  <Link href="/app">
+                    <Button size="lg" className="gap-1.5 bg-primary hover:bg-primary/90">
+                      Go to App
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/register">
+                      <Button size="lg" className="gap-1.5 bg-primary hover:bg-primary/90">
+                        Start for free
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                    <Link href="/login">
+                      <Button size="lg" variant="outline">
+                        Log in
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -374,9 +397,15 @@ const LandingPage: React.FC = () => {
                 <p className="text-muted-foreground mb-4">
                   Get step-by-step solutions to your homework problems in any subject.
                 </p>
-                <Link href="/register" className="text-primary hover:underline mt-auto">
-                  Try AI Homework Helper
-                </Link>
+                {user ? (
+                  <Link href="/app" className="text-primary hover:underline mt-auto">
+                    Go to AI Homework Helper
+                  </Link>
+                ) : (
+                  <Link href="/register" className="text-primary hover:underline mt-auto">
+                    Try AI Homework Helper
+                  </Link>
+                )}
               </div>
               <div className="flex flex-col p-6 bg-background rounded-xl border shadow-sm">
                 <Search className="h-8 w-8 text-primary mb-4" />
@@ -384,9 +413,15 @@ const LandingPage: React.FC = () => {
                 <p className="text-muted-foreground mb-4">
                   Understand complex concepts with interactive explanations and visual aids.
                 </p>
-                <Link href="/register" className="text-primary hover:underline mt-auto">
-                  Try Concept Explorer
-                </Link>
+                {user ? (
+                  <Link href="/app" className="text-primary hover:underline mt-auto">
+                    Go to Concept Explorer
+                  </Link>
+                ) : (
+                  <Link href="/register" className="text-primary hover:underline mt-auto">
+                    Try Concept Explorer
+                  </Link>
+                )}
               </div>
               <div className="flex flex-col p-6 bg-background rounded-xl border shadow-sm">
                 <Image className="h-8 w-8 text-primary mb-4" />
@@ -394,9 +429,15 @@ const LandingPage: React.FC = () => {
                 <p className="text-muted-foreground mb-4">
                   Convert text explanations into diagrams, charts, and visual aids for better understanding.
                 </p>
-                <Link href="/register" className="text-primary hover:underline mt-auto">
-                  Try Visual Learning
-                </Link>
+                {user ? (
+                  <Link href="/app" className="text-primary hover:underline mt-auto">
+                    Go to Visual Learning
+                  </Link>
+                ) : (
+                  <Link href="/register" className="text-primary hover:underline mt-auto">
+                    Try Visual Learning
+                  </Link>
+                )}
               </div>
               <div className="flex flex-col p-6 bg-background rounded-xl border shadow-sm">
                 <FileCode className="h-8 w-8 text-primary mb-4" />
@@ -404,9 +445,15 @@ const LandingPage: React.FC = () => {
                 <p className="text-muted-foreground mb-4">
                   Access comprehensive solutions for NCERT textbooks across all subjects and classes.
                 </p>
-                <Link href="/register" className="text-primary hover:underline mt-auto">
-                  Try NCERT Solutions
-                </Link>
+                {user ? (
+                  <Link href="/app" className="text-primary hover:underline mt-auto">
+                    Go to NCERT Solutions
+                  </Link>
+                ) : (
+                  <Link href="/register" className="text-primary hover:underline mt-auto">
+                    Try NCERT Solutions
+                  </Link>
+                )}
               </div>
               <div className="flex flex-col p-6 bg-background rounded-xl border shadow-sm">
                 <Database className="h-8 w-8 text-primary mb-4" />
@@ -414,9 +461,15 @@ const LandingPage: React.FC = () => {
                 <p className="text-muted-foreground mb-4">
                   Practice with thousands of questions and get instant feedback on your answers.
                 </p>
-                <Link href="/register" className="text-primary hover:underline mt-auto">
-                  Try Practice Question Bank
-                </Link>
+                {user ? (
+                  <Link href="/app" className="text-primary hover:underline mt-auto">
+                    Go to Practice Question Bank
+                  </Link>
+                ) : (
+                  <Link href="/register" className="text-primary hover:underline mt-auto">
+                    Try Practice Question Bank
+                  </Link>
+                )}
               </div>
               <div className="flex flex-col p-6 bg-background rounded-xl border shadow-sm">
                 <Zap className="h-8 w-8 text-primary mb-4" />
@@ -501,11 +554,19 @@ const LandingPage: React.FC = () => {
                   </ul>
                 </div>
                 <div className="flex flex-col p-6 mt-auto">
-                  <Link href="/register">
-                    <Button className="w-full" variant="outline">
-                      Get Started
-                    </Button>
-                  </Link>
+                  {user ? (
+                    <Link href="/app">
+                      <Button className="w-full" variant="outline">
+                        Go to App
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/register">
+                      <Button className="w-full" variant="outline">
+                        Get Started
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col rounded-xl border shadow-sm bg-background relative">
@@ -545,11 +606,19 @@ const LandingPage: React.FC = () => {
                   </ul>
                 </div>
                 <div className="flex flex-col p-6 mt-auto">
-                  <Link href="/register">
-                    <Button className="w-full bg-primary hover:bg-primary/90">
-                      Get Started
-                    </Button>
-                  </Link>
+                  {user ? (
+                    <Link href="/app">
+                      <Button className="w-full bg-primary hover:bg-primary/90">
+                        Go to App
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/register">
+                      <Button className="w-full bg-primary hover:bg-primary/90">
+                        Get Started
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col rounded-xl border shadow-sm bg-background">
@@ -586,11 +655,19 @@ const LandingPage: React.FC = () => {
                   </ul>
                 </div>
                 <div className="flex flex-col p-6 mt-auto">
-                  <Link href="/register">
-                    <Button className="w-full" variant="outline">
-                      Get Started
-                    </Button>
-                  </Link>
+                  {user ? (
+                    <Link href="/app">
+                      <Button className="w-full" variant="outline">
+                        Go to App
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/register">
+                      <Button className="w-full" variant="outline">
+                        Get Started
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
@@ -610,12 +687,21 @@ const LandingPage: React.FC = () => {
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Link href="/register">
-                  <Button size="lg" variant="secondary" className="gap-1.5">
-                    Get Started
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
+                {user ? (
+                  <Link href="/app">
+                    <Button size="lg" variant="secondary" className="gap-1.5">
+                      Go to App
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/register">
+                    <Button size="lg" variant="secondary" className="gap-1.5">
+                      Get Started
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </div>

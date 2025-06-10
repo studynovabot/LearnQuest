@@ -48,13 +48,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/">
-        {user ? (
-          <MainLayout>
-            <Dashboard />
-          </MainLayout>
-        ) : (
-          <LandingPage />
-        )}
+        <LandingPage />
       </Route>
       <Route path="/app">
         <ProtectedRoute>
