@@ -23,17 +23,22 @@ import PersonalizedAgent from "@/pages/PersonalizedAgent";
 import ContentManager from "@/pages/ContentManager";
 import DocumentSearch from "@/pages/DocumentSearch";
 import VectorUploadPage from "@/pages/VectorUploadPage";
+import LandingPage from "@/pages/LandingPage";
+import Terms from "@/pages/Terms";
 import AdminRoute from "@/components/AdminRoute";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { useEffect } from "react";
+import { useUserContext } from "@/context/UserContext";
 // import { Analytics } from "@vercel/analytics/react";
 // import { SpeedInsights } from "@vercel/speed-insights/react";
 
 function Router() {
   const [location] = useLocation();
   const { trackPageView } = useAnalytics();
+  const { user } = useUserContext();
 
   // Track page views when location changes
   useEffect(() => {
@@ -43,14 +48,34 @@ function Router() {
   return (
     <Switch>
       <Route path="/">
-        <MainLayout>
-          <Dashboard />
-        </MainLayout>
+        {user ? (
+          <MainLayout>
+            <Dashboard />
+          </MainLayout>
+        ) : (
+          <LandingPage />
+        )}
+      </Route>
+      <Route path="/app">
+        <ProtectedRoute>
+          <MainLayout>
+            <Dashboard />
+          </MainLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/dashboard">
+        <ProtectedRoute>
+          <MainLayout>
+            <Dashboard />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/chat">
-        <MainLayout>
-          <ChatAgents />
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <ChatAgents />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/login">
         <Login />
@@ -67,64 +92,89 @@ function Router() {
       <Route path="/privacy-policy">
         <PrivacyPolicy />
       </Route>
+      <Route path="/terms">
+        <Terms />
+      </Route>
       <Route path="/settings">
-        <MainLayout>
-          <Settings />
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <Settings />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/themes">
-        <MainLayout>
-          <Themes />
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <Themes />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/subscription">
-        <MainLayout>
-          <Subscription />
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <Subscription />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/flow-charts">
-        <MainLayout>
-          <FlowCharts />
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <FlowCharts />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/ncert-solutions">
-        <MainLayout>
-          <NCERTSolutions />
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <NCERTSolutions />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/textbook-solutions">
-        <MainLayout>
-          <TextbookSolutions />
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <TextbookSolutions />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/image-tools">
-        <MainLayout>
-          <ImageTools />
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <ImageTools />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/personalized-agent">
-        <MainLayout>
-          <PersonalizedAgent />
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <PersonalizedAgent />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/content-manager">
-        <MainLayout>
-          <AdminRoute>
-            <ContentManager />
-          </AdminRoute>
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <AdminRoute>
+              <ContentManager />
+            </AdminRoute>
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/vector-upload">
-        <MainLayout>
-          <AdminRoute>
-            <VectorUploadPage />
-          </AdminRoute>
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <AdminRoute>
+              <VectorUploadPage />
+            </AdminRoute>
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/document-search">
-        <MainLayout>
-          <DocumentSearch />
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <DocumentSearch />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route>
         <NotFound />

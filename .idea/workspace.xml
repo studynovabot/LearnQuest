@@ -7,7 +7,6 @@
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/config/themes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/config/themes.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +119,16 @@
       <workItem from="1749190457823" duration="381000" />
       <workItem from="1749191171922" duration="3509000" />
       <workItem from="1749194931718" duration="6771000" />
-      <workItem from="1749203894523" duration="2066000" />
+      <workItem from="1749203894523" duration="2118000" />
+      <workItem from="1749206441400" duration="269000" />
+      <workItem from="1749227814967" duration="127000" />
+      <workItem from="1749227967765" duration="246000" />
+      <workItem from="1749228246692" duration="541000" />
+      <workItem from="1749229726136" duration="1191000" />
+      <workItem from="1749234882134" duration="1290000" />
+      <workItem from="1749273226822" duration="1215000" />
+      <workItem from="1749298903098" duration="105000" />
+      <workItem from="1749395344778" duration="244000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -709,8 +717,8 @@
       <map>
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749205714269" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749205714269" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749298955411" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749273538360" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/chat.js" value="1749153829847" />
         <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
@@ -743,9 +751,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1749146585035" />
       </map>
     </option>
-    <option name="lastCommitHash" value="2922986511cdebd60b1a0e0dedc36f817995674b" />
-    <option name="lastIndexTimestamp" value="1749205714269" />
-    <option name="repoAccumulatedChanges" value="227" />
+    <option name="lastCommitHash" value="1d614ba3016c2d8e94b2bf04810b1fcf848c8361" />
+    <option name="lastIndexTimestamp" value="1749298955411" />
+    <option name="repoAccumulatedChanges" value="21" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />

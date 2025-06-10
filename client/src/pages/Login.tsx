@@ -20,11 +20,11 @@ const Login = () => {
   const { login, loading, user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
-  // If user is already authenticated, redirect to main app
+  // If user is already authenticated, redirect to app
   useEffect(() => {
     if (isAuthenticated && user) {
-      console.log('✅ User already authenticated, redirecting to main app');
-      setLocation("/");
+      console.log('✅ User already authenticated, redirecting to app');
+      setLocation("/app");
     }
   }, [isAuthenticated, user, setLocation]);
 
@@ -32,7 +32,7 @@ const Login = () => {
     e.preventDefault();
     const success = await login(email, password);
     if (success) {
-      setLocation("/");
+      setLocation("/app");
     }
   };
 

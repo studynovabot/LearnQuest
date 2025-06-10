@@ -20,11 +20,11 @@ const Register = () => {
   const { register, loading, user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
-  // If user is already authenticated, redirect to main app
+  // If user is already authenticated, redirect to app
   useEffect(() => {
     if (isAuthenticated && user) {
-      console.log('✅ User already authenticated, redirecting to main app');
-      setLocation("/");
+      console.log('✅ User already authenticated, redirecting to app');
+      setLocation("/app");
     }
   }, [isAuthenticated, user, setLocation]);
 
@@ -55,8 +55,8 @@ const Register = () => {
       // After successful registration, user is automatically logged in
       // Add a small delay to ensure user state is updated before redirect
       setTimeout(() => {
-        console.log('🔄 Redirecting to main app...');
-        setLocation("/");
+        console.log('🔄 Redirecting to app...');
+        setLocation("/app");
       }, 200);
     } else {
       console.log('❌ Registration failed');
