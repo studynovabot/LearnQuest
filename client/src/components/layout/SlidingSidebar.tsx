@@ -17,7 +17,8 @@ import {
   DatabaseIcon,
   ShieldIcon,
   SettingsIcon,
-  BookIcon
+  BookIcon,
+  UserIcon
 } from "@/components/ui/icons";
 
 interface SlidingSidebarProps {
@@ -29,7 +30,7 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
   const { user } = useAuth();
 
   // Check if current user is admin
-  const userIsAdmin = isAdmin(user?.email);
+  const userIsAdmin = isAdmin(user?.email) || user?.role === 'admin';
 
   // Complete navigation items
   const navigationItems = [
@@ -74,9 +75,9 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
   const adminNavigationItems = [
     {
       icon: DatabaseIcon,
-      label: "Vector Upload",
+      label: "Vector Database",
       path: "/vector-upload",
-      description: "Admin Upload",
+      description: "Vector DB Editing",
       adminOnly: true,
       feature: ADMIN_FEATURES.VECTOR_UPLOAD
     },
@@ -87,6 +88,14 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       description: "File Management",
       adminOnly: true,
       feature: ADMIN_FEATURES.CONTENT_MODERATION
+    },
+    {
+      icon: UserIcon,
+      label: "Admin Users",
+      path: "/admin-users",
+      description: "User Management",
+      adminOnly: true,
+      feature: ADMIN_FEATURES.USER_MANAGEMENT
     }
   ];
 

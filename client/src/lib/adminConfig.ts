@@ -151,6 +151,12 @@ export const ADMIN_FEATURES = {
 export const shouldShowAdminFeature = (userEmail: string, feature: string): boolean => {
   if (!isAdmin(userEmail)) return false;
   
+  // For now, always show these features for any admin user to ensure they're visible
+  if (feature === ADMIN_FEATURES.VECTOR_UPLOAD || 
+      feature === ADMIN_FEATURES.USER_MANAGEMENT) {
+    return true;
+  }
+  
   switch (feature) {
     case ADMIN_FEATURES.VECTOR_UPLOAD:
       return hasPermission(userEmail, 'vector-database', 'upload');
