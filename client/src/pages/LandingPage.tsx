@@ -53,9 +53,9 @@ const LandingPage: React.FC = () => {
               <a href="#testimonials" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
                 Testimonials
               </a>
-              <a href="#pricing" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
-                Pricing
-              </a>
+              <Link href="/pricing">
+                <span className="text-sm font-medium text-slate-300 hover:text-white transition-colors cursor-pointer">Pricing</span>
+              </Link>
             </nav>
             <div className="flex items-center gap-3">
               {user ? (
