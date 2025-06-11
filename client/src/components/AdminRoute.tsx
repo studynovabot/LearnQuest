@@ -13,7 +13,7 @@ interface AdminRouteProps {
 
 const AdminRoute: React.FC<AdminRouteProps> = ({ children, fallback }) => {
   const { user } = useAuth();
-  const userIsAdmin = isAdmin(user?.email);
+  const userIsAdmin = isAdmin(user?.email) || user?.role === 'admin';
 
   if (!userIsAdmin) {
     return fallback || <AdminAccessDenied />;

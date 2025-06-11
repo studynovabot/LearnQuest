@@ -1,5 +1,5 @@
 // Admin authentication middleware
-import { initializeFirebase, getFirestoreDb } from './firebase.js';
+import { initializeFirebaseAdmin, getFirestoreAdminDb } from './firebase-admin.js';
 
 // Admin email addresses
 const ADMIN_EMAILS = [
@@ -10,8 +10,8 @@ const ADMIN_EMAILS = [
 export async function verifyAdminAccess(req) {
   try {
     // Initialize Firebase
-    initializeFirebase();
-    const db = getFirestoreDb();
+    initializeFirebaseAdmin();
+    const db = getFirestoreAdminDb();
 
     // Get user ID from headers
     const userId = req.headers['x-user-id'];
