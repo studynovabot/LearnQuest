@@ -354,11 +354,23 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.log('✅ User profile fetched successfully:', userData);
         
         // Update the stored user with the new data
+        const parsedStoredUser = JSON.parse(storedUser);
         const updatedUser = {
-          ...JSON.parse(storedUser), // Keep existing fields
+          ...parsedStoredUser, // Keep existing fields
           ...userData, // Update with new profile data
+          // Explicitly preserve these important fields if they exist in the stored user
+          role: parsedStoredUser.role || userData.role || 'user',
+          isPro: parsedStoredUser.isPro !== undefined ? parsedStoredUser.isPro : (userData.isPro || false),
+          subscriptionPlan: parsedStoredUser.subscriptionPlan || userData.subscriptionPlan || 'free',
+          subscriptionStatus: parsedStoredUser.subscriptionStatus || userData.subscriptionStatus || 'trial',
+          subscriptionExpiry: parsedStoredUser.subscriptionExpiry || userData.subscriptionExpiry,
           updatedAt: new Date() // Update the timestamp
         };
+        
+        // Log the before and after state for debugging
+        console.log('Before update - stored user:', parsedStoredUser);
+        console.log('Server data:', userData);
+        console.log('After update - merged user:', updatedUser);
         
         // Update localStorage and state
         localStorage.setItem('user', JSON.stringify(updatedUser));

@@ -156,12 +156,18 @@ const Settings = () => {
           if (storedUserStr) {
             const storedUser = JSON.parse(storedUserStr);
             
-            // Update the user with the new profile data
+            // Update the user with the new profile data while preserving admin status and subscription info
             const updatedUser = {
               ...storedUser,
               displayName: result.user.displayName || storedUser.displayName,
               className: result.user.className || storedUser.className,
               board: result.user.board || storedUser.board,
+              // Explicitly preserve these important fields
+              role: storedUser.role || 'user',
+              isPro: storedUser.isPro || false,
+              subscriptionPlan: storedUser.subscriptionPlan || 'free',
+              subscriptionStatus: storedUser.subscriptionStatus || 'trial',
+              subscriptionExpiry: storedUser.subscriptionExpiry,
               updatedAt: new Date()
             };
             
