@@ -36,11 +36,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               localStorage.removeItem('user');
               
               // Create a default admin user for testing
-              const adminUser = {
+              const adminUser: User = {
                 id: 'admin_user_001',
                 email: 'admin@example.com',
                 displayName: 'Admin User',
                 isPro: true,
+                subscriptionPlan: 'goat', // Admin gets the highest tier
+                subscriptionStatus: 'active',
+                subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+                role: 'admin',
                 lastLogin: new Date(),
                 createdAt: new Date(),
                 updatedAt: new Date()
@@ -57,11 +61,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             localStorage.removeItem('user');
             
             // Create a default admin user for testing
-            const adminUser = {
+            const adminUser: User = {
               id: 'admin_user_001',
               email: 'admin@example.com',
               displayName: 'Admin User',
               isPro: true,
+              subscriptionPlan: 'goat', // Admin gets the highest tier
+              subscriptionStatus: 'active',
+              subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+              role: 'admin',
               lastLogin: new Date(),
               createdAt: new Date(),
               updatedAt: new Date()
@@ -72,11 +80,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           }
         } else {
           // Create a default admin user for testing
-          const adminUser = {
+          const adminUser: User = {
             id: 'admin_user_001',
             email: 'admin@example.com',
             displayName: 'Admin User',
             isPro: true,
+            subscriptionPlan: 'goat', // Admin gets the highest tier
+            subscriptionStatus: 'active',
+            subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+            role: 'admin',
             lastLogin: new Date(),
             createdAt: new Date(),
             updatedAt: new Date()
@@ -137,6 +149,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       email: "demo@example.com",
       displayName: "Demo User (Offline)",
       isPro: false,
+      subscriptionPlan: 'free',
+      subscriptionStatus: 'trial',
+      subscriptionExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       lastLogin: new Date(),
       createdAt: new Date(),
       updatedAt: new Date()
@@ -214,8 +229,23 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       console.log('🔄 Starting registration process...');
 
-      const requestBody = { action: 'register', email, displayName, password, isPro: false };
-      console.log('📤 Registration request:', { email, displayName, isPro: false });
+      const requestBody = { 
+        action: 'register', 
+        email, 
+        displayName, 
+        password, 
+        isPro: false,
+        subscriptionPlan: 'free',
+        subscriptionStatus: 'trial',
+        subscriptionExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7-day trial
+      };
+      console.log('📤 Registration request:', { 
+        email, 
+        displayName, 
+        isPro: false, 
+        subscriptionPlan: 'free',
+        subscriptionStatus: 'trial'
+      });
 
       const response = await fetch(`${config.apiUrl}/auth`, {
         method: 'POST',
