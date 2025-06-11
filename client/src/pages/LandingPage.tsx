@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Helmet } from "react-helmet";
 import { useUserContext } from "@/context/UserContext";
+import { StarIcon, CrownIcon } from "@/components/ui/icons";
 
 const LandingPage: React.FC = () => {
   const { user } = useUserContext();
@@ -547,153 +548,96 @@ const LandingPage: React.FC = () => {
                   Try Study Nova now
                 </h2>
                 <p className="max-w-[900px] text-slate-300 text-lg md:text-xl/relaxed">
-                  Free to start. Fully powered autonomous AI Agent for learning. Upgrade to Pro to lift the limits.
+                  Free to start. Upgrade for unlimited AI tutoring and advanced features.
                 </p>
               </div>
             </div>
             <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-3 mt-16">
-              <div className="flex flex-col rounded-xl border border-slate-700 shadow-lg bg-slate-800/50">
-                <div className="p-8">
-                  <h3 className="text-2xl font-bold text-white">Free</h3>
-                  <div className="mt-6 text-left">
-                    <span className="text-4xl font-bold text-white">₹0</span>
-                    <span className="text-slate-400">/month</span>
-                  </div>
-                  <p className="mt-3 text-sm text-slate-400">
-                    For personal and hobby projects
-                  </p>
-                  <ul className="mt-8 space-y-4">
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">Access to Autonomous AI Agent (limited usage per day)</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">In-app chat with 32k context</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">Unlimited explanations powered by advanced AI</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">Subject-aware vector database (RAG)</span>
-                    </li>
-                  </ul>
+              {/* Free Plan */}
+              <div className="flex flex-col rounded-2xl border border-slate-700 shadow-lg bg-slate-800/50 p-8">
+                <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
+                <div className="flex items-end gap-2 mt-2">
+                  <span className="text-4xl font-bold text-white">₹0</span>
+                  <span className="text-slate-400 text-base">/ month</span>
                 </div>
-                <div className="flex flex-col p-8 mt-auto">
+                <p className="mt-3 text-sm text-slate-400">For personal and hobby projects</p>
+                <ul className="mt-8 space-y-4 flex-1">
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Access to Autonomous AI Agent (limited usage per day)</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Unlimited chat sessions</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Progress tracking & analytics</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Basic performance insights</span></li>
+                </ul>
+                <div className="flex flex-col p-0 mt-8">
                   {user ? (
                     <Link href="/app">
-                      <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white border-0">
-                        Go to App
-                      </Button>
+                      <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white border-0">Go to App</Button>
                     </Link>
                   ) : (
                     <Link href="/register">
-                      <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white border-0">
-                        Get Started
-                      </Button>
+                      <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white border-0">Get Started</Button>
                     </Link>
                   )}
                 </div>
               </div>
-              <div className="flex flex-col rounded-xl border border-blue-500/50 shadow-lg bg-slate-800/70 relative">
-                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-0 rounded-full bg-blue-600 px-4 py-2">
-                  <span className="text-xs font-medium text-white">Popular</span>
+              {/* Pro Plan */}
+              <div className="flex flex-col rounded-2xl border border-blue-500/50 shadow-lg bg-slate-800/70 p-8 relative ring-2 ring-blue-500 scale-105 z-10">
+                <div className="absolute -top-4 right-6 bg-blue-600 px-4 py-1 rounded-full text-xs font-semibold text-white shadow-lg">Most Popular</div>
+                <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2"><StarIcon size={20} className="text-blue-400" /> Pro</h3>
+                <div className="flex items-end gap-2 mt-2">
+                  <span className="text-4xl font-bold text-white">₹350</span>
+                  <span className="text-slate-400 text-base">/ month</span>
                 </div>
-                <div className="p-8">
-                  <h3 className="text-2xl font-bold text-white">Pro</h3>
-                  <div className="mt-6 text-left">
-                    <span className="text-4xl font-bold text-white">₹299</span>
-                    <span className="text-slate-400">/month — for professional use</span>
-                  </div>
-                  <p className="mt-3 text-sm text-slate-400">
-                    Includes everything in the Free, plus:
-                  </p>
-                  <ul className="mt-8 space-y-4">
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">40 requests/day to Autonomous AI Agent</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">Unlimited in-app chat with 64k context</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">Access to additional explanation models</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">Performance analytics and insights</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">Priority support</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex flex-col p-8 mt-auto">
+                <p className="mt-3 text-sm text-slate-400">Perfect for regular learners who want comprehensive AI tutoring</p>
+                <ul className="mt-8 space-y-4 flex-1">
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Access to all AI tutors</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Unlimited chat sessions</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Progress tracking & analytics</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Custom study plans</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Priority support</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Mobile app access</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Offline content download</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Basic performance insights</span></li>
+                </ul>
+                <div className="flex flex-col p-0 mt-8">
                   {user ? (
                     <Link href="/app">
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0">
-                        Go to App
-                      </Button>
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0">Go to App</Button>
                     </Link>
                   ) : (
                     <Link href="/register">
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0">
-                        Get Started
-                      </Button>
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0">Get Started</Button>
                     </Link>
                   )}
                 </div>
               </div>
-              <div className="flex flex-col rounded-xl border border-slate-700 shadow-lg bg-slate-800/50">
-                <div className="p-8">
-                  <h3 className="text-2xl font-bold text-white">Enterprise</h3>
-                  <div className="mt-6 text-left">
-                    <span className="text-4xl font-bold text-white">Custom</span>
-                    <span className="text-slate-400"> pricing</span>
-                  </div>
-                  <p className="mt-3 text-sm text-slate-400">
-                    Deploy AI Agent on-premise, as SaaS, or on AWS.
-                  </p>
-                  <ul className="mt-8 space-y-4">
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">LLM fine-tuning on your school's curriculum</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">Optimized for multiple GPUs</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">Data privacy</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">Priority support and onboarding</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">Custom integrations</span>
-                    </li>
-                  </ul>
+              {/* Goat Plan */}
+              <div className="flex flex-col rounded-2xl border border-purple-500/50 shadow-lg bg-slate-800/70 p-8 relative">
+                <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2"><CrownIcon size={20} className="text-yellow-400" /> Goat</h3>
+                <div className="flex items-end gap-2 mt-2">
+                  <span className="text-4xl font-bold text-white">₹410</span>
+                  <span className="text-slate-400 text-base">/ month</span>
                 </div>
-                <div className="flex flex-col p-8 mt-auto">
+                <p className="mt-3 text-sm text-slate-400">For daily practitioners who demand the ultimate learning experience</p>
+                <ul className="mt-8 space-y-4 flex-1">
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Everything in Pro</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Advanced AI tutoring models</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Personalized learning paths</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Real-time performance analysis</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">1-on-1 expert sessions</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Advanced study materials</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Priority queue access</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Custom AI tutor training</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Advanced analytics dashboard</span></li>
+                  <li className="flex items-start"><CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" /><span className="text-slate-300">Early access to new features</span></li>
+                </ul>
+                <div className="flex flex-col p-0 mt-8">
                   {user ? (
-                    <Link href="/contact">
-                      <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white border-0">
-                        Contact Sales
-                      </Button>
+                    <Link href="/app">
+                      <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white border-0">Go to App</Button>
                     </Link>
                   ) : (
-                    <Link href="/contact">
-                      <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white border-0">
-                        Contact Sales
-                      </Button>
+                    <Link href="/register">
+                      <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white border-0">Get Started</Button>
                     </Link>
                   )}
                 </div>

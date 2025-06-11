@@ -32,6 +32,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { useEffect } from "react";
 import { useUserContext } from "@/context/UserContext";
+import PricingPage from "@/pages/PricingPage";
 // import { Analytics } from "@vercel/analytics/react";
 // import { SpeedInsights } from "@vercel/speed-insights/react";
 
@@ -169,6 +170,9 @@ function Router() {
             <DocumentSearch />
           </MainLayout>
         </ProtectedRoute>
+      </Route>
+      <Route path="/pricing">
+        <PricingPage />
       </Route>
       <Route>
         <NotFound />

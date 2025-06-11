@@ -55,20 +55,6 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="JavaScript Debug.localhost:5000">
-    <configuration name="localhost:5000" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:5000">
-      <method v="2" />
-    </configuration>
-    <configuration name="localhost:8080" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:8080/">
-      <method v="2" />
-    </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="JavaScript Debug.localhost:5000" />
-        <item itemvalue="JavaScript Debug.localhost:8080" />
-      </list>
-    </recent_temporary>
-  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -129,6 +115,10 @@
       <workItem from="1749273226822" duration="1215000" />
       <workItem from="1749298903098" duration="105000" />
       <workItem from="1749395344778" duration="244000" />
+      <workItem from="1749572678872" duration="4488000" />
+      <workItem from="1749624709271" duration="294000" />
+      <workItem from="1749625295315" duration="1984000" />
+      <workItem from="1749627435333" duration="32000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -717,8 +707,8 @@
       <map>
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749298955411" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749273538360" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1749626800561" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749626800561" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/chat.js" value="1749153829847" />
         <entry key="$PROJECT_DIR$/api/image-analysis.js" value="1749056522548" />
@@ -729,7 +719,10 @@
         <entry key="$PROJECT_DIR$/api/user-profile.js" value="1749200477482" />
         <entry key="$PROJECT_DIR$/api/vector-upload.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/client/package.json" value="1749147224393" />
+        <entry key="$PROJECT_DIR$/client/public/images/hero-image.svg" value="1749573895681" />
         <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749110092207" />
+        <entry key="$PROJECT_DIR$/client/src/App.tsx" value="1749575993054" />
+        <entry key="$PROJECT_DIR$/client/src/components/ProtectedRoute.tsx" value="1749573895681" />
         <entry key="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" value="1749107092617" />
         <entry key="$PROJECT_DIR$/client/src/components/ui/premium-chat.tsx" value="1749193596216" />
         <entry key="$PROJECT_DIR$/client/src/config.ts" value="1749146265660" />
@@ -738,8 +731,12 @@
         <entry key="$PROJECT_DIR$/client/src/hooks/useChat.ts" value="1749192394666" />
         <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749192394666" />
         <entry key="$PROJECT_DIR$/client/src/pages/ChatAgents.tsx" value="1749192698909" />
+        <entry key="$PROJECT_DIR$/client/src/pages/LandingPage.tsx" value="1749575993054" />
+        <entry key="$PROJECT_DIR$/client/src/pages/Login.tsx" value="1749573895681" />
         <entry key="$PROJECT_DIR$/client/src/pages/PersonalizedAgent.tsx" value="1748929206006" />
+        <entry key="$PROJECT_DIR$/client/src/pages/Register.tsx" value="1749573895681" />
         <entry key="$PROJECT_DIR$/client/src/pages/Settings.tsx" value="1749201077415" />
+        <entry key="$PROJECT_DIR$/client/src/pages/Terms.tsx" value="1749573895681" />
         <entry key="$PROJECT_DIR$/dev-server.js" value="1748942466395" />
         <entry key="$PROJECT_DIR$/firebase-config.js" value="1749195832013" />
         <entry key="$PROJECT_DIR$/package-lock.json" value="1749196433376" />
@@ -751,9 +748,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1749146585035" />
       </map>
     </option>
-    <option name="lastCommitHash" value="1d614ba3016c2d8e94b2bf04810b1fcf848c8361" />
-    <option name="lastIndexTimestamp" value="1749298955411" />
-    <option name="repoAccumulatedChanges" value="21" />
+    <option name="lastCommitHash" value="6e991e851657f245290da06f2ca77b15bb4da421" />
+    <option name="lastIndexTimestamp" value="1749626800561" />
+    <option name="repoAccumulatedChanges" value="58" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />
