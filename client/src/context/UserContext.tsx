@@ -41,10 +41,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 email: 'admin@example.com',
                 displayName: 'Admin User',
                 isPro: true,
-                subscriptionPlan: 'goat', // Admin gets the highest tier
-                subscriptionStatus: 'active',
+                // Use optional properties with proper type
+                subscriptionPlan: 'goat' as 'free' | 'pro' | 'goat', // Admin gets the highest tier
+                subscriptionStatus: 'active' as 'active' | 'trial' | 'expired' | 'canceled',
                 subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-                role: 'admin',
+                role: 'admin' as 'user' | 'admin',
                 lastLogin: new Date(),
                 createdAt: new Date(),
                 updatedAt: new Date()
@@ -66,10 +67,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               email: 'admin@example.com',
               displayName: 'Admin User',
               isPro: true,
-              subscriptionPlan: 'goat', // Admin gets the highest tier
-              subscriptionStatus: 'active',
+              // Use optional properties with proper type
+              subscriptionPlan: 'goat' as 'free' | 'pro' | 'goat', // Admin gets the highest tier
+              subscriptionStatus: 'active' as 'active' | 'trial' | 'expired' | 'canceled',
               subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-              role: 'admin',
+              role: 'admin' as 'user' | 'admin',
               lastLogin: new Date(),
               createdAt: new Date(),
               updatedAt: new Date()
@@ -85,10 +87,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             email: 'admin@example.com',
             displayName: 'Admin User',
             isPro: true,
-            subscriptionPlan: 'goat', // Admin gets the highest tier
-            subscriptionStatus: 'active',
+            // Use optional properties with proper type
+            subscriptionPlan: 'goat' as 'free' | 'pro' | 'goat', // Admin gets the highest tier
+            subscriptionStatus: 'active' as 'active' | 'trial' | 'expired' | 'canceled',
             subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-            role: 'admin',
+            role: 'admin' as 'user' | 'admin',
             lastLogin: new Date(),
             createdAt: new Date(),
             updatedAt: new Date()
@@ -149,8 +152,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       email: "demo@example.com",
       displayName: "Demo User (Offline)",
       isPro: false,
-      subscriptionPlan: 'free',
-      subscriptionStatus: 'trial',
+      // Use optional properties with proper type
+      subscriptionPlan: 'free' as 'free' | 'pro' | 'goat',
+      subscriptionStatus: 'trial' as 'active' | 'trial' | 'expired' | 'canceled',
       subscriptionExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       lastLogin: new Date(),
       createdAt: new Date(),
@@ -235,16 +239,16 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         displayName, 
         password, 
         isPro: false,
-        subscriptionPlan: 'free',
-        subscriptionStatus: 'trial',
+        subscriptionPlan: 'free' as 'free' | 'pro' | 'goat',
+        subscriptionStatus: 'trial' as 'active' | 'trial' | 'expired' | 'canceled',
         subscriptionExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7-day trial
       };
       console.log('📤 Registration request:', { 
         email, 
         displayName, 
         isPro: false, 
-        subscriptionPlan: 'free',
-        subscriptionStatus: 'trial'
+        subscriptionPlan: 'free' as 'free' | 'pro' | 'goat',
+        subscriptionStatus: 'trial' as 'active' | 'trial' | 'expired' | 'canceled'
       });
 
       const response = await fetch(`${config.apiUrl}/auth`, {
