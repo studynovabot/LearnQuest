@@ -1,24 +1,19 @@
-
 import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { 
-  ArrowRight, 
-  BookOpen, 
-  Brain, 
-  Lightbulb, 
-  Users, 
-  CheckCircle, 
-  Star, 
-  Code, 
-  Search, 
-  Image, 
-  FileCode, 
+import {
+  BookOpen,
+  Brain,
+  Lightbulb,
+  Users,
+  CheckCircle,
+  Code,
+  Search,
+  Image,
+  FileCode,
   Database,
-  Github,
-  Server,
   Lock,
-  Zap
+  Github
 } from "lucide-react";
 import { Helmet } from "react-helmet";
 import { useUserContext } from "@/context/UserContext";
@@ -32,42 +27,52 @@ const LandingPage: React.FC = () => {
         <meta name="description" content="Study Nova helps students master any subject with personalized AI tutors, interactive learning tools, and comprehensive study materials." />
       </Helmet>
 
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen bg-slate-950 text-white">
+        {/* Top Banner */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center py-2 px-4">
+          <p className="text-sm">
+            Study Nova is now the #1 AI-powered learning platform for students{" "}
+            <a href="#features" className="underline hover:no-underline">
+              Read More
+            </a>
+          </p>
+        </div>
+
         {/* Navigation */}
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className="sticky top-0 z-50 w-full bg-slate-950/95 backdrop-blur border-b border-slate-800">
           <div className="container flex h-16 items-center justify-between px-4 md:px-6">
             <div className="flex items-center gap-2">
-              <BookOpen className="h-6 w-6 text-primary" />
+              <BookOpen className="h-6 w-6 text-blue-400" />
               <span className="text-xl font-bold">Study Nova</span>
             </div>
-            <nav className="hidden md:flex gap-6">
-              <a href="#features" className="text-sm font-medium hover:text-primary">
+            <nav className="hidden md:flex gap-8">
+              <a href="#features" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
                 Features
               </a>
-              <a href="#testimonials" className="text-sm font-medium hover:text-primary">
+              <a href="#testimonials" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
                 Testimonials
               </a>
-              <a href="#pricing" className="text-sm font-medium hover:text-primary">
+              <a href="#pricing" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
                 Pricing
               </a>
             </nav>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {user ? (
                 <Link href="/app">
-                  <Button size="sm" className="bg-primary hover:bg-primary/90">
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white border-0">
                     Go to App
                   </Button>
                 </Link>
               ) : (
                 <>
                   <Link href="/login">
-                    <Button variant="outline" size="sm">
-                      Log in
+                    <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-slate-800">
+                      Sign In
                     </Button>
                   </Link>
                   <Link href="/register">
-                    <Button size="sm" className="bg-primary hover:bg-primary/90">
-                      Sign up
+                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white border-0">
+                      Get Started
                     </Button>
                   </Link>
                 </>
@@ -77,41 +82,44 @@ const LandingPage: React.FC = () => {
         </header>
 
         {/* Hero Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
+        <section className="w-full py-16 md:py-24 lg:py-32 bg-slate-950">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center text-center space-y-4 md:space-y-8 max-w-3xl mx-auto">
-              <div className="space-y-3">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                  Study Nova thinks like you, adapts to your learning style instantly
+            <div className="flex flex-col items-center text-center space-y-6 md:space-y-8 max-w-4xl mx-auto">
+              <div className="space-y-6">
+                <h1 className="text-4xl font-bold tracking-tight sm:text-6xl xl:text-7xl/none bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                  #1 AI-Powered Learning Platform for Students
                 </h1>
-                <p className="text-muted-foreground md:text-xl max-w-[700px] mx-auto">
-                  Access AI tutors, educational content, and personalized learning tools with our premium platform designed for academic excellence.
+                <p className="text-slate-300 text-lg md:text-xl max-w-[800px] mx-auto leading-relaxed">
+                  Study Nova codes like you, thinks like you, and adapts to your learning style instantly.
+                  Integrate it with your curriculum, fine-tune it to your subjects, and choose the best AI tutors for your tasks.
+                  Learn anywhere and stay in full control of your education.
                 </p>
               </div>
               <div className="flex flex-wrap justify-center gap-3">
-                <span className="px-3 py-1 text-sm bg-muted rounded-full">Personalized</span>
-                <span className="px-3 py-1 text-sm bg-muted rounded-full">Interactive</span>
-                <span className="px-3 py-1 text-sm bg-muted rounded-full">Comprehensive</span>
+                <span className="px-4 py-2 text-sm bg-slate-800 text-slate-200 rounded-full border border-slate-700">Personalized</span>
+                <span className="px-4 py-2 text-sm bg-slate-800 text-slate-200 rounded-full border border-slate-700">AI-powered</span>
+                <span className="px-4 py-2 text-sm bg-slate-800 text-slate-200 rounded-full border border-slate-700">Comprehensive</span>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <p className="text-slate-400 text-base">
+                Start for free in your favorite subjects, or contact us for premium solutions.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 {user ? (
                   <Link href="/app">
-                    <Button size="lg" className="gap-1.5 bg-primary hover:bg-primary/90">
+                    <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white border-0 px-8 py-3 text-base">
                       Go to App
-                      <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
                 ) : (
                   <>
                     <Link href="/register">
-                      <Button size="lg" className="gap-1.5 bg-primary hover:bg-primary/90">
-                        Start for free
-                        <ArrowRight className="h-4 w-4" />
+                      <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white border-0 px-8 py-3 text-base">
+                        Start for Free
                       </Button>
                     </Link>
-                    <Link href="/login">
-                      <Button size="lg" variant="outline">
-                        Log in
+                    <Link href="/contact">
+                      <Button size="lg" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white px-8 py-3 text-base">
+                        Book a demo
                       </Button>
                     </Link>
                   </>
@@ -122,14 +130,14 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Trusted By Section */}
-        <section className="w-full py-8 md:py-12 bg-muted/30">
+        <section className="w-full py-12 md:py-16 bg-slate-900/50">
           <div className="container px-4 md:px-6">
-            <h2 className="text-2xl font-bold text-center mb-8">
-              Study Nova AI tutor trusted by thousands of students
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-slate-200">
+              AI learning agent trusted by thousands of students
             </h2>
-            <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-6">
               <div className="text-center">
-                <h3 className="text-xl md:text-2xl font-medium">
+                <h3 className="text-xl md:text-2xl font-medium text-slate-300">
                   Get your AI Study Partner that works for you
                 </h3>
               </div>
@@ -138,46 +146,46 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Main Features */}
-        <section className="w-full py-12 md:py-24 lg:py-32">
+        <section className="w-full py-16 md:py-24 lg:py-32 bg-slate-950">
           <div className="container px-4 md:px-6">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-              <div className="space-y-4">
-                <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
-                  Autonomous AI tutor
+              <div className="space-y-6">
+                <div className="inline-block rounded-lg bg-slate-800 border border-slate-700 px-4 py-2 text-sm text-slate-300">
+                  Autonomous AI agent
                 </div>
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
+                <h2 className="text-3xl font-bold tracking-tight md:text-4xl/tight text-white">
                   Delegate your learning tasks end-to-end
                 </h2>
-                <p className="text-muted-foreground md:text-xl/relaxed">
-                  Just describe what you need to learn — Study Nova AI plans, explains, and helps you master the topic. It works like a personal tutor in your device, integrating with your curriculum and learning style.
+                <p className="text-slate-300 text-lg md:text-xl/relaxed">
+                  Just describe what you need to learn — Study Nova Agent plans, executes, and teaches. It works like another tutor in your study space, integrating with your curriculum and learning style, while letting you preview and control the process.
                 </p>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Explains concepts step-by-step with reasoning</span>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-300">Completes learning tasks step-by-step with reasoning.</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Searches and analyzes textbooks for accurate explanations</span>
+                  <li className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-300">Searches and analyzes textbooks for accurate execution.</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Creates personalized study plans and practice questions</span>
+                  <li className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-300">Connects with curriculum, practice tests, study materials, and more.</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Simple, intuitive interface for all ages</span>
+                  <li className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-300">Simple, intuitive UX.</span>
                   </li>
                 </ul>
               </div>
-              <div className="relative aspect-video overflow-hidden rounded-xl border bg-muted/50">
+              <div className="relative aspect-video overflow-hidden rounded-xl border border-slate-700 bg-slate-900/50">
                 <img
                   src="/images/hero-image.svg"
-                  alt="LearnQuest AI Tutor Interface"
+                  alt="Study Nova AI Agent Interface"
                   className="object-cover w-full h-full"
                   onError={(e) => {
                     // Fallback if image doesn't exist
-                    e.currentTarget.src = "https://placehold.co/600x400/e2e8f0/64748b?text=AI+Tutor+Interface";
+                    e.currentTarget.src = "https://placehold.co/600x400/1e293b/64748b?text=AI+Agent+Interface";
                   }}
                 />
               </div>
@@ -186,38 +194,38 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Second Feature */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/30">
+        <section className="w-full py-16 md:py-24 lg:py-32 bg-slate-900/50">
           <div className="container px-4 md:px-6">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-              <div className="order-2 lg:order-1 relative aspect-video overflow-hidden rounded-xl border bg-muted/50">
+              <div className="order-2 lg:order-1 relative aspect-video overflow-hidden rounded-xl border border-slate-700 bg-slate-900/50">
                 <img
-                  src="https://placehold.co/600x400/e2e8f0/64748b?text=In-App+Chat"
-                  alt="LearnQuest In-App Chat"
+                  src="https://placehold.co/600x400/1e293b/64748b?text=In-App+Chat"
+                  alt="Study Nova In-App Chat"
                   className="object-cover w-full h-full"
                 />
               </div>
-              <div className="order-1 lg:order-2 space-y-4">
-                <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
+              <div className="order-1 lg:order-2 space-y-6">
+                <div className="inline-block rounded-lg bg-slate-800 border border-slate-700 px-4 py-2 text-sm text-slate-300">
                   In-app chat
                 </div>
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                  Ask, learn, and solve problems in natural language
+                <h2 className="text-3xl font-bold tracking-tight md:text-4xl/tight text-white">
+                  Ask, edit, debug, and generate solutions in natural language
                 </h2>
-                <p className="text-muted-foreground md:text-xl/relaxed">
-                  Get accurate, context-aware answers and explanations, tailored to your curriculum. Fast and meeting your specific learning needs.
+                <p className="text-slate-300 text-lg md:text-xl/relaxed">
+                  Get accurate, context-aware chat answers and suggestions, tailored to your project. Fast and meeting your specific needs.
                 </p>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Ask questions about any subject or topic</span>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-300">Ask questions about any subject or topic</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Get step-by-step solutions to homework problems</span>
+                  <li className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-300">Get step-by-step solutions to homework problems</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Request explanations at your learning level</span>
+                  <li className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-300">Request explanations at your learning level</span>
                   </li>
                 </ul>
               </div>
@@ -226,42 +234,45 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Third Feature */}
-        <section className="w-full py-12 md:py-24 lg:py-32">
+        <section className="w-full py-16 md:py-24 lg:py-32 bg-slate-950">
           <div className="container px-4 md:px-6">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-              <div className="space-y-4">
-                <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
-                  Comprehensive study materials
+              <div className="space-y-6">
+                <div className="inline-block rounded-lg bg-slate-800 border border-slate-700 px-4 py-2 text-sm text-slate-300">
+                  Accurate autocompletions
                 </div>
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                  Access NCERT solutions and textbook explanations
+                <h2 className="text-3xl font-bold tracking-tight md:text-4xl/tight text-white">
+                  Use AI to continue your learning in real-time
                 </h2>
-                <p className="text-muted-foreground md:text-xl/relaxed">
-                  LearnQuest provides detailed solutions to NCERT textbooks and other educational materials, helping you understand complex topics with ease.
+                <p className="text-slate-300 text-lg md:text-xl/relaxed">
+                  As you study, Study Nova predicts the next concepts, explanations, or practice problems with precision.
                 </p>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Complete NCERT solutions for all classes</span>
+                <p className="text-slate-300 text-base">
+                  Powered by advanced AI models and Retrieval-augmented generation (RAG), it analyzes every topic you explore, retrieves subject-specific insights, and generates content for your next learning step.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-300">Complete NCERT solutions for all classes</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Step-by-step explanations of concepts</span>
+                  <li className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-300">Step-by-step explanations of concepts</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Visual aids like flow charts and diagrams</span>
+                  <li className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-300">Visual aids like flow charts and diagrams</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Practice questions with detailed solutions</span>
+                  <li className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-300">Practice questions with detailed solutions</span>
                   </li>
                 </ul>
               </div>
-              <div className="relative aspect-video overflow-hidden rounded-xl border bg-muted/50">
+              <div className="relative aspect-video overflow-hidden rounded-xl border border-slate-700 bg-slate-900/50">
                 <img
-                  src="https://placehold.co/600x400/e2e8f0/64748b?text=Study+Materials"
-                  alt="LearnQuest Study Materials"
+                  src="https://placehold.co/600x400/1e293b/64748b?text=Study+Materials"
+                  alt="Study Nova Study Materials"
                   className="object-cover w-full h-full"
                 />
               </div>
@@ -270,73 +281,73 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Testimonials Section */}
-        <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32 bg-muted/30">
+        <section id="testimonials" className="w-full py-16 md:py-24 lg:py-32 bg-slate-900/50">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  See how students use AI tutor in real studies
+            <div className="flex flex-col items-center justify-center space-y-6 text-center">
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-white">
+                  See how students use AI Agent in real projects
                 </h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Watch use cases of Study Nova AI autonomously solving students' problems while they focus on understanding.
+                <p className="max-w-[900px] text-slate-300 text-lg md:text-xl/relaxed">
+                  Vibe learning as it is: your high-level guidance, and AI handles the rest. Watch use cases of Study Nova Agent autonomously solving students' tasks while they barely touch the keyboard.
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-12">
-              <div className="flex flex-col justify-between space-y-4 rounded-xl border p-6 shadow-sm">
-                <div className="space-y-2">
-                  <h3 className="font-bold">Study Nova AI saved me hours of study time</h3>
-                  <p className="text-muted-foreground">
-                    "Study Nova has completely transformed how I study. The AI tutors explain concepts in a way that's easy to understand, and the NCERT solutions have been a lifesaver for my exams."
+            <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 mt-16">
+              <div className="flex flex-col justify-between space-y-6 rounded-xl border border-slate-700 bg-slate-800/50 p-8 shadow-lg">
+                <div className="space-y-4">
+                  <h3 className="font-bold text-white text-lg">80 hours of studying from scratch — instead done in 30 minutes</h3>
+                  <p className="text-slate-300 leading-relaxed">
+                    "The new tutor told me that he needed 80 hours to understand from scratch, as reviewing it would take the same amount of time or more. So I connected Study Nova to my textbooks and used the visual tools while logged into my study dashboard. And guess what happened? In about 30 minutes of prompt ping-pong, it identified the issue with my understanding. I told the Agent I didn't want to memorize — just understand! And it did! This freaking Agent keeps amazing me every single time."
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <div className="rounded-full bg-primary/10 p-1">
-                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                      <span className="text-xs font-medium">RS</span>
+                  <div className="rounded-full bg-blue-500/20 p-1">
+                    <div className="h-10 w-10 rounded-full bg-blue-500/30 flex items-center justify-center">
+                      <span className="text-sm font-medium text-blue-200">RS</span>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Rahul S.</p>
-                    <p className="text-xs text-muted-foreground">Class 10 Student</p>
+                    <p className="text-sm font-medium text-white">Rahul S.</p>
+                    <p className="text-xs text-slate-400">Class 10 Student</p>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col justify-between space-y-4 rounded-xl border p-6 shadow-sm">
-                <div className="space-y-2">
-                  <h3 className="font-bold">My grades improved dramatically</h3>
-                  <p className="text-muted-foreground">
-                    "As a parent, I'm impressed with how Study Nova has helped my daughter improve her grades. The personalized approach and detailed explanations have made a huge difference."
+              <div className="flex flex-col justify-between space-y-6 rounded-xl border border-slate-700 bg-slate-800/50 p-8 shadow-lg">
+                <div className="space-y-4">
+                  <h3 className="font-bold text-white text-lg">3 weeks of waiting — solved in just 14 minutes!</h3>
+                  <p className="text-slate-300 leading-relaxed">
+                    "Another big win story here! I also work with other study groups, and their workload is already full, so they don't have much time for improvements. Still, I just asked the Study Nova Agent to build me a study plan for a difficult chapter that this group is covering. Let me tell you — in just 14 minutes, the agent created the most beautiful, fully functional study guide (nothing was missing) for this chapter. All I did was give it the link to the textbook... (They had been asking for a study guide 3 weeks ago, a few people said 'OK', but nothing was delivered.)"
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <div className="rounded-full bg-primary/10 p-1">
-                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                      <span className="text-xs font-medium">PK</span>
+                  <div className="rounded-full bg-blue-500/20 p-1">
+                    <div className="h-10 w-10 rounded-full bg-blue-500/30 flex items-center justify-center">
+                      <span className="text-sm font-medium text-blue-200">PK</span>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Priya K.</p>
-                    <p className="text-xs text-muted-foreground">Parent</p>
+                    <p className="text-sm font-medium text-white">Priya K.</p>
+                    <p className="text-xs text-slate-400">Parent & Educator</p>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col justify-between space-y-4 rounded-xl border p-6 shadow-sm">
-                <div className="space-y-2">
-                  <h3 className="font-bold">Complex topics made simple</h3>
-                  <p className="text-muted-foreground">
-                    "The interactive study tools and concept maps have helped me visualize complex topics. I've seen a significant improvement in my understanding and retention of difficult subjects."
+              <div className="flex flex-col justify-between space-y-6 rounded-xl border border-slate-700 bg-slate-800/50 p-8 shadow-lg">
+                <div className="space-y-4">
+                  <h3 className="font-bold text-white text-lg">Study Nova Agent handles around 95% of the work</h3>
+                  <p className="text-slate-300 leading-relaxed">
+                    "As someone with zero prior advanced study experience, this Study Nova agent has been incredibly effective. With its intelligent support, I can now tackle complex subjects using a 'vibe learning' approach. I'd describe this agent as my personal paid tutor — it handles around 95% of the work, including explaining and helping me practice concepts. Moreover, it helps me understand learning logic in the process, making it both a study and a learning tool."
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <div className="rounded-full bg-primary/10 p-1">
-                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                      <span className="text-xs font-medium">AM</span>
+                  <div className="rounded-full bg-blue-500/20 p-1">
+                    <div className="h-10 w-10 rounded-full bg-blue-500/30 flex items-center justify-center">
+                      <span className="text-sm font-medium text-blue-200">AM</span>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Ananya M.</p>
-                    <p className="text-xs text-muted-foreground">Class 12 Student</p>
+                    <p className="text-sm font-medium text-white">Ananya M.</p>
+                    <p className="text-xs text-slate-400">Class 12 Student</p>
                   </div>
                 </div>
               </div>
@@ -345,169 +356,182 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Features Grid */}
-        <section id="features" className="w-full py-12 md:py-24 lg:py-32">
+        <section id="features" className="w-full py-16 md:py-24 lg:py-32 bg-slate-950">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  With Study Nova AI tutor, transform how you learn
+            <div className="flex flex-col items-center justify-center space-y-6 text-center">
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-white">
+                  With AI Agent, transform how you build knowledge
                 </h2>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-              <div className="flex flex-col items-center text-center space-y-3 p-6">
-                <Brain className="h-12 w-12 text-primary" />
-                <h3 className="text-xl font-bold">Understands your context</h3>
-                <p className="text-muted-foreground">
-                  Study Nova analyzes your curriculum and learning style to deliver accurate, context-aware explanations and solutions.
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-16">
+              <div className="flex flex-col items-center text-center space-y-6 p-8">
+                <div className="relative">
+                  <Brain className="h-16 w-16 text-blue-400" />
+                  <div className="absolute inset-0 bg-blue-400/20 rounded-full blur-xl"></div>
+                </div>
+                <h3 className="text-xl font-bold text-white">Understands your context</h3>
+                <p className="text-slate-300 leading-relaxed">
+                  Study Nova analyzes your entire learning environment to deliver accurate, context-aware explanations and solutions—better than any other tested solution.
                 </p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  <span className="px-3 py-1 text-xs bg-slate-800 text-slate-300 rounded-full border border-slate-700">Curriculum</span>
+                  <span className="px-3 py-1 text-xs bg-slate-800 text-slate-300 rounded-full border border-slate-700">Textbooks</span>
+                  <span className="px-3 py-1 text-xs bg-slate-800 text-slate-300 rounded-full border border-slate-700">Notes</span>
+                  <span className="px-3 py-1 text-xs bg-slate-800 text-slate-300 rounded-full border border-slate-700">Practice</span>
+                  <span className="px-3 py-1 text-xs bg-slate-800 text-slate-300 rounded-full border border-slate-700">...</span>
+                </div>
               </div>
-              <div className="flex flex-col items-center text-center space-y-3 p-6">
-                <Lightbulb className="h-12 w-12 text-primary" />
-                <h3 className="text-xl font-bold">Learns and evolves with you</h3>
-                <p className="text-muted-foreground">
-                  The more you use it, the smarter it gets. Study Nova adapts to your learning pace and preferences.
+              <div className="flex flex-col items-center text-center space-y-6 p-8">
+                <div className="relative">
+                  <Lightbulb className="h-16 w-16 text-blue-400" />
+                  <div className="absolute inset-0 bg-blue-400/20 rounded-full blur-xl"></div>
+                </div>
+                <h3 className="text-xl font-bold text-white">Learns and evolves with you</h3>
+                <p className="text-slate-300 leading-relaxed">
+                  The more you use it, the smarter it gets. Save use cases, refine memory, and train the Agent to adapt to your workflow. Make it your real digital twin.
                 </p>
+                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center border border-slate-700">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-blue-500/50 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col items-center text-center space-y-3 p-6">
-                <Lock className="h-12 w-12 text-primary" />
-                <h3 className="text-xl font-bold">Safe and secure</h3>
-                <p className="text-muted-foreground">
-                  Your data is protected and your privacy is our priority. Learn with confidence.
+              <div className="flex flex-col items-center text-center space-y-6 p-8">
+                <div className="relative">
+                  <Lock className="h-16 w-16 text-blue-400" />
+                  <div className="absolute inset-0 bg-blue-400/20 rounded-full blur-xl"></div>
+                </div>
+                <h3 className="text-xl font-bold text-white">Remains in your control</h3>
+                <p className="text-slate-300 leading-relaxed">
+                  On-premise deployment keeps your data private and fully under your control. It provides maximum security and complete data ownership.
                 </p>
+                <div className="w-full h-32 bg-slate-900/50 rounded-lg border border-slate-700 flex items-center justify-center">
+                  <div className="text-slate-500 text-sm">Your browser does not support the video tag.</div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
         {/* Tools Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/30">
+        <section className="w-full py-16 md:py-24 lg:py-32 bg-slate-900/50">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            <div className="flex flex-col items-center justify-center space-y-6 text-center">
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-white">
                   Powerful AI tools for every learning task
                 </h2>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-              <div className="flex flex-col p-6 bg-background rounded-xl border shadow-sm">
-                <Code className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-2">AI Homework Helper</h3>
-                <p className="text-muted-foreground mb-4">
-                  Get step-by-step solutions to your homework problems in any subject.
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg hover:bg-slate-800/70 transition-colors">
+                <Code className="h-10 w-10 text-blue-400 mb-6" />
+                <h3 className="text-xl font-bold mb-3 text-white">AI Homework Helper</h3>
+                <p className="text-slate-300 mb-6 leading-relaxed">
+                  Generate solutions for any homework problem. This online tool easily generates, optimizes, and explains solutions in various subjects.
                 </p>
                 {user ? (
-                  <Link href="/app" className="text-primary hover:underline mt-auto">
-                    Go to AI Homework Helper
+                  <Link href="/app" className="text-blue-400 hover:text-blue-300 hover:underline mt-auto font-medium">
+                    Try AI Homework Helper
                   </Link>
                 ) : (
-                  <Link href="/register" className="text-primary hover:underline mt-auto">
+                  <Link href="/register" className="text-blue-400 hover:text-blue-300 hover:underline mt-auto font-medium">
                     Try AI Homework Helper
                   </Link>
                 )}
               </div>
-              <div className="flex flex-col p-6 bg-background rounded-xl border shadow-sm">
-                <Search className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-2">Concept Explorer</h3>
-                <p className="text-muted-foreground mb-4">
-                  Understand complex concepts with interactive explanations and visual aids.
+              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg hover:bg-slate-800/70 transition-colors">
+                <Search className="h-10 w-10 text-blue-400 mb-6" />
+                <h3 className="text-xl font-bold mb-3 text-white">AI Concept Review</h3>
+                <p className="text-slate-300 mb-6 leading-relaxed">
+                  Automate concept reviews with AI. This tool analyzes topics in multiple subjects and provides clear explanations and improvements.
                 </p>
                 {user ? (
-                  <Link href="/app" className="text-primary hover:underline mt-auto">
-                    Go to Concept Explorer
+                  <Link href="/app" className="text-blue-400 hover:text-blue-300 hover:underline mt-auto font-medium">
+                    Try AI Concept Review
                   </Link>
                 ) : (
-                  <Link href="/register" className="text-primary hover:underline mt-auto">
-                    Try Concept Explorer
+                  <Link href="/register" className="text-blue-400 hover:text-blue-300 hover:underline mt-auto font-medium">
+                    Try AI Concept Review
                   </Link>
                 )}
               </div>
-              <div className="flex flex-col p-6 bg-background rounded-xl border shadow-sm">
-                <Image className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-2">Visual Learning</h3>
-                <p className="text-muted-foreground mb-4">
-                  Convert text explanations into diagrams, charts, and visual aids for better understanding.
+              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg hover:bg-slate-800/70 transition-colors">
+                <Image className="h-10 w-10 text-blue-400 mb-6" />
+                <h3 className="text-xl font-bold mb-3 text-white">Image to Notes</h3>
+                <p className="text-slate-300 mb-6 leading-relaxed">
+                  Convert images or screenshots into structured study notes. Just upload your file, add details or requirements, choose a model, and get your notes.
                 </p>
                 {user ? (
-                  <Link href="/app" className="text-primary hover:underline mt-auto">
-                    Go to Visual Learning
+                  <Link href="/app" className="text-blue-400 hover:text-blue-300 hover:underline mt-auto font-medium">
+                    Try Image to Notes
                   </Link>
                 ) : (
-                  <Link href="/register" className="text-primary hover:underline mt-auto">
-                    Try Visual Learning
+                  <Link href="/register" className="text-blue-400 hover:text-blue-300 hover:underline mt-auto font-medium">
+                    Try Image to Notes
                   </Link>
                 )}
               </div>
-              <div className="flex flex-col p-6 bg-background rounded-xl border shadow-sm">
-                <FileCode className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-2">NCERT Solutions</h3>
-                <p className="text-muted-foreground mb-4">
-                  Access comprehensive solutions for NCERT textbooks across all subjects and classes.
+              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg hover:bg-slate-800/70 transition-colors">
+                <FileCode className="h-10 w-10 text-blue-400 mb-6" />
+                <h3 className="text-xl font-bold mb-3 text-white">Math Solution Generator</h3>
+                <p className="text-slate-300 mb-6 leading-relaxed">
+                  Ask to generate, explain, or solve your Math problems. Simply select the action, describe the problem, choose the model, and our online tool will do it for you.
                 </p>
                 {user ? (
-                  <Link href="/app" className="text-primary hover:underline mt-auto">
-                    Go to NCERT Solutions
+                  <Link href="/app" className="text-blue-400 hover:text-blue-300 hover:underline mt-auto font-medium">
+                    Try Math Solution Generator
                   </Link>
                 ) : (
-                  <Link href="/register" className="text-primary hover:underline mt-auto">
-                    Try NCERT Solutions
+                  <Link href="/register" className="text-blue-400 hover:text-blue-300 hover:underline mt-auto font-medium">
+                    Try Math Solution Generator
                   </Link>
                 )}
               </div>
-              <div className="flex flex-col p-6 bg-background rounded-xl border shadow-sm">
-                <Database className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-2">Practice Question Bank</h3>
-                <p className="text-muted-foreground mb-4">
-                  Practice with thousands of questions and get instant feedback on your answers.
+              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg hover:bg-slate-800/70 transition-colors">
+                <Database className="h-10 w-10 text-blue-400 mb-6" />
+                <h3 className="text-xl font-bold mb-3 text-white">Science Lab Generator</h3>
+                <p className="text-slate-300 mb-6 leading-relaxed">
+                  Request experiment generation, optimization, or analysis for your Science projects. Just pick an action, define the experiment, select a model, and let our online tool handle the rest.
                 </p>
                 {user ? (
-                  <Link href="/app" className="text-primary hover:underline mt-auto">
-                    Go to Practice Question Bank
+                  <Link href="/app" className="text-blue-400 hover:text-blue-300 hover:underline mt-auto font-medium">
+                    Try Science Lab Generator
                   </Link>
                 ) : (
-                  <Link href="/register" className="text-primary hover:underline mt-auto">
-                    Try Practice Question Bank
+                  <Link href="/register" className="text-blue-400 hover:text-blue-300 hover:underline mt-auto font-medium">
+                    Try Science Lab Generator
                   </Link>
                 )}
-              </div>
-              <div className="flex flex-col p-6 bg-background rounded-xl border shadow-sm">
-                <Zap className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-2">Exam Prep</h3>
-                <p className="text-muted-foreground mb-4">
-                  Prepare for exams with personalized study plans, mock tests, and performance analytics.
-                </p>
-                <Link href="/register" className="text-primary hover:underline mt-auto">
-                  Try Exam Prep
-                </Link>
               </div>
             </div>
           </div>
         </section>
 
         {/* Subjects Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32">
+        <section className="w-full py-16 md:py-24 lg:py-32 bg-slate-950">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Supports all major subjects
+            <div className="flex flex-col items-center justify-center space-y-6 text-center">
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-white">
+                  Supports 25+ subjects
                 </h2>
               </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-12">
-              {["Mathematics", "Physics", "Chemistry", "Biology", "History", "Geography", 
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 mt-16">
+              {["Mathematics", "Physics", "Chemistry", "Biology", "History", "Geography",
                 "Economics", "English", "Hindi", "Science", "Social Studies", "Computer Science"].map((subject) => (
-                <div key={subject} className="flex items-center justify-center p-4 rounded-lg border bg-background">
-                  <span className="font-medium">{subject}</span>
+                <div key={subject} className="flex items-center justify-center p-6 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-colors">
+                  <span className="font-medium text-slate-200 text-center">{subject}</span>
                 </div>
               ))}
             </div>
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-12">
               <Link href="/register">
-                <Button size="lg" className="gap-1.5 bg-primary hover:bg-primary/90">
-                  Get LearnQuest
-                  <ArrowRight className="h-4 w-4" />
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white border-0 px-8 py-3 text-base">
+                  Get Study Nova
                 </Button>
               </Link>
             </div>
@@ -515,156 +539,160 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Pricing Section */}
-        <section id="pricing" className="w-full py-12 md:py-24 lg:py-32 bg-muted/30">
+        <section id="pricing" className="w-full py-16 md:py-24 lg:py-32 bg-slate-900/50">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            <div className="flex flex-col items-center justify-center space-y-6 text-center">
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-white">
                   Try Study Nova now
                 </h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Free to start. Fully powered AI tutor for students. Upgrade to Pro for unlimited access.
+                <p className="max-w-[900px] text-slate-300 text-lg md:text-xl/relaxed">
+                  Free to start. Fully powered autonomous AI Agent for learning. Upgrade to Pro to lift the limits.
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-3 mt-12">
-              <div className="flex flex-col rounded-xl border shadow-sm bg-background">
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold">Free</h3>
-                  <div className="mt-4 text-center">
-                    <span className="text-4xl font-bold">₹0</span>
-                    <span className="text-muted-foreground">/month</span>
+            <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-3 mt-16">
+              <div className="flex flex-col rounded-xl border border-slate-700 shadow-lg bg-slate-800/50">
+                <div className="p-8">
+                  <h3 className="text-2xl font-bold text-white">Free</h3>
+                  <div className="mt-6 text-left">
+                    <span className="text-4xl font-bold text-white">₹0</span>
+                    <span className="text-slate-400">/month</span>
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    For personal and hobby learning
+                  <p className="mt-3 text-sm text-slate-400">
+                    For personal and hobby projects
                   </p>
-                  <ul className="mt-6 space-y-3">
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Limited AI tutor access (5 questions/day)</span>
+                  <ul className="mt-8 space-y-4">
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">Access to Autonomous AI Agent (limited usage per day)</span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Basic NCERT solutions</span>
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">In-app chat with 32k context</span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Access to concept explanations</span>
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">Unlimited explanations powered by advanced AI</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">Subject-aware vector database (RAG)</span>
                     </li>
                   </ul>
                 </div>
-                <div className="flex flex-col p-6 mt-auto">
+                <div className="flex flex-col p-8 mt-auto">
                   {user ? (
                     <Link href="/app">
-                      <Button className="w-full" variant="outline">
+                      <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white border-0">
                         Go to App
                       </Button>
                     </Link>
                   ) : (
                     <Link href="/register">
-                      <Button className="w-full" variant="outline">
+                      <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white border-0">
                         Get Started
                       </Button>
                     </Link>
                   )}
                 </div>
               </div>
-              <div className="flex flex-col rounded-xl border shadow-sm bg-background relative">
-                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-0 rounded-full bg-primary px-3 py-1">
-                  <span className="text-xs font-medium text-primary-foreground">Popular</span>
+              <div className="flex flex-col rounded-xl border border-blue-500/50 shadow-lg bg-slate-800/70 relative">
+                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-0 rounded-full bg-blue-600 px-4 py-2">
+                  <span className="text-xs font-medium text-white">Popular</span>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold">Pro</h3>
-                  <div className="mt-4 text-center">
-                    <span className="text-4xl font-bold">₹299</span>
-                    <span className="text-muted-foreground">/month</span>
+                <div className="p-8">
+                  <h3 className="text-2xl font-bold text-white">Pro</h3>
+                  <div className="mt-6 text-left">
+                    <span className="text-4xl font-bold text-white">₹299</span>
+                    <span className="text-slate-400">/month — for professional use</span>
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    For serious students
+                  <p className="mt-3 text-sm text-slate-400">
+                    Includes everything in the Free, plus:
                   </p>
-                  <ul className="mt-6 space-y-3">
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Everything in Free</span>
+                  <ul className="mt-8 space-y-4">
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">40 requests/day to Autonomous AI Agent</span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Unlimited AI tutor access</span>
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">Unlimited in-app chat with 64k context</span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Full NCERT solutions</span>
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">Access to additional explanation models</span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Performance analytics</span>
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">Performance analytics and insights</span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Practice question bank</span>
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">Priority support</span>
                     </li>
                   </ul>
                 </div>
-                <div className="flex flex-col p-6 mt-auto">
+                <div className="flex flex-col p-8 mt-auto">
                   {user ? (
                     <Link href="/app">
-                      <Button className="w-full bg-primary hover:bg-primary/90">
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0">
                         Go to App
                       </Button>
                     </Link>
                   ) : (
                     <Link href="/register">
-                      <Button className="w-full bg-primary hover:bg-primary/90">
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0">
                         Get Started
                       </Button>
                     </Link>
                   )}
                 </div>
               </div>
-              <div className="flex flex-col rounded-xl border shadow-sm bg-background">
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold">Premium</h3>
-                  <div className="mt-4 text-center">
-                    <span className="text-4xl font-bold">₹599</span>
-                    <span className="text-muted-foreground">/month</span>
+              <div className="flex flex-col rounded-xl border border-slate-700 shadow-lg bg-slate-800/50">
+                <div className="p-8">
+                  <h3 className="text-2xl font-bold text-white">Enterprise</h3>
+                  <div className="mt-6 text-left">
+                    <span className="text-4xl font-bold text-white">Custom</span>
+                    <span className="text-slate-400"> pricing</span>
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    For exam preparation
+                  <p className="mt-3 text-sm text-slate-400">
+                    Deploy AI Agent on-premise, as SaaS, or on AWS.
                   </p>
-                  <ul className="mt-6 space-y-3">
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Everything in Pro</span>
+                  <ul className="mt-8 space-y-4">
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">LLM fine-tuning on your school's curriculum</span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Personalized study plans</span>
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">Optimized for multiple GPUs</span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Mock tests & exam prep</span>
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">Data privacy</span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Visual learning tools</span>
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">Priority support and onboarding</span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                      <span>Priority support</span>
+                    <li className="flex items-start">
+                      <CheckCircle className="mr-3 h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">Custom integrations</span>
                     </li>
                   </ul>
                 </div>
-                <div className="flex flex-col p-6 mt-auto">
+                <div className="flex flex-col p-8 mt-auto">
                   {user ? (
-                    <Link href="/app">
-                      <Button className="w-full" variant="outline">
-                        Go to App
+                    <Link href="/contact">
+                      <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white border-0">
+                        Contact Sales
                       </Button>
                     </Link>
                   ) : (
-                    <Link href="/register">
-                      <Button className="w-full" variant="outline">
-                        Get Started
+                    <Link href="/contact">
+                      <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white border-0">
+                        Contact Sales
                       </Button>
                     </Link>
                   )}
@@ -675,30 +703,28 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-primary text-primary-foreground">
+        <section className="w-full py-16 md:py-24 lg:py-32 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Ready to transform your learning experience?
+            <div className="flex flex-col items-center justify-center space-y-6 text-center">
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+                  Empower your learning with AI Agent
                 </h2>
-                <p className="max-w-[900px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Join thousands of students who are achieving academic excellence with Study Nova.
+                <p className="max-w-[900px] text-blue-100 text-lg md:text-xl/relaxed">
+                  Learn how Study Nova Agent can turn AI into a true force multiplier for your education.
                 </p>
               </div>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row">
+              <div className="flex flex-col gap-4 min-[400px]:flex-row">
                 {user ? (
                   <Link href="/app">
-                    <Button size="lg" variant="secondary" className="gap-1.5">
+                    <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 border-0 px-8 py-3 text-base font-medium">
                       Go to App
-                      <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
                 ) : (
-                  <Link href="/register">
-                    <Button size="lg" variant="secondary" className="gap-1.5">
-                      Get Started
-                      <ArrowRight className="h-4 w-4" />
+                  <Link href="/contact">
+                    <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 border-0 px-8 py-3 text-base font-medium">
+                      Book a Demo
                     </Button>
                   </Link>
                 )}
@@ -708,26 +734,56 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Footer */}
-        <footer className="border-t py-6 md:py-8">
-          <div className="container flex flex-col items-center justify-center gap-4 md:flex-row md:gap-8 px-4 md:px-6">
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">Study Nova</span>
+        <footer className="border-t border-slate-800 bg-slate-950 py-12 md:py-16">
+          <div className="container px-4 md:px-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-6 w-6 text-blue-400" />
+                  <span className="text-xl font-bold text-white">Study Nova</span>
+                </div>
+                <p className="text-slate-400 text-sm">
+                  Autonomous AI Agent for Learning
+                </p>
+                <div className="flex gap-4">
+                  <a href="#" className="text-slate-400 hover:text-white">
+                    <Github className="h-5 w-5" />
+                  </a>
+                  <a href="#" className="text-slate-400 hover:text-white">
+                    <Users className="h-5 w-5" />
+                  </a>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <h4 className="text-white font-medium">Product</h4>
+                <nav className="flex flex-col gap-2">
+                  <a href="#features" className="text-slate-400 hover:text-white text-sm">Features</a>
+                  <a href="#pricing" className="text-slate-400 hover:text-white text-sm">Pricing</a>
+                  <a href="#" className="text-slate-400 hover:text-white text-sm">Self hosted</a>
+                </nav>
+              </div>
+              <div className="space-y-4">
+                <h4 className="text-white font-medium">Company</h4>
+                <nav className="flex flex-col gap-2">
+                  <a href="#" className="text-slate-400 hover:text-white text-sm">About</a>
+                  <a href="#" className="text-slate-400 hover:text-white text-sm">Blog</a>
+                  <a href="#" className="text-slate-400 hover:text-white text-sm">Documentation</a>
+                  <a href="#" className="text-slate-400 hover:text-white text-sm">FAQ</a>
+                </nav>
+              </div>
+              <div className="space-y-4">
+                <h4 className="text-white font-medium">Resources</h4>
+                <nav className="flex flex-col gap-2">
+                  <a href="#" className="text-slate-400 hover:text-white text-sm">Community</a>
+                  <a href="/terms" className="text-slate-400 hover:text-white text-sm">Terms of Use</a>
+                  <a href="/privacy-policy" className="text-slate-400 hover:text-white text-sm">Privacy Policy</a>
+                  <a href="#" className="text-slate-400 hover:text-white text-sm">Cookies Policy</a>
+                </nav>
+              </div>
             </div>
-            <nav className="flex gap-4 sm:gap-6">
-              <Link href="/privacy-policy" className="text-xs hover:underline underline-offset-4">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="text-xs hover:underline underline-offset-4">
-                Terms of Service
-              </Link>
-              <a href="#" className="text-xs hover:underline underline-offset-4">
-                Contact
-              </a>
-            </nav>
-            <div className="flex items-center gap-4">
-              <p className="text-xs text-muted-foreground">
-                © 2024 Study Nova. All rights reserved.
+            <div className="border-t border-slate-800 mt-12 pt-8 text-center">
+              <p className="text-slate-400 text-sm">
+                © 2025 Study Nova. All rights reserved.
               </p>
             </div>
           </div>
