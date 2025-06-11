@@ -3,13 +3,29 @@ import { initializeFirebaseAdmin, getFirestoreAdminDb } from '../utils/firebase-
 import { requireAdmin } from '../utils/admin-auth.js';
 
 // Initialize Firebase
-initializeFirebaseAdmin();
+const adminApp = initializeFirebaseAdmin();
+if (!adminApp) {
+  console.error('❌ Failed to initialize Firebase Admin SDK');
+}
+
 const db = getFirestoreAdminDb();
+if (!db) {
+  console.error('❌ Failed to get Firestore Admin database');
+}
+
+console.log('✅ Admin users API initialized');
 
 /**
  * Get all users with pagination and filtering
  */
 async function getAllUsers(req, res) {
+  console.log('📊 Getting all users from Firebase');
+  console.log('Request headers:', {
+    userId: req.headers['x-user-id'],
+    userEmail: req.headers['x-user-email'],
+    authorization: req.headers['authorization'] ? 'Present' : 'Missing'
+  });
+  
   try {
     const { 
       page = 1, 
@@ -55,7 +71,20 @@ async function getAllUsers(req, res) {
     query = query.limit(limitNum).offset(offset);
     
     // Execute query
+    console.log('Executing Firestore query:', {
+      collection: 'users',
+      filters: {
+        role: role || 'any',
+        subscriptionPlan: subscriptionPlan || 'any'
+      },
+      sortBy,
+      sortOrder,
+      limit: limitNum,
+      offset
+    });
+    
     const snapshot = await query.get();
+    console.log(`Query returned ${snapshot.size} documents`);
     
     // Process results
     let users = [];
@@ -104,6 +133,50 @@ async function getAllUsers(req, res) {
     
   } catch (error) {
     console.error('Error fetching users:', error);
+    
+    // Try a simpler query as fallback
+    try {
+      console.log('Attempting fallback query...');
+      const fallbackQuery = db.collection('users').limit(20);
+      const fallbackSnapshot = await fallbackQuery.get();
+      
+      if (!fallbackSnapshot.empty) {
+        console.log(`Fallback query returned ${fallbackSnapshot.size} documents`);
+        
+        // Process results
+        let fallbackUsers = [];
+        fallbackSnapshot.forEach(doc => {
+          const userData = doc.data();
+          
+          // Convert timestamps to ISO strings for JSON serialization
+          const processedUser = {
+            id: doc.id,
+            ...userData,
+            createdAt: userData.createdAt ? userData.createdAt.toDate().toISOString() : null,
+            updatedAt: userData.updatedAt ? userData.updatedAt.toDate().toISOString() : null,
+            lastLogin: userData.lastLogin ? userData.lastLogin.toDate().toISOString() : null,
+            subscriptionExpiry: userData.subscriptionExpiry ? userData.subscriptionExpiry.toDate().toISOString() : null
+          };
+          
+          fallbackUsers.push(processedUser);
+        });
+        
+        return res.status(200).json({
+          users: fallbackUsers,
+          pagination: {
+            total: fallbackUsers.length,
+            page: 1,
+            limit: 20,
+            pages: 1
+          },
+          fallback: true,
+          originalError: error.message
+        });
+      }
+    } catch (fallbackError) {
+      console.error('Fallback query also failed:', fallbackError);
+    }
+    
     return res.status(500).json({ 
       message: 'Failed to fetch users', 
       error: error.message 
