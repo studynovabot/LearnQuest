@@ -3,12 +3,15 @@ export interface User {
   email: string;
   displayName: string;
   isPro: boolean;
+  subscriptionPlan: 'free' | 'pro' | 'goat'; // Specific plan type - making this required
+  subscriptionStatus: 'active' | 'trial' | 'expired' | 'canceled'; // Making this required
+  subscriptionExpiry: Date; // Making this required
   className?: string; // User's class/grade
   board?: string; // Educational board (CBSE/ICSE)
-  role?: 'user' | 'admin'; // User role
-  createdAt?: Date;
-  updatedAt?: Date;
-  lastLogin?: Date | null;
+  role: 'user' | 'admin'; // User role - making this required
+  createdAt: Date; // Making this required
+  updatedAt: Date; // Making this required
+  lastLogin: Date | null; // Making this required
   isFirstLogin?: boolean; // Track if this is the user's first login session
 }
 
