@@ -19,11 +19,32 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Provider component
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // TEMPORARY: Bypass authentication for UI testing
+  const BYPASS_AUTH = true;
+  
+  const [user, setUser] = useState<User | null>(BYPASS_AUTH ? {
+    id: 'demo-user-ui-test',
+    email: 'demo@example.com',
+    displayName: 'Demo User (UI Testing)',
+    isPro: true,
+    subscriptionPlan: 'pro',
+    subscriptionStatus: 'active',
+    subscriptionExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+    role: 'user',
+    lastLogin: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date()
+  } : null);
+  const [loading, setLoading] = useState(!BYPASS_AUTH);
 
   // Check if user is already logged in on mount
   useEffect(() => {
+    // Skip authentication checks if bypassing auth
+    if (BYPASS_AUTH) {
+      setLoading(false);
+      return;
+    }
+    
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         if (firebaseUser) {
@@ -114,7 +135,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, []);
+  }, [BYPASS_AUTH]);
 
   // Create developer user for local development only
   const createDeveloperUser = async () => {
