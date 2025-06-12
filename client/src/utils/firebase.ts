@@ -6,12 +6,13 @@ import { User } from '@/types';
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBmCZ88FJUX5E1yVVj8-jm_kK0HhTDzmPc",  // Updated API key
-  authDomain: "studynovabot.firebaseapp.com", 
+  apiKey: "AIzaSyBWqeEO_-9OWKKX_MIolTwnvPS0F5j4ANY",
+  authDomain: "studynovabot.firebaseapp.com",
   projectId: "studynovabot",
-  storageBucket: "studynovabot.appspot.com",
+  storageBucket: "studynovabot.firebasestorage.app",
   messagingSenderId: "250481817155",
-  appId: "1:250481817155:web:16ef3bbdb36bbc375dc6f6"
+  appId: "1:250481817155:web:160f30bdb36bbc375dc6f6",
+  measurementId: "G-Z9MX8BMRYM"
 };
 
 // Log the actual Firebase config being used for debugging
@@ -21,6 +22,22 @@ console.log("Firebase config being used:", JSON.stringify(firebaseConfig));
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Initialize Analytics if in browser environment
+let analytics = null;
+if (typeof window !== 'undefined') {
+  // Dynamically import Firebase analytics to avoid SSR issues
+  import('firebase/analytics').then(({ getAnalytics }) => {
+    try {
+      analytics = getAnalytics(app);
+      console.log('Firebase Analytics initialized');
+    } catch (error) {
+      console.error('Error initializing Firebase Analytics:', error);
+    }
+  }).catch(err => {
+    console.error('Failed to load Firebase Analytics:', err);
+  });
+}
 
 // Convert Firebase user to app User
 export const convertFirebaseUserToUser = async (firebaseUser: FirebaseUser): Promise<User> => {
