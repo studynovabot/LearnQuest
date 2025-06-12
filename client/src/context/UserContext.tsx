@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { User } from "@/types";
 import { config } from "@/config";
+import { signInWithEmail, registerWithEmail, signOutUser, auth } from "@/utils/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 // Define the context type
 interface UserContextType {
@@ -22,80 +24,85 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Check if user is already logged in on mount
   useEffect(() => {
-    const checkAuth = async () => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
-        // Try to get user from localStorage
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          try {
-            const parsedUser = JSON.parse(storedUser);
-
-            // Check if this is an old mock user that needs to be replaced
-            if (parsedUser.id === 'user-123' || parsedUser.id.startsWith('demo-user') || parsedUser.id.startsWith('mock-') || parsedUser.id.startsWith('fallback-')) {
-              console.log('Found old mock user, clearing...');
-              localStorage.removeItem('user');
-              
-              // Create a default admin user for testing
-              const adminUser: User = {
-                id: 'admin_user_001',
-                email: 'admin@example.com',
-                displayName: 'Admin User',
-                isPro: true,
-                subscriptionPlan: 'goat', // Admin gets the highest tier
-                subscriptionStatus: 'active',
-                subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-                role: 'admin',
-                lastLogin: new Date(),
-                createdAt: new Date(),
-                updatedAt: new Date()
-              };
-              localStorage.setItem('user', JSON.stringify(adminUser));
-              setUser(adminUser);
-              console.log('Created default admin user:', adminUser);
-            } else {
-              setUser(parsedUser);
-              console.log('User loaded from localStorage:', parsedUser);
-            }
-          } catch (parseError) {
-            console.error('Failed to parse stored user data:', parseError);
-            localStorage.removeItem('user');
-            
-            // Create a default admin user for testing
-            const adminUser: User = {
-              id: 'admin_user_001',
-              email: 'admin@example.com',
-              displayName: 'Admin User',
-              isPro: true,
-              subscriptionPlan: 'goat', // Admin gets the highest tier
-              subscriptionStatus: 'active',
-              subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-              role: 'admin',
-              lastLogin: new Date(),
-              createdAt: new Date(),
-              updatedAt: new Date()
-            };
-            localStorage.setItem('user', JSON.stringify(adminUser));
-            setUser(adminUser);
-            console.log('Created default admin user after parse error:', adminUser);
+        if (firebaseUser) {
+          console.log('Firebase user authenticated:', firebaseUser.email);
+          
+          // Convert Firebase user to app User
+          const { signInWithEmail, convertFirebaseUserToUser } = await import('@/utils/firebase');
+          const userData = await convertFirebaseUserToUser(firebaseUser);
+          
+          // Special case for admin users
+          if (userData.email === 'thakurranveersingh505@gmail.com' || userData.email === 'tradingproffical@gmail.com') {
+            userData.role = 'admin';
           }
+          
+          setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
+          console.log('User loaded from Firebase auth:', userData);
         } else {
-          // Create a default admin user for testing
-          const adminUser: User = {
-            id: 'admin_user_001',
-            email: 'admin@example.com',
-            displayName: 'Admin User',
-            isPro: true,
-            subscriptionPlan: 'goat', // Admin gets the highest tier
-            subscriptionStatus: 'active',
-            subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-            role: 'admin',
-            lastLogin: new Date(),
-            createdAt: new Date(),
-            updatedAt: new Date()
-          };
-          localStorage.setItem('user', JSON.stringify(adminUser));
-          setUser(adminUser);
-          console.log('Created default admin user (no stored user):', adminUser);
+          console.log('No Firebase user found, checking localStorage...');
+          
+          // Try to get user from localStorage as fallback
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            try {
+              const parsedUser = JSON.parse(storedUser);
+              
+              // Check if this is a mock user
+              if (parsedUser.id === 'user-123' || parsedUser.id.startsWith('demo-user') || 
+                  parsedUser.id.startsWith('mock-') || parsedUser.id.startsWith('fallback-') ||
+                  parsedUser.id === 'admin_user_001') {
+                console.log('Found mock user, clearing...');
+                localStorage.removeItem('user');
+                setUser(null);
+                
+                // Try to auto-login with the provided credentials
+                if (import.meta.env.DEV) {
+                  console.log('Development mode - attempting auto-login with provided credentials');
+                  login('thakurranveersingh505@gmail.com', 'India#321')
+                    .then(success => {
+                      if (success) {
+                        console.log('Auto-login successful');
+                      } else {
+                        console.log('Auto-login failed');
+                      }
+                    })
+                    .catch(error => {
+                      console.error('Auto-login error:', error);
+                    });
+                }
+              } else {
+                // Use the stored user data
+                setUser(parsedUser);
+                console.log('User loaded from localStorage:', parsedUser);
+              }
+            } catch (parseError) {
+              console.error('Failed to parse stored user data:', parseError);
+              localStorage.removeItem('user');
+              setUser(null);
+            }
+          } else {
+            // No user found
+            setUser(null);
+            
+            // Try to auto-login with the provided credentials in development mode
+            if (import.meta.env.DEV) {
+              console.log('Development mode - attempting auto-login with provided credentials');
+              login('thakurranveersingh505@gmail.com', 'India#321')
+                .then(success => {
+                  if (success) {
+                    console.log('Auto-login successful');
+                  } else {
+                    console.log('Auto-login failed');
+                  }
+                })
+                .catch(error => {
+                  console.error('Auto-login error:', error);
+                });
+            }
+          }
         }
       } catch (error) {
         console.error("Authentication check failed:", error);
@@ -103,20 +110,18 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } finally {
         setLoading(false);
       }
-    };
-
-    checkAuth().catch((error) => {
-      console.error('checkAuth promise rejection:', error);
-      setLoading(false);
     });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   // Create developer user for local development only
   const createDeveloperUser = async () => {
-    console.log('🔄 Development mode - attempting auto-login...');
+    console.log('🔄 Development mode - attempting auto-login with Firebase...');
 
     try {
-      // Try to login with your credentials first
+      // Try to login with the provided credentials first
       console.log('🔄 Attempting login with developer credentials...');
       const loginSuccess = await login('thakurranveersingh505@gmail.com', 'India#321');
 
@@ -125,7 +130,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return;
       } else {
         console.log('⚠️ Login failed, attempting to register developer account...');
-        // Try to register your account
+        // Try to register the account
         const registerSuccess = await register('thakurranveersingh505@gmail.com', 'Ranveer Singh', 'India#321');
         if (registerSuccess) {
           console.log('✅ Developer account registered successfully');
@@ -167,53 +172,23 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
-      console.log('🔄 Starting login process...');
-
-      const requestBody = { action: 'login', email, password };
+      console.log('🔄 Starting login process with Firebase...');
       console.log('📤 Login request:', { email });
 
-      const response = await fetch(`${config.apiUrl}/auth`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      }).catch((fetchError) => {
-        console.error('Login fetch error:', fetchError);
-        throw new Error(`Network error: ${fetchError.message}`);
-      });
+      // Use Firebase authentication
+      const userData = await signInWithEmail(email, password);
+      console.log('✅ Login successful:', userData);
 
-      console.log('📥 Login response status:', response.status);
+      // Store the user data
+      const userWithFirstLogin = {
+        ...userData,
+        isFirstLogin: false
+      };
 
-      if (response.ok) {
-        const data = await response.json().catch((jsonError) => {
-          console.error('Login response JSON parse error:', jsonError);
-          throw new Error('Invalid response format');
-        });
-        console.log('✅ Login successful:', data);
+      setUser(userWithFirstLogin);
+      localStorage.setItem('user', JSON.stringify(userWithFirstLogin));
 
-        // Store the user data from the response with first login flag
-        const userWithFirstLogin = {
-          ...(data.user || data),
-          isFirstLogin: data.isFirstLogin || false
-        };
-
-        setUser(userWithFirstLogin);
-        localStorage.setItem('user', JSON.stringify(userWithFirstLogin));
-
-        return true;
-      } else {
-        let errorMessage = 'Login failed';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-          console.error('❌ Server error response:', errorData);
-        } catch (e) {
-          console.error('Failed to parse error response:', e);
-        }
-        console.error('❌ Login failed:', errorMessage);
-        return false;
-      }
+      return true;
     } catch (error) {
       console.error("❌ Login error:", error);
       return false;
@@ -228,19 +203,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (email: string, displayName: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
-      console.log('🔄 Starting registration process...');
-
-      const requestBody = { 
-        action: 'register', 
-        email, 
-        displayName, 
-        password, 
-        isPro: false,
-        subscriptionPlan: 'free',
-        subscriptionStatus: 'trial',
-        role: 'user', // Adding required role
-        subscriptionExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7-day trial
-      };
+      console.log('🔄 Starting registration process with Firebase...');
       console.log('📤 Registration request:', { 
         email, 
         displayName, 
@@ -250,48 +213,20 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         role: 'user'
       });
 
-      const response = await fetch(`${config.apiUrl}/auth`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      }).catch((fetchError) => {
-        console.error('Register fetch error:', fetchError);
-        throw new Error(`Network error: ${fetchError.message}`);
-      });
+      // Use Firebase authentication
+      const userData = await registerWithEmail(email, displayName, password);
+      console.log('✅ Registration successful:', userData);
 
-      console.log('📥 Registration response status:', response.status);
+      // Store the user data with first login flag
+      const userWithFirstLogin = {
+        ...userData,
+        isFirstLogin: true // Registration is always first login
+      };
 
-      if (response.ok) {
-        const userData = await response.json().catch((jsonError) => {
-          console.error('Register response JSON parse error:', jsonError);
-          throw new Error('Invalid response format');
-        });
-        console.log('✅ Registration successful:', userData);
+      setUser(userWithFirstLogin);
+      localStorage.setItem('user', JSON.stringify(userWithFirstLogin));
 
-        // Store the user data from the response with first login flag
-        const userWithFirstLogin = {
-          ...(userData.user || userData),
-          isFirstLogin: userData.isFirstLogin || true // Registration is always first login
-        };
-
-        setUser(userWithFirstLogin);
-        localStorage.setItem('user', JSON.stringify(userWithFirstLogin));
-
-        return true;
-      } else {
-        let errorMessage = 'Registration failed';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-          console.error('❌ Server error response:', errorData);
-        } catch (e) {
-          console.error('Failed to parse error response:', e);
-        }
-        console.error('❌ Registration failed:', errorMessage);
-        return false;
-      }
+      return true;
     } catch (error) {
       console.error("❌ Registration error:", error);
       return false;
@@ -301,9 +236,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // Logout function
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+  const logout = async () => {
+    try {
+      await signOutUser();
+      setUser(null);
+      localStorage.removeItem('user');
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   // Refresh user data

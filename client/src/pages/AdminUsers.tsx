@@ -116,8 +116,8 @@ const AdminUsers: React.FC = () => {
         sortBy,
         sortOrder,
         ...(search && { search }),
-        ...(subscriptionFilter && { subscriptionPlan: subscriptionFilter }),
-        ...(roleFilter && { role: roleFilter })
+        ...(subscriptionFilter && subscriptionFilter !== 'all' && { subscriptionPlan: subscriptionFilter }),
+        ...(roleFilter && roleFilter !== 'all' && { role: roleFilter })
       });
       
       console.log(`Fetching users from: ${config.apiUrl}/admin-users?${queryParams}`);
@@ -517,7 +517,7 @@ const AdminUsers: React.FC = () => {
                           <SelectValue placeholder="Subscription" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Plans</SelectItem>
+                          <SelectItem value="all">All Plans</SelectItem>
                           <SelectItem value="free">Free</SelectItem>
                           <SelectItem value="pro">Pro</SelectItem>
                           <SelectItem value="goat">Goat</SelectItem>
@@ -534,7 +534,7 @@ const AdminUsers: React.FC = () => {
                           <SelectValue placeholder="Role" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Roles</SelectItem>
+                          <SelectItem value="all">All Roles</SelectItem>
                           <SelectItem value="user">User</SelectItem>
                           <SelectItem value="admin">Admin</SelectItem>
                         </SelectContent>
