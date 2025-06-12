@@ -96,6 +96,7 @@ interface User {
   createdAt?: string;
   updatedAt?: string;
   lastLogin?: string;
+  isBlocked?: boolean;
 }
 
 interface UserStats {
@@ -238,7 +239,7 @@ const AdminUsers: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to fetch users');
       
       // Create mock data as fallback if in development or if explicitly enabled
-      if (import.meta.env.DEV || config.enableMockFallback) {
+      if (typeof import.meta !== 'undefined' && import.meta.env?.DEV || config.enableMockFallback) {
         console.log('Using mock data as fallback');
         const mockUsers = generateMockUsers(10);
         setUsers(mockUsers);
@@ -653,7 +654,8 @@ const AdminUsers: React.FC = () => {
         role: index === 0 ? 'admin' : roles[Math.floor(Math.random() * roles.length)],
         createdAt: createdDate.toISOString(),
         updatedAt: new Date().toISOString(),
-        lastLogin: lastLoginDate.toISOString()
+        lastLogin: lastLoginDate.toISOString(),
+        isBlocked: Math.random() > 0.9 // 10% chance of being blocked
       };
     });
   };
@@ -957,7 +959,7 @@ const AdminUsers: React.FC = () => {
                         <RefreshCw className="w-4 h-4 mr-2" />
                         Try Again
                       </Button>
-                      {(import.meta.env.DEV || config.enableMockFallback) && (
+                      {(typeof import.meta !== 'undefined' && import.meta.env?.DEV || config.enableMockFallback) && (
                         <Button 
                           variant="secondary" 
                           onClick={() => {
