@@ -25,6 +25,7 @@ import DocumentSearch from "@/pages/DocumentSearch";
 import VectorUploadPage from "@/pages/VectorUploadPage";
 import LandingPage from "@/pages/LandingPage";
 import Terms from "@/pages/Terms";
+import AdminUsers from "@/pages/AdminUsers";
 import AdminRoute from "@/components/AdminRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout";
@@ -160,6 +161,15 @@ function Router() {
           <MainLayout>
             <AdminRoute>
               <VectorUploadPage />
+            </AdminRoute>
+          </MainLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin-users">
+        <ProtectedRoute>
+          <MainLayout>
+            <AdminRoute>
+              <AdminUsers />
             </AdminRoute>
           </MainLayout>
         </ProtectedRoute>

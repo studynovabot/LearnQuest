@@ -680,6 +680,541 @@
   }
   */
 
+  /* Remove all hover effects globally */
+  * :hover, *:hover::before, *:hover::after {
+    /* Remove transform, box-shadow, background, border, color, opacity, and filter changes on hover */
+    transform: none !important;
+    box-shadow: none !important;
+    background: none !important;
+    background-color: inherit !important;
+    border-color: inherit !important;
+    color: inherit !important;
+    opacity: 1 !important;
+    filter: none !important;
+    text-decoration: none !important;
+    outline: none !important;
+  }
+
+  /* Remove specific hover classes for premium components */
+  .glass-card:hover,
+  .glass-card-strong:hover,
+  .premium-card:hover,
+  .agent-card:hover,
+  .hover-lift:hover,
+  .hover-scale:hover,
+  .hover-shadow:hover,
+  .btn-premium:hover,
+  .nav-icon:hover,
+  .cursor-pointer:hover,
+  button:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    background: inherit !important;
+    color: inherit !important;
+    opacity: 1 !important;
+  }
+
+  /* Remove hover effect for .glow and .glow::after */
+  .glow:hover::after {
+    opacity: 0 !important;
+  }
+
+  /* Remove hover effect for nav-icon gradient */
+  .nav-icon:hover::after {
+    opacity: 0 !important;
+  }
+
+  /* Remove hover effect for custom scrollbars */
+  ::-webkit-scrollbar-thumb:hover {
+    opacity: 0.5 !important;
+    background: inherit !important;
+  }
+
+  body {
+    @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))] antialiased overflow-x-hidden;
+    font-family: ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  /* Premium Background System - Light Theme */
+  body:not(.dark) {
+    background:
+      var(--bg-overlay-1),
+      var(--bg-overlay-2),
+      var(--bg-overlay-3),
+      radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+      hsl(var(--background));
+    background-attachment: fixed;
+  }
+
+  /* Premium Background System - Dark Theme */
+  body.dark {
+    background:
+      var(--bg-overlay-1),
+      var(--bg-overlay-2),
+      var(--bg-overlay-3),
+      radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+      hsl(var(--background));
+    background-attachment: fixed;
+  }
+
+  /* Animated background for premium feel */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 25% 25%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(255, 119, 198, 0.1) 0%, transparent 50%);
+    animation: float 20s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Theme Personality System - Background Patterns */
+  .theme-bg-none::before {
+    display: none;
+  }
+
+  .theme-bg-dots::before {
+    background-image: radial-gradient(circle, rgba(var(--primary), 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    animation: none;
+  }
+
+  .theme-bg-grid::before {
+    background-image:
+      linear-gradient(rgba(var(--primary), 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--primary), 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    animation: none;
+  }
+
+  .theme-bg-waves::before {
+    background-image:
+      radial-gradient(ellipse at top, rgba(var(--primary), 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom, rgba(var(--secondary), 0.1) 0%, transparent 50%);
+    animation: float 15s ease-in-out infinite;
+  }
+
+  .theme-bg-particles::before {
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(var(--primary), 0.15) 2px, transparent 2px),
+      radial-gradient(circle at 80% 80%, rgba(var(--secondary), 0.15) 1px, transparent 1px),
+      radial-gradient(circle at 40% 60%, rgba(var(--accent), 0.1) 1px, transparent 1px);
+    background-size: 50px 50px, 30px 30px, 70px 70px;
+    animation: float 25s ease-in-out infinite;
+  }
+
+  /* Theme Personality System - Ambient Animations */
+  .theme-ambient-none::before {
+    animation: none !important;
+  }
+
+  .theme-ambient-subtle::before {
+    animation-duration: 30s;
+    animation-timing-function: ease-in-out;
+  }
+
+  .theme-ambient-gentle::before {
+    animation-duration: 20s;
+    animation-timing-function: ease-in-out;
+  }
+
+  .theme-ambient-active::before {
+    animation-duration: 10s;
+    animation-timing-function: ease-in-out;
+  }
+
+  /* Theme Personality System - Cursor Styles */
+  .theme-cursor-default {
+    cursor: default;
+  }
+
+  .theme-cursor-precise {
+    cursor: crosshair;
+  }
+
+  .theme-cursor-creative {
+    cursor: pointer;
+  }
+
+  .theme-cursor-playful {
+    cursor: grab;
+  }
+
+  .theme-cursor-playful:active {
+    cursor: grabbing;
+  }
+
+  /* Theme Personality System - Interaction Feedback */
+  .theme-feedback-minimal button:hover,
+  .theme-feedback-minimal .cursor-pointer:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .theme-feedback-standard button:hover,
+  .theme-feedback-standard .cursor-pointer:hover {
+    transform: translateY(-1px);
+  }
+
+  .theme-feedback-enhanced button:hover,
+  .theme-feedback-enhanced .cursor-pointer:hover {
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .theme-feedback-immersive button:hover,
+  .theme-feedback-immersive .cursor-pointer:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: var(--shadow-premium-lg);
+  }
+
+  .theme-feedback-immersive button:active,
+  .theme-feedback-immersive .cursor-pointer:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+
+  /* Smooth theme transitions for specific elements */
+  .theme-transition {
+    transition: all 200ms ease-in-out;
+  }
+
+  /* Theme transitioning state for smooth changes */
+  .theme-transitioning {
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  /* Only apply transitions to content elements, not layout components */
+  .theme-transitioning .glass-card,
+  .theme-transitioning .premium-card,
+  .theme-transitioning .btn-premium,
+  .theme-transitioning .card,
+  .theme-transitioning .button {
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  /* Protect layout components from theme transitions - EXCEPT sidebar hover */
+  .theme-transitioning [data-sidebar],
+  .theme-transitioning nav:not(.sliding-sidebar nav),
+  .theme-transitioning header {
+    transition: none !important;
+  }
+
+  /* Allow sidebar hover during theme transitions */
+  .theme-transitioning .sliding-sidebar {
+    transition: width 300ms ease-in-out, background-color 300ms ease-in-out !important;
+  }
+
+  /* Prevent flash of unstyled content during theme switch */
+  html {
+    color-scheme: light dark;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* Theme-specific body classes */
+  body.theme-ocean-blue {
+    --theme-accent: #3b82f6;
+  }
+
+  body.theme-forest-green {
+    --theme-accent: #10b981;
+  }
+
+  body.theme-sunset-orange {
+    --theme-accent: #f59e0b;
+  }
+
+  body.theme-purple-galaxy {
+    --theme-accent: #8b5cf6;
+  }
+
+  body.theme-minimalist-gray {
+    --theme-accent: #6b7280;
+  }
+
+  /* Layout Protection - Ensure sidebar and navigation components maintain proper positioning */
+  .sliding-sidebar {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    height: 100vh !important;
+    z-index: 50 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Ensure sidebar content remains functional */
+  .sliding-sidebar nav,
+  .sliding-sidebar .flex,
+  .sliding-sidebar .space-y-2,
+  .sliding-sidebar button {
+    display: flex !important;
+    visibility: visible !important;
+  }
+
+  /* Protect mobile header from theme interference */
+  .mobile-header {
+    position: relative !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Fix dropdown text visibility in both light and dark modes */
+  select {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  select option {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  /* Dark mode specific fixes for dropdowns */
+  .dark select {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  .dark select option {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  /* Light mode specific fixes for dropdowns */
+  :not(.dark) select {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  :not(.dark) select option {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  /* Additional fixes for premium form components */
+  .glass-card select,
+  .premium-card select {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  .glass-card select option,
+  .premium-card select option {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  /* Ensure proper contrast for all form elements */
+  input, textarea, select {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  /* Fix for webkit browsers (Safari, Chrome) */
+  select::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  select::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  select::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground));
+    border-radius: 4px;
+  }
+
+  /* Force text visibility in all browsers */
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+
+  /* Ensure option text is always visible */
+  option {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+    padding: 8px 12px;
+  }
+
+  /* Dark mode option styling */
+  .dark option {
+    color: #ffffff !important;
+    background-color: #1f2937 !important;
+  }
+
+  /* Light mode option styling */
+  :not(.dark) option {
+    color: #111827 !important;
+    background-color: #ffffff !important;
+  }
+
+  /* High contrast mode for better visibility */
+  @media (prefers-contrast: high) {
+    select, option {
+      color: hsl(var(--foreground)) !important;
+      background-color: hsl(var(--background)) !important;
+      border: 2px solid hsl(var(--border)) !important;
+    }
+  }
+
+  /* Theme Personality System - Typography */
+  .text-rendering-crisp {
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .text-rendering-smooth {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+  }
+
+  .text-rendering-geometric {
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* TEMPORARILY DISABLED - Theme Personality System - Border Radius
+  .theme-radius-sharp .glass-card,
+  .theme-radius-sharp .premium-card,
+  .theme-radius-sharp .btn-premium,
+  .theme-radius-sharp .card,
+  .theme-radius-sharp .button,
+  .theme-radius-sharp .input {
+    border-radius: 0.25rem !important;
+  }
+
+  .theme-radius-rounded .glass-card,
+  .theme-radius-rounded .premium-card,
+  .theme-radius-rounded .btn-premium,
+  .theme-radius-rounded .card,
+  .theme-radius-rounded .button,
+  .theme-radius-rounded .input {
+    border-radius: 0.75rem !important;
+  }
+
+  .theme-radius-pill .glass-card,
+  .theme-radius-pill .premium-card,
+  .theme-radius-pill .card {
+    border-radius: 1.5rem !important;
+  }
+
+  .theme-radius-pill .btn-premium,
+  .theme-radius-pill .button,
+  .theme-radius-pill .input {
+    border-radius: 9999px !important;
+  }
+  */
+
+
+
+  /* TEMPORARILY DISABLED - Theme Personality System - Spacing
+  .theme-spacing-compact {
+    --spacing-multiplier: 0.75;
+  }
+
+  .theme-spacing-compact .glass-card,
+  .theme-spacing-compact .premium-card,
+  .theme-spacing-compact .card,
+  .theme-spacing-compact .btn-premium,
+  .theme-spacing-compact .button {
+    padding: calc(var(--spacing-multiplier, 1) * 0.75rem);
+  }
+
+  .theme-spacing-compact .space-y-4 > * + *,
+  .theme-spacing-compact .space-x-4 > * + * {
+    margin: calc(var(--spacing-multiplier, 1) * 0.5rem);
+  }
+
+  .theme-spacing-normal {
+    --spacing-multiplier: 1;
+  }
+
+  .theme-spacing-spacious {
+    --spacing-multiplier: 1.5;
+  }
+
+  .theme-spacing-spacious .glass-card,
+  .theme-spacing-spacious .premium-card,
+  .theme-spacing-spacious .card,
+  .theme-spacing-spacious .btn-premium,
+  .theme-spacing-spacious .button {
+    padding: calc(var(--spacing-multiplier, 1) * 1.5rem);
+  }
+
+  .theme-spacing-spacious .space-y-4 > * + *,
+  .theme-spacing-spacious .space-x-4 > * + * {
+    margin: calc(var(--spacing-multiplier, 1) * 1rem);
+  }
+  */
+
+  /* TEMPORARILY DISABLED - Theme Personality System - Density
+  .theme-density-dense {
+    line-height: 1.2;
+  }
+
+  .theme-density-dense .glass-card,
+  .theme-density-dense .premium-card {
+    padding: 0.75rem;
+  }
+
+  .theme-density-normal {
+    line-height: 1.5;
+  }
+
+  .theme-density-airy {
+    line-height: 1.8;
+  }
+
+  .theme-density-airy .glass-card,
+  .theme-density-airy .premium-card {
+    padding: 2rem;
+  }
+  */
+
+  /* TEMPORARILY DISABLED - Theme Personality System - Card Styles
+  .theme-cards-flat .glass-card,
+  .theme-cards-flat .premium-card {
+    box-shadow: none;
+    border: 1px solid var(--border);
+    background: var(--card);
+  }
+
+  .theme-cards-elevated .glass-card,
+  .theme-cards-elevated .premium-card {
+    box-shadow: var(--shadow-premium);
+    transform: translateY(0);
+  }
+
+  .theme-cards-floating .glass-card,
+  .theme-cards-floating .premium-card {
+    box-shadow: var(--shadow-premium-lg);
+    transform: translateY(-4px);
+  }
+  */
+
   /* Responsive glassmorphism optimizations */
   @media (max-width: 768px) {
     .glass-card {
