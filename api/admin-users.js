@@ -95,10 +95,69 @@ async function getAllUsers(req, res) {
       const processedUser = {
         id: doc.id,
         ...userData,
-        createdAt: userData.createdAt ? userData.createdAt.toDate().toISOString() : null,
-        updatedAt: userData.updatedAt ? userData.updatedAt.toDate().toISOString() : null,
-        lastLogin: userData.lastLogin ? userData.lastLogin.toDate().toISOString() : null,
-        subscriptionExpiry: userData.subscriptionExpiry ? userData.subscriptionExpiry.toDate().toISOString() : null
+        createdAt: userData.createdAt ? 
+          (typeof userData.createdAt.toDate === 'function' ? 
+            userData.createdAt.toDate().toISOString() : 
+            (userData.createdAt instanceof Date ? 
+              userData.createdAt.toISOString() : 
+              (typeof userData.createdAt === 'string' ? userData.createdAt : null)
+            )
+          ) : null,
+        updatedAt: userData.updatedAt ? 
+          (typeof userData.updatedAt.toDate === 'function' ? 
+            userData.updatedAt.toDate().toISOString() : 
+            (userData.updatedAt instanceof Date ? 
+              userData.updatedAt.toISOString() : 
+              (typeof userData.updatedAt === 'string' ? userData.updatedAt : null)
+            )
+          ) : null,
+        lastLogin: userData.lastLogin ? 
+          (typeof userData.lastLogin.toDate === 'function' ? 
+            userData.lastLogin.toDate().toISOString() : 
+            (userData.lastLogin instanceof Date ? 
+              userData.lastLogin.toISOString() : 
+              (typeof userData.lastLogin === 'string' ? userData.lastLogin : null)
+            )
+          ) : null,
+        subscriptionExpiry: userData.subscriptionExpiry ? 
+          (typeof userData.subscriptionExpiry.toDate === 'function' ? 
+            userData.subscriptionExpiry.toDate().toISOString() : 
+            (userData.subscriptionExpiry instanceof Date ? 
+              userData.subscriptionExpiry.toISOString() : 
+              (typeof userData.subscriptionExpiry === 'string' ? userData.subscriptionExpiry : null)
+            )
+          
+          (typeof userData.createdAt.toDate === 'function' ? 
+            userData.createdAt.toDate().toISOString() : 
+            (userData.createdAt instanceof Date ? 
+              userData.createdAt.toISOString() : 
+              (typeof userData.createdAt === 'string' ? userData.createdAt : null)
+            )
+          ) : null,
+        updatedAt: userData.updatedAt ? 
+          (typeof userData.updatedAt.toDate === 'function' ? 
+            userData.updatedAt.toDate().toISOString() : 
+            (userData.updatedAt instanceof Date ? 
+              userData.updatedAt.toISOString() : 
+              (typeof userData.updatedAt === 'string' ? userData.updatedAt : null)
+            )
+          ) : null,
+        lastLogin: userData.lastLogin ? 
+          (typeof userData.lastLogin.toDate === 'function' ? 
+            userData.lastLogin.toDate().toISOString() : 
+            (userData.lastLogin instanceof Date ? 
+              userData.lastLogin.toISOString() : 
+              (typeof userData.lastLogin === 'string' ? userData.lastLogin : null)
+            )
+          ) : null,
+        subscriptionExpiry: userData.subscriptionExpiry ? 
+          (typeof userData.subscriptionExpiry.toDate === 'function' ? 
+            userData.subscriptionExpiry.toDate().toISOString() : 
+            (userData.subscriptionExpiry instanceof Date ? 
+              userData.subscriptionExpiry.toISOString() : 
+              (typeof userData.subscriptionExpiry === 'string' ? userData.subscriptionExpiry : null)
+            )
+          ) : null
       };
       
       // Apply text search filter (client-side since Firestore doesn't support full-text search)
@@ -152,10 +211,38 @@ async function getAllUsers(req, res) {
           const processedUser = {
             id: doc.id,
             ...userData,
-            createdAt: userData.createdAt ? userData.createdAt.toDate().toISOString() : null,
-            updatedAt: userData.updatedAt ? userData.updatedAt.toDate().toISOString() : null,
-            lastLogin: userData.lastLogin ? userData.lastLogin.toDate().toISOString() : null,
-            subscriptionExpiry: userData.subscriptionExpiry ? userData.subscriptionExpiry.toDate().toISOString() : null
+            createdAt: userData.createdAt ? 
+              (typeof userData.createdAt.toDate === 'function' ? 
+                userData.createdAt.toDate().toISOString() : 
+                (userData.createdAt instanceof Date ? 
+                  userData.createdAt.toISOString() : 
+                  (typeof userData.createdAt === 'string' ? userData.createdAt : null)
+                )
+              ) : null,
+            updatedAt: userData.updatedAt ? 
+              (typeof userData.updatedAt.toDate === 'function' ? 
+                userData.updatedAt.toDate().toISOString() : 
+                (userData.updatedAt instanceof Date ? 
+                  userData.updatedAt.toISOString() : 
+                  (typeof userData.updatedAt === 'string' ? userData.updatedAt : null)
+                )
+              ) : null,
+            lastLogin: userData.lastLogin ? 
+              (typeof userData.lastLogin.toDate === 'function' ? 
+                userData.lastLogin.toDate().toISOString() : 
+                (userData.lastLogin instanceof Date ? 
+                  userData.lastLogin.toISOString() : 
+                  (typeof userData.lastLogin === 'string' ? userData.lastLogin : null)
+                )
+              ) : null,
+            subscriptionExpiry: userData.subscriptionExpiry ? 
+              (typeof userData.subscriptionExpiry.toDate === 'function' ? 
+                userData.subscriptionExpiry.toDate().toISOString() : 
+                (userData.subscriptionExpiry instanceof Date ? 
+                  userData.subscriptionExpiry.toISOString() : 
+                  (typeof userData.subscriptionExpiry === 'string' ? userData.subscriptionExpiry : null)
+                )
+              ) : null
           };
           
           fallbackUsers.push(processedUser);
