@@ -55,16 +55,10 @@ export const convertFirebaseUserToUser = async (firebaseUser: FirebaseUser): Pro
       subscriptionPlan: userData?.subscriptionPlan || 'free',
       subscriptionStatus: userData?.subscriptionStatus || 'trial',
       subscriptionExpiry: userData?.subscriptionExpiry && typeof userData.subscriptionExpiry.toDate === 'function' 
-        ? userData.subscriptionExpiry && typeof userData.subscriptionExpiry.toDate === 'function' 
         ? userData.subscriptionExpiry.toDate() 
-        :        : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       role: userData?.role || 'user',
       createdAt: userData?.createdAt && typeof userData.createdAt.toDate === 'function' 
-        ? userData.createdAt.toDate() 
-        : new Date(),
-      updatedAt: userData?.updatedAt && typeof userData.updatedAt.toDate === 'function' 
-        ? userData.updatedAt.toDate() 
-        : && typeof userData.createdAt.toDate === 'function' 
         ? userData.createdAt.toDate() 
         : new Date(),
       updatedAt: userData?.updatedAt && typeof userData.updatedAt.toDate === 'function' 

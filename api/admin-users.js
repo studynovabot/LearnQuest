@@ -126,37 +126,6 @@ async function getAllUsers(req, res) {
               userData.subscriptionExpiry.toISOString() : 
               (typeof userData.subscriptionExpiry === 'string' ? userData.subscriptionExpiry : null)
             )
-          
-          (typeof userData.createdAt.toDate === 'function' ? 
-            userData.createdAt.toDate().toISOString() : 
-            (userData.createdAt instanceof Date ? 
-              userData.createdAt.toISOString() : 
-              (typeof userData.createdAt === 'string' ? userData.createdAt : null)
-            )
-          ) : null,
-        updatedAt: userData.updatedAt ? 
-          (typeof userData.updatedAt.toDate === 'function' ? 
-            userData.updatedAt.toDate().toISOString() : 
-            (userData.updatedAt instanceof Date ? 
-              userData.updatedAt.toISOString() : 
-              (typeof userData.updatedAt === 'string' ? userData.updatedAt : null)
-            )
-          ) : null,
-        lastLogin: userData.lastLogin ? 
-          (typeof userData.lastLogin.toDate === 'function' ? 
-            userData.lastLogin.toDate().toISOString() : 
-            (userData.lastLogin instanceof Date ? 
-              userData.lastLogin.toISOString() : 
-              (typeof userData.lastLogin === 'string' ? userData.lastLogin : null)
-            )
-          ) : null,
-        subscriptionExpiry: userData.subscriptionExpiry ? 
-          (typeof userData.subscriptionExpiry.toDate === 'function' ? 
-            userData.subscriptionExpiry.toDate().toISOString() : 
-            (userData.subscriptionExpiry instanceof Date ? 
-              userData.subscriptionExpiry.toISOString() : 
-              (typeof userData.subscriptionExpiry === 'string' ? userData.subscriptionExpiry : null)
-            )
           ) : null
       };
       
