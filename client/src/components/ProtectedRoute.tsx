@@ -10,8 +10,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useUserContext();
   const [, setLocation] = useLocation();
 
+  // TEMPORARY: Bypass authentication for UI testing
+  // TODO: Remove this when done testing
+  const BYPASS_AUTH = true;
+
   useEffect(() => {
-    if (!loading && !user) {
+    if (!BYPASS_AUTH && !loading && !user) {
       // Redirect to login if not authenticated
       console.log('User not authenticated, redirecting to login');
       setLocation('/login');
@@ -19,7 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }, [user, loading, setLocation]);
 
   // Show nothing while checking authentication
-  if (loading) {
+  if (!BYPASS_AUTH && loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -27,8 +31,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  // If authenticated, render children
-  return user ? <>{children}</> : null;
+  // If authenticated or bypassing auth, render children
+  return (BYPASS_AUTH || user) ? <>{children}</> : null;
 };
 
 export default ProtectedRoute;
