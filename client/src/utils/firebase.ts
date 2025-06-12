@@ -6,12 +6,12 @@ import { User } from '@/types';
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBWqEeO_-9OWKXK_MIoITnwnvPS0F5j4ANY",
-  authDomain: "studynovabot.firebaseapp.com",
-  projectId: "studynovabot",
-  storageBucket: "studynovabot.appspot.com",
-  messagingSenderId: "250481817155",
-  appId: "1:250481817155:web:16ef3bbdb36bbc375dc6f6"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBWqEeO_-9OWKXK_MIoITnwnvPS0F5j4ANY",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "studynovabot.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "studynovabot",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "studynovabot.appspot.com",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "250481817155",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:250481817155:web:16ef3bbdb36bbc375dc6f6"
 };
 
 // Initialize Firebase
