@@ -301,8 +301,274 @@ async function getUserStats(req, res) {
   }
 }
 
+/**
+ * Delete a user
+ */
+async function deleteUser(req, res) {
+  try {
+    const { userId } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+    
+    console.log(`Attempting to delete user with ID: ${userId}`);
+    
+    // First, delete the user document from Firestore
+    await db.collection('users').doc(userId).delete();
+    console.log(`Firestore document deleted for user ${userId}`);
+    
+    // Get the Firebase Auth Admin instance
+    const { getAuthAdmin } = require('../utils/firebase-admin.js');
+    const auth = getAuthAdmin();
+    
+    if (auth) {
+      try {
+        // Delete the user from Firebase Authentication
+        await auth.deleteUser(userId);
+        console.log(`Firebase Auth user deleted for ${userId}`);
+      } catch (authError) {
+        console.error(`Error deleting Firebase Auth user: ${authError.message}`);
+        // Continue anyway since we've already deleted from Firestore
+      }
+    }
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: `User ${userId} has been deleted successfully` 
+    });
+    
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return res.status(500).json({ 
+      message: 'Failed to delete user', 
+      error: error.message 
+    });
+  }
+}
+
+/**
+ * Block/unblock a user
+ */
+async function toggleUserBlock(req, res) {
+  try {
+    const { userId, blocked } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+    
+    const blockStatus = blocked === true;
+    console.log(`Setting block status to ${blockStatus} for user: ${userId}`);
+    
+    // Update the user's blocked status in Firestore
+    await db.collection('users').doc(userId).update({
+      isBlocked: blockStatus,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    
+    // Get the Firebase Auth Admin instance
+    const { getAuthAdmin } = require('../utils/firebase-admin.js');
+    const auth = getAuthAdmin();
+    
+    if (auth) {
+      try {
+        // Disable/enable the user in Firebase Authentication
+        await auth.updateUser(userId, {
+          disabled: blockStatus
+        });
+        console.log(`Firebase Auth user ${blockStatus ? 'disabled' : 'enabled'}: ${userId}`);
+      } catch (authError) {
+        console.error(`Error updating Firebase Auth user: ${authError.message}`);
+      }
+    }
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: `User ${userId} has been ${blockStatus ? 'blocked' : 'unblocked'} successfully` 
+    });
+    
+  } catch (error) {
+    console.error('Error toggling user block status:', error);
+    return res.status(500).json({ 
+      message: 'Failed to update user block status', 
+      error: error.message 
+    });
+  }
+}
+
+/**
+ * Update user subscription plan
+ */
+async function updateUserPlan(req, res) {
+  try {
+    const { userId, subscriptionPlan, subscriptionStatus, subscriptionExpiry } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+    
+    console.log(`Updating subscription for user: ${userId}`);
+    console.log(`New plan: ${subscriptionPlan}, status: ${subscriptionStatus}`);
+    
+    // Prepare update data
+    const updateData = {
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+    
+    // Only include fields that are provided
+    if (subscriptionPlan) {
+      updateData.subscriptionPlan = subscriptionPlan;
+      updateData.isPro = subscriptionPlan !== 'free';
+    }
+    
+    if (subscriptionStatus) {
+      updateData.subscriptionStatus = subscriptionStatus;
+    }
+    
+    if (subscriptionExpiry) {
+      // Convert to Firestore timestamp
+      updateData.subscriptionExpiry = new Date(subscriptionExpiry);
+    }
+    
+    // Update the user in Firestore
+    await db.collection('users').doc(userId).update(updateData);
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: `User ${userId} subscription updated successfully` 
+    });
+    
+  } catch (error) {
+    console.error('Error updating user subscription:', error);
+    return res.status(500).json({ 
+      message: 'Failed to update user subscription', 
+      error: error.message 
+    });
+  }
+}
+
+/**
+ * Update user role
+ */
+async function updateUserRole(req, res) {
+  try {
+    const { userId, role } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+    
+    if (!role || !['user', 'admin'].includes(role)) {
+      return res.status(400).json({ message: 'Valid role is required (user or admin)' });
+    }
+    
+    console.log(`Updating role for user: ${userId} to ${role}`);
+    
+    // Update the user in Firestore
+    await db.collection('users').doc(userId).update({
+      role,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: `User ${userId} role updated to ${role} successfully` 
+    });
+    
+  } catch (error) {
+    console.error('Error updating user role:', error);
+    return res.status(500).json({ 
+      message: 'Failed to update user role', 
+      error: error.message 
+    });
+  }
+}
+
+/**
+ * Update user display name or other credentials
+ */
+async function updateUserCredentials(req, res) {
+  try {
+    const { userId, displayName, email } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+    
+    if (!displayName && !email) {
+      return res.status(400).json({ message: 'No fields to update' });
+    }
+    
+    console.log(`Updating credentials for user: ${userId}`);
+    
+    // Prepare update data
+    const updateData = {
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+    
+    if (displayName) {
+      updateData.displayName = displayName;
+    }
+    
+    if (email) {
+      updateData.email = email;
+      
+      // Update email in Firebase Auth if available
+      const { getAuthAdmin } = require('../utils/firebase-admin.js');
+      const auth = getAuthAdmin();
+      
+      if (auth) {
+        try {
+          await auth.updateUser(userId, { email });
+          console.log(`Firebase Auth email updated for ${userId}`);
+        } catch (authError) {
+          console.error(`Error updating Firebase Auth email: ${authError.message}`);
+          // Continue anyway since we're updating Firestore
+        }
+      }
+    }
+    
+    // Update the user in Firestore
+    await db.collection('users').doc(userId).update(updateData);
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: `User ${userId} credentials updated successfully` 
+    });
+    
+  } catch (error) {
+    console.error('Error updating user credentials:', error);
+    return res.status(500).json({ 
+      message: 'Failed to update user credentials', 
+      error: error.message 
+    });
+  }
+}
+
 // Export the handler with admin middleware
 export default requireAdmin(async (req, res) => {
+  // Handle different HTTP methods
+  if (req.method === 'POST') {
+    const { action } = req.query;
+    
+    switch (action) {
+      case 'delete-user':
+        return deleteUser(req, res);
+      case 'toggle-block':
+        return toggleUserBlock(req, res);
+      case 'update-plan':
+        return updateUserPlan(req, res);
+      case 'update-role':
+        return updateUserRole(req, res);
+      case 'update-credentials':
+        return updateUserCredentials(req, res);
+      default:
+        return res.status(400).json({ message: 'Invalid action' });
+    }
+  }
+  
+  // For GET requests
   const { action = 'list' } = req.query;
   
   switch (action) {

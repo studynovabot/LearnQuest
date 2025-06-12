@@ -38,7 +38,51 @@ import {
 } from '@/components/ui/pagination';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Search, RefreshCw, UserIcon, Users, Crown, Star } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { 
+  Loader2, 
+  Search, 
+  RefreshCw, 
+  UserIcon, 
+  Users, 
+  Crown, 
+  Star, 
+  MoreHorizontal, 
+  Trash, 
+  Shield, 
+  Edit, 
+  Ban, 
+  Check, 
+  UserCog 
+} from 'lucide-react';
 
 interface User {
   id: string;
@@ -96,6 +140,22 @@ const AdminUsers: React.FC = () => {
   // State for user stats
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+  
+  // State for user management
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
+  const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
+  const [isActionLoading, setIsActionLoading] = useState(false);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  
+  // Form state
+  const [editDisplayName, setEditDisplayName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editRole, setEditRole] = useState<'user' | 'admin'>('user');
+  const [editPlan, setEditPlan] = useState<'free' | 'pro' | 'goat'>('free');
+  const [editPlanStatus, setEditPlanStatus] = useState<'active' | 'trial' | 'expired' | 'canceled'>('active');
   
   // Check if user is admin
   const isAdmin = user?.role === 'admin' || 
@@ -275,6 +335,295 @@ const AdminUsers: React.FC = () => {
       hour: '2-digit',
       minute: '2-digit'
     }).format(date);
+  };
+  
+  // Handle editing user credentials
+  const handleEditUser = (userToEdit: User) => {
+    setSelectedUser(userToEdit);
+    setEditDisplayName(userToEdit.displayName || '');
+    setEditEmail(userToEdit.email || '');
+    setIsEditDialogOpen(true);
+  };
+  
+  // Handle changing user role
+  const handleChangeRole = (userToEdit: User) => {
+    setSelectedUser(userToEdit);
+    setEditRole(userToEdit.role || 'user');
+    setIsRoleDialogOpen(true);
+  };
+  
+  // Handle changing user subscription plan
+  const handleChangePlan = (userToEdit: User) => {
+    setSelectedUser(userToEdit);
+    setEditPlan(userToEdit.subscriptionPlan || 'free');
+    setEditPlanStatus(userToEdit.subscriptionStatus || 'active');
+    setIsPlanDialogOpen(true);
+  };
+  
+  // Handle saving user credentials
+  const handleSaveCredentials = async () => {
+    if (!selectedUser) return;
+    
+    setIsActionLoading(true);
+    setActionSuccess(null);
+    setActionError(null);
+    
+    try {
+      const response = await fetch(`${config.apiUrl}/admin-users?action=update-credentials`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.id}`,
+          'X-User-ID': user?.id || '',
+          'X-User-Email': user?.email || ''
+        },
+        body: JSON.stringify({
+          userId: selectedUser.id,
+          displayName: editDisplayName,
+          email: editEmail
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update user credentials');
+      }
+      
+      const result = await response.json();
+      setActionSuccess(result.message || 'User credentials updated successfully');
+      
+      // Update the user in the local state
+      setUsers(prev => prev.map(u => 
+        u.id === selectedUser.id 
+          ? { ...u, displayName: editDisplayName, email: editEmail } 
+          : u
+      ));
+      
+      // Close the dialog after a short delay
+      setTimeout(() => {
+        setIsEditDialogOpen(false);
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error updating user credentials:', error);
+      setActionError(error instanceof Error ? error.message : 'An unknown error occurred');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+  
+  // Handle saving user role
+  const handleSaveRole = async () => {
+    if (!selectedUser) return;
+    
+    setIsActionLoading(true);
+    setActionSuccess(null);
+    setActionError(null);
+    
+    try {
+      const response = await fetch(`${config.apiUrl}/admin-users?action=update-role`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.id}`,
+          'X-User-ID': user?.id || '',
+          'X-User-Email': user?.email || ''
+        },
+        body: JSON.stringify({
+          userId: selectedUser.id,
+          role: editRole
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update user role');
+      }
+      
+      const result = await response.json();
+      setActionSuccess(result.message || 'User role updated successfully');
+      
+      // Update the user in the local state
+      setUsers(prev => prev.map(u => 
+        u.id === selectedUser.id 
+          ? { ...u, role: editRole } 
+          : u
+      ));
+      
+      // Close the dialog after a short delay
+      setTimeout(() => {
+        setIsRoleDialogOpen(false);
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      setActionError(error instanceof Error ? error.message : 'An unknown error occurred');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+  
+  // Handle saving user subscription plan
+  const handleSavePlan = async () => {
+    if (!selectedUser) return;
+    
+    setIsActionLoading(true);
+    setActionSuccess(null);
+    setActionError(null);
+    
+    try {
+      // Create a subscription expiry date based on plan and status
+      let expiryDate = new Date();
+      if (editPlanStatus === 'trial') {
+        expiryDate.setDate(expiryDate.getDate() + 7); // 7 day trial
+      } else if (editPlanStatus === 'active') {
+        expiryDate.setMonth(expiryDate.getMonth() + 1); // 1 month subscription
+      } else {
+        expiryDate.setDate(expiryDate.getDate() - 1); // Already expired
+      }
+      
+      const response = await fetch(`${config.apiUrl}/admin-users?action=update-plan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.id}`,
+          'X-User-ID': user?.id || '',
+          'X-User-Email': user?.email || ''
+        },
+        body: JSON.stringify({
+          userId: selectedUser.id,
+          subscriptionPlan: editPlan,
+          subscriptionStatus: editPlanStatus,
+          subscriptionExpiry: expiryDate.toISOString()
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update user subscription');
+      }
+      
+      const result = await response.json();
+      setActionSuccess(result.message || 'User subscription updated successfully');
+      
+      // Update the user in the local state
+      setUsers(prev => prev.map(u => 
+        u.id === selectedUser.id 
+          ? { 
+              ...u, 
+              subscriptionPlan: editPlan, 
+              subscriptionStatus: editPlanStatus,
+              subscriptionExpiry: expiryDate.toISOString(),
+              isPro: editPlan !== 'free'
+            } 
+          : u
+      ));
+      
+      // Close the dialog after a short delay
+      setTimeout(() => {
+        setIsPlanDialogOpen(false);
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error updating user subscription:', error);
+      setActionError(error instanceof Error ? error.message : 'An unknown error occurred');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+  
+  // Handle deleting a user
+  const handleDeleteUser = async (userToDelete: User) => {
+    setIsActionLoading(true);
+    setActionSuccess(null);
+    setActionError(null);
+    
+    try {
+      const response = await fetch(`${config.apiUrl}/admin-users?action=delete-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.id}`,
+          'X-User-ID': user?.id || '',
+          'X-User-Email': user?.email || ''
+        },
+        body: JSON.stringify({
+          userId: userToDelete.id
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete user');
+      }
+      
+      const result = await response.json();
+      setActionSuccess(result.message || 'User deleted successfully');
+      
+      // Remove the user from the local state
+      setUsers(prev => prev.filter(u => u.id !== userToDelete.id));
+      
+      // Update user stats if available
+      if (userStats) {
+        setUserStats({
+          ...userStats,
+          totalUsers: userStats.totalUsers - 1,
+          proUsers: userToDelete.subscriptionPlan === 'pro' ? userStats.proUsers - 1 : userStats.proUsers,
+          goatUsers: userToDelete.subscriptionPlan === 'goat' ? userStats.goatUsers - 1 : userStats.goatUsers,
+          freeUsers: userToDelete.subscriptionPlan === 'free' ? userStats.freeUsers - 1 : userStats.freeUsers
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      setActionError(error instanceof Error ? error.message : 'An unknown error occurred');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+  
+  // Handle blocking/unblocking a user
+  const handleToggleBlock = async (userToToggle: User, blockStatus: boolean) => {
+    setIsActionLoading(true);
+    setActionSuccess(null);
+    setActionError(null);
+    
+    try {
+      const response = await fetch(`${config.apiUrl}/admin-users?action=toggle-block`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.id}`,
+          'X-User-ID': user?.id || '',
+          'X-User-Email': user?.email || ''
+        },
+        body: JSON.stringify({
+          userId: userToToggle.id,
+          blocked: blockStatus
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to ${blockStatus ? 'block' : 'unblock'} user`);
+      }
+      
+      const result = await response.json();
+      setActionSuccess(result.message || `User ${blockStatus ? 'blocked' : 'unblocked'} successfully`);
+      
+      // Update the user in the local state
+      setUsers(prev => prev.map(u => 
+        u.id === userToToggle.id 
+          ? { ...u, isBlocked: blockStatus } 
+          : u
+      ));
+      
+    } catch (error) {
+      console.error(`Error ${blockStatus ? 'blocking' : 'unblocking'} user:`, error);
+      setActionError(error instanceof Error ? error.message : 'An unknown error occurred');
+    } finally {
+      setIsActionLoading(false);
+    }
   };
   
   // Generate mock users for fallback
@@ -643,14 +992,20 @@ const AdminUsers: React.FC = () => {
                           <TableHead>Role</TableHead>
                           <TableHead>Created</TableHead>
                           <TableHead>Last Login</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {users.map((user) => (
-                          <TableRow key={user.id}>
+                          <TableRow key={user.id} className={user.isBlocked ? 'opacity-60' : ''}>
                             <TableCell>
                               <div>
-                                <div className="font-medium">{user.displayName}</div>
+                                <div className="font-medium flex items-center">
+                                  {user.displayName}
+                                  {user.isBlocked && (
+                                    <Badge variant="destructive" className="ml-2">Blocked</Badge>
+                                  )}
+                                </div>
                                 <div className="text-sm text-muted-foreground">{user.email}</div>
                               </div>
                             </TableCell>
@@ -672,6 +1027,75 @@ const AdminUsers: React.FC = () => {
                             </TableCell>
                             <TableCell>
                               {formatDate(user.lastLogin)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" className="h-8 w-8 p-0" disabled={isActionLoading}>
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                  <DropdownMenuGroup>
+                                    <DropdownMenuItem onClick={() => handleEditUser(user)}>
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Edit Profile
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleChangeRole(user)}>
+                                      <UserCog className="h-4 w-4 mr-2" />
+                                      Change Role
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleChangePlan(user)}>
+                                      <Star className="h-4 w-4 mr-2" />
+                                      Change Plan
+                                    </DropdownMenuItem>
+                                  </DropdownMenuGroup>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuGroup>
+                                    {user.isBlocked ? (
+                                      <DropdownMenuItem onClick={() => handleToggleBlock(user, false)}>
+                                        <Check className="h-4 w-4 mr-2" />
+                                        Unblock User
+                                      </DropdownMenuItem>
+                                    ) : (
+                                      <DropdownMenuItem onClick={() => handleToggleBlock(user, true)}>
+                                        <Ban className="h-4 w-4 mr-2" />
+                                        Block User
+                                      </DropdownMenuItem>
+                                    )}
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                          <Trash className="h-4 w-4 mr-2" />
+                                          Delete User
+                                        </DropdownMenuItem>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Delete User</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Are you sure you want to delete this user? This action cannot be undone.
+                                            <div className="mt-2 p-2 border rounded bg-slate-50 dark:bg-slate-900">
+                                              <div><strong>{user.displayName}</strong></div>
+                                              <div className="text-sm text-muted-foreground">{user.email}</div>
+                                            </div>
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                          <AlertDialogAction 
+                                            onClick={() => handleDeleteUser(user)}
+                                            className="bg-red-500 hover:bg-red-600">
+                                            Delete
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </DropdownMenuGroup>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -874,6 +1298,182 @@ const AdminUsers: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* User Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit User Profile</DialogTitle>
+            <DialogDescription>
+              Update user profile information below.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="name" className="text-right font-medium">
+                Name
+              </label>
+              <Input
+                id="name"
+                value={editDisplayName}
+                onChange={(e) => setEditDisplayName(e.target.value)}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="email" className="text-right font-medium">
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          {actionSuccess && (
+            <div className="bg-green-100 text-green-800 p-2 rounded text-sm">
+              {actionSuccess}
+            </div>
+          )}
+          {actionError && (
+            <div className="bg-red-100 text-red-800 p-2 rounded text-sm">
+              {actionError}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveCredentials} disabled={isActionLoading}>
+              {isActionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Role Change Dialog */}
+      <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Change User Role</DialogTitle>
+            <DialogDescription>
+              Change the role and permissions for this user.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="role" className="text-right font-medium">
+                Role
+              </label>
+              <Select
+                value={editRole}
+                onValueChange={(value) => setEditRole(value as 'user' | 'admin')}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          {actionSuccess && (
+            <div className="bg-green-100 text-green-800 p-2 rounded text-sm">
+              {actionSuccess}
+            </div>
+          )}
+          {actionError && (
+            <div className="bg-red-100 text-red-800 p-2 rounded text-sm">
+              {actionError}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsRoleDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveRole} disabled={isActionLoading}>
+              {isActionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Subscription Plan Dialog */}
+      <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Change Subscription Plan</DialogTitle>
+            <DialogDescription>
+              Update the user's subscription plan and status.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="plan" className="text-right font-medium">
+                Plan
+              </label>
+              <Select
+                value={editPlan}
+                onValueChange={(value) => setEditPlan(value as 'free' | 'pro' | 'goat')}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="free">Free</SelectItem>
+                  <SelectItem value="pro">Pro</SelectItem>
+                  <SelectItem value="goat">Goat</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="status" className="text-right font-medium">
+                Status
+              </label>
+              <Select
+                value={editPlanStatus}
+                onValueChange={(value) => setEditPlanStatus(value as 'active' | 'trial' | 'expired' | 'canceled')}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="trial">Trial</SelectItem>
+                  <SelectItem value="expired">Expired</SelectItem>
+                  <SelectItem value="canceled">Canceled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          {actionSuccess && (
+            <div className="bg-green-100 text-green-800 p-2 rounded text-sm">
+              {actionSuccess}
+            </div>
+          )}
+          {actionError && (
+            <div className="bg-red-100 text-red-800 p-2 rounded text-sm">
+              {actionError}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPlanDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSavePlan} disabled={isActionLoading}>
+              {isActionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
