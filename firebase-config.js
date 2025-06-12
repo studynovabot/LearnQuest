@@ -6,7 +6,7 @@ loadEnvVariables();
 
 // Fallback configuration in case environment variables are not available
 const fallbackConfig = {
-  apiKey: "AIzaSyBWqEeO_-9OWKXK_MIoITnwnvPS0F5j4ANY",
+  apiKey: "AIzaSyBmCZ88FJUX5E1yVVj8-jm_kK0HhTDzmPc",
   authDomain: "studynovabot.firebaseapp.com",
   projectId: "studynovabot",
   storageBucket: "studynovabot.appspot.com",
