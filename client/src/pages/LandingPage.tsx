@@ -152,7 +152,7 @@ const LandingPage: React.FC = () => {
               <div className="space-y-6">
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-tight">
                   <span className="block text-white">The Future of</span>
-                  <span className="block text-gradient animate-shimmer">AI Learning</span>
+                  <span className="block text-gradient">AI Learning</span>
                   <span className="block text-white">is Here</span>
                 </h1>
                 
