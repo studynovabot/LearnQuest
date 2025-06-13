@@ -71,7 +71,13 @@ export function useAdvancedTheme() {
           document.documentElement.classList.add('dark');
           document.documentElement.classList.remove('light');
         } else {
-            // Update tracking variables to prevent unnecessary re-applications
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.remove('dark');
+        }
+
+        document.body.className = `${cleanedClasses} theme-${selectedTheme}`.trim();
+            
+        // Update tracking variables to prevent unnecessary re-applications
         setLastAppliedTheme(selectedTheme);
         setLastAppliedMode(resolvedTheme || '');
 

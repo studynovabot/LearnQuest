@@ -349,7 +349,6 @@
   /* Apply border color to all elements */
   * {
     @apply border-[hsl(var(--border))];
-    @apply border-[hsl(var(--border))];
   }
 
   /* Apply transitions to all elements except layout components */
