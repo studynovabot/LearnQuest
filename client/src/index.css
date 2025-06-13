@@ -130,6 +130,28 @@
   @apply bg-white/10 backdrop-blur-md border border-white/20;
 }
 
+.glass-card {
+  @apply bg-card/80 backdrop-blur-md border border-border/50 shadow-sm;
+}
+
+.glass-card-strong {
+  @apply bg-card/90 backdrop-blur-premium border border-border/70 shadow-md;
+}
+
+/* Dark mode specific styles for glass cards */
+.dark .glass-card {
+  @apply bg-card/80 border-border/50;
+}
+
+.dark .glass-card-strong {
+  @apply bg-card/90 border-border/70;
+}
+
+/* Premium card dark mode styles */
+.dark .premium-card {
+  @apply bg-card text-card-foreground border-border;
+}
+
 .text-gradient {
   @apply bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent;
 }
@@ -872,11 +894,7 @@
     outline: none !important;
   }
 
-  /* Remove specific hover classes for premium components */
-  .glass-card:hover,
-  .glass-card-strong:hover,
-  .premium-card:hover,
-  .agent-card:hover,
+  /* Only apply hover effects to elements with specific hover classes */
   .hover-lift:hover,
   .hover-scale:hover,
   .hover-shadow:hover,
