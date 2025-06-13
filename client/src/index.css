@@ -132,24 +132,51 @@
 
 .glass-card {
   @apply bg-card/80 backdrop-blur-md border border-border/50 shadow-sm;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .glass-card-strong {
   @apply bg-card/90 backdrop-blur-premium border border-border/70 shadow-md;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-/* Dark mode specific styles for glass cards */
-.dark .glass-card {
-  @apply bg-card/80 border-border/50;
+/* Ensure all card types are visible by default */
+.card,
+.premium-card,
+[class*="card"],
+[class*="tile"] {
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-.dark .glass-card-strong {
-  @apply bg-card/90 border-border/70;
-}
-
-/* Premium card dark mode styles */
-.dark .premium-card {
+/* Dark mode specific styles for all card types */
+.dark .glass-card,
+.dark .glass-card-strong,
+.dark .premium-card,
+.dark .card,
+.dark [class*="card"],
+.dark [class*="tile"] {
   @apply bg-card text-card-foreground border-border;
+  color: hsl(var(--card-foreground)) !important;
+  background-color: hsl(var(--card)) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Light mode specific styles for all card types */
+.light .glass-card,
+.light .glass-card-strong,
+.light .premium-card,
+.light .card,
+.light [class*="card"],
+.light [class*="tile"] {
+  @apply bg-card text-card-foreground border-border;
+  color: hsl(var(--card-foreground)) !important;
+  background-color: hsl(var(--card)) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .text-gradient {
@@ -898,6 +925,41 @@
   .hover-lift:hover,
   .hover-scale:hover,
   .hover-shadow:hover,
+
+  /* Ensure cards remain visible on hover regardless of theme */
+  .glass-card:hover,
+  .glass-card-strong:hover,
+  .premium-card:hover,
+  .card:hover,
+  [class*="card"]:hover,
+  [class*="tile"]:hover {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Dark mode hover styles to maintain dark appearance */
+  .dark .glass-card:hover,
+  .dark .glass-card-strong:hover,
+  .dark .premium-card:hover,
+  .dark .card:hover,
+  .dark [class*="card"]:hover,
+  .dark [class*="tile"]:hover {
+    background-color: hsl(var(--card)) !important;
+    color: hsl(var(--card-foreground)) !important;
+    border-color: hsl(var(--border)) !important;
+  }
+
+  /* Light mode hover styles to maintain light appearance */
+  .light .glass-card:hover,
+  .light .glass-card-strong:hover,
+  .light .premium-card:hover,
+  .light .card:hover,
+  .light [class*="card"]:hover,
+  .light [class*="tile"]:hover {
+    background-color: hsl(var(--card)) !important;
+    color: hsl(var(--card-foreground)) !important;
+    border-color: hsl(var(--border)) !important;
+  }
   .btn-premium:hover,
   .nav-icon:hover,
   .cursor-pointer:hover,
