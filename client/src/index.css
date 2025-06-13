@@ -346,9 +346,14 @@
 }
 
 @layer base {
-  /* FIXED: More specific selector to avoid interfering with layout components */
-  *:not(.sliding-sidebar):not([data-sidebar]):not(.sidebar):not(nav):not(header):not(.mobile-header):not(.mobile-nav) {
+  /* Apply border color to all elements */
+  * {
     @apply border-[hsl(var(--border))];
+    @apply border-[hsl(var(--border))];
+  }
+
+  /* Apply transitions to all elements except layout components */
+  *:not(.sliding-sidebar):not([data-sidebar]):not(.sidebar):not(nav):not(header):not(.mobile-header):not(.mobile-nav) {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;

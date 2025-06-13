@@ -38,7 +38,7 @@ export function ThemeToggle({
   }
 
   const toggleTheme = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+    const newTheme = resolvedTheme === "dark" ? "light" : "dark";
   };
 
   return (
@@ -100,7 +100,17 @@ export function ThemeToggleCompact({ className }: { className?: string }) {
   }
 
   const toggleTheme = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+    setTheme resolvedTheme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    
+    // Force apply theme class to ensure immediate visual feedback
+    if (newTheme === "dark") {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    } else {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+    }
   };
 
   return (

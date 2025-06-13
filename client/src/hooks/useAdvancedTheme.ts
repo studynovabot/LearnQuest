@@ -45,31 +45,7 @@ export function useAdvancedTheme() {
       return; // No change, skip application
     }
 
-    // Check if any input is currently focused to prevent interruption
-    const activeElement = document.activeElement as HTMLElement | null;
-    const isInputFocused = activeElement && (
-      activeElement.tagName === 'INPUT' ||
-      activeElement.tagName === 'TEXTAREA' ||
-      (activeElement.hasAttribute('contenteditable') && activeElement.getAttribute('contenteditable') === 'true')
-    );
-
-    // If an input is focused, defer theme application to prevent focus loss
-    if (isInputFocused) {
-      const deferredUpdate = () => {
-        // Check again if input is still focused
-        const stillFocused = document.activeElement === activeElement;
-        if (!stillFocused) {
-          // Input is no longer focused, safe to apply theme
-          applyThemeChanges();
-        } else {
-          // Still focused, defer again
-          setTimeout(deferredUpdate, 200);
-        }
-      };
-      setTimeout(deferredUpdate, 200);
-      return;
-    }
-
+    // Always apply theme changes immediately without deferring
     applyThemeChanges();
 
     function applyThemeChanges() {
@@ -77,30 +53,25 @@ export function useAdvancedTheme() {
       const isDarkMode = resolvedTheme === 'dark';
       const variables = isDarkMode ? themeConfig.variables.dark : themeConfig.variables.light;
 
-      // Optimize variables to only update changed ones
-      const optimizedVariables = optimizeThemeVariables(variables);
-
-      // Simplified DOM updates - only colors, no layout changes
       try {
-        // Apply CSS variables to document root (colors only)
+        // Apply CSS variables to document root (all variables, not just optimized ones)
         const root = document.documentElement;
-        Object.entries(optimizedVariables).forEach(([property, value]) => {
+        Object.entries(variables).forEach(([property, value]) => {
           root.style.setProperty(property, value);
         });
 
-        // Add theme class to body for color styling only
-        // Preserve all existing classes except theme color classes
+        // Add theme class to body
         const currentClasses = document.body.className;
         const cleanedClasses = currentClasses
           .replace(/\btheme-(?:default|ocean-blue|forest-green|sunset-orange|purple-galaxy|minimalist-gray)\b/g, '')
           .trim();
 
-        document.body.className = `${cleanedClasses} theme-${selectedTheme}`.trim();
-
-        // COMPLETELY DISABLED: Theme personality application to prevent focus loss
-        // This prevents any DOM manipulation that could cause input focus loss
-
-        // Update tracking variables to prevent unnecessary re-applications
+        // Add dark/light class explicitly to ensure proper theme application
+        if (isDarkMode) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+        } else {
+            // Update tracking variables to prevent unnecessary re-applications
         setLastAppliedTheme(selectedTheme);
         setLastAppliedMode(resolvedTheme || '');
 

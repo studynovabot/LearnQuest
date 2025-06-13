@@ -38,26 +38,21 @@ import { StarIcon, CrownIcon } from "@/components/ui/icons";
 
 const LandingPage: React.FC = () => {
   const { user } = useUserContext();
-  const [liveUserCount, setLiveUserCount] = useState(12847);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    setIsVisible(true);
-    // Simulate live user count updates
-    const interval = setInterval(() => {
-      setLiveUserCount(prev => prev + Math.floor(Math.random() * 3));
-    }, 5000);
-    return () => clearInterval(interval);
+    // No need to set isVisible to true as it's already true
+    // We've removed the fake user count simulation
   }, []);
 
   return (
     <>
       <Helmet>
         <title>StudyNova AI - World's Most Advanced AI Learning Platform</title>
-        <meta name="description" content="Experience the future of learning with StudyNova AI. Get personalized AI tutoring that adapts to your learning style. Join 50,000+ students achieving 95% better grades." />
+        <meta name="description" content="Experience the future of learning with StudyNova AI. Get personalized AI tutoring that adapts to your learning style and helps you achieve better grades." />
         <meta name="keywords" content="AI learning, personalized tutoring, NCERT solutions, AI education, study platform, artificial intelligence" />
         <meta property="og:title" content="StudyNova AI - World's Most Advanced AI Learning Platform" />
-        <meta property="og:description" content="Join 50,000+ students using AI to achieve 95% better grades" />
+        <meta property="og:description" content="Experience personalized AI tutoring that adapts to your learning style" />
         <meta property="og:image" content="/og-image.jpg" />
       </Helmet>
 
@@ -74,11 +69,7 @@ const LandingPage: React.FC = () => {
           <div className="flex items-center justify-center space-x-2">
             <Sparkles className="h-4 w-4 animate-pulse" />
             <p className="text-sm font-medium">
-              🎉 <strong>50,000+ students</strong> achieved 95% better grades with StudyNova AI
-              <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs bg-white/20 backdrop-blur-sm">
-                <Flame className="h-3 w-3 mr-1" />
-                Live: {liveUserCount.toLocaleString()} active learners
-              </span>
+              🎉 <strong>Experience the future of learning</strong> with StudyNova AI
             </p>
             <Sparkles className="h-4 w-4 animate-pulse" />
           </div>
@@ -110,10 +101,6 @@ const LandingPage: React.FC = () => {
               <a href="#pricing" className="text-sm font-medium text-white/80 hover:text-white transition-all duration-200 hover:scale-105">
                 Pricing
               </a>
-              <div className="flex items-center space-x-1 px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-400/30">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                <span className="text-xs text-emerald-400 font-medium">{liveUserCount.toLocaleString()} online</span>
-              </div>
             </nav>
             
             <div className="flex items-center gap-3">
@@ -152,13 +139,12 @@ const LandingPage: React.FC = () => {
               <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 animate-float">
                 <Trophy className="h-5 w-5 text-amber-400 mr-2" />
                 <span className="text-sm font-medium text-white">
-                  🏆 Ranked #1 AI Learning Platform by 50,000+ Students
+                  🏆 Advanced AI Learning Platform
                 </span>
                 <div className="ml-3 flex items-center space-x-1">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="h-4 w-4 text-amber-400 fill-current" />
                   ))}
-                  <span className="text-xs text-amber-400 ml-1">4.9/5</span>
                 </div>
               </div>
 
@@ -221,7 +207,7 @@ const LandingPage: React.FC = () => {
                 </div>
                 <div className="flex items-center">
                   <Users className="h-4 w-4 mr-2 text-purple-400" />
-                  <span>Join 50,000+ Students</span>
+                  <span>Join Our Community</span>
                 </div>
               </div>
 
@@ -283,33 +269,33 @@ const LandingPage: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               <div className="text-center group">
                 <div className="premium-card p-6 group-hover:scale-105 transition-all duration-300">
-                  <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">50K+</div>
-                  <div className="text-white/80 font-medium">Active Students</div>
-                  <div className="text-sm text-emerald-400 mt-1">↗ +2,847 this week</div>
+                  <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">24/7</div>
+                  <div className="text-white/80 font-medium">AI Support</div>
+                  <div className="text-sm text-emerald-400 mt-1">Always Available</div>
                 </div>
               </div>
               
               <div className="text-center group">
                 <div className="premium-card p-6 group-hover:scale-105 transition-all duration-300">
-                  <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">95%</div>
-                  <div className="text-white/80 font-medium">Grade Improvement</div>
-                  <div className="text-sm text-emerald-400 mt-1">Verified Results</div>
+                  <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">Fast</div>
+                  <div className="text-white/80 font-medium">Response Time</div>
+                  <div className="text-sm text-emerald-400 mt-1">Instant Answers</div>
                 </div>
               </div>
               
               <div className="text-center group">
                 <div className="premium-card p-6 group-hover:scale-105 transition-all duration-300">
-                  <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">10M+</div>
-                  <div className="text-white/80 font-medium">Questions Solved</div>
-                  <div className="text-sm text-emerald-400 mt-1">↗ +50K daily</div>
+                  <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">100+</div>
+                  <div className="text-white/80 font-medium">Topics Covered</div>
+                  <div className="text-sm text-emerald-400 mt-1">Comprehensive</div>
                 </div>
               </div>
               
               <div className="text-center group">
                 <div className="premium-card p-6 group-hover:scale-105 transition-all duration-300">
-                  <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">4.9★</div>
-                  <div className="text-white/80 font-medium">Student Rating</div>
-                  <div className="text-sm text-emerald-400 mt-1">12,000+ Reviews</div>
+                  <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">Easy</div>
+                  <div className="text-white/80 font-medium">To Use</div>
+                  <div className="text-sm text-emerald-400 mt-1">User Friendly</div>
                 </div>
               </div>
             </div>
