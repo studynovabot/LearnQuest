@@ -19,32 +19,11 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Provider component
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // TEMPORARY: Bypass authentication for UI testing
-  const BYPASS_AUTH = true;
-  
-  const [user, setUser] = useState<User | null>(BYPASS_AUTH ? {
-    id: 'demo-user-ui-test',
-    email: 'demo@example.com',
-    displayName: 'Demo User (UI Testing)',
-    isPro: true,
-    subscriptionPlan: 'pro',
-    subscriptionStatus: 'active',
-    subscriptionExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-    role: 'user',
-    lastLogin: new Date(),
-    createdAt: new Date(),
-    updatedAt: new Date()
-  } : null);
-  const [loading, setLoading] = useState(!BYPASS_AUTH);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Check if user is already logged in on mount
   useEffect(() => {
-    // Skip authentication checks if bypassing auth
-    if (BYPASS_AUTH) {
-      setLoading(false);
-      return;
-    }
-    
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         if (firebaseUser) {
@@ -79,21 +58,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 localStorage.removeItem('user');
                 setUser(null);
                 
-                // Try to auto-login with the provided credentials
-                if (import.meta.env.DEV) {
-                  console.log('Development mode - attempting auto-login with provided credentials');
-                  login('thakurranveersingh505@gmail.com', 'India#321')
-                    .then(success => {
-                      if (success) {
-                        console.log('Auto-login successful');
-                      } else {
-                        console.log('Auto-login failed');
-                      }
-                    })
-                    .catch(error => {
-                      console.error('Auto-login error:', error);
-                    });
-                }
+                // No auto-login, user must authenticate manually
+                console.log('No stored user found, user must login manually');
               } else {
                 // Use the stored user data
                 setUser(parsedUser);
@@ -108,21 +74,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // No user found
             setUser(null);
             
-            // Try to auto-login with the provided credentials in development mode
-            if (import.meta.env.DEV) {
-              console.log('Development mode - attempting auto-login with provided credentials');
-              login('thakurranveersingh505@gmail.com', 'India#321')
-                .then(success => {
-                  if (success) {
-                    console.log('Auto-login successful');
-                  } else {
-                    console.log('Auto-login failed');
-                  }
-                })
-                .catch(error => {
-                  console.error('Auto-login error:', error);
-                });
-            }
+            // No auto-login, user must authenticate manually
+            console.log('No user found, user must login manually');
           }
         }
       } catch (error) {
@@ -135,59 +88,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, [BYPASS_AUTH]);
+  }, []);
 
-  // Create developer user for local development only
-  const createDeveloperUser = async () => {
-    console.log('🔄 Development mode - attempting auto-login with Firebase...');
+  // No developer auto-login functionality
 
-    try {
-      // Try to login with the provided credentials first
-      console.log('🔄 Attempting login with developer credentials...');
-      const loginSuccess = await login('thakurranveersingh505@gmail.com', 'India#321');
-
-      if (loginSuccess) {
-        console.log('✅ Logged in with developer credentials');
-        return;
-      } else {
-        console.log('⚠️ Login failed, attempting to register developer account...');
-        // Try to register the account
-        const registerSuccess = await register('thakurranveersingh505@gmail.com', 'Ranveer Singh', 'India#321');
-        if (registerSuccess) {
-          console.log('✅ Developer account registered successfully');
-          return;
-        }
-      }
-
-      throw new Error('Could not login or register developer account');
-    } catch (error) {
-      console.error('💥 Developer auto-login failed:', error);
-      console.log('🔄 You will need to login manually');
-      setUser(null);
-    }
-  };
-
-  // Create a fallback user if backend is not available
-  const createFallbackUser = async () => {
-    console.log('🆘 Creating fallback user (backend unavailable)...');
-    const fallbackUser: User = {
-      id: `fallback-user-${Date.now()}`,
-      email: "demo@example.com",
-      displayName: "Demo User (Offline)",
-      isPro: false,
-      subscriptionPlan: 'free',
-      subscriptionStatus: 'trial',
-      subscriptionExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      role: 'user', // Adding required role
-      lastLogin: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
-    setUser(fallbackUser);
-    localStorage.setItem('user', JSON.stringify(fallbackUser));
-    console.log('🔧 Fallback user created:', fallbackUser);
-  };
+  // No fallback user functionality - proper authentication required
 
   // Login function
   const login = async (email: string, password: string): Promise<boolean> => {

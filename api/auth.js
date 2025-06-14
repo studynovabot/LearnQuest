@@ -82,31 +82,7 @@ export default function handler(req, res) {
           console.error('Firebase auth failed, trying hardcoded admin:', firebaseError.message);
         }
 
-        // Fallback hardcoded admin check
-        if (email === 'thakurranveersingh505@gmail.com' && password === 'India#321') {
-          const adminUser = {
-            id: 'admin_user_001',
-            email: 'thakurranveersingh505@gmail.com',
-            displayName: 'Admin User',
-            role: 'admin',
-            isPro: true,
-            subscriptionPlan: 'goat', // Highest tier
-            subscriptionStatus: 'active',
-            subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-            className: '',
-            board: '',
-            createdAt: new Date(),
-            lastLogin: new Date(),
-            isFirstLogin: false
-          };
-
-          console.log('Hardcoded admin login successful');
-          return res.status(200).json({
-            user: adminUser,
-            isFirstLogin: false,
-            message: 'Login successful (hardcoded)'
-          });
-        }
+        // No hardcoded admin login - proper authentication required
 
         console.log('Invalid credentials for:', email);
         return res.status(401).json({ message: 'Invalid credentials' });
