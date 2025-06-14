@@ -3,8 +3,13 @@ import SubjectOverview from "@/components/dashboard/SubjectOverview";
 import AITutors from "@/components/dashboard/AITutors";
 import NovaLogo from "@/components/ui/NovaLogo";
 import WelcomeMessage from "@/components/dashboard/WelcomeMessage";
+import StudyPlanGenerator from "@/components/dashboard/StudyPlanGenerator";
+import VisualLearningTools from "@/components/dashboard/VisualLearningTools";
+import TextbookConnector from "@/components/dashboard/TextbookConnector";
+import PersonalizedDashboard from "@/components/dashboard/PersonalizedDashboard";
 import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 import { PremiumCard, StatCard, TutorCard } from "@/components/premium/PremiumCard";
 import { PremiumButton } from "@/components/premium/PremiumButton";
 import { 
@@ -26,7 +31,10 @@ import {
   Calendar,
   MessageSquare,
   Settings,
-  Crown
+  Crown,
+  FileText,
+  MindMap,
+  Link as LinkIcon
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -230,26 +238,136 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
+            className="mb-12"
           >
             <PremiumCard className="p-8">
               <h3 className="text-xl font-display font-bold text-foreground mb-6">Quick Actions</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
-                  <BookOpen className="h-6 w-6" />
-                  <span className="text-sm">NCERT Solutions</span>
-                </PremiumButton>
-                <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
-                  <MessageSquare className="h-6 w-6" />
-                  <span className="text-sm">AI Chat</span>
-                </PremiumButton>
-                <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
-                  <BarChart3 className="h-6 w-6" />
-                  <span className="text-sm">Progress</span>
-                </PremiumButton>
-                <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
-                  <Settings className="h-6 w-6" />
-                  <span className="text-sm">Settings</span>
-                </PremiumButton>
+                <Link href="/ncert-solutions">
+                  <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
+                    <BookOpen className="h-6 w-6" />
+                    <span className="text-sm">NCERT Solutions</span>
+                  </PremiumButton>
+                </Link>
+                <Link href="/chat">
+                  <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
+                    <MessageSquare className="h-6 w-6" />
+                    <span className="text-sm">AI Chat</span>
+                  </PremiumButton>
+                </Link>
+                <Link href="/dashboard">
+                  <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
+                    <BarChart3 className="h-6 w-6" />
+                    <span className="text-sm">Progress</span>
+                  </PremiumButton>
+                </Link>
+                <Link href="/settings">
+                  <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
+                    <Settings className="h-6 w-6" />
+                    <span className="text-sm">Settings</span>
+                  </PremiumButton>
+                </Link>
+              </div>
+            </PremiumCard>
+          </motion.section>
+
+          {/* New Features Section */}
+          <div className="mb-8">
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">
+              Advanced Learning Tools
+            </h2>
+            <p className="text-muted-foreground mb-6">Powerful AI-powered tools to enhance your learning experience</p>
+          </div>
+
+          {/* Study Plan Generator and Personalized Dashboard */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="mb-12"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.8 }}
+              >
+                <StudyPlanGenerator />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.8 }}
+              >
+                <PersonalizedDashboard />
+              </motion.div>
+            </div>
+          </motion.section>
+
+          {/* Visual Learning Tools and Textbook Connector */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+            className="mb-12"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 1.0 }}
+              >
+                <VisualLearningTools />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 1.0 }}
+              >
+                <TextbookConnector />
+              </motion.div>
+            </div>
+          </motion.section>
+
+          {/* Feature Highlights */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.1 }}
+            className="mb-12"
+          >
+            <PremiumCard className="p-8">
+              <h3 className="text-xl font-display font-bold text-foreground mb-6">Why Students Love Study Nova</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-muted/30 rounded-lg p-6">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                    <Clock className="h-6 w-6 text-primary" />
+                  </div>
+                  <h4 className="text-lg font-semibold mb-2">Save Time</h4>
+                  <p className="text-sm text-muted-foreground">
+                    "In about 30 minutes of prompt ping-pong, it identified the issue with my understanding. I told the Agent I didn't want to memorize — just understand!"
+                  </p>
+                </div>
+                
+                <div className="bg-muted/30 rounded-lg p-6">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                    <FileText className="h-6 w-6 text-primary" />
+                  </div>
+                  <h4 className="text-lg font-semibold mb-2">Instant Study Guides</h4>
+                  <p className="text-sm text-muted-foreground">
+                    "In just 14 minutes, the agent created the most beautiful, fully functional study guide for this chapter. All I did was give it the link to the textbook..."
+                  </p>
+                </div>
+                
+                <div className="bg-muted/30 rounded-lg p-6">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                    <Brain className="h-6 w-6 text-primary" />
+                  </div>
+                  <h4 className="text-lg font-semibold mb-2">Personal Tutor</h4>
+                  <p className="text-sm text-muted-foreground">
+                    "I'd describe this agent as my personal paid tutor — it handles around 95% of the work, including explaining and helping me practice concepts."
+                  </p>
+                </div>
               </div>
             </PremiumCard>
           </motion.section>

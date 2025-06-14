@@ -1,11 +1,15 @@
 import { useUserContext } from "@/context/UserContext";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { isAdmin as checkIsAdmin } from "@/lib/adminConfig";
 
 export function useAuth() {
   const { user, loading, login, register, logout, refreshUser } = useUserContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  
+  // Check if current user is admin
+  const isAdmin = user ? (checkIsAdmin(user.email) || user.role === 'admin') : false;
 
   const handleLogin = async (email: string, password: string) => {
     if (isSubmitting) return false;
@@ -41,6 +45,7 @@ export function useAuth() {
     user,
     loading: loading || isSubmitting,
     isAuthenticated: !!user,
+    isAdmin,
     login: handleLogin,
     register: handleRegister,
     logout: handleLogout,
