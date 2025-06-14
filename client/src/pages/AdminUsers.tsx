@@ -97,6 +97,7 @@ interface User {
   updatedAt?: string;
   lastLogin?: string;
   isBlocked?: boolean;
+  isMockData?: boolean; // Flag to identify mock data
 }
 
 interface UserStats {
@@ -250,6 +251,7 @@ const AdminUsers: React.FC = () => {
           pages: 1
         });
         setError('Using mock data (API request failed)');
+        setUsingMockData(true); // Set the flag that we're using mock data
       }
     } finally {
       setLoading(false);
@@ -370,6 +372,29 @@ const AdminUsers: React.FC = () => {
     setActionError(null);
     
     try {
+      // Check if this is mock data
+      if (selectedUser.isMockData || usingMockData) {
+        console.log('Updating credentials for mock user:', selectedUser.id);
+        
+        // Just update the local state without API call
+        setUsers(prev => prev.map(u => 
+          u.id === selectedUser.id 
+            ? { ...u, displayName: editDisplayName, email: editEmail } 
+            : u
+        ));
+        
+        setActionSuccess('Mock user credentials updated successfully');
+        
+        // Close the dialog after a short delay
+        setTimeout(() => {
+          setIsEditDialogOpen(false);
+        }, 1500);
+        
+        setIsActionLoading(false);
+        return;
+      }
+      
+      // Real API call for non-mock users
       const response = await fetch(`${config.apiUrl}/admin-users?action=update-credentials`, {
         method: 'POST',
         headers: {
@@ -422,6 +447,29 @@ const AdminUsers: React.FC = () => {
     setActionError(null);
     
     try {
+      // Check if this is mock data
+      if (selectedUser.isMockData || usingMockData) {
+        console.log('Updating role for mock user:', selectedUser.id, 'to', editRole);
+        
+        // Just update the local state without API call
+        setUsers(prev => prev.map(u => 
+          u.id === selectedUser.id 
+            ? { ...u, role: editRole } 
+            : u
+        ));
+        
+        setActionSuccess('Mock user role updated successfully');
+        
+        // Close the dialog after a short delay
+        setTimeout(() => {
+          setIsRoleDialogOpen(false);
+        }, 1500);
+        
+        setIsActionLoading(false);
+        return;
+      }
+      
+      // Real API call for non-mock users
       const response = await fetch(`${config.apiUrl}/admin-users?action=update-role`, {
         method: 'POST',
         headers: {
@@ -483,6 +531,59 @@ const AdminUsers: React.FC = () => {
         expiryDate.setDate(expiryDate.getDate() - 1); // Already expired
       }
       
+      // Check if this is mock data
+      if (selectedUser.isMockData || usingMockData) {
+        console.log('Updating subscription for mock user:', selectedUser.id, 'to', editPlan, editPlanStatus);
+        
+        // Just update the local state without API call
+        setUsers(prev => prev.map(u => 
+          u.id === selectedUser.id 
+            ? { 
+                ...u, 
+                subscriptionPlan: editPlan, 
+                subscriptionStatus: editPlanStatus,
+                subscriptionExpiry: expiryDate.toISOString(),
+                isPro: editPlan !== 'free'
+              } 
+            : u
+        ));
+        
+        // Update user stats if available
+        if (userStats) {
+          const oldPlan = selectedUser.subscriptionPlan || 'free';
+          const newPlan = editPlan;
+          
+          if (oldPlan !== newPlan) {
+            const statsUpdate = { ...userStats };
+            
+            // Decrement old plan count
+            if (oldPlan === 'pro') statsUpdate.proUsers--;
+            else if (oldPlan === 'goat') statsUpdate.goatUsers--;
+            else statsUpdate.freeUsers--;
+            
+            // Increment new plan count
+            if (newPlan === 'pro') statsUpdate.proUsers++;
+            else if (newPlan === 'goat') statsUpdate.goatUsers++;
+            else statsUpdate.freeUsers++;
+            
+            // Update conversion rate
+            statsUpdate.conversionRate = ((statsUpdate.proUsers + statsUpdate.goatUsers) / statsUpdate.totalUsers * 100).toFixed(2);
+            
+            setUserStats(statsUpdate);
+          }
+        }
+        
+        setActionSuccess('Mock user subscription updated successfully');
+        
+        // Close the dialog after a short delay
+        setTimeout(() => {
+          setIsPlanDialogOpen(false);
+        }, 1500);
+        
+        setIsActionLoading(false);
+        return;
+      }
+      
       const response = await fetch(`${config.apiUrl}/admin-users?action=update-plan`, {
         method: 'POST',
         headers: {
@@ -540,6 +641,30 @@ const AdminUsers: React.FC = () => {
     setActionError(null);
     
     try {
+      // Check if this is mock data
+      if (userToDelete.isMockData || usingMockData) {
+        console.log('Deleting mock user:', userToDelete.id);
+        
+        // Just remove from local state without API call
+        setUsers(prev => prev.filter(u => u.id !== userToDelete.id));
+        
+        // Update user stats if available
+        if (userStats) {
+          setUserStats({
+            ...userStats,
+            totalUsers: userStats.totalUsers - 1,
+            proUsers: userToDelete.subscriptionPlan === 'pro' ? userStats.proUsers - 1 : userStats.proUsers,
+            goatUsers: userToDelete.subscriptionPlan === 'goat' ? userStats.goatUsers - 1 : userStats.goatUsers,
+            freeUsers: userToDelete.subscriptionPlan === 'free' ? userStats.freeUsers - 1 : userStats.freeUsers
+          });
+        }
+        
+        setActionSuccess('Mock user deleted successfully');
+        setIsActionLoading(false);
+        return;
+      }
+      
+      // Real API call for non-mock users
       const response = await fetch(`${config.apiUrl}/admin-users?action=delete-user`, {
         method: 'POST',
         headers: {
@@ -590,6 +715,23 @@ const AdminUsers: React.FC = () => {
     setActionError(null);
     
     try {
+      // Check if this is mock data
+      if (userToToggle.isMockData || usingMockData) {
+        console.log(`${blockStatus ? 'Blocking' : 'Unblocking'} mock user:`, userToToggle.id);
+        
+        // Just update the local state without API call
+        setUsers(prev => prev.map(u => 
+          u.id === userToToggle.id 
+            ? { ...u, isBlocked: blockStatus } 
+            : u
+        ));
+        
+        setActionSuccess(`Mock user ${blockStatus ? 'blocked' : 'unblocked'} successfully`);
+        setIsActionLoading(false);
+        return;
+      }
+      
+      // Real API call for non-mock users
       const response = await fetch(`${config.apiUrl}/admin-users?action=toggle-block`, {
         method: 'POST',
         headers: {
@@ -627,8 +769,14 @@ const AdminUsers: React.FC = () => {
     }
   };
   
+  // Track if we're using mock data
+  const [usingMockData, setUsingMockData] = useState(false);
+  
   // Generate mock users for fallback
   const generateMockUsers = (count: number): User[] => {
+    // Set the flag that we're using mock data
+    setUsingMockData(true);
+    
     const subscriptionPlans: Array<'free' | 'pro' | 'goat'> = ['free', 'pro', 'goat'];
     const subscriptionStatuses: Array<'active' | 'trial' | 'expired' | 'canceled'> = ['active', 'trial', 'expired', 'canceled'];
     const roles: Array<'user' | 'admin'> = ['user', 'admin'];
@@ -655,7 +803,8 @@ const AdminUsers: React.FC = () => {
         createdAt: createdDate.toISOString(),
         updatedAt: new Date().toISOString(),
         lastLogin: lastLoginDate.toISOString(),
-        isBlocked: Math.random() > 0.9 // 10% chance of being blocked
+        isBlocked: Math.random() > 0.9, // 10% chance of being blocked
+        isMockData: true // Flag to identify mock data
       };
     });
   };
@@ -800,6 +949,21 @@ const AdminUsers: React.FC = () => {
       </Helmet>
       
       <div className="container mx-auto py-8 space-y-8">
+        {usingMockData && (
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded">
+            <div className="flex items-center">
+              <svg className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="font-bold">Mock Data Mode</p>
+            </div>
+            <p className="text-sm mt-1">
+              You are viewing mock data. All operations will only affect the local state and won't make real API calls.
+              This is typically shown when the backend API is unavailable.
+            </p>
+          </div>
+        )}
+        
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">User Management</h1>
