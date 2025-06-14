@@ -1,6 +1,7 @@
 // Admin users API endpoint
 import { initializeFirebaseAdmin, getFirestoreAdminDb } from '../utils/firebase-admin.js';
 import { requireAdmin } from '../utils/admin-auth.js';
+import admin from 'firebase-admin';
 
 // Initialize Firebase
 const adminApp = initializeFirebaseAdmin();
@@ -314,12 +315,18 @@ async function deleteUser(req, res) {
     
     console.log(`Attempting to delete user with ID: ${userId}`);
     
-    // First, delete the user document from Firestore
+    // First, check if the user exists in Firestore
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: `User with ID ${userId} not found` });
+    }
+    
+    // Delete the user document from Firestore
     await db.collection('users').doc(userId).delete();
     console.log(`Firestore document deleted for user ${userId}`);
     
     // Get the Firebase Auth Admin instance
-    const { getAuthAdmin } = require('../utils/firebase-admin.js');
+    const { getAuthAdmin } = await import('../utils/firebase-admin.js');
     const auth = getAuthAdmin();
     
     if (auth) {
@@ -330,7 +337,10 @@ async function deleteUser(req, res) {
       } catch (authError) {
         console.error(`Error deleting Firebase Auth user: ${authError.message}`);
         // Continue anyway since we've already deleted from Firestore
+        console.log('Continuing with Firestore deletion only');
       }
+    } else {
+      console.warn('Firebase Auth admin not available, skipping auth user deletion');
     }
     
     return res.status(200).json({ 
@@ -361,14 +371,20 @@ async function toggleUserBlock(req, res) {
     const blockStatus = blocked === true;
     console.log(`Setting block status to ${blockStatus} for user: ${userId}`);
     
+    // Check if user exists
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: `User with ID ${userId} not found` });
+    }
+    
     // Update the user's blocked status in Firestore
     await db.collection('users').doc(userId).update({
       isBlocked: blockStatus,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      updatedAt: new Date() // Use JavaScript Date instead of admin.firestore.FieldValue
     });
     
     // Get the Firebase Auth Admin instance
-    const { getAuthAdmin } = require('../utils/firebase-admin.js');
+    const { getAuthAdmin } = await import('../utils/firebase-admin.js');
     const auth = getAuthAdmin();
     
     if (auth) {
@@ -380,7 +396,10 @@ async function toggleUserBlock(req, res) {
         console.log(`Firebase Auth user ${blockStatus ? 'disabled' : 'enabled'}: ${userId}`);
       } catch (authError) {
         console.error(`Error updating Firebase Auth user: ${authError.message}`);
+        console.log('Continuing with Firestore update only');
       }
+    } else {
+      console.warn('Firebase Auth admin not available, skipping auth user update');
     }
     
     return res.status(200).json({ 
@@ -411,9 +430,15 @@ async function updateUserPlan(req, res) {
     console.log(`Updating subscription for user: ${userId}`);
     console.log(`New plan: ${subscriptionPlan}, status: ${subscriptionStatus}`);
     
+    // Check if user exists
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: `User with ID ${userId} not found` });
+    }
+    
     // Prepare update data
     const updateData = {
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      updatedAt: new Date() // Use JavaScript Date instead of admin.firestore.FieldValue
     };
     
     // Only include fields that are provided
@@ -427,7 +452,7 @@ async function updateUserPlan(req, res) {
     }
     
     if (subscriptionExpiry) {
-      // Convert to Firestore timestamp
+      // Convert to Date object
       updateData.subscriptionExpiry = new Date(subscriptionExpiry);
     }
     
@@ -465,10 +490,16 @@ async function updateUserRole(req, res) {
     
     console.log(`Updating role for user: ${userId} to ${role}`);
     
+    // Check if user exists
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: `User with ID ${userId} not found` });
+    }
+    
     // Update the user in Firestore
     await db.collection('users').doc(userId).update({
       role,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      updatedAt: new Date() // Use JavaScript Date instead of admin.firestore.FieldValue
     });
     
     return res.status(200).json({ 
@@ -502,9 +533,15 @@ async function updateUserCredentials(req, res) {
     
     console.log(`Updating credentials for user: ${userId}`);
     
+    // Check if user exists
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: `User with ID ${userId} not found` });
+    }
+    
     // Prepare update data
     const updateData = {
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      updatedAt: new Date() // Use JavaScript Date instead of admin.firestore.FieldValue
     };
     
     if (displayName) {
@@ -515,7 +552,7 @@ async function updateUserCredentials(req, res) {
       updateData.email = email;
       
       // Update email in Firebase Auth if available
-      const { getAuthAdmin } = require('../utils/firebase-admin.js');
+      const { getAuthAdmin } = await import('../utils/firebase-admin.js');
       const auth = getAuthAdmin();
       
       if (auth) {
@@ -524,8 +561,10 @@ async function updateUserCredentials(req, res) {
           console.log(`Firebase Auth email updated for ${userId}`);
         } catch (authError) {
           console.error(`Error updating Firebase Auth email: ${authError.message}`);
-          // Continue anyway since we're updating Firestore
+          console.log('Continuing with Firestore update only');
         }
+      } else {
+        console.warn('Firebase Auth admin not available, skipping auth user update');
       }
     }
     
