@@ -33,7 +33,7 @@ import {
   Settings,
   Crown,
   FileText,
-  Brain,
+  BrainCircuit,
   Link as LinkIcon
 } from "lucide-react";
 
@@ -361,7 +361,7 @@ const Dashboard = () => {
                 
                 <div className="bg-muted/30 rounded-lg p-6">
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <Brain className="h-6 w-6 text-primary" />
+                    <BrainCircuit className="h-6 w-6 text-primary" />
                   </div>
                   <h4 className="text-lg font-semibold mb-2">Personal Tutor</h4>
                   <p className="text-sm text-muted-foreground">
