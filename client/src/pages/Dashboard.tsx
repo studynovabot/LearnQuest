@@ -33,7 +33,7 @@ import {
   Settings,
   Crown,
   FileText,
-  MindMap,
+  Brain,
   Link as LinkIcon
 } from "lucide-react";
 

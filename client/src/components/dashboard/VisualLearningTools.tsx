@@ -9,9 +9,9 @@ import {
   BookOpen, 
   BrainCircuit, 
   FileText, 
-  FlowChart, 
+  GitBranch, 
   Loader2, 
-  MindMap, 
+  Brain, 
   Network, 
   Pencil, 
   Zap 
@@ -302,7 +302,7 @@ const VisualLearningTools = () => {
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <MindMap className="h-5 w-5 text-primary" />
+          <Brain className="h-5 w-5 text-primary" />
           Visual Learning Tools
         </CardTitle>
       </CardHeader>
@@ -314,7 +314,7 @@ const VisualLearningTools = () => {
               <span>Concept Maps</span>
             </TabsTrigger>
             <TabsTrigger value="flowcharts" className="flex items-center gap-2">
-              <FlowChart className="h-4 w-4" />
+              <GitBranch className="h-4 w-4" />
               <span>Flowcharts</span>
             </TabsTrigger>
             <TabsTrigger value="mind-maps" className="flex items-center gap-2">
