@@ -38,12 +38,8 @@ import { StarIcon, CrownIcon } from "@/components/ui/icons";
 
 const LandingPage: React.FC = () => {
   const { user } = useUserContext();
-  const [isVisible, setIsVisible] = useState(true);
-
-  useEffect(() => {
-    // No need to set isVisible to true as it's already true
-    // We've removed the fake user count simulation
-  }, []);
+  // Always set isVisible to true and remove the state since we want content to always be visible
+  const isVisible = true;
 
   return (
     <>
@@ -133,7 +129,7 @@ const LandingPage: React.FC = () => {
         {/* Hero Section */}
         <section className="relative z-10 w-full py-20 md:py-32 lg:py-40">
           <div className="container px-4 md:px-6">
-            <div className={`flex flex-col items-center text-center space-y-8 md:space-y-12 max-w-6xl mx-auto transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <div className="flex flex-col items-center text-center space-y-8 md:space-y-12 max-w-6xl mx-auto opacity-100">
               
               {/* Social Proof Badge */}
               <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 animate-float">
@@ -267,32 +263,32 @@ const LandingPage: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-              <div className="text-center group">
-                <div className="premium-card p-6 group-hover:scale-105 transition-all duration-300">
+              <div className="text-center">
+                <div className="premium-card p-6">
                   <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">24/7</div>
                   <div className="text-white/80 font-medium">AI Support</div>
                   <div className="text-sm text-emerald-400 mt-1">Always Available</div>
                 </div>
               </div>
               
-              <div className="text-center group">
-                <div className="premium-card p-6 group-hover:scale-105 transition-all duration-300">
+              <div className="text-center">
+                <div className="premium-card p-6">
                   <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">Fast</div>
                   <div className="text-white/80 font-medium">Response Time</div>
                   <div className="text-sm text-emerald-400 mt-1">Instant Answers</div>
                 </div>
               </div>
               
-              <div className="text-center group">
-                <div className="premium-card p-6 group-hover:scale-105 transition-all duration-300">
+              <div className="text-center">
+                <div className="premium-card p-6">
                   <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">100+</div>
                   <div className="text-white/80 font-medium">Topics Covered</div>
                   <div className="text-sm text-emerald-400 mt-1">Comprehensive</div>
                 </div>
               </div>
               
-              <div className="text-center group">
-                <div className="premium-card p-6 group-hover:scale-105 transition-all duration-300">
+              <div className="text-center">
+                <div className="premium-card p-6">
                   <div className="text-4xl md:text-5xl font-display font-bold text-gradient mb-2">Easy</div>
                   <div className="text-white/80 font-medium">To Use</div>
                   <div className="text-sm text-emerald-400 mt-1">User Friendly</div>
@@ -614,7 +610,7 @@ const LandingPage: React.FC = () => {
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
-              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg hover:bg-slate-800/70 transition-colors">
+              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg">
                 <Code className="h-10 w-10 text-blue-400 mb-6" />
                 <h3 className="text-xl font-bold mb-3 text-white">AI Homework Helper</h3>
                 <p className="text-slate-300 mb-6 leading-relaxed">
@@ -630,7 +626,7 @@ const LandingPage: React.FC = () => {
                   </Link>
                 )}
               </div>
-              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg hover:bg-slate-800/70 transition-colors">
+              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg">
                 <Search className="h-10 w-10 text-blue-400 mb-6" />
                 <h3 className="text-xl font-bold mb-3 text-white">AI Concept Review</h3>
                 <p className="text-slate-300 mb-6 leading-relaxed">
@@ -646,7 +642,7 @@ const LandingPage: React.FC = () => {
                   </Link>
                 )}
               </div>
-              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg hover:bg-slate-800/70 transition-colors">
+              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg">
                 <Image className="h-10 w-10 text-blue-400 mb-6" />
                 <h3 className="text-xl font-bold mb-3 text-white">Image to Notes</h3>
                 <p className="text-slate-300 mb-6 leading-relaxed">
@@ -662,7 +658,7 @@ const LandingPage: React.FC = () => {
                   </Link>
                 )}
               </div>
-              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg hover:bg-slate-800/70 transition-colors">
+              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg">
                 <FileCode className="h-10 w-10 text-blue-400 mb-6" />
                 <h3 className="text-xl font-bold mb-3 text-white">Math Solution Generator</h3>
                 <p className="text-slate-300 mb-6 leading-relaxed">
@@ -678,7 +674,7 @@ const LandingPage: React.FC = () => {
                   </Link>
                 )}
               </div>
-              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg hover:bg-slate-800/70 transition-colors">
+              <div className="flex flex-col p-8 bg-slate-800/50 rounded-xl border border-slate-700 shadow-lg">
                 <Database className="h-10 w-10 text-blue-400 mb-6" />
                 <h3 className="text-xl font-bold mb-3 text-white">Science Lab Generator</h3>
                 <p className="text-slate-300 mb-6 leading-relaxed">
@@ -711,7 +707,7 @@ const LandingPage: React.FC = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 mt-16">
               {["Mathematics", "Physics", "Chemistry", "Biology", "History", "Geography",
                 "Economics", "English", "Hindi", "Science", "Social Studies", "Computer Science"].map((subject) => (
-                <div key={subject} className="flex items-center justify-center p-6 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-colors">
+                <div key={subject} className="flex items-center justify-center p-6 rounded-lg border border-slate-700 bg-slate-800/50">
                   <span className="font-medium text-slate-200 text-center">{subject}</span>
                 </div>
               ))}

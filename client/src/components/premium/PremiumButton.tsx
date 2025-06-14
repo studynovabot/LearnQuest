@@ -21,8 +21,8 @@ export const PremiumButton: React.FC<PremiumButtonProps> = ({
   
   const variants = {
     primary: "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl focus:ring-indigo-500",
-    secondary: "bg-white/90 backdrop-blur-sm border-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50 hover:border-indigo-300 focus:ring-indigo-500",
-    ghost: "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 focus:ring-indigo-500",
+    secondary: "bg-card backdrop-blur-sm border-2 border-border text-primary hover:bg-muted hover:border-primary/30 focus:ring-primary",
+    ghost: "text-muted-foreground hover:text-primary hover:bg-muted focus:ring-primary",
     gradient: "bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-600 hover:from-emerald-600 hover:via-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl focus:ring-purple-500"
   };
   

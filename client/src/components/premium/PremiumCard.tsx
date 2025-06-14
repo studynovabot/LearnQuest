@@ -19,10 +19,10 @@ export const PremiumCard: React.FC<PremiumCardProps> = ({
   return (
     <div 
       className={cn(
-        "bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl",
+        "bg-card text-card-foreground backdrop-blur-sm rounded-2xl border border-border shadow-xl",
         hover && "hover:shadow-2xl hover:scale-105 transition-all duration-300",
         glow && "animate-glow",
-        gradient && "bg-gradient-to-br from-white/90 to-indigo-50/90",
+        gradient && "bg-gradient-to-br from-background/90 to-indigo-50/90",
         className
       )}
     >
@@ -58,8 +58,8 @@ export const StatCard: React.FC<StatCardProps> = ({
     <PremiumCard className="p-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <p className="text-3xl font-bold text-gray-900">{value}</p>
+          <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
+          <p className="text-3xl font-bold text-foreground">{value}</p>
           {trend && (
             <p className="text-sm text-green-600 mt-1">{trend}</p>
           )}
@@ -99,22 +99,22 @@ export const TutorCard: React.FC<TutorCardProps> = ({
             {avatar}
           </div>
           {status === 'online' && (
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full animate-pulse"></div>
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-background rounded-full animate-pulse"></div>
           )}
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
             {name}
           </h3>
-          <p className="text-sm text-gray-500">{subject}</p>
+          <p className="text-sm text-muted-foreground">{subject}</p>
         </div>
       </div>
       
-      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{description}</p>
+      <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{description}</p>
       
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-400">Last used: {lastUsed}</span>
-        <div className="w-6 h-6 text-gray-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all">
+        <span className="text-xs text-muted-foreground/70">Last used: {lastUsed}</span>
+        <div className="w-6 h-6 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all">
           →
         </div>
       </div>

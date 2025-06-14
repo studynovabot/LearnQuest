@@ -90,12 +90,12 @@ const Dashboard = () => {
         <meta name="description" content="Experience the future of learning with personalized AI tutors, real-time progress tracking, and adaptive study plans." />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen bg-background">
         {/* Animated Background Elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 right-20 w-64 h-64 bg-purple-200/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-          <div className="absolute bottom-20 left-20 w-64 h-64 bg-indigo-200/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-pink-200/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+          <div className="absolute top-20 right-20 w-64 h-64 bg-purple-200/30 dark:bg-purple-900/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+          <div className="absolute bottom-20 left-20 w-64 h-64 bg-indigo-200/30 dark:bg-indigo-900/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-pink-200/20 dark:bg-pink-900/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -118,25 +118,25 @@ const Dashboard = () => {
                       <Brain className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h1 className="text-3xl md:text-4xl font-display font-bold text-gray-900">
+                      <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
                         Welcome back, <span className="text-gradient">{user?.displayName?.split(' ')[0] || 'Demo'}!</span> 👋
                       </h1>
-                      <p className="text-gray-600 text-lg">Ready to continue your AI-powered learning journey?</p>
+                      <p className="text-muted-foreground text-lg">Ready to continue your AI-powered learning journey?</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center space-x-6 text-sm">
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
-                      <span className="text-gray-600">All AI tutors online</span>
+                      <span className="text-muted-foreground">All AI tutors online</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Crown className="h-4 w-4 text-amber-500" />
-                      <span className="text-gray-600">Pro Member</span>
+                      <span className="text-muted-foreground">Pro Member</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Flame className="h-4 w-4 text-orange-500" />
-                      <span className="text-gray-600">7-day streak</span>
+                      <span className="text-muted-foreground">7-day streak</span>
                     </div>
                   </div>
                 </div>
@@ -200,14 +200,14 @@ const Dashboard = () => {
           >
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-2">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">
                   Your AI Tutors
                 </h2>
-                <p className="text-gray-600">Choose your AI tutor and start learning instantly</p>
+                <p className="text-muted-foreground">Choose your AI tutor and start learning instantly</p>
               </div>
-              <div className="flex items-center space-x-2 px-4 py-2 bg-emerald-100 rounded-full">
+              <div className="flex items-center space-x-2 px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                <span className="text-sm text-emerald-700 font-medium">All tutors online</span>
+                <span className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">All tutors online</span>
               </div>
             </div>
             
@@ -232,7 +232,7 @@ const Dashboard = () => {
             transition={{ duration: 0.6, delay: 0.6 }}
           >
             <PremiumCard className="p-8">
-              <h3 className="text-xl font-display font-bold text-gray-900 mb-6">Quick Actions</h3>
+              <h3 className="text-xl font-display font-bold text-foreground mb-6">Quick Actions</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
                   <BookOpen className="h-6 w-6" />
