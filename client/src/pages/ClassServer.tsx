@@ -766,15 +766,31 @@ const ClassServer = () => {
                           </Button>
                         );
                       })}
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex h-7 w-7 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 p-0 opacity-0 transition-opacity group-hover:opacity-100"
-                        >
-                          <PlusIcon className="h-4 w-4" />
-                        </Button>
-                      </PopoverTrigger>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex h-7 w-7 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 p-0 opacity-0 transition-opacity group-hover:opacity-100"
+                          >
+                            <PlusIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent side="top" className="w-60 p-2">
+                          <div className="grid grid-cols-8 gap-2">
+                            {["😀", "😂", "❤️", "👍", "👎", "😠", "🎉", "🔥", "👋", "🤔", "🙏", "💯", "🌟", "🎮", "📚", "💻"].map(emoji => (
+                              <Button 
+                                key={emoji}
+                                variant="ghost" 
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleReaction(message.id, emoji)}
+                              >
+                                {emoji}
+                              </Button>
+                            ))}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   )}
                 </div>
@@ -1395,17 +1411,33 @@ const ClassServer = () => {
                     </>
                   )}
                   
-                  <PopoverTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-full text-zinc-400 hover:text-zinc-100"
-                      aria-label="Open emoji picker"
-                    >
-                      <SmileIcon className="h-5 w-5" />
-                    </Button>
-                  </PopoverTrigger>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full text-zinc-400 hover:text-zinc-100"
+                        aria-label="Open emoji picker"
+                      >
+                        <SmileIcon className="h-5 w-5" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent side="top" className="w-60 p-2">
+                      <div className="grid grid-cols-8 gap-2">
+                        {["😀", "😂", "❤️", "👍", "👎", "😠", "🎉", "🔥", "👋", "🤔", "🙏", "💯", "🌟", "🎮", "📚", "💻"].map(emoji => (
+                          <Button 
+                            key={emoji}
+                            variant="ghost" 
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleEmojiSelect(emoji)}
+                          >
+                            {emoji}
+                          </Button>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             </form>
