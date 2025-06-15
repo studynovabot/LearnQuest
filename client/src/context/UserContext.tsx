@@ -12,6 +12,7 @@ interface UserContextType {
   register: (email: string, displayName: string, password: string) => Promise<boolean>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  updateUser: (userData: User) => void;
 }
 
 // Create the context with a default value
@@ -264,6 +265,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  // Update user data
+  const updateUser = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
+
   // Create the context value object
   const contextValue: UserContextType = {
     user,
@@ -272,6 +279,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     register,
     logout,
     refreshUser,
+    updateUser,
   };
 
   return (

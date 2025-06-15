@@ -4,6 +4,7 @@ export interface User {
   displayName: string;
   isPro: boolean;
   subscriptionPlan: 'free' | 'pro' | 'goat'; // Specific plan type - making this required
+  subscription_tier?: 'free' | 'pro' | 'goat'; // Alternative field for subscription tier
   subscriptionStatus: 'active' | 'trial' | 'expired' | 'canceled'; // Making this required
   subscriptionExpiry: Date; // Making this required
   className?: string; // User's class/grade
@@ -13,6 +14,9 @@ export interface User {
   updatedAt: Date; // Making this required
   lastLogin: Date | null; // Making this required
   isFirstLogin?: boolean; // Track if this is the user's first login session
+  xp?: number; // Experience points for gamification
+  streak?: number; // Daily login streak
+  profilePic?: string | null; // Profile picture URL
 }
 
 export interface Subject {

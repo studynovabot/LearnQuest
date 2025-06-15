@@ -17,7 +17,13 @@ export const userSchema = z.object({
   // Privacy fields
   privacyCompliant: z.boolean().default(true),
   authMethod: z.enum(['password', 'otp']).default('password'),
-  trialStarted: z.boolean().default(false)
+  trialStarted: z.boolean().default(false),
+  // Class Server & Goat Nitro fields
+  xp: z.number().default(0),
+  streak: z.number().default(0),
+  lastStreakDate: z.date().nullable(),
+  profilePic: z.string().nullable(),
+  subscription_tier: z.enum(['free', 'pro', 'goat']).default('free')
 });
 
 export const subjectSchema = z.object({
@@ -34,6 +40,55 @@ export const aiTutorSchema = z.object({
   subject: z.string().nullable(),
   iconName: z.string().nullable(),
   color: z.string().nullable()
+});
+
+// Class Server Schemas
+export const classServerSchema = z.object({
+  id: z.string(),
+  class_name: z.string(),
+  description: z.string(),
+  icon_url: z.string().nullable(),
+  created_at: z.date(),
+  updated_at: z.date()
+});
+
+export const topicSchema = z.object({
+  id: z.string(),
+  server_id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  is_premium: z.boolean().default(false),
+  created_at: z.date(),
+  updated_at: z.date()
+});
+
+export const serverMessageSchema = z.object({
+  id: z.string(),
+  user_id: z.string(),
+  topic_id: z.string(),
+  text: z.string(),
+  media_url: z.string().nullable(),
+  media_type: z.enum(['image', 'pdf', 'doc', 'none']).default('none'),
+  timestamp: z.date(),
+  is_ai: z.boolean().default(false)
+});
+
+export const goatPerksSchema = z.object({
+  id: z.string(),
+  user_id: z.string(),
+  badge_style: z.string().nullable(),
+  access_flags: z.array(z.string()).default([]),
+  customizations: z.record(z.string()).default({}),
+  created_at: z.date(),
+  updated_at: z.date()
+});
+
+export const xpEventSchema = z.object({
+  id: z.string(),
+  user_id: z.string(),
+  amount: z.number(),
+  reason: z.string(),
+  timestamp: z.date()
 });
 
 // Privacy-related schemas
@@ -94,6 +149,35 @@ export const insertUserSchema = userSchema.omit({
 
 export const insertSubjectSchema = subjectSchema.omit({ id: true });
 export const insertChatMessageSchema = chatMessageSchema.omit({ id: true, createdAt: true });
+
+// Insert schemas for Class Server
+export const insertClassServerSchema = classServerSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true
+});
+
+export const insertTopicSchema = topicSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true
+});
+
+export const insertServerMessageSchema = serverMessageSchema.omit({
+  id: true,
+  timestamp: true
+});
+
+export const insertGoatPerksSchema = goatPerksSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true
+});
+
+export const insertXpEventSchema = xpEventSchema.omit({
+  id: true,
+  timestamp: true
+});
 
 // Educational Content Schemas
 export const educationalContentSchema = z.object({
@@ -163,6 +247,19 @@ export type ChatMessage = z.infer<typeof chatMessageSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertSubject = z.infer<typeof insertSubjectSchema>;
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+
+// Class Server Types
+export type ClassServer = z.infer<typeof classServerSchema>;
+export type Topic = z.infer<typeof topicSchema>;
+export type ServerMessage = z.infer<typeof serverMessageSchema>;
+export type GoatPerks = z.infer<typeof goatPerksSchema>;
+export type XpEvent = z.infer<typeof xpEventSchema>;
+
+export type InsertClassServer = z.infer<typeof insertClassServerSchema>;
+export type InsertTopic = z.infer<typeof insertTopicSchema>;
+export type InsertServerMessage = z.infer<typeof insertServerMessageSchema>;
+export type InsertGoatPerks = z.infer<typeof insertGoatPerksSchema>;
+export type InsertXpEvent = z.infer<typeof insertXpEventSchema>;
 
 // Educational Content Types
 export type EducationalContent = z.infer<typeof educationalContentSchema>;

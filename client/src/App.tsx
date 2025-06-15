@@ -8,6 +8,7 @@ import { UserProvider } from "@/context/UserContext";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import ChatAgents from "@/pages/ChatAgents";
+import ClassServer from "@/pages/ClassServer";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import OTPLogin from "@/pages/OTPLogin";
@@ -75,6 +76,13 @@ function Router() {
         <ProtectedRoute>
           <MainLayout>
             <ChatAgents />
+          </MainLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/class-server">
+        <ProtectedRoute>
+          <MainLayout>
+            <ClassServer />
           </MainLayout>
         </ProtectedRoute>
       </Route>
