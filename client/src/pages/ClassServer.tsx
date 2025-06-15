@@ -55,6 +55,7 @@ import {
   CircleIcon,
   MoonIcon,
   SunIcon,
+  // Add missing icons
   MicIcon,
   HeadphonesIcon
 } from '@/components/ui/icons';
@@ -84,6 +85,9 @@ const ClassServer = () => {
     setTypingIndicator,
     setReply,
     toggleMembersList,
+    createServer,
+    createTopic,
+    createCategory
   } = useClassServer();
   
   const { xp, streak, isGoatUser, isProUser, getUserRank, getBadgeStyle, isFeatureAvailable } = useGoatNitro();
@@ -101,6 +105,21 @@ const ClassServer = () => {
   const [showNitroAnimation, setShowNitroAnimation] = useState(false);
   const [customStatus, setCustomStatus] = useState('');
   const [selectedBanner, setSelectedBanner] = useState<string | null>(null);
+  
+  // Server creation state
+  const [isCreatingServer, setIsCreatingServer] = useState(false);
+  const [newServerName, setNewServerName] = useState('');
+  const [newServerDescription, setNewServerDescription] = useState('');
+  
+  // Channel creation state
+  const [isCreatingChannel, setIsCreatingChannel] = useState(false);
+  const [newChannelName, setNewChannelName] = useState('');
+  const [newChannelDescription, setNewChannelDescription] = useState('');
+  const [newChannelCategory, setNewChannelCategory] = useState('');
+  
+  // Category creation state
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
   
   // Animation controls
   const avatarControls = useAnimation();
@@ -304,6 +323,56 @@ const ClassServer = () => {
   const handleReaction = (messageId: string, emoji: string) => {
     addReaction(messageId, emoji);
   };
+  
+  // Handle server creation
+  const handleCreateServer = async () => {
+    if (!newServerName.trim()) return;
+    
+    const newServer = await createServer(newServerName.trim(), newServerDescription.trim());
+    if (newServer) {
+      setNewServerName('');
+      setNewServerDescription('');
+      setIsCreatingServer(false);
+      selectServer(newServer);
+    }
+  };
+  
+  // Handle channel creation
+  const handleCreateChannel = async () => {
+    if (!newChannelName.trim() || !newChannelCategory) return;
+    
+    const newChannel = await createTopic(
+      newChannelName.trim(),
+      newChannelDescription.trim(),
+      newChannelCategory,
+      false
+    );
+    
+    if (newChannel) {
+      setNewChannelName('');
+      setNewChannelDescription('');
+      setNewChannelCategory('');
+      setIsCreatingChannel(false);
+      selectTopic(newChannel);
+    }
+  };
+  
+  // Handle category creation
+  const handleCreateCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    
+    const newCategory = await createCategory(newCategoryName.trim());
+    if (newCategory) {
+      setNewCategoryName('');
+      setIsCreatingCategory(false);
+      
+      // Expand the new category
+      setExpandedCategories(prev => ({
+        ...prev,
+        [newCategory.id]: true
+      }));
+    }
+  };
 
   // Render server list
   const renderServerList = () => {
@@ -331,52 +400,59 @@ const ClassServer = () => {
         
         <Separator className="my-2 bg-zinc-700" />
         
-        {servers.map((server) => (
-          <Tooltip key={server.id}>
-            <TooltipTrigger asChild>
-              <Button
-                variant={activeServer?.id === server.id ? 'default' : 'ghost'}
-                className={cn(
-                  'relative h-12 w-12 rounded-full p-0 transition-all duration-200',
-                  activeServer?.id === server.id 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'hover:rounded-2xl'
-                )}
-                onClick={() => selectServer(server)}
-              >
-                {server.icon_url ? (
-                  <img
-                    src={server.icon_url}
-                    alt={server.class_name}
-                    className="h-full w-full rounded-inherit object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center rounded-inherit bg-muted">
-                    {server.class_name.substring(0, 2)}
-                  </div>
-                )}
-                
-                {/* Unread indicator */}
-                {server.id === '2' && (
-                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                    3
-                  </span>
-                )}
-                
-                {/* Server selection indicator */}
-                {activeServer?.id === server.id && (
-                  <div className="absolute -left-2 top-1/2 h-10 w-1 -translate-y-1/2 rounded-r-full bg-white" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              <div className="flex flex-col">
-                <span className="font-semibold">{server.class_name}</span>
-                <span className="text-xs text-muted-foreground">{server.member_count} members</span>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        ))}
+        {servers.length > 0 ? (
+          servers.map((server) => (
+            <Tooltip key={server.id}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={activeServer?.id === server.id ? 'default' : 'ghost'}
+                  className={cn(
+                    'relative h-12 w-12 rounded-full p-0 transition-all duration-200',
+                    activeServer?.id === server.id 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'hover:rounded-2xl'
+                  )}
+                  onClick={() => selectServer(server)}
+                >
+                  {server.icon_url ? (
+                    <img
+                      src={server.icon_url}
+                      alt={server.class_name}
+                      className="h-full w-full rounded-inherit object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center rounded-inherit bg-muted">
+                      {server.class_name.substring(0, 2)}
+                    </div>
+                  )}
+                  
+                  {/* Server selection indicator */}
+                  {activeServer?.id === server.id && (
+                    <div className="absolute -left-2 top-1/2 h-10 w-1 -translate-y-1/2 rounded-r-full bg-white" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <div className="flex flex-col">
+                  <span className="font-semibold">{server.class_name}</span>
+                  <span className="text-xs text-muted-foreground">{server.member_count} members</span>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center px-2 py-4 text-center">
+            <div className="mb-2 text-sm text-zinc-400">No servers yet</div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full"
+              onClick={() => setIsCreatingServer(true)}
+            >
+              Create Your First Server
+            </Button>
+          </div>
+        )}
         
         <Separator className="my-2 bg-zinc-700" />
         
@@ -385,12 +461,12 @@ const ClassServer = () => {
             <Button
               variant="ghost"
               className="h-12 w-12 rounded-full bg-emerald-600 p-0 text-white hover:rounded-2xl hover:bg-emerald-700"
-              onClick={() => setShowServerInfo(true)}
+              onClick={() => setIsCreatingServer(true)}
             >
               <PlusIcon className="h-6 w-6" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="right">Add a Server</TooltipContent>
+          <TooltipContent side="right">Create a Server</TooltipContent>
         </Tooltip>
         
         <Tooltip>
@@ -399,10 +475,10 @@ const ClassServer = () => {
               variant="ghost"
               className="h-12 w-12 rounded-full bg-indigo-600 p-0 text-white hover:rounded-2xl hover:bg-indigo-700"
             >
-              <BookIcon className="h-6 w-6" />
+              <SettingsIcon className="h-6 w-6" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="right">Discover Servers</TooltipContent>
+          <TooltipContent side="right">Settings</TooltipContent>
         </Tooltip>
       </>
     );
@@ -463,8 +539,8 @@ const ClassServer = () => {
               {category.topics.map((topic) => {
                 const isActive = activeTopic?.id === topic.id;
                 const isLocked = topic.is_premium && !isGoatUser;
-                const topicIcon = topic.type === 'voice' 
-                  ? <HomeIcon className="mr-2 h-4 w-4" /> 
+                const topicIcon = topic.type === 'announcement' 
+                  ? <BellIcon className="mr-2 h-4 w-4" /> 
                   : <HashIcon className="mr-2 h-4 w-4" />;
                 
                 return (

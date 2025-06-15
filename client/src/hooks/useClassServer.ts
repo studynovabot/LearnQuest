@@ -108,6 +108,23 @@ export function useClassServer() {
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
+  // Function declarations to avoid circular dependencies
+  const fetchMessages = useCallback(async (topicId: string) => {}, []);
+  const fetchMembers = useCallback(async (serverId: string) => {}, []);
+  const fetchTopics = useCallback(async (serverId: string) => {}, []);
+  
+  // Set up real implementations after declarations to avoid circular dependencies
+  useEffect(() => {
+    // Set up fetchTopics implementation
+    Object.assign(fetchTopics, fetchTopicsImpl);
+    
+    // Set up fetchMessages implementation
+    Object.assign(fetchMessages, fetchMessagesImpl);
+    
+    // Set up fetchMembers implementation
+    Object.assign(fetchMembers, fetchMembersImpl);
+  }, []);
+
   // Fetch all servers the user has access to
   const fetchServers = useCallback(async () => {
     if (!user?.id) return;
@@ -115,78 +132,49 @@ export function useClassServer() {
     try {
       setIsLoading(true);
       
-      // In a real implementation, you would fetch from Supabase
-      // For now, we'll use mock data
-      const mockServers: ClassServer[] = [
-        {
-          id: '1',
-          class_name: 'Physics 101',
-          description: 'Introduction to Physics and its applications',
-          icon_url: 'https://ui-avatars.com/api/?name=Physics&background=5865F2&color=fff',
-          banner_url: 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa',
-          created_at: new Date().toISOString(),
-          teacher_id: 'teacher-1',
-          member_count: 156,
-        },
-        {
-          id: '2',
-          class_name: 'Chemistry 101',
-          description: 'Introduction to Chemistry and lab experiments',
-          icon_url: 'https://ui-avatars.com/api/?name=Chemistry&background=57F287&color=fff',
-          banner_url: 'https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6',
-          created_at: new Date().toISOString(),
-          teacher_id: 'teacher-2',
-          member_count: 124,
-        },
-        {
-          id: '3',
-          class_name: 'Mathematics',
-          description: 'Advanced Mathematics for competitive exams',
-          icon_url: 'https://ui-avatars.com/api/?name=Math&background=FEE75C&color=000',
-          banner_url: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb',
-          created_at: new Date().toISOString(),
-          teacher_id: 'teacher-3',
-          member_count: 210,
-        },
-        {
-          id: '4',
-          class_name: 'Biology',
-          description: 'Introduction to Biology and life sciences',
-          icon_url: 'https://ui-avatars.com/api/?name=Bio&background=EB459E&color=fff',
-          banner_url: 'https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe',
-          created_at: new Date().toISOString(),
-          teacher_id: 'teacher-4',
-          member_count: 98,
-        },
-        {
-          id: '5',
-          class_name: 'Computer Science',
-          description: 'Programming, Algorithms and Data Structures',
-          icon_url: 'https://ui-avatars.com/api/?name=CS&background=ED4245&color=fff',
-          banner_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c',
-          created_at: new Date().toISOString(),
-          teacher_id: 'teacher-5',
-          member_count: 178,
-        },
-        {
-          id: '6',
-          class_name: 'Study Group',
-          description: 'General study group for all subjects',
-          icon_url: 'https://ui-avatars.com/api/?name=SG&background=9B59B6&color=fff',
-          banner_url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173',
-          created_at: new Date().toISOString(),
-          teacher_id: null,
-          member_count: 342,
-        },
-      ];
+      // Fetch servers from Supabase
+      const { data: userServers, error: userServersError } = await supabase
+        .from('server_members')
+        .select('server_id')
+        .eq('user_id', user.id);
       
-      setServers(mockServers);
+      if (userServersError) throw userServersError;
       
-      // If there are servers, select the first one by default
-      if (mockServers.length > 0 && !activeServer) {
-        setActiveServer(mockServers[0]);
-        fetchTopics(mockServers[0].id);
-        fetchMembers(mockServers[0].id);
+      if (userServers && userServers.length > 0) {
+        const serverIds = userServers.map(us => us.server_id);
+        
+        const { data: serversData, error: serversError } = await supabase
+          .from('class_servers')
+          .select('*, server_members(count)')
+          .in('id', serverIds);
+        
+        if (serversError) throw serversError;
+        
+        if (serversData && serversData.length > 0) {
+          const formattedServers: ClassServer[] = serversData.map(server => ({
+            id: server.id,
+            class_name: server.class_name,
+            description: server.description,
+            icon_url: server.icon_url,
+            banner_url: server.banner_url,
+            created_at: server.created_at,
+            teacher_id: server.teacher_id,
+            member_count: server.server_members ? server.server_members.length : 0
+          }));
+          
+          setServers(formattedServers);
+          
+          // If there are servers, select the first one by default
+          if (formattedServers.length > 0 && !activeServer) {
+            setActiveServer(formattedServers[0]);
+            fetchTopics(formattedServers[0].id);
+            fetchMembers(formattedServers[0].id);
+          }
+        } else {
+          setServers([]);
+        }
+      } else {
+        setServers([]);
       }
     } catch (error) {
       console.error('Error fetching servers:', error);
@@ -198,158 +186,138 @@ export function useClassServer() {
     } finally {
       setIsLoading(false);
     }
-  }, [user, activeServer, toast]);
+  }, [user, activeServer, toast, fetchTopics, fetchMembers]);
 
   // Fetch topics for a server
-  const fetchTopics = useCallback(async (serverId: string) => {
+  const fetchTopicsImpl = useCallback(async (serverId: string) => {
     if (!user?.id) return;
     
     try {
       setIsLoading(true);
       
-      // In a real implementation, you would fetch from Supabase
-      // For now, we'll use mock data
-      const mockCategories: ServerCategory[] = [
-        {
-          id: 'cat-1',
-          name: 'INFORMATION',
-          topics: [
-            {
-              id: '1',
-              name: 'announcements',
-              description: 'Important announcements from teachers',
-              server_id: serverId,
-              is_premium: false,
-              created_at: new Date().toISOString(),
-              category_id: 'cat-1',
-              type: 'announcement',
-              unread_count: 2,
-            },
-            {
-              id: '2',
-              name: 'rules',
-              description: 'Server rules and guidelines',
-              server_id: serverId,
-              is_premium: false,
-              created_at: new Date().toISOString(),
-              category_id: 'cat-1',
-              type: 'text',
-            },
-          ],
-        },
-        {
-          id: 'cat-2',
-          name: 'TEXT CHANNELS',
-          topics: [
-            {
-              id: '3',
-              name: 'general',
-              description: 'General discussion',
-              server_id: serverId,
-              is_premium: false,
-              created_at: new Date().toISOString(),
-              category_id: 'cat-2',
-              type: 'text',
-              unread_count: 5,
-            },
-            {
-              id: '4',
-              name: 'homework-help',
-              description: 'Get help with homework',
-              server_id: serverId,
-              is_premium: false,
-              created_at: new Date().toISOString(),
-              category_id: 'cat-2',
-              type: 'text',
-            },
-            {
-              id: '5',
-              name: 'study-resources',
-              description: 'Share study resources',
-              server_id: serverId,
-              is_premium: false,
-              created_at: new Date().toISOString(),
-              category_id: 'cat-2',
-              type: 'text',
-            },
-          ],
-        },
-        {
-          id: 'cat-3',
-          name: 'VOICE CHANNELS',
-          topics: [
-            {
-              id: '6',
-              name: 'study-hall',
-              description: 'Voice channel for group study',
-              server_id: serverId,
-              is_premium: false,
-              created_at: new Date().toISOString(),
-              category_id: 'cat-3',
-              type: 'voice',
-            },
-            {
-              id: '7',
-              name: 'teacher-office',
-              description: 'Office hours with teachers',
-              server_id: serverId,
-              is_premium: false,
-              created_at: new Date().toISOString(),
-              category_id: 'cat-3',
-              type: 'voice',
-            },
-          ],
-        },
-        {
-          id: 'cat-4',
-          name: 'PREMIUM CHANNELS',
-          topics: [
-            {
-              id: '8',
-              name: 'topper-club',
-              description: 'Exclusive channel for top students',
-              server_id: serverId,
-              is_premium: true,
-              created_at: new Date().toISOString(),
-              category_id: 'cat-4',
-              type: 'text',
-            },
-            {
-              id: '9',
-              name: 'ai-god-mode',
-              description: 'Advanced AI assistance',
-              server_id: serverId,
-              is_premium: true,
-              created_at: new Date().toISOString(),
-              category_id: 'cat-4',
-              type: 'text',
-            },
-            {
-              id: '10',
-              name: 'exam-prep',
-              description: 'Prepare for exams',
-              server_id: serverId,
-              is_premium: true,
-              created_at: new Date().toISOString(),
-              category_id: 'cat-4',
-              type: 'text',
-            },
-          ],
-        },
-      ];
+      // Fetch categories from Supabase
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('server_categories')
+        .select('*')
+        .eq('server_id', serverId)
+        .order('position', { ascending: true });
       
-      // Flatten topics for backward compatibility
-      const allTopics = mockCategories.flatMap(category => category.topics);
+      if (categoriesError) throw categoriesError;
       
-      setCategories(mockCategories);
-      setTopics(allTopics);
-      
-      // If there are topics, select the first one by default
-      if (allTopics.length > 0 && !activeTopic) {
-        const defaultTopic = allTopics.find(t => t.name === 'general') || allTopics[0];
-        setActiveTopic(defaultTopic);
-        setActiveCategory(mockCategories.find(c => c.id === defaultTopic.category_id) || null);
-        fetchMessages(defaultTopic.id);
+      if (categoriesData && categoriesData.length > 0) {
+        // Fetch topics for each category
+        const categoriesWithTopics: ServerCategory[] = [];
+        
+        for (const category of categoriesData) {
+          const { data: topicsData, error: topicsError } = await supabase
+            .from('topics')
+            .select('*')
+            .eq('category_id', category.id)
+            .eq('server_id', serverId)
+            .not('type', 'eq', 'voice') // Exclude voice channels
+            .order('position', { ascending: true });
+          
+          if (topicsError) throw topicsError;
+          
+          if (topicsData && topicsData.length > 0) {
+            categoriesWithTopics.push({
+              id: category.id,
+              name: category.name,
+              topics: topicsData.map(topic => ({
+                id: topic.id,
+                name: topic.name,
+                description: topic.description,
+                server_id: topic.server_id,
+                is_premium: topic.is_premium,
+                created_at: topic.created_at,
+                category_id: topic.category_id,
+                type: topic.type === 'voice' ? 'text' : topic.type, // Convert any voice channels to text
+                unread_count: topic.unread_count || 0
+              }))
+            });
+          } else {
+            // Include empty categories too
+            categoriesWithTopics.push({
+              id: category.id,
+              name: category.name,
+              topics: []
+            });
+          }
+        }
+        
+        // Flatten topics for backward compatibility
+        const allTopics = categoriesWithTopics.flatMap(category => category.topics);
+        
+        setCategories(categoriesWithTopics);
+        setTopics(allTopics);
+        
+        // If there are topics, select the first one by default
+        if (allTopics.length > 0 && !activeTopic) {
+          const defaultTopic = allTopics.find(t => t.name === 'general') || allTopics[0];
+          setActiveTopic(defaultTopic);
+          setActiveCategory(categoriesWithTopics.find(c => c.id === defaultTopic.category_id) || null);
+          fetchMessages(defaultTopic.id);
+        }
+      } else {
+        // No categories found, create default ones
+        const { data: newCategory, error: newCategoryError } = await supabase
+          .from('server_categories')
+          .insert([
+            { 
+              name: 'TEXT CHANNELS', 
+              server_id: serverId,
+              position: 0
+            }
+          ])
+          .select()
+          .single();
+        
+        if (newCategoryError) throw newCategoryError;
+        
+        if (newCategory) {
+          // Create a default general channel
+          const { data: newTopic, error: newTopicError } = await supabase
+            .from('topics')
+            .insert([
+              {
+                name: 'general',
+                description: 'General discussion',
+                server_id: serverId,
+                is_premium: false,
+                category_id: newCategory.id,
+                type: 'text',
+                position: 0
+              }
+            ])
+            .select()
+            .single();
+          
+          if (newTopicError) throw newTopicError;
+          
+          if (newTopic) {
+            const category: ServerCategory = {
+              id: newCategory.id,
+              name: newCategory.name,
+              topics: [{
+                id: newTopic.id,
+                name: newTopic.name,
+                description: newTopic.description,
+                server_id: newTopic.server_id,
+                is_premium: newTopic.is_premium,
+                created_at: newTopic.created_at,
+                category_id: newTopic.category_id,
+                type: newTopic.type,
+                unread_count: 0
+              }]
+            };
+            
+            setCategories([category]);
+            setTopics(category.topics);
+            setActiveTopic(category.topics[0]);
+            setActiveCategory(category);
+            fetchMessages(category.topics[0].id);
+          }
+        }
       }
     } catch (error) {
       console.error('Error fetching topics:', error);
@@ -363,187 +331,148 @@ export function useClassServer() {
     }
   }, [user, activeTopic, toast]);
 
-  // Fetch messages for a topic
-  const fetchMessages = useCallback(async (topicId: string) => {
+
+  // Fetch messages for a topic implementation
+  const fetchMessagesImpl = useCallback(async (topicId: string) => {
     if (!user?.id) return;
     
     try {
       setIsLoadingMessages(true);
       
-      // In a real implementation, you would fetch from Supabase
-      // For now, we'll use mock data
-      const mockMessages: Message[] = [
-        {
-          id: '1',
-          text: 'Welcome to the class server! This is a place to discuss topics related to the class.',
-          user_id: 'teacher-1',
-          topic_id: topicId,
-          timestamp: new Date(Date.now() - 86400000 * 3).toISOString(), // 3 days ago
-          media_url: null,
-          media_type: null,
-          is_ai: false,
-          pinned: true,
-          reactions: [
-            { emoji: '👍', count: 15, users: ['student-1', 'student-2', 'student-3'] },
-            { emoji: '🎉', count: 8, users: ['student-4', 'student-5'] },
-          ],
-          users: {
-            id: 'teacher-1',
-            displayName: 'Prof. Johnson',
-            profilePic: 'https://ui-avatars.com/api/?name=Prof+Johnson&background=5865F2&color=fff',
-            subscription_tier: 'goat',
-          },
-        },
-        {
-          id: '2',
-          text: 'Hi everyone! I\'m excited to learn with you all.',
-          user_id: 'student-1',
-          topic_id: topicId,
-          timestamp: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
-          media_url: null,
-          media_type: null,
-          is_ai: false,
-          reactions: [
-            { emoji: '👋', count: 12, users: ['teacher-1', 'student-2', 'student-3'] },
-          ],
-          users: {
-            id: 'student-1',
-            displayName: 'Arjun K.',
-            profilePic: 'https://ui-avatars.com/api/?name=Arjun+K&background=57F287&color=fff',
-            subscription_tier: 'goat',
-          },
-        },
-        {
-          id: '3',
-          text: 'Does anyone have the notes from yesterday\'s lecture?',
-          user_id: 'student-2',
-          topic_id: topicId,
-          timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-          media_url: null,
-          media_type: null,
-          is_ai: false,
-          users: {
-            id: 'student-2',
-            displayName: 'Priya M.',
-            profilePic: 'https://ui-avatars.com/api/?name=Priya+M&background=FEE75C&color=000',
-            subscription_tier: 'free',
-          },
-        },
-        {
-          id: '4',
-          text: 'I\'ll share my notes with everyone. Here they are!',
-          user_id: 'student-3',
-          topic_id: topicId,
-          timestamp: new Date(Date.now() - 3600000 * 12).toISOString(), // 12 hours ago
-          media_url: 'https://example.com/notes.pdf',
-          media_type: 'pdf',
-          is_ai: false,
-          reactions: [
-            { emoji: '🙏', count: 8, users: ['student-2', 'student-4', 'student-5'] },
-            { emoji: '⭐', count: 5, users: ['teacher-1', 'student-1'] },
-          ],
-          users: {
-            id: 'student-3',
-            displayName: 'Rahul S.',
-            profilePic: 'https://ui-avatars.com/api/?name=Rahul+S&background=EB459E&color=fff',
-            subscription_tier: 'pro',
-          },
-        },
-        {
-          id: '5',
-          text: 'Thank you for sharing! This will be very helpful for the upcoming exam.',
-          user_id: 'student-4',
-          topic_id: topicId,
-          timestamp: new Date(Date.now() - 3600000 * 6).toISOString(), // 6 hours ago
-          media_url: null,
-          media_type: null,
-          is_ai: false,
-          reply_to: '4',
-          users: {
-            id: 'student-4',
-            displayName: 'Neha P.',
-            profilePic: 'https://ui-avatars.com/api/?name=Neha+P&background=ED4245&color=fff',
-            subscription_tier: 'free',
-          },
-        },
-        {
-          id: '6',
-          text: 'Remember everyone, the exam will cover chapters 1-5. Make sure to review all the material.',
-          user_id: 'teacher-1',
-          topic_id: topicId,
-          timestamp: new Date(Date.now() - 3600000 * 2).toISOString(), // 2 hours ago
-          media_url: null,
-          media_type: null,
-          is_ai: false,
-          pinned: true,
-          reactions: [
-            { emoji: '👍', count: 10, users: ['student-1', 'student-2', 'student-3'] },
-            { emoji: '📝', count: 7, users: ['student-4', 'student-5'] },
-          ],
-          users: {
-            id: 'teacher-1',
-            displayName: 'Prof. Johnson',
-            profilePic: 'https://ui-avatars.com/api/?name=Prof+Johnson&background=5865F2&color=fff',
-            subscription_tier: 'goat',
-          },
-        },
-        {
-          id: '7',
-          text: 'I\'m having trouble understanding the concept of quantum entanglement. Can someone explain it?',
-          user_id: 'student-5',
-          topic_id: topicId,
-          timestamp: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
-          media_url: null,
-          media_type: null,
-          is_ai: false,
-          mentions: ['teacher-1'],
-          users: {
-            id: 'student-5',
-            displayName: 'Vikram S.',
-            profilePic: 'https://ui-avatars.com/api/?name=Vikram+S&background=9B59B6&color=fff',
-            subscription_tier: 'free',
-          },
-        },
-        {
-          id: '8',
-          text: '/askai What is quantum entanglement and how does it work?',
-          user_id: user?.id || 'current-user',
-          topic_id: topicId,
-          timestamp: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
-          media_url: null,
-          media_type: null,
-          is_ai: false,
-          reply_to: '7',
-          users: {
-            id: user?.id || 'current-user',
-            displayName: user?.displayName || 'You',
-            profilePic: user?.profilePic || 'https://ui-avatars.com/api/?name=You&background=5865F2&color=fff',
-            subscription_tier: user?.subscription_tier || 'free',
-          },
-        },
-        {
-          id: '9',
-          text: 'Quantum entanglement is a phenomenon in quantum physics where two or more particles become correlated in such a way that the quantum state of each particle cannot be described independently of the others, regardless of the distance separating them. When particles are entangled, whatever happens to one particle can instantly affect the other, even if they are separated by vast distances. This phenomenon was famously described by Einstein as "spooky action at a distance." It\'s a fundamental concept in quantum computing and quantum information theory, as it allows for potentially instantaneous communication and secure encryption methods.',
-          user_id: 'ai-assistant',
-          topic_id: topicId,
-          timestamp: new Date(Date.now() - 890000).toISOString(), // 14 minutes 50 seconds ago
-          media_url: null,
-          media_type: null,
-          is_ai: true,
-          reactions: [
-            { emoji: '🤖', count: 3, users: ['student-1', 'student-5'] },
-            { emoji: '🧠', count: 2, users: ['teacher-1'] },
-          ],
-          users: {
-            id: 'ai-assistant',
-            displayName: 'Nova AI',
-            profilePic: 'https://ui-avatars.com/api/?name=AI&background=5865F2&color=fff',
-            subscription_tier: 'goat',
-          },
-        },
-      ];
+      // Fetch messages from Supabase with user data
+      const { data: messagesData, error: messagesError } = await supabase
+        .from('messages')
+        .select(`
+          *,
+          users:user_id (
+            id,
+            display_name,
+            profile_pic,
+            subscription_tier
+          ),
+          reactions (
+            emoji,
+            user_id
+          )
+        `)
+        .eq('topic_id', topicId)
+        .order('timestamp', { ascending: true });
       
-      setMessages(mockMessages);
+      if (messagesError) throw messagesError;
+      
+      if (messagesData && messagesData.length > 0) {
+        // Format messages with proper structure
+        const formattedMessages: Message[] = messagesData.map(message => {
+          // Process reactions to get counts and user lists
+          const reactionGroups: {[key: string]: {emoji: string, count: number, users: string[]}} = {};
+          
+          if (message.reactions && message.reactions.length > 0) {
+            message.reactions.forEach((reaction: {emoji: string, user_id: string}) => {
+              if (!reactionGroups[reaction.emoji]) {
+                reactionGroups[reaction.emoji] = {
+                  emoji: reaction.emoji,
+                  count: 0,
+                  users: []
+                };
+              }
+              
+              reactionGroups[reaction.emoji].count += 1;
+              reactionGroups[reaction.emoji].users.push(reaction.user_id);
+            });
+          }
+          
+          return {
+            id: message.id,
+            text: message.text,
+            user_id: message.user_id,
+            topic_id: message.topic_id,
+            timestamp: message.timestamp,
+            media_url: message.media_url,
+            media_type: message.media_type,
+            is_ai: message.is_ai || false,
+            edited: message.edited || false,
+            edited_at: message.edited_at,
+            pinned: message.pinned || false,
+            reactions: Object.values(reactionGroups),
+            mentions: message.mentions,
+            reply_to: message.reply_to,
+            users: message.users ? {
+              id: message.users.id,
+              displayName: message.users.display_name,
+              profilePic: message.users.profile_pic,
+              subscription_tier: message.users.subscription_tier || 'free'
+            } : null
+          };
+        });
+        
+        setMessages(formattedMessages);
+      } else {
+        // If no messages, check if this is a new topic and add a welcome message
+        const { data: topicData, error: topicError } = await supabase
+          .from('topics')
+          .select('created_at')
+          .eq('id', topicId)
+          .single();
+        
+        if (topicError) throw topicError;
+        
+        if (topicData) {
+          const createdAt = new Date(topicData.created_at);
+          const now = new Date();
+          const diffInMinutes = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60));
+          
+          // If topic was created less than 5 minutes ago, add a welcome message
+          if (diffInMinutes < 5) {
+            const welcomeMessage = {
+              text: 'Welcome to this channel! This is the beginning of the conversation.',
+              user_id: user.id,
+              topic_id: topicId,
+              is_ai: false
+            };
+            
+            const { data: newMessage, error: newMessageError } = await supabase
+              .from('messages')
+              .insert([welcomeMessage])
+              .select(`
+                *,
+                users:user_id (
+                  id,
+                  display_name,
+                  profile_pic,
+                  subscription_tier
+                )
+              `)
+              .single();
+            
+            if (newMessageError) throw newMessageError;
+            
+            if (newMessage) {
+              setMessages([{
+                id: newMessage.id,
+                text: newMessage.text,
+                user_id: newMessage.user_id,
+                topic_id: newMessage.topic_id,
+                timestamp: newMessage.timestamp,
+                media_url: newMessage.media_url,
+                media_type: newMessage.media_type,
+                is_ai: newMessage.is_ai || false,
+                users: newMessage.users ? {
+                  id: newMessage.users.id,
+                  displayName: newMessage.users.display_name,
+                  profilePic: newMessage.users.profile_pic,
+                  subscription_tier: newMessage.users.subscription_tier || 'free'
+                } : null
+              }]);
+            } else {
+              setMessages([]);
+            }
+          } else {
+            setMessages([]);
+          }
+        } else {
+          setMessages([]);
+        }
+      }
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast({
@@ -557,116 +486,127 @@ export function useClassServer() {
   }, [user, toast]);
 
   // Fetch members for a server
-  const fetchMembers = useCallback(async (serverId: string) => {
+  const fetchMembersImpl = useCallback(async (serverId: string) => {
     if (!user?.id) return;
     
     try {
       setIsLoadingMembers(true);
       
-      // In a real implementation, you would fetch from Supabase
-      // For now, we'll use mock data
-      const mockMembers: ServerMember[] = [
-        {
-          id: 'member-1',
-          user_id: 'teacher-1',
-          server_id: serverId,
-          role: 'owner',
-          joined_at: new Date(Date.now() - 86400000 * 30).toISOString(), // 30 days ago
-          status: 'online',
-          user: {
-            id: 'teacher-1',
-            displayName: 'Prof. Johnson',
-            profilePic: 'https://ui-avatars.com/api/?name=Prof+Johnson&background=5865F2&color=fff',
-            subscription_tier: 'goat',
-          },
-        },
-        {
-          id: 'member-2',
-          user_id: 'student-1',
-          server_id: serverId,
-          role: 'moderator',
-          joined_at: new Date(Date.now() - 86400000 * 25).toISOString(), // 25 days ago
-          status: 'online',
-          user: {
-            id: 'student-1',
-            displayName: 'Arjun K.',
-            profilePic: 'https://ui-avatars.com/api/?name=Arjun+K&background=57F287&color=fff',
-            subscription_tier: 'goat',
-          },
-        },
-        {
-          id: 'member-3',
-          user_id: 'student-2',
-          server_id: serverId,
-          role: 'member',
-          joined_at: new Date(Date.now() - 86400000 * 20).toISOString(), // 20 days ago
-          status: 'idle',
-          user: {
-            id: 'student-2',
-            displayName: 'Priya M.',
-            profilePic: 'https://ui-avatars.com/api/?name=Priya+M&background=FEE75C&color=000',
-            subscription_tier: 'free',
-          },
-        },
-        {
-          id: 'member-4',
-          user_id: 'student-3',
-          server_id: serverId,
-          role: 'member',
-          joined_at: new Date(Date.now() - 86400000 * 18).toISOString(), // 18 days ago
-          status: 'online',
-          user: {
-            id: 'student-3',
-            displayName: 'Rahul S.',
-            profilePic: 'https://ui-avatars.com/api/?name=Rahul+S&background=EB459E&color=fff',
-            subscription_tier: 'pro',
-          },
-        },
-        {
-          id: 'member-5',
-          user_id: 'student-4',
-          server_id: serverId,
-          role: 'member',
-          joined_at: new Date(Date.now() - 86400000 * 15).toISOString(), // 15 days ago
-          status: 'offline',
-          user: {
-            id: 'student-4',
-            displayName: 'Neha P.',
-            profilePic: 'https://ui-avatars.com/api/?name=Neha+P&background=ED4245&color=fff',
-            subscription_tier: 'free',
-          },
-        },
-        {
-          id: 'member-6',
-          user_id: 'student-5',
-          server_id: serverId,
-          role: 'member',
-          joined_at: new Date(Date.now() - 86400000 * 10).toISOString(), // 10 days ago
-          status: 'dnd',
-          user: {
-            id: 'student-5',
-            displayName: 'Vikram S.',
-            profilePic: 'https://ui-avatars.com/api/?name=Vikram+S&background=9B59B6&color=fff',
-            subscription_tier: 'free',
-          },
-        },
-        {
-          id: 'member-7',
-          user_id: user?.id || 'current-user',
-          server_id: serverId,
-          role: 'member',
-          joined_at: new Date(Date.now() - 86400000 * 5).toISOString(), // 5 days ago
-          status: 'online',
-          user: {
-            id: user?.id || 'current-user',
-            displayName: user?.displayName || 'You',
-            profilePic: user?.profilePic || 'https://ui-avatars.com/api/?name=You&background=5865F2&color=fff',
-            subscription_tier: user?.subscription_tier || 'free',
-          },
-        },
-      ];
+      // Fetch members from Supabase with user data
+      const { data: membersData, error: membersError } = await supabase
+        .from('server_members')
+        .select(`
+          *,
+          users:user_id (
+            id,
+            display_name,
+            profile_pic,
+            subscription_tier,
+            last_seen
+          )
+        `)
+        .eq('server_id', serverId)
+        .order('role', { ascending: true });
       
-      setMembers(mockMembers);
+      if (membersError) throw membersError;
+      
+      if (membersData && membersData.length > 0) {
+        // Format members with proper structure
+        const formattedMembers: ServerMember[] = membersData.map(member => {
+          // Determine online status based on last_seen
+          let status: 'online' | 'idle' | 'dnd' | 'offline' = 'offline';
+          
+          if (member.users && member.users.last_seen) {
+            const lastSeen = new Date(member.users.last_seen);
+            const now = new Date();
+            const diffInMinutes = Math.floor((now.getTime() - lastSeen.getTime()) / (1000 * 60));
+            
+            if (diffInMinutes < 5) {
+              status = 'online';
+            } else if (diffInMinutes < 30) {
+              status = 'idle';
+            }
+          }
+          
+          // If this is the current user, always show as online
+          if (member.user_id === user.id) {
+            status = 'online';
+          }
+          
+          return {
+            id: member.id,
+            user_id: member.user_id,
+            server_id: member.server_id,
+            role: member.role as 'owner' | 'admin' | 'moderator' | 'member',
+            joined_at: member.joined_at,
+            nickname: member.nickname,
+            status,
+            user: member.users ? {
+              id: member.users.id,
+              displayName: member.users.display_name,
+              profilePic: member.users.profile_pic,
+              subscription_tier: member.users.subscription_tier || 'free'
+            } : {
+              id: member.user_id,
+              displayName: 'Unknown User',
+              profilePic: null,
+              subscription_tier: 'free'
+            }
+          };
+        });
+        
+        setMembers(formattedMembers);
+      } else {
+        // If no members found, this is unusual but handle it gracefully
+        // At minimum, the current user should be a member
+        const { data: newMember, error: newMemberError } = await supabase
+          .from('server_members')
+          .insert([
+            {
+              user_id: user.id,
+              server_id: serverId,
+              role: 'owner',
+              joined_at: new Date().toISOString()
+            }
+          ])
+          .select(`
+            *,
+            users:user_id (
+              id,
+              display_name,
+              profile_pic,
+              subscription_tier
+            )
+          `)
+          .single();
+        
+        if (newMemberError) throw newMemberError;
+        
+        if (newMember) {
+          setMembers([{
+            id: newMember.id,
+            user_id: newMember.user_id,
+            server_id: newMember.server_id,
+            role: newMember.role as 'owner' | 'admin' | 'moderator' | 'member',
+            joined_at: newMember.joined_at,
+            nickname: newMember.nickname,
+            status: 'online',
+            user: newMember.users ? {
+              id: newMember.users.id,
+              displayName: newMember.users.display_name,
+              profilePic: newMember.users.profile_pic,
+              subscription_tier: newMember.users.subscription_tier || 'free'
+            } : {
+              id: user.id,
+              displayName: user.displayName,
+              profilePic: user.profilePic,
+              subscription_tier: user.subscription_tier || 'free'
+            }
+          }]);
+        } else {
+          setMembers([]);
+        }
+      }
     } catch (error) {
       console.error('Error fetching members:', error);
       toast({
@@ -686,14 +626,14 @@ export function useClassServer() {
     setActiveCategory(null);
     fetchTopics(server.id);
     fetchMembers(server.id);
-  }, [fetchTopics, fetchMembers]);
+  }, []);
 
   // Select a topic
   const selectTopic = useCallback((topic: Topic) => {
     setActiveTopic(topic);
     setActiveCategory(categories.find(c => c.id === topic.category_id) || null);
     fetchMessages(topic.id);
-  }, [fetchMessages, categories]);
+  }, [categories]);
 
   // Send a message
   const sendMessage = useCallback(async (
@@ -708,7 +648,12 @@ export function useClassServer() {
       
       // Extract mentions from text (format: @username)
       const mentionRegex = /@(\w+)/g;
-      const mentionMatches = [...text.matchAll(mentionRegex)];
+      let match;
+      const mentionMatches = [];
+      while ((match = mentionRegex.exec(text)) !== null) {
+        mentionMatches.push(match);
+      }
+      
       const mentions = mentionMatches.map(match => {
         const username = match[1];
         const member = members.find(m => 
@@ -856,6 +801,211 @@ export function useClassServer() {
     setShowMembersList(prev => !prev);
   }, []);
 
+  // Create a new server
+  const createServer = useCallback(async (serverName: string, description: string) => {
+    if (!user?.id) return null;
+    
+    try {
+      // Create the server
+      const { data: newServer, error: serverError } = await supabase
+        .from('class_servers')
+        .insert([
+          {
+            class_name: serverName,
+            description: description,
+            teacher_id: user.id,
+            icon_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(serverName)}&background=5865F2&color=fff`,
+            created_at: new Date().toISOString()
+          }
+        ])
+        .select()
+        .single();
+      
+      if (serverError) throw serverError;
+      
+      if (newServer) {
+        // Add the current user as a member and owner
+        const { data: newMember, error: memberError } = await supabase
+          .from('server_members')
+          .insert([
+            {
+              user_id: user.id,
+              server_id: newServer.id,
+              role: 'owner',
+              joined_at: new Date().toISOString()
+            }
+          ])
+          .select()
+          .single();
+        
+        if (memberError) throw memberError;
+        
+        // Create default category
+        const { data: newCategory, error: categoryError } = await supabase
+          .from('server_categories')
+          .insert([
+            {
+              name: 'TEXT CHANNELS',
+              server_id: newServer.id,
+              position: 0
+            }
+          ])
+          .select()
+          .single();
+        
+        if (categoryError) throw categoryError;
+        
+        if (newCategory) {
+          // Create default general channel
+          const { data: newTopic, error: topicError } = await supabase
+            .from('topics')
+            .insert([
+              {
+                name: 'general',
+                description: 'General discussion',
+                server_id: newServer.id,
+                is_premium: false,
+                category_id: newCategory.id,
+                type: 'text',
+                position: 0
+              }
+            ])
+            .select()
+            .single();
+          
+          if (topicError) throw topicError;
+        }
+        
+        // Refresh the server list
+        await fetchServers();
+        
+        // Return the new server
+        return {
+          id: newServer.id,
+          class_name: newServer.class_name,
+          description: newServer.description,
+          icon_url: newServer.icon_url,
+          created_at: newServer.created_at,
+          teacher_id: newServer.teacher_id,
+          member_count: 1
+        } as ClassServer;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error creating server:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create server.',
+        variant: 'destructive',
+      });
+      return null;
+    }
+  }, [user, fetchServers, toast]);
+
+  // Create a new topic/channel
+  const createTopic = useCallback(async (
+    name: string, 
+    description: string, 
+    categoryId: string, 
+    isPremium: boolean = false
+  ) => {
+    if (!user?.id || !activeServer) return null;
+    
+    try {
+      // Create the topic
+      const { data: newTopic, error: topicError } = await supabase
+        .from('topics')
+        .insert([
+          {
+            name: name.toLowerCase().replace(/\s+/g, '-'),
+            description,
+            server_id: activeServer.id,
+            is_premium: isPremium,
+            category_id: categoryId,
+            type: 'text',
+            position: topics.filter(t => t.category_id === categoryId).length
+          }
+        ])
+        .select()
+        .single();
+      
+      if (topicError) throw topicError;
+      
+      if (newTopic) {
+        // Refresh topics
+        await fetchTopics(activeServer.id);
+        
+        // Return the new topic
+        return {
+          id: newTopic.id,
+          name: newTopic.name,
+          description: newTopic.description,
+          server_id: newTopic.server_id,
+          is_premium: newTopic.is_premium,
+          created_at: newTopic.created_at,
+          category_id: newTopic.category_id,
+          type: newTopic.type,
+          unread_count: 0
+        } as Topic;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error creating topic:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create channel.',
+        variant: 'destructive',
+      });
+      return null;
+    }
+  }, [user, activeServer, topics, toast]);
+
+  // Create a new category
+  const createCategory = useCallback(async (name: string) => {
+    if (!user?.id || !activeServer) return null;
+    
+    try {
+      // Create the category
+      const { data: newCategory, error: categoryError } = await supabase
+        .from('server_categories')
+        .insert([
+          {
+            name: name.toUpperCase(),
+            server_id: activeServer.id,
+            position: categories.length
+          }
+        ])
+        .select()
+        .single();
+      
+      if (categoryError) throw categoryError;
+      
+      if (newCategory) {
+        // Refresh topics and categories
+        await fetchTopics(activeServer.id);
+        
+        // Return the new category
+        return {
+          id: newCategory.id,
+          name: newCategory.name,
+          topics: []
+        } as ServerCategory;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error creating category:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create category.',
+        variant: 'destructive',
+      });
+      return null;
+    }
+  }, [user, activeServer, categories, toast]);
+
   // Initial data loading
   useEffect(() => {
     if (user?.id) {
@@ -886,5 +1036,8 @@ export function useClassServer() {
     setTypingIndicator,
     setReply,
     toggleMembersList,
+    createServer,
+    createTopic,
+    createCategory
   };
 }
