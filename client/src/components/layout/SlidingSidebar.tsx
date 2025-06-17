@@ -20,7 +20,9 @@ import {
   BookIcon,
   UserIcon,
   HashIcon,
-  UsersIcon
+  UsersIcon,
+  TrophyIcon,
+  AwardIcon
 } from "@/components/ui/icons";
 
 interface SlidingSidebarProps {
@@ -55,6 +57,11 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       icon: MessageIcon,
       label: "AI Chat",
       path: "/chat",
+    },
+    {
+      icon: TrophyIcon,
+      label: "Ranks & Achievements",
+      path: "/ranks",
     },
     {
       icon: PaletteIcon,

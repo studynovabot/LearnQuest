@@ -25,6 +25,7 @@ import VectorUploadPage from "@/pages/VectorUploadPage";
 import LandingPage from "@/pages/LandingPage";
 import Terms from "@/pages/Terms";
 import AdminUsers from "@/pages/AdminUsers";
+import Ranks from "@/pages/Ranks";
 import AdminRoute from "@/components/AdminRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout";
@@ -182,6 +183,13 @@ function Router() {
       </Route>
       <Route path="/pricing">
         <PricingPage />
+      </Route>
+      <Route path="/ranks">
+        <ProtectedRoute>
+          <MainLayout>
+            <Ranks />
+          </MainLayout>
+        </ProtectedRoute>
       </Route>
       <Route>
         <NotFound />
