@@ -123,8 +123,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ users = [] }) => {
       previousRank: 350,
       level: Math.floor((user?.studyPoints || 0) / 500) + 1,
       isCurrentUser: true,
-      isGoat: user?.subscription?.tier === 'goat',
-      title: user?.equippedTitle
+      isGoat: user?.subscriptionPlan === 'goat',
+      title: 'Student' // Default title if equippedTitle doesn't exist
     }
   ];
   

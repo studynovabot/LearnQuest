@@ -90,7 +90,7 @@ const ClassServer = () => {
     createCategory
   } = useClassServer();
   
-  const { xp, streak, isGoatUser, isProUser, getUserRank, getBadgeStyle, isFeatureAvailable } = useGoatNitro();
+  const { studyPoints, streak, isGoatUser, isProUser, getUserRank, getBadgeStyle, isFeatureAvailable } = useGoatNitro();
   const { processAiCommand, isGenerating } = useAiChat();
   
   // UI state

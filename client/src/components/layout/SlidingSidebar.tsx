@@ -18,7 +18,6 @@ import {
   ShieldIcon,
   SettingsIcon,
   BookIcon,
-  UserIcon,
   HashIcon,
   UsersIcon,
   TrophyIcon,
@@ -99,7 +98,7 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       feature: ADMIN_FEATURES.CONTENT_MODERATION
     },
     {
-      icon: UserIcon,
+      icon: UsersIcon,
       label: "Admin Users",
       path: "/admin-users",
       description: "User Management",

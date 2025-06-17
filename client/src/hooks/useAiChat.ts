@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export function useAiChat() {
   const { user } = useUserContext();
-  const { isFeatureAvailable, addXp } = useGoatNitro();
+  const { isFeatureAvailable, addStudyPoints } = useGoatNitro();
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -73,9 +73,9 @@ export function useAiChat() {
       const data = await response.json();
       const aiResponse = data.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
 
-      // Award XP for using the AI assistant
+      // Award Study Points for using the AI assistant
       if (user?.id) {
-        addXp(10, 'Used AI assistant');
+        addStudyPoints(10, 'Used AI assistant');
       }
 
       return aiResponse;
@@ -90,7 +90,7 @@ export function useAiChat() {
     } finally {
       setIsGenerating(false);
     }
-  }, [user, isFeatureAvailable, addXp, toast]);
+  }, [user, isFeatureAvailable, addStudyPoints, toast]);
 
   // Generate a fallback response when the API is unavailable
   const generateFallbackResponse = (prompt: string) => {

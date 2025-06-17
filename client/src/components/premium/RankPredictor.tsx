@@ -39,11 +39,11 @@ const RankPredictor: React.FC<RankPredictorProps> = ({ className }) => {
     // Days remaining impact: closer to exam = more accurate prediction
     const daysImpact = Math.max(0, 1000 - (daysRemaining * 10));
     
-    // XP impact: more XP = better rank
-    const xpImpact = (user?.xp || 0) * 2;
+    // Study Points impact: more Study Points = better rank
+    const spImpact = (user?.studyPoints || 0) * 2;
     
     // Calculate final rank (lower is better)
-    let predictedRank = Math.max(1, Math.floor(baseRank - hoursImpact - tasksImpact - daysImpact - xpImpact));
+    let predictedRank = Math.max(1, Math.floor(baseRank - hoursImpact - tasksImpact - daysImpact - spImpact));
     
     // Ensure rank is within reasonable bounds
     return Math.min(10000, Math.max(1, predictedRank));

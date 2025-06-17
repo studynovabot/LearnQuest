@@ -8,7 +8,7 @@ const GOAT_FEATURES = {
   media_upload: true,
   premium_channels: true,
   custom_badges: true,
-  xp_boosts: true,
+  sp_boosts: true,
 };
 
 // Features available with Pro subscription
@@ -17,7 +17,7 @@ const PRO_FEATURES = {
   media_upload: true,
   premium_channels: false,
   custom_badges: false,
-  xp_boosts: false,
+  sp_boosts: false,
 };
 
 // Rank thresholds
@@ -35,14 +35,14 @@ export function useGoatNitro() {
   const { user, updateUser } = useUserContext();
   const { toast } = useToast();
   
-  // State for XP and streak
-  const [xp, setXp] = useState(user?.xp || 0);
+  // State for Study Points and streak
+  const [studyPoints, setStudyPoints] = useState(user?.studyPoints || 0);
   const [streak, setStreak] = useState(user?.streak || 0);
   
   // Update state when user changes
   useEffect(() => {
     if (user) {
-      setXp(user.xp || 0);
+      setStudyPoints(user.studyPoints || 0);
       setStreak(user.streak || 0);
     }
   }, [user]);
@@ -63,51 +63,51 @@ export function useGoatNitro() {
     return false;
   }, [isGoatUser, isProUser]);
 
-  // Add XP to user
-  const addXp = useCallback(async (amount: number, reason: string) => {
+  // Add Study Points to user
+  const addStudyPoints = useCallback(async (amount: number, reason: string) => {
     if (!user) return;
     
     try {
-      // Calculate new XP
-      const newXp = xp + amount;
+      // Calculate new Study Points
+      const newStudyPoints = studyPoints + amount;
       
       // Update local state
-      setXp(newXp);
+      setStudyPoints(newStudyPoints);
       
       // In a real implementation, you would update the user in the database
       // For now, we'll just update the local user context
       if (updateUser) {
         updateUser({
           ...user,
-          xp: newXp,
+          studyPoints: newStudyPoints,
         });
       }
       
       // Show toast notification
       toast({
-        title: `+${amount} XP`,
+        title: `+${amount} SP`,
         description: reason,
         variant: 'default',
       });
       
-      return newXp;
+      return newStudyPoints;
     } catch (error) {
-      console.error('Error adding XP:', error);
+      console.error('Error adding Study Points:', error);
     }
-  }, [user, xp, updateUser, toast]);
+  }, [user, studyPoints, updateUser, toast]);
 
-  // Get user's rank based on XP
+  // Get user's rank based on Study Points
   const getUserRank = useCallback(() => {
     const ranks = Object.entries(RANKS).sort((a, b) => b[1] - a[1]);
     
     for (const [rank, threshold] of ranks) {
-      if (xp >= threshold) {
+      if (studyPoints >= threshold) {
         return rank;
       }
     }
     
     return 'Novice';
-  }, [xp]);
+  }, [studyPoints]);
 
   // Get badge style based on rank
   const getBadgeStyle = useCallback(() => {
@@ -134,12 +134,12 @@ export function useGoatNitro() {
   }, [getUserRank]);
 
   return {
-    xp,
+    studyPoints,
     streak,
     isGoatUser,
     isProUser,
     isFeatureAvailable,
-    addXp,
+    addStudyPoints,
     getUserRank,
     getBadgeStyle,
   };
