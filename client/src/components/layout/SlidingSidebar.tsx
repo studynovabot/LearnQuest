@@ -59,6 +59,11 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       path: "/chat",
     },
     {
+      icon: AwardIcon,
+      label: "Gamification",
+      path: "/gamification",
+    },
+    {
       icon: TrophyIcon,
       label: "Ranks & Achievements",
       path: "/ranks",

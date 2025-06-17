@@ -8,38 +8,41 @@ import { useUserContext } from "@/context/UserContext";
 
 // Pricing data and features from Subscription.tsx
 const pricingPlans = [
-	{ tier: "Pro", duration: "Monthly", price: 350, monthlyEquivalent: 350, yearlyEquivalent: 4200, savings: "", isPopular: false },
-	{ tier: "Pro", duration: "Quarterly", price: 870, monthlyEquivalent: 290, yearlyEquivalent: 3480, savings: "Save ₹180", isPopular: true },
-	{ tier: "Pro", duration: "Half-Yearly", price: 1740, monthlyEquivalent: 290, yearlyEquivalent: 3480, savings: "Save ₹360", isPopular: false },
-	{ tier: "Pro", duration: "Yearly", price: 2820, monthlyEquivalent: 235, yearlyEquivalent: 2820, savings: "Save ₹1380", isPopular: false },
-	{ tier: "Goat", duration: "Monthly", price: 410, monthlyEquivalent: 410, yearlyEquivalent: 4920, savings: "", isPremium: true },
-	{ tier: "Goat", duration: "Quarterly", price: 990, monthlyEquivalent: 330, yearlyEquivalent: 3960, savings: "Save ₹240", isPremium: true },
-	{ tier: "Goat", duration: "Half-Yearly", price: 1980, monthlyEquivalent: 330, yearlyEquivalent: 3960, savings: "Save ₹480", isPremium: true },
-	{ tier: "Goat", duration: "Yearly", price: 3180, monthlyEquivalent: 265, yearlyEquivalent: 3180, savings: "Save ₹1740", isPremium: true, isPopular: true },
+	{ tier: "Pro", duration: "Monthly", price: 299, monthlyEquivalent: 299, yearlyEquivalent: 3588, savings: "", isPopular: false },
+	{ tier: "Pro", duration: "Quarterly", price: 870, monthlyEquivalent: 290, yearlyEquivalent: 3480, savings: "Save ₹27/month", isPopular: true },
+	{ tier: "Pro", duration: "Half-Yearly", price: 1740, monthlyEquivalent: 290, yearlyEquivalent: 3480, savings: "Save ₹54/month", isPopular: false },
+	{ tier: "Pro", duration: "Yearly", price: 2820, monthlyEquivalent: 235, yearlyEquivalent: 2820, savings: "Save ₹768/year", isPopular: false },
+	{ tier: "GOAT", duration: "Monthly", price: 599, monthlyEquivalent: 599, yearlyEquivalent: 7188, savings: "", isPremium: true },
+	{ tier: "GOAT", duration: "Quarterly", price: 1650, monthlyEquivalent: 550, yearlyEquivalent: 6600, savings: "Save ₹147/quarter", isPremium: true },
+	{ tier: "GOAT", duration: "Half-Yearly", price: 3300, monthlyEquivalent: 550, yearlyEquivalent: 6600, savings: "Save ₹294/half-year", isPremium: true },
+	{ tier: "GOAT", duration: "Yearly", price: 5990, monthlyEquivalent: 499, yearlyEquivalent: 5990, savings: "Save ₹1200/year", isPremium: true, isPopular: true },
 ];
 
 const proFeatures = [
-	"Access to all AI tutors",
-	"Unlimited chat sessions",
-	"Progress tracking & analytics",
-	"Custom study plans",
-	"Priority support",
-	"Mobile app access",
-	"Offline content download",
-	"Basic performance insights",
+	"Unlimited AI text & image questions",
+	"Full note summary generator (PDF)",
+	"Flashcards & custom revision plans",
+	"Pomodoro + AI timer assistant",
+	"500 SP/day cap",
+	"Earn Nova Coins (weekly rewards)",
+	"Weekly streak boosters (2x SP Sundays)",
+	"AI Tutor Lite (remembers your name & subjects)",
+	"Leaderboard rewards (top 50 weekly)",
+	"1 streak insurance token/month",
 ];
 
 const goatFeatures = [
-	"Everything in Pro",
-	"Advanced AI tutoring models",
-	"Personalized learning paths",
-	"Real-time performance analysis",
-	"1-on-1 expert sessions",
-	"Advanced study materials",
-	"Priority queue access",
-	"Custom AI tutor training",
-	"Advanced analytics dashboard",
+	"All Pro features",
+	"2x Study Point multiplier on all activities",
+	"AI Tutor Elite (remembers style & weak areas)",
+	"GOAT Badge on leaderboard & chat",
+	"Exclusive store items (titles, themes, etc.)",
+	"1000 SP/day cap",
+	"Access to exclusive 'Study Lounge'",
+	"Monthly rank certificate (PDF + shareable)",
+	"Fast-track customer support",
 	"Early access to new features",
+	"2 streak insurance tokens/month",
 ];
 
 const PricingPage: React.FC = () => {

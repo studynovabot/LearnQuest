@@ -3,7 +3,10 @@ import { SUBSCRIPTION_PLANS } from '@/components/subscription/FeatureAccess';
 import { 
   PREMIUM_FEATURES, 
   hasFeatureAccess,
-  FEATURE_SUBSCRIPTION_LEVEL
+  FEATURE_SUBSCRIPTION_LEVEL,
+  DAILY_SP_CAPS,
+  SP_MULTIPLIERS,
+  STREAK_INSURANCE
 } from '@/constants/PremiumFeatures';
 
 /**
@@ -19,11 +22,11 @@ export function useFeatureAccess() {
   if (user) {
     // First check the new subscriptionPlan field
     if (user.subscriptionPlan) {
-      userPlan = user.subscriptionPlan === 'pro' ? SUBSCRIPTION_PLANS.PREMIUM : SUBSCRIPTION_PLANS.FREE;
+      userPlan = user.subscriptionPlan;
     } 
     // Fallback to the isPro boolean for backward compatibility
     else if (user.isPro) {
-      userPlan = SUBSCRIPTION_PLANS.PREMIUM;
+      userPlan = SUBSCRIPTION_PLANS.PRO;
     }
     
     // Check subscription status - if expired or canceled, revert to free
@@ -41,14 +44,14 @@ export function useFeatureAccess() {
    * Check if the user has access to a specific feature
    */
   const hasAccess = (featureKey: string): boolean => {
-    return hasFeatureAccess(featureKey, userPlan.toLowerCase() as 'free' | 'premium');
+    return hasFeatureAccess(featureKey, userPlan.toLowerCase() as 'free' | 'pro' | 'goat');
   };
   
   /**
    * Get the required plan name for a feature
    */
   const getRequiredPlan = (featureKey: string): string => {
-    return FEATURE_SUBSCRIPTION_LEVEL[featureKey] || 'premium';
+    return FEATURE_SUBSCRIPTION_LEVEL[featureKey] || 'pro';
   };
   
   /**
@@ -66,11 +69,43 @@ export function useFeatureAccess() {
       return true; // Everyone has at least free access
     }
     
-    if (plan === SUBSCRIPTION_PLANS.PREMIUM) {
-      return userPlan === SUBSCRIPTION_PLANS.PREMIUM;
+    if (plan === SUBSCRIPTION_PLANS.PRO) {
+      return userPlan === SUBSCRIPTION_PLANS.PRO || userPlan === SUBSCRIPTION_PLANS.GOAT;
+    }
+    
+    if (plan === SUBSCRIPTION_PLANS.GOAT) {
+      return userPlan === SUBSCRIPTION_PLANS.GOAT;
     }
     
     return false;
+  };
+  
+  /**
+   * Get the daily SP cap for the current user
+   */
+  const getDailySPCap = (): number => {
+    return DAILY_SP_CAPS[userPlan.toLowerCase() as 'free' | 'pro' | 'goat'];
+  };
+  
+  /**
+   * Get the SP multiplier for the current user
+   */
+  const getSPMultiplier = (): number => {
+    return SP_MULTIPLIERS[userPlan.toLowerCase() as 'free' | 'pro' | 'goat'];
+  };
+  
+  /**
+   * Get the streak insurance tokens for the current user
+   */
+  const getStreakInsurance = (): number => {
+    return STREAK_INSURANCE[userPlan.toLowerCase() as 'free' | 'pro' | 'goat'];
+  };
+  
+  /**
+   * Check if the user can earn Nova Coins
+   */
+  const canEarnNovaCoins = (): boolean => {
+    return hasAccess('nova_coins_earning');
   };
   
   return {
@@ -78,6 +113,10 @@ export function useFeatureAccess() {
     getRequiredPlan,
     getCurrentPlan,
     isOnPlanOrHigher,
+    getDailySPCap,
+    getSPMultiplier,
+    getStreakInsurance,
+    canEarnNovaCoins,
     PLANS: SUBSCRIPTION_PLANS,
     FEATURES: PREMIUM_FEATURES
   };

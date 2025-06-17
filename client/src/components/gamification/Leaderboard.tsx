@@ -1,215 +1,363 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { PremiumCard } from '@/components/premium/PremiumCard';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Medal, Trophy, Users, Crown, Star, ArrowUp, ArrowDown, Minus } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useUserContext } from '@/context/UserContext';
+import { Trophy, Crown, BarChart, ArrowUp, ArrowDown, Minus, Award } from 'lucide-react';
 
 interface LeaderboardUser {
   id: string;
   name: string;
   avatar?: string;
-  points: number;
+  studyPoints: number;
+  novaCoins?: number;
   rank: number;
-  previousRank: number;
-  level: number;
+  previousRank?: number;
+  level?: number;
+  isGoat?: boolean;
   isCurrentUser?: boolean;
+  title?: string;
 }
 
 interface LeaderboardProps {
-  users: LeaderboardUser[];
-  className?: string;
+  users?: LeaderboardUser[];
 }
 
-const Leaderboard: React.FC<LeaderboardProps> = ({ users, className }) => {
-  const [timeframe, setTimeframe] = React.useState('weekly');
+const Leaderboard: React.FC<LeaderboardProps> = ({ users = [] }) => {
+  const { user } = useUserContext();
+  const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
   
-  // Sort users by points
-  const sortedUsers = [...users].sort((a, b) => b.points - a.points);
+  // Mock data if no users are provided
+  const mockUsers: LeaderboardUser[] = [
+    {
+      id: 'user-1',
+      name: 'Arjun Singh',
+      avatar: 'https://i.pravatar.cc/150?img=1',
+      studyPoints: 4850,
+      novaCoins: 120,
+      rank: 1,
+      previousRank: 2,
+      level: 5,
+      isGoat: true,
+      title: 'Memory King'
+    },
+    {
+      id: 'user-2',
+      name: 'Priya Sharma',
+      avatar: 'https://i.pravatar.cc/150?img=5',
+      studyPoints: 4720,
+      novaCoins: 85,
+      rank: 2,
+      previousRank: 1,
+      level: 5,
+      isGoat: false
+    },
+    {
+      id: 'user-3',
+      name: 'Rahul Patel',
+      avatar: 'https://i.pravatar.cc/150?img=3',
+      studyPoints: 4350,
+      novaCoins: 65,
+      rank: 3,
+      previousRank: 3,
+      level: 4,
+      isGoat: false,
+      title: 'AI Slayer'
+    },
+    {
+      id: 'user-4',
+      name: 'Neha Gupta',
+      avatar: 'https://i.pravatar.cc/150?img=4',
+      studyPoints: 3980,
+      rank: 4,
+      previousRank: 5,
+      level: 4
+    },
+    {
+      id: 'user-5',
+      name: 'Vikram Mehta',
+      avatar: 'https://i.pravatar.cc/150?img=6',
+      studyPoints: 3750,
+      rank: 5,
+      previousRank: 4,
+      level: 4,
+      isGoat: true,
+      title: 'Nova Legend'
+    },
+    {
+      id: 'user-6',
+      name: 'Ananya Desai',
+      avatar: 'https://i.pravatar.cc/150?img=7',
+      studyPoints: 3600,
+      novaCoins: 40,
+      rank: 6,
+      previousRank: 7,
+      level: 4
+    },
+    {
+      id: 'user-7',
+      name: 'Rohan Joshi',
+      avatar: 'https://i.pravatar.cc/150?img=8',
+      studyPoints: 3450,
+      rank: 7,
+      previousRank: 6,
+      level: 3
+    },
+    {
+      id: 'user-8',
+      name: 'Kavita Reddy',
+      avatar: 'https://i.pravatar.cc/150?img=9',
+      studyPoints: 3200,
+      rank: 8,
+      previousRank: 9,
+      level: 3,
+      isGoat: true
+    },
+    // Current user
+    {
+      id: user?.id || 'current-user',
+      name: user?.displayName || 'You',
+      avatar: user?.profilePic || 'https://i.pravatar.cc/150?img=15',
+      studyPoints: user?.studyPoints || 2450,
+      novaCoins: user?.novaCoins || 45,
+      rank: 342,
+      previousRank: 350,
+      level: Math.floor((user?.studyPoints || 0) / 500) + 1,
+      isCurrentUser: true,
+      isGoat: user?.subscription?.tier === 'goat',
+      title: user?.equippedTitle
+    }
+  ];
+  
+  const leaderboardUsers = users.length > 0 ? users : mockUsers;
+  
+  // Sort users by rank
+  const sortedUsers = [...leaderboardUsers].sort((a, b) => a.rank - b.rank);
   
   // Get top 3 users
   const topUsers = sortedUsers.slice(0, 3);
   
-  // Get remaining users
-  const remainingUsers = sortedUsers.slice(3);
+  // Get other users (ranks 4-8)
+  const otherUsers = sortedUsers.filter(u => u.rank > 3 && u.rank <= 8);
   
-  // Get rank change indicator
-  const getRankChange = (user: LeaderboardUser) => {
-    const diff = user.previousRank - user.rank;
+  // Get current user if not in top 8
+  const currentUser = sortedUsers.find(u => u.isCurrentUser && u.rank > 8);
+  
+  // Helper function to render rank change indicator
+  const getRankChangeIndicator = (user: LeaderboardUser) => {
+    if (!user.previousRank) return null;
     
-    if (diff > 0) {
-      return (
-        <div className="flex items-center text-emerald-500">
-          <ArrowUp className="h-3 w-3 mr-1" />
-          <span className="text-xs">{diff}</span>
-        </div>
-      );
-    } else if (diff < 0) {
-      return (
-        <div className="flex items-center text-rose-500">
-          <ArrowDown className="h-3 w-3 mr-1" />
-          <span className="text-xs">{Math.abs(diff)}</span>
-        </div>
-      );
+    if (user.rank < user.previousRank) {
+      return <ArrowUp className="h-3 w-3 text-green-500" />;
+    } else if (user.rank > user.previousRank) {
+      return <ArrowDown className="h-3 w-3 text-red-500" />;
     } else {
-      return (
-        <div className="flex items-center text-muted-foreground">
-          <Minus className="h-3 w-3 mr-1" />
-          <span className="text-xs">0</span>
-        </div>
-      );
+      return <Minus className="h-3 w-3 text-gray-500" />;
     }
   };
-
+  
   return (
-    <PremiumCard className={cn("overflow-hidden", className)}>
-      <div className="p-8 border-b border-border/40">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold flex items-center">
-            <Trophy className="h-6 w-6 mr-3 text-amber-500" />
-            Leaderboard
-          </h2>
-          
-          <Tabs defaultValue="weekly" value={timeframe} onValueChange={setTimeframe}>
-            <TabsList className="grid grid-cols-3">
-              <TabsTrigger value="daily">Daily</TabsTrigger>
-              <TabsTrigger value="weekly">Weekly</TabsTrigger>
-              <TabsTrigger value="monthly">Monthly</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-        
-        <p className="text-muted-foreground">
-          See how you rank against other learners. Earn more points to climb the leaderboard!
-        </p>
-      </div>
-      
-      {/* Top 3 Users */}
-      <div className="p-8 bg-muted/20">
-        <div className="flex justify-center items-end gap-4 mb-8">
-          {topUsers.map((user, index) => {
-            // Determine position (2nd, 1st, 3rd)
-            const position = index === 0 ? 1 : index === 1 ? 0 : 2;
-            const sizes = ['h-24 w-24', 'h-32 w-32', 'h-20 w-20'];
-            const heights = ['h-24', 'h-32', 'h-20'];
-            const medals = [
-              <Medal key="silver" className="h-8 w-8 text-gray-400" />,
-              <Crown key="gold" className="h-10 w-10 text-amber-500" />,
-              <Medal key="bronze" className="h-7 w-7 text-amber-700" />
-            ];
-            
-            return (
-              <motion.div
-                key={user.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: position * 0.1 }}
-                className={cn(
-                  "flex flex-col items-center",
-                  user.isCurrentUser && "text-primary"
-                )}
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Trophy className="mr-2 h-5 w-5 text-amber-500" />
+          Leaderboard
+        </CardTitle>
+        <CardDescription>See how you rank against other students</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex space-x-2">
+              <Button 
+                variant={timeframe === 'daily' ? 'default' : 'outline'} 
+                size="sm" 
+                className="text-xs"
+                onClick={() => setTimeframe('daily')}
               >
-                <div className="relative mb-2">
-                  <Avatar className={cn(
-                    sizes[position],
-                    "border-4",
-                    user.isCurrentUser ? "border-primary" : "border-background"
-                  )}>
-                    <AvatarImage src={user.avatar} />
-                    <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                      {user.name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-background rounded-full p-1">
-                    {medals[position]}
+                Daily
+              </Button>
+              <Button 
+                variant={timeframe === 'weekly' ? 'default' : 'outline'} 
+                size="sm" 
+                className="text-xs"
+                onClick={() => setTimeframe('weekly')}
+              >
+                Weekly
+              </Button>
+              <Button 
+                variant={timeframe === 'monthly' ? 'default' : 'outline'} 
+                size="sm" 
+                className="text-xs"
+                onClick={() => setTimeframe('monthly')}
+              >
+                Monthly
+              </Button>
+            </div>
+            <Button variant="ghost" size="sm" className="text-xs">
+              <BarChart className="h-3 w-3 mr-1" />
+              View Stats
+            </Button>
+          </div>
+          
+          {/* Top 3 Users */}
+          <div className="flex justify-center items-end gap-4 mb-8">
+            {/* 2nd Place */}
+            {topUsers[1] && (
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 rounded-full bg-slate-200 mb-2 overflow-hidden">
+                  <img src={topUsers[1].avatar || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 10)}`} alt="2nd place" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-16 h-24 bg-gradient-to-b from-slate-300 to-slate-400 rounded-t-lg flex items-center justify-center">
+                  <div className="text-xl font-bold text-white">2</div>
+                </div>
+                <div className="text-xs font-medium mt-1 flex items-center">
+                  {topUsers[1].name.split(' ')[0]} {topUsers[1].isGoat && <Crown className="h-3 w-3 ml-1 text-amber-500" />}
+                </div>
+                <div className="text-xs text-muted-foreground">{topUsers[1].studyPoints} SP</div>
+                <div className="flex items-center text-xs mt-1">
+                  {getRankChangeIndicator(topUsers[1])}
+                </div>
+              </div>
+            )}
+            
+            {/* 1st Place */}
+            {topUsers[0] && (
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 rounded-full bg-slate-200 mb-2 overflow-hidden border-2 border-amber-500">
+                  <img src={topUsers[0].avatar || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 10)}`} alt="1st place" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-20 h-32 bg-gradient-to-b from-amber-400 to-amber-600 rounded-t-lg flex items-center justify-center">
+                  <div className="text-2xl font-bold text-white">1</div>
+                </div>
+                <div className="text-sm font-medium mt-1 flex items-center">
+                  {topUsers[0].name.split(' ')[0]} {topUsers[0].isGoat && <Crown className="h-3 w-3 ml-1 text-amber-500" />}
+                </div>
+                <div className="text-xs text-muted-foreground">{topUsers[0].studyPoints} SP</div>
+                <div className="flex items-center text-xs mt-1">
+                  {getRankChangeIndicator(topUsers[0])}
+                </div>
+              </div>
+            )}
+            
+            {/* 3rd Place */}
+            {topUsers[2] && (
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 rounded-full bg-slate-200 mb-2 overflow-hidden">
+                  <img src={topUsers[2].avatar || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 10)}`} alt="3rd place" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-16 h-20 bg-gradient-to-b from-amber-700 to-amber-800 rounded-t-lg flex items-center justify-center">
+                  <div className="text-xl font-bold text-white">3</div>
+                </div>
+                <div className="text-xs font-medium mt-1 flex items-center">
+                  {topUsers[2].name.split(' ')[0]} {topUsers[2].isGoat && <Crown className="h-3 w-3 ml-1 text-amber-500" />}
+                </div>
+                <div className="text-xs text-muted-foreground">{topUsers[2].studyPoints} SP</div>
+                <div className="flex items-center text-xs mt-1">
+                  {getRankChangeIndicator(topUsers[2])}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Other Rankings */}
+          <div className="space-y-2">
+            {otherUsers.map(user => (
+              <div 
+                key={user.id} 
+                className={`flex items-center p-2 rounded-lg ${
+                  user.isCurrentUser 
+                    ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' 
+                    : 'bg-muted'
+                }`}
+              >
+                <div className="w-8 text-center font-medium">{user.rank}</div>
+                <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden mx-2">
+                  <img 
+                    src={user.avatar || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 10)}`} 
+                    alt={`Rank ${user.rank}`} 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium flex items-center">
+                    {user.isCurrentUser ? 'You' : user.name}
+                    {user.isGoat && <Crown className="h-3 w-3 ml-1 text-amber-500" />}
+                    {user.title && (
+                      <span className="ml-1 text-xs bg-slate-200 dark:bg-slate-700 px-1 rounded text-slate-700 dark:text-slate-300">
+                        {user.title}
+                      </span>
+                    )}
                   </div>
                 </div>
-                
-                <div className={cn(
-                  heights[position],
-                  "flex flex-col items-center justify-end"
-                )}>
-                  <p className={cn(
-                    "font-semibold truncate max-w-[100px] text-center",
-                    user.isCurrentUser ? "text-primary" : "text-foreground"
-                  )}>
-                    {user.name}
-                  </p>
-                  
-                  <div className="flex items-center mt-1">
-                    {Array.from({ length: user.level }).map((_, i) => (
-                      <Star key={i} className="h-3 w-3 text-amber-500 fill-amber-500" />
-                    ))}
+                <div className="text-sm font-medium flex items-center">
+                  {user.studyPoints} SP
+                  <span className="ml-1">{getRankChangeIndicator(user)}</span>
+                </div>
+              </div>
+            ))}
+            
+            {/* Current User (if not in top 8) */}
+            {currentUser && (
+              <>
+                <div className="text-center text-xs text-muted-foreground py-2">
+                  • • •
+                </div>
+                <div className="flex items-center p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                  <div className="w-8 text-center font-medium">{currentUser.rank}</div>
+                  <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden mx-2">
+                    <img 
+                      src={currentUser.avatar || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 10)}`} 
+                      alt="You" 
+                      className="w-full h-full object-cover" 
+                    />
                   </div>
-                  
-                  <p className="text-sm font-medium mt-1">
-                    {user.points} pts
-                  </p>
-                  
-                  <div className="mt-1">
-                    {getRankChange(user)}
+                  <div className="flex-1">
+                    <div className="text-sm font-medium flex items-center">
+                      You
+                      {currentUser.isGoat && <Crown className="h-3 w-3 ml-1 text-amber-500" />}
+                      {currentUser.title && (
+                        <span className="ml-1 text-xs bg-slate-200 dark:bg-slate-700 px-1 rounded text-slate-700 dark:text-slate-300">
+                          {currentUser.title}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-sm font-medium flex items-center">
+                    {currentUser.studyPoints} SP
+                    <span className="ml-1">{getRankChangeIndicator(currentUser)}</span>
                   </div>
                 </div>
-              </motion.div>
-            );
-          })}
+              </>
+            )}
+          </div>
+          
+          <div className="bg-muted p-4 rounded-lg mt-6">
+            <h3 className="text-sm font-medium flex items-center mb-2">
+              <Award className="h-4 w-4 mr-2 text-amber-500" />
+              Weekly Rewards
+            </h3>
+            <ul className="space-y-1 text-xs text-muted-foreground">
+              <li className="flex justify-between">
+                <span>Top 10:</span>
+                <span className="font-medium">50 Nova Coins</span>
+              </li>
+              <li className="flex justify-between">
+                <span>Top 25:</span>
+                <span className="font-medium">25 Nova Coins</span>
+              </li>
+              <li className="flex justify-between">
+                <span>Top 50:</span>
+                <span className="font-medium">10 Nova Coins</span>
+              </li>
+              <li className="flex justify-between">
+                <span>Top 100:</span>
+                <span className="font-medium">5 Nova Coins</span>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-      
-      {/* Remaining Users */}
-      <div className="p-8">
-        <h3 className="text-lg font-semibold mb-6">Rankings</h3>
-        
-        <div className="space-y-4">
-          {remainingUsers.map((user, index) => (
-            <motion.div
-              key={user.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className={cn(
-                "flex items-center p-4 rounded-xl border border-border/30",
-                user.isCurrentUser ? "bg-primary/5 border-primary/30" : "bg-card/50"
-              )}
-            >
-              <div className="w-8 font-bold text-center mr-4">
-                {user.rank}
-              </div>
-              
-              <Avatar className="h-10 w-10 mr-4">
-                <AvatarImage src={user.avatar} />
-                <AvatarFallback className="bg-primary/10 text-primary">
-                  {user.name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="flex-1 min-w-0">
-                <p className={cn(
-                  "font-medium truncate",
-                  user.isCurrentUser ? "text-primary" : "text-foreground"
-                )}>
-                  {user.name}
-                </p>
-                <div className="flex items-center">
-                  <div className="flex mr-2">
-                    {Array.from({ length: user.level }).map((_, i) => (
-                      <Star key={i} className="h-3 w-3 text-amber-500 fill-amber-500" />
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Level {user.level}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center">
-                <p className="font-medium mr-3">{user.points} pts</p>
-                {getRankChange(user)}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </PremiumCard>
+      </CardContent>
+    </Card>
   );
 };
 

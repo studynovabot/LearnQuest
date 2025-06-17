@@ -6,13 +6,15 @@ import {
   PREMIUM_FEATURES, 
   FEATURE_DESCRIPTIONS, 
   FEATURE_SUBSCRIPTION_LEVEL,
-  hasFeatureAccess
+  hasFeatureAccess,
+  isGoatFeature
 } from '@/constants/PremiumFeatures';
 
 // Define the subscription plans
 export const SUBSCRIPTION_PLANS = {
   FREE: 'free',
-  PREMIUM: 'premium'
+  PRO: 'pro',
+  GOAT: 'goat'
 };
 
 interface FeatureAccessProps {
@@ -38,14 +40,27 @@ const FeatureAccess: React.FC<FeatureAccessProps> = ({
   const { user } = useUserContext();
   
   // Determine user's plan
-  const userPlan = user?.isPro ? SUBSCRIPTION_PLANS.PREMIUM : SUBSCRIPTION_PLANS.FREE;
+  let userPlan = SUBSCRIPTION_PLANS.FREE;
+  
+  if (user?.subscriptionPlan) {
+    userPlan = user.subscriptionPlan;
+  } else if (user?.isPro) {
+    userPlan = SUBSCRIPTION_PLANS.PRO;
+  }
   
   // Check if the user has access to this feature
-  const hasAccess = hasFeatureAccess(featureKey, userPlan as 'free' | 'premium');
+  const hasAccess = hasFeatureAccess(featureKey, userPlan as 'free' | 'pro' | 'goat');
   
   if (hasAccess) {
     return <>{children}</>;
   }
+  
+  // Determine if this is a GOAT-only feature
+  const isGoatOnly = isGoatFeature(featureKey);
+  const featureLevel = isGoatOnly ? 'GOAT' : 'Pro';
+  const gradientClass = isGoatOnly 
+    ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+    : "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700";
   
   // If teaser is enabled, show a blurred version of the content
   if (teaser) {
@@ -62,14 +77,14 @@ const FeatureAccess: React.FC<FeatureAccessProps> = ({
         {/* Overlay with upgrade button */}
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 backdrop-blur-sm rounded-lg">
           <div className="text-center space-y-4 p-6">
-            <h3 className="text-lg font-semibold text-white">Premium Feature</h3>
+            <h3 className="text-lg font-semibold text-white">{featureLevel} Feature</h3>
             <p className="text-sm text-white/80">
-              Upgrade to unlock {FEATURE_DESCRIPTIONS[featureKey] || 'this premium feature'}.
+              Upgrade to {featureLevel} to unlock {FEATURE_DESCRIPTIONS[featureKey] || 'this premium feature'}.
             </p>
             {showUpgradeButton && (
               <Button 
                 asChild 
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+                className={gradientClass}
               >
                 <Link href="/subscription">🔓 Unlock Now</Link>
               </Button>
@@ -85,14 +100,14 @@ const FeatureAccess: React.FC<FeatureAccessProps> = ({
     <div className="flex flex-col items-center justify-center p-6 border border-dashed rounded-lg bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
       {fallback || (
         <div className="text-center space-y-4">
-          <h3 className="text-lg font-semibold">Premium Feature</h3>
+          <h3 className="text-lg font-semibold">{featureLevel} Feature</h3>
           <p className="text-sm text-muted-foreground">
-            This feature requires a Premium subscription.
+            This feature requires a {featureLevel} subscription.
           </p>
           {showUpgradeButton && (
             <Button 
               asChild 
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+              className={gradientClass}
             >
               <Link href="/subscription">🔓 Unlock Now</Link>
             </Button>

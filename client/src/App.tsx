@@ -26,6 +26,7 @@ import LandingPage from "@/pages/LandingPage";
 import Terms from "@/pages/Terms";
 import AdminUsers from "@/pages/AdminUsers";
 import Ranks from "@/pages/Ranks";
+import GamificationPage from "@/pages/GamificationPage";
 import AdminRoute from "@/components/AdminRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout";
@@ -188,6 +189,13 @@ function Router() {
         <ProtectedRoute>
           <MainLayout>
             <Ranks />
+          </MainLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/gamification">
+        <ProtectedRoute>
+          <MainLayout>
+            <GamificationPage />
           </MainLayout>
         </ProtectedRoute>
       </Route>
