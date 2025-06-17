@@ -42,56 +42,59 @@ export const PricingSection: React.FC = () => {
       period: "/month",
       description: "Perfect for trying out StudyNova AI",
       features: [
-        "10 questions per day",
         "Basic AI tutors",
-        "NCERT solutions (limited)",
-        "Community support",
-        "Basic progress tracking"
+        "25% of AI answers revealed",
+        "5 flashcards per day",
+        "2 AI revision sessions per day",
+        "Standard XP (daily cap)",
+        "Basic leaderboard access"
       ],
       cta: "Start Free",
       color: "blue",
       icon: <Rocket className="h-6 w-6" />
     },
     {
-      name: "Pro",
+      name: "Premium",
       price: isAnnual ? "₹149" : "₹199",
       originalPrice: isAnnual ? "₹249" : "₹299",
       period: "/month",
-      description: "Best for regular learners",
+      description: "Unlock your full potential",
       features: [
-        "500 questions per day",
-        "All AI tutors",
-        "Complete NCERT solutions",
-        "Image analysis tools",
-        "Priority support",
-        "Progress analytics",
-        "Mobile app access",
-        "Offline content download"
+        "Full AI answers with explanations",
+        "CBSE topper-formatted answers",
+        "AIR Rank Simulator",
+        "Smart Study Plan generator",
+        "Unlimited AI flashcards",
+        "Unlimited revision sessions",
+        "2x XP and streak shields",
+        "PDF export of answers",
+        "Weak chapter detection"
       ],
       cta: "Start 7-Day Free Trial",
       popular: true,
-      color: "purple",
+      color: "gradient",
       icon: <Crown className="h-6 w-6" />
     },
     {
-      name: "Premium",
-      price: isAnnual ? "₹199" : "₹299",
-      originalPrice: isAnnual ? "₹399" : "₹499",
-      period: "/month",
-      description: "For serious students",
+      name: "School Plan",
+      price: isAnnual ? "₹99" : "₹149",
+      originalPrice: isAnnual ? "₹199" : "₹249",
+      period: "/student/month",
+      description: "For educational institutions",
       features: [
-        "Unlimited everything",
-        "1-on-1 expert sessions",
-        "Custom AI tutors",
-        "Advanced analytics",
-        "Exam preparation",
-        "24/7 priority support",
-        "Early access to features",
-        "Personal learning coach"
+        "All Premium features",
+        "Bulk student accounts",
+        "Teacher dashboard",
+        "Class performance analytics",
+        "Custom curriculum integration",
+        "Dedicated account manager",
+        "Teacher training sessions",
+        "Priority support",
+        "Custom branding options"
       ],
-      cta: "Start 7-Day Free Trial",
-      color: "gradient",
-      icon: <Trophy className="h-6 w-6" />
+      cta: "Contact Sales",
+      color: "purple",
+      icon: <Users className="h-6 w-6" />
     }
   ];
 
