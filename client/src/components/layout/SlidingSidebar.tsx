@@ -40,7 +40,7 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
     {
       icon: HomeIcon,
       label: "Home",
-      path: "/",
+      path: "/app",
     },
     {
       icon: BookOpenIcon,
