@@ -48,20 +48,28 @@ export function useGoatNitro() {
   }, [user]);
 
   // Check if user has Goat Nitro
-  const isGoatUser = user?.subscription_tier === 'goat';
+  const isGoatUser = user?.subscription_tier === 'goat' || user?.subscriptionPlan === 'goat';
   
   // Check if user has Pro subscription
-  const isProUser = user?.subscription_tier === 'pro';
+  const isProUser = user?.subscription_tier === 'pro' || user?.subscriptionPlan === 'pro';
+  
+  // Check if user is admin
+  const isAdmin = user?.role === 'admin';
 
   // Check if a feature is available based on subscription
   const isFeatureAvailable = useCallback((featureKey: keyof typeof GOAT_FEATURES) => {
+    // Admin users have access to all features
+    if (isAdmin) {
+      return true;
+    }
+    
     if (isGoatUser) {
       return GOAT_FEATURES[featureKey];
     } else if (isProUser) {
       return PRO_FEATURES[featureKey];
     }
     return false;
-  }, [isGoatUser, isProUser]);
+  }, [isGoatUser, isProUser, isAdmin]);
 
   // Add Study Points to user
   const addStudyPoints = useCallback(async (amount: number, reason: string) => {
@@ -138,6 +146,7 @@ export function useGoatNitro() {
     streak,
     isGoatUser,
     isProUser,
+    isAdmin,
     isFeatureAvailable,
     addStudyPoints,
     getUserRank,

@@ -48,8 +48,11 @@ const FeatureAccess: React.FC<FeatureAccessProps> = ({
     userPlan = SUBSCRIPTION_PLANS.PRO;
   }
   
+  // Check if user is admin
+  const isAdmin = user?.role === 'admin';
+  
   // Check if the user has access to this feature
-  const hasAccess = hasFeatureAccess(featureKey, userPlan as 'free' | 'pro' | 'goat');
+  const hasAccess = hasFeatureAccess(featureKey, userPlan as 'free' | 'pro' | 'goat', isAdmin);
   
   if (hasAccess) {
     return <>{children}</>;

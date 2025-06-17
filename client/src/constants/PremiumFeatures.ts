@@ -158,7 +158,12 @@ export function isGoatFeature(featureKey: string): boolean {
 }
 
 // Check if a user has access to a feature
-export function hasFeatureAccess(featureKey: string, userSubscription: 'free' | 'pro' | 'goat'): boolean {
+export function hasFeatureAccess(featureKey: string, userSubscription: 'free' | 'pro' | 'goat', isAdmin: boolean = false): boolean {
+  // Admin users have access to all features
+  if (isAdmin) {
+    return true;
+  }
+  
   const requiredLevel = FEATURE_SUBSCRIPTION_LEVEL[featureKey];
   
   if (requiredLevel === 'free') {
