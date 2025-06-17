@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface PremiumButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'gradient';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'gradient' | 'outline';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   children: React.ReactNode;
   isLoading?: boolean;
@@ -23,6 +23,7 @@ export const PremiumButton: React.FC<PremiumButtonProps> = ({
     primary: "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl focus:ring-indigo-500",
     secondary: "bg-card/80 backdrop-blur-sm border border-border/40 text-primary hover:bg-muted/50 hover:border-primary/30 focus:ring-primary",
     ghost: "text-muted-foreground hover:text-primary hover:bg-muted/30 focus:ring-primary",
+    outline: "border border-primary/30 text-primary hover:bg-primary/10 focus:ring-primary",
     gradient: "bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-600 hover:from-emerald-600 hover:via-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl focus:ring-purple-500"
   };
   

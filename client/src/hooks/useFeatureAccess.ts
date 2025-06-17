@@ -1,10 +1,10 @@
 import { useUserContext } from '@/context/UserContext';
+import { SUBSCRIPTION_PLANS } from '@/components/subscription/FeatureAccess';
 import { 
-  SUBSCRIPTION_PLANS, 
-  FEATURE_ACCESS, 
-  checkFeatureAccess, 
-  getRequiredPlanForFeature 
-} from '@/components/subscription/FeatureAccess';
+  PREMIUM_FEATURES, 
+  hasFeatureAccess,
+  FEATURE_SUBSCRIPTION_LEVEL
+} from '@/constants/PremiumFeatures';
 
 /**
  * Hook to check if the current user has access to specific features
@@ -23,7 +23,7 @@ export function useFeatureAccess() {
     } 
     // Fallback to the isPro boolean for backward compatibility
     else if (user.isPro) {
-      userPlan = SUBSCRIPTION_PLANS.PRO;
+      userPlan = SUBSCRIPTION_PLANS.PREMIUM;
     }
     
     // Check subscription status - if expired or canceled, revert to free
@@ -41,14 +41,14 @@ export function useFeatureAccess() {
    * Check if the user has access to a specific feature
    */
   const hasAccess = (featureKey: string): boolean => {
-    return checkFeatureAccess(featureKey, userPlan);
+    return hasFeatureAccess(featureKey, userPlan.toLowerCase() as 'free' | 'premium');
   };
   
   /**
    * Get the required plan name for a feature
    */
   const getRequiredPlan = (featureKey: string): string => {
-    return getRequiredPlanForFeature(featureKey);
+    return FEATURE_SUBSCRIPTION_LEVEL[featureKey] || 'premium';
   };
   
   /**
@@ -66,12 +66,8 @@ export function useFeatureAccess() {
       return true; // Everyone has at least free access
     }
     
-    if (plan === SUBSCRIPTION_PLANS.PRO) {
-      return userPlan === SUBSCRIPTION_PLANS.PRO || userPlan === SUBSCRIPTION_PLANS.GOAT;
-    }
-    
-    if (plan === SUBSCRIPTION_PLANS.GOAT) {
-      return userPlan === SUBSCRIPTION_PLANS.GOAT;
+    if (plan === SUBSCRIPTION_PLANS.PREMIUM) {
+      return userPlan === SUBSCRIPTION_PLANS.PREMIUM;
     }
     
     return false;
@@ -83,7 +79,7 @@ export function useFeatureAccess() {
     getCurrentPlan,
     isOnPlanOrHigher,
     PLANS: SUBSCRIPTION_PLANS,
-    FEATURES: FEATURE_ACCESS
+    FEATURES: PREMIUM_FEATURES
   };
 }
 

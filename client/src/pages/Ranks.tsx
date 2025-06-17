@@ -17,7 +17,10 @@ import {
   Target, 
   Trophy, 
   Users, 
-  Zap 
+  Zap,
+  MessageSquare,
+  Flame,
+  Clock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

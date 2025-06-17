@@ -43,7 +43,8 @@ import {
   PlusCircle,
   Lightbulb,
   Rocket,
-  Medal
+  Medal,
+  Gift
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -155,7 +156,7 @@ const Dashboard = () => {
     {
       id: "4",
       name: user?.displayName || "You",
-      avatar: user?.photoURL || undefined,
+      avatar: user?.profileImage || undefined,
       points: 750,
       rank: 4,
       previousRank: 6,
