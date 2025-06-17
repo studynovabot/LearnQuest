@@ -34,7 +34,8 @@ import {
   Crown,
   FileText,
   BrainCircuit,
-  Link as LinkIcon
+  Link as LinkIcon,
+  PlusCircle
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -99,41 +100,40 @@ const Dashboard = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        {/* Animated Background Elements */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 right-20 w-64 h-64 bg-purple-200/30 dark:bg-purple-900/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-          <div className="absolute bottom-20 left-20 w-64 h-64 bg-indigo-200/30 dark:bg-indigo-900/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-pink-200/20 dark:bg-pink-900/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        {/* Subtle Background Elements */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
+          <div className="absolute top-40 right-40 w-96 h-96 bg-purple-200/20 dark:bg-purple-900/10 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
+          <div className="absolute bottom-40 left-40 w-96 h-96 bg-indigo-200/20 dark:bg-indigo-900/10 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Premium Welcome Section */}
+        <div className="relative z-10 max-w-7xl mx-auto px-8 py-12">
+          {/* Welcome Section - Cleaner with more whitespace */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mb-12"
+            className="mb-16"
           >
-            <PremiumCard className="p-8 overflow-hidden relative" gradient>
-              {/* Background Decorations */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-500/20 to-transparent rounded-full blur-2xl"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-indigo-500/20 to-transparent rounded-full blur-xl"></div>
+            <PremiumCard className="p-12 overflow-hidden relative" gradient>
+              {/* Subtle Background Decorations */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-indigo-500/10 to-transparent rounded-full blur-2xl"></div>
               
               <div className="relative z-10 flex flex-col md:flex-row items-center justify-between">
-                <div className="flex-1 mb-6 md:mb-0">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center animate-glow">
-                      <Brain className="h-6 w-6 text-white" />
+                <div className="flex-1 mb-8 md:mb-0">
+                  <div className="flex items-center space-x-5 mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center animate-glow">
+                      <Brain className="h-8 w-8 text-white" />
                     </div>
                     <div>
-                      <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
-                        Welcome back, <span className="text-gradient">{user?.displayName?.split(' ')[0] || 'Demo'}!</span> 👋
+                      <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground">
+                        Welcome, <span className="text-gradient">{user?.displayName?.split(' ')[0] || 'Demo'}</span>
                       </h1>
-                      <p className="text-muted-foreground text-lg">Ready to continue your AI-powered learning journey?</p>
+                      <p className="text-muted-foreground text-xl mt-2">Ready to continue your learning journey?</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-6 text-sm">
+                  <div className="flex items-center space-x-8 text-sm mt-4">
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
                       <span className="text-muted-foreground">All AI tutors online</span>
@@ -149,25 +149,25 @@ const Dashboard = () => {
                   </div>
                 </div>
                 
-                <div className="flex space-x-4">
-                  <PremiumButton variant="gradient" size="lg" className="group">
-                    <Zap className="h-5 w-5 mr-2 group-hover:animate-bounce" />
+                <div>
+                  <PremiumButton variant="gradient" size="lg" className="group px-8 py-6 rounded-xl text-lg">
+                    <Zap className="h-5 w-5 mr-3 group-hover:animate-bounce" />
                     Start Learning
-                    <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="h-5 w-5 ml-3 group-hover:translate-x-1 transition-transform" />
                   </PremiumButton>
                 </div>
               </div>
             </PremiumCard>
           </motion.section>
 
-          {/* Quick Stats */}
+          {/* Quick Stats - More spacious layout */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mb-12"
+            className="mb-20"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <StatCard
                 title="Study Streak"
                 value="7 days"
@@ -199,28 +199,28 @@ const Dashboard = () => {
             </div>
           </motion.section>
 
-          {/* AI Tutors Section */}
+          {/* AI Tutors Section - Cleaner with more whitespace */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="mb-12"
+            className="mb-20"
           >
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">
+                <h2 className="text-3xl font-display font-bold text-foreground mb-3">
                   Your AI Tutors
                 </h2>
-                <p className="text-muted-foreground">Choose your AI tutor and start learning instantly</p>
+                <p className="text-muted-foreground text-lg">Choose your AI tutor and start learning instantly</p>
               </div>
-              <div className="flex items-center space-x-2 px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
+              <div className="flex items-center space-x-2 px-5 py-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                 <span className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">All tutors online</span>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {aiTutors.map((tutor, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {aiTutors.slice(0, 3).map((tutor, index) => (
                 <motion.div
                   key={tutor.name}
                   initial={{ opacity: 0, y: 20 }}
@@ -231,62 +231,71 @@ const Dashboard = () => {
                 </motion.div>
               ))}
             </div>
+            
+            {/* View All Button with more whitespace */}
+            <div className="flex justify-center mt-10">
+              <PremiumButton variant="outline" className="px-8 py-3 rounded-xl">
+                View All Tutors
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </PremiumButton>
+            </div>
           </motion.section>
 
-          {/* Quick Actions */}
+          {/* Quick Actions - More spacious and cleaner */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="mb-12"
+            className="mb-20"
           >
-            <PremiumCard className="p-8">
-              <h3 className="text-xl font-display font-bold text-foreground mb-6">Quick Actions</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Link href="/ncert-solutions">
-                  <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
-                    <BookOpen className="h-6 w-6" />
-                    <span className="text-sm">NCERT Solutions</span>
-                  </PremiumButton>
-                </Link>
-                <Link href="/chat">
-                  <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
-                    <MessageSquare className="h-6 w-6" />
-                    <span className="text-sm">AI Chat</span>
-                  </PremiumButton>
-                </Link>
-                <Link href="/dashboard">
-                  <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
-                    <BarChart3 className="h-6 w-6" />
-                    <span className="text-sm">Progress</span>
-                  </PremiumButton>
-                </Link>
-                <Link href="/settings">
-                  <PremiumButton variant="secondary" className="flex-col h-20 space-y-2">
-                    <Settings className="h-6 w-6" />
-                    <span className="text-sm">Settings</span>
-                  </PremiumButton>
-                </Link>
-              </div>
-            </PremiumCard>
+            <h2 className="text-3xl font-display font-bold text-foreground mb-10">
+              Quick Actions
+            </h2>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <Link href="/ncert-solutions">
+                <PremiumButton variant="secondary" className="flex-col h-32 space-y-4 hover:bg-primary/5">
+                  <BookOpen className="h-8 w-8" />
+                  <span className="text-base">NCERT Solutions</span>
+                </PremiumButton>
+              </Link>
+              <Link href="/chat">
+                <PremiumButton variant="secondary" className="flex-col h-32 space-y-4 hover:bg-primary/5">
+                  <MessageSquare className="h-8 w-8" />
+                  <span className="text-base">AI Chat</span>
+                </PremiumButton>
+              </Link>
+              <Link href="/dashboard">
+                <PremiumButton variant="secondary" className="flex-col h-32 space-y-4 hover:bg-primary/5">
+                  <BarChart3 className="h-8 w-8" />
+                  <span className="text-base">Progress</span>
+                </PremiumButton>
+              </Link>
+              <Link href="/settings">
+                <PremiumButton variant="secondary" className="flex-col h-32 space-y-4 hover:bg-primary/5">
+                  <Settings className="h-8 w-8" />
+                  <span className="text-base">Settings</span>
+                </PremiumButton>
+              </Link>
+            </div>
           </motion.section>
 
-          {/* New Features Section */}
-          <div className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">
+          {/* Advanced Learning Tools Section - More whitespace */}
+          <div className="mb-10">
+            <h2 className="text-3xl font-display font-bold text-foreground mb-3">
               Advanced Learning Tools
             </h2>
-            <p className="text-muted-foreground mb-6">Powerful AI-powered tools to enhance your learning experience</p>
+            <p className="text-muted-foreground text-lg mb-10">Powerful AI-powered tools to enhance your learning experience</p>
           </div>
 
-          {/* Study Plan Generator and Personalized Dashboard */}
+          {/* Study Plan Generator and Personalized Dashboard - More spacious */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
-            className="mb-12"
+            className="mb-20"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -304,14 +313,14 @@ const Dashboard = () => {
             </div>
           </motion.section>
 
-          {/* Visual Learning Tools and Textbook Connector */}
+          {/* Visual Learning Tools and Textbook Connector - More spacious */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9 }}
-            className="mb-12"
+            className="mb-20"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -329,46 +338,22 @@ const Dashboard = () => {
             </div>
           </motion.section>
 
-          {/* Feature Highlights */}
+          {/* Explore More Section - Clean and spacious */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.1 }}
-            className="mb-12"
+            className="mb-10"
           >
-            <PremiumCard className="p-8">
-              <h3 className="text-xl font-display font-bold text-foreground mb-6">Why Students Love Study Nova</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-muted/30 rounded-lg p-6">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <Clock className="h-6 w-6 text-primary" />
-                  </div>
-                  <h4 className="text-lg font-semibold mb-2">Save Time</h4>
-                  <p className="text-sm text-muted-foreground">
-                    "In about 30 minutes of prompt ping-pong, it identified the issue with my understanding. I told the Agent I didn't want to memorize — just understand!"
-                  </p>
-                </div>
-                
-                <div className="bg-muted/30 rounded-lg p-6">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <FileText className="h-6 w-6 text-primary" />
-                  </div>
-                  <h4 className="text-lg font-semibold mb-2">Instant Study Guides</h4>
-                  <p className="text-sm text-muted-foreground">
-                    "In just 14 minutes, the agent created the most beautiful, fully functional study guide for this chapter. All I did was give it the link to the textbook..."
-                  </p>
-                </div>
-                
-                <div className="bg-muted/30 rounded-lg p-6">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <BrainCircuit className="h-6 w-6 text-primary" />
-                  </div>
-                  <h4 className="text-lg font-semibold mb-2">Personal Tutor</h4>
-                  <p className="text-sm text-muted-foreground">
-                    "I'd describe this agent as my personal paid tutor — it handles around 95% of the work, including explaining and helping me practice concepts."
-                  </p>
-                </div>
-              </div>
+            <PremiumCard className="p-12 text-center">
+              <h3 className="text-2xl font-display font-bold mb-6">Ready to explore more?</h3>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
+                Discover all the powerful features StudyNova AI has to offer and take your learning to the next level.
+              </p>
+              <PremiumButton variant="gradient" size="lg" className="px-8 py-4 rounded-xl">
+                <Sparkles className="h-5 w-5 mr-2" />
+                Explore All Features
+              </PremiumButton>
             </PremiumCard>
           </motion.section>
         </div>

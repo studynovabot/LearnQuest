@@ -16,6 +16,7 @@ import {
   Upload 
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PremiumCard } from "@/components/premium/PremiumCard";
 
 interface ConnectedTextbook {
   id: string;
@@ -143,40 +144,40 @@ const TextbookConnector = () => {
   });
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-primary" />
+    <PremiumCard className="h-full">
+      <CardHeader className="px-8 pt-8 pb-4">
+        <CardTitle className="flex items-center gap-3 text-2xl">
+          <BookOpen className="h-6 w-6 text-primary" />
           Textbook Connector
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-8 pb-8">
         <Tabs defaultValue="connect" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-2 mb-4">
-            <TabsTrigger value="connect" className="flex items-center gap-2">
+          <TabsList className="grid grid-cols-2 mb-8 p-1">
+            <TabsTrigger value="connect" className="flex items-center gap-2 py-3">
               <LinkIcon className="h-4 w-4" />
               <span>Connect Textbooks</span>
             </TabsTrigger>
-            <TabsTrigger value="my-books" className="flex items-center gap-2">
+            <TabsTrigger value="my-books" className="flex items-center gap-2 py-3">
               <FileText className="h-4 w-4" />
               <span>My Textbooks</span>
             </TabsTrigger>
           </TabsList>
           
           <TabsContent value="connect">
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
+            <div className="space-y-6">
+              <p className="text-base text-muted-foreground">
                 Connect your textbooks to get AI-powered summaries, study guides, and practice questions.
               </p>
               
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     placeholder="Search by title, author, or ISBN..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
+                    className="pl-12 py-6 text-base rounded-xl"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         handleSearch();
@@ -184,63 +185,66 @@ const TextbookConnector = () => {
                     }}
                   />
                 </div>
-                <Button onClick={handleSearch} disabled={isSearching || !searchQuery.trim()}>
+                <Button 
+                  onClick={handleSearch} 
+                  disabled={isSearching || !searchQuery.trim()}
+                  className="py-6 px-6 rounded-xl"
+                >
                   {isSearching ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
                     "Search"
                   )}
                 </Button>
               </div>
               
-              <div className="flex items-center justify-center gap-2 border border-dashed border-border rounded-lg p-6 bg-muted/50">
-                <Upload className="h-5 w-5 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Or drag and drop PDF textbooks here</span>
+              <div className="flex items-center justify-center gap-3 border border-dashed border-border/50 rounded-xl p-10 bg-muted/30">
+                <Upload className="h-6 w-6 text-muted-foreground" />
+                <span className="text-base text-muted-foreground">Or drag and drop PDF textbooks here</span>
               </div>
               
               {isSearching ? (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-                  <p className="text-sm text-muted-foreground">Searching for textbooks...</p>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader2 className="h-10 w-10 animate-spin text-primary mb-6" />
+                  <p className="text-base text-muted-foreground">Searching for textbooks...</p>
                 </div>
               ) : searchResults.length > 0 ? (
-                <div className="space-y-4">
-                  <h3 className="text-sm font-medium">Search Results</h3>
+                <div className="space-y-6">
+                  <h3 className="text-lg font-medium">Search Results</h3>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {searchResults.map((book) => (
                       <motion.div
                         key={book.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-4 p-3 border border-border rounded-lg bg-card"
+                        className="flex items-center gap-6 p-5 border border-border/50 rounded-xl bg-card/50"
                       >
                         {book.thumbnail && (
                           <img 
                             src={book.thumbnail} 
                             alt={book.title} 
-                            className="w-12 h-16 object-cover rounded-md"
+                            className="w-16 h-20 object-cover rounded-lg"
                           />
                         )}
                         
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm truncate">{book.title}</h4>
-                          <p className="text-xs text-muted-foreground truncate">
+                          <h4 className="font-medium text-lg truncate">{book.title}</h4>
+                          <p className="text-base text-muted-foreground truncate">
                             {book.author} • {book.subject} • {book.chapters} chapters
                           </p>
                         </div>
                         
                         <Button
-                          size="sm"
                           onClick={() => handleConnect(book)}
                           disabled={isConnecting}
-                          className="flex-shrink-0"
+                          className="flex-shrink-0 py-5 px-5 rounded-xl"
                         >
                           {isConnecting ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Loader2 className="h-5 w-5 animate-spin" />
                           ) : (
                             <>
-                              <Plus className="h-4 w-4 mr-1" />
+                              <Plus className="h-5 w-5 mr-2" />
                               Connect
                             </>
                           )}
@@ -254,65 +258,65 @@ const TextbookConnector = () => {
           </TabsContent>
           
           <TabsContent value="my-books">
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
+            <div className="space-y-6">
+              <p className="text-base text-muted-foreground">
                 Your connected textbooks are available for AI-powered learning.
               </p>
               
               {connectedBooks.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 border border-dashed border-border rounded-lg">
-                  <BookOpen className="h-10 w-10 text-muted-foreground mb-4" />
-                  <p className="text-sm text-muted-foreground mb-2">No textbooks connected yet</p>
+                <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border/50 rounded-xl bg-muted/30">
+                  <BookOpen className="h-16 w-16 text-muted-foreground mb-6" />
+                  <p className="text-lg text-muted-foreground mb-6">No textbooks connected yet</p>
                   <Button 
                     variant="outline" 
-                    size="sm"
+                    size="lg"
                     onClick={() => setActiveTab("connect")}
+                    className="py-6 px-8 rounded-xl"
                   >
                     Connect Your First Textbook
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {connectedBooks.map((book) => (
                     <motion.div
                       key={book.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center gap-4 p-4 border border-border rounded-lg bg-card"
+                      className="flex items-center gap-6 p-6 border border-border/50 rounded-xl bg-card/50"
                     >
                       {book.thumbnail && (
                         <img 
                           src={book.thumbnail} 
                           alt={book.title} 
-                          className="w-16 h-20 object-cover rounded-md"
+                          className="w-20 h-28 object-cover rounded-lg"
                         />
                       )}
                       
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium truncate">{book.title}</h4>
-                        <p className="text-sm text-muted-foreground truncate">
+                        <h4 className="font-medium text-xl truncate">{book.title}</h4>
+                        <p className="text-base text-muted-foreground truncate">
                           {book.author} • {book.subject}
                         </p>
-                        <div className="flex items-center mt-2">
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                            <Check className="h-3 w-3 mr-1" />
+                        <div className="flex items-center mt-3">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
+                            <Check className="h-4 w-4 mr-2" />
                             Connected
                           </span>
-                          <span className="text-xs text-muted-foreground ml-2">
+                          <span className="text-sm text-muted-foreground ml-3">
                             {book.chapters} chapters available
                           </span>
                         </div>
                       </div>
                       
-                      <div className="flex flex-col gap-2">
-                        <Button size="sm" variant="outline" className="w-full">
-                          <ExternalLink className="h-4 w-4 mr-1" />
+                      <div className="flex flex-col gap-3">
+                        <Button variant="outline" className="w-full py-5 px-5 rounded-xl">
+                          <ExternalLink className="h-5 w-5 mr-2" />
                           Open
                         </Button>
                         <Button 
-                          size="sm" 
                           variant="ghost" 
-                          className="w-full text-muted-foreground hover:text-destructive"
+                          className="w-full py-5 px-5 rounded-xl text-muted-foreground hover:text-destructive"
                           onClick={() => handleDisconnect(book.id)}
                         >
                           Disconnect
@@ -326,7 +330,7 @@ const TextbookConnector = () => {
           </TabsContent>
         </Tabs>
       </CardContent>
-    </Card>
+    </PremiumCard>
   );
 };
 

@@ -19,8 +19,8 @@ export const PremiumCard: React.FC<PremiumCardProps> = ({
   return (
     <div 
       className={cn(
-        "bg-card text-card-foreground backdrop-blur-sm rounded-2xl border border-border shadow-xl",
-        hover && "hover:shadow-2xl hover:scale-105 transition-all duration-300",
+        "bg-card text-card-foreground backdrop-blur-sm rounded-3xl border border-border/40 shadow-xl",
+        hover && "hover:shadow-2xl hover:scale-[1.02] transition-all duration-300",
         glow && "animate-glow",
         gradient && "bg-gradient-to-br from-background/90 to-indigo-50/90",
         className
@@ -47,24 +47,24 @@ export const StatCard: React.FC<StatCardProps> = ({
   color = 'blue'
 }) => {
   const colorClasses = {
-    blue: 'from-blue-500 to-indigo-600',
-    green: 'from-green-500 to-emerald-600',
-    purple: 'from-purple-500 to-violet-600',
-    orange: 'from-orange-500 to-amber-600',
-    red: 'from-red-500 to-rose-600'
+    blue: 'from-blue-500/90 to-indigo-600/90',
+    green: 'from-green-500/90 to-emerald-600/90',
+    purple: 'from-purple-500/90 to-violet-600/90',
+    orange: 'from-orange-500/90 to-amber-600/90',
+    red: 'from-red-500/90 to-rose-600/90'
   };
 
   return (
-    <PremiumCard className="p-6">
+    <PremiumCard className="p-8">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
+          <p className="text-sm font-medium text-muted-foreground mb-2">{title}</p>
           <p className="text-3xl font-bold text-foreground">{value}</p>
           {trend && (
-            <p className="text-sm text-green-600 mt-1">{trend}</p>
+            <p className="text-sm text-green-600 mt-2">{trend}</p>
           )}
         </div>
-        <div className={`p-3 rounded-xl bg-gradient-to-br ${colorClasses[color]} text-white`}>
+        <div className={`p-4 rounded-2xl bg-gradient-to-br ${colorClasses[color]} text-white`}>
           {icon}
         </div>
       </div>
@@ -92,29 +92,29 @@ export const TutorCard: React.FC<TutorCardProps> = ({
   onClick
 }) => {
   return (
-    <PremiumCard className="p-6 cursor-pointer group" hover>
-      <div className="flex items-center space-x-4 mb-4">
+    <PremiumCard className="p-8 cursor-pointer group" hover>
+      <div className="flex items-center space-x-5 mb-6">
         <div className="relative">
-          <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-semibold text-lg">
+          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-semibold text-2xl">
             {avatar}
           </div>
           {status === 'online' && (
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-background rounded-full animate-pulse"></div>
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-2 border-background rounded-full animate-pulse"></div>
           )}
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+          <h3 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
             {name}
           </h3>
-          <p className="text-sm text-muted-foreground">{subject}</p>
+          <p className="text-base text-muted-foreground">{subject}</p>
         </div>
       </div>
       
-      <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{description}</p>
+      <p className="text-muted-foreground text-base mb-6 line-clamp-2">{description}</p>
       
       <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground/70">Last used: {lastUsed}</span>
-        <div className="w-6 h-6 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all">
+        <span className="text-sm text-muted-foreground/70">Last used: {lastUsed}</span>
+        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white group-hover:translate-x-1 transition-all">
           →
         </div>
       </div>

@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { BookOpen, FileText, Link as LinkIcon, Loader2, PlusCircle, Save } from "lucide-react";
 import { useChat } from "@/hooks/useChat";
+import { PremiumCard } from "@/components/premium/PremiumCard";
 
 interface StudyPlan {
   title: string;
@@ -123,59 +124,59 @@ const StudyPlanGenerator = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5 text-primary" />
+    <PremiumCard className="h-full">
+      <CardHeader className="px-8 pt-8 pb-4">
+        <CardTitle className="flex items-center gap-3 text-2xl">
+          <FileText className="h-6 w-6 text-primary" />
           Study Plan Generator
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-8 pb-8">
         {!studyPlan ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="space-y-4"
+            className="space-y-6"
           >
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 mb-2">
                 <LinkIcon className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Textbook URL (optional)</span>
+                <span className="text-base font-medium">Textbook URL (optional)</span>
               </div>
               <Input
                 placeholder="Paste textbook URL here..."
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="w-full"
+                className="w-full py-6 px-4 text-base"
               />
             </div>
             
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 mb-2">
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Topic (optional)</span>
+                <span className="text-base font-medium">Topic (optional)</span>
               </div>
               <Textarea
                 placeholder="Enter a topic or learning objective..."
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                className="w-full min-h-[100px]"
+                className="w-full min-h-[120px] text-base p-4"
               />
             </div>
             
             <Button 
               onClick={handleGeneratePlan} 
-              className="w-full"
+              className="w-full py-6 mt-4 text-base rounded-xl"
               disabled={isGenerating || (!url && !topic)}
             >
               {isGenerating ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Generating Plan...
                 </>
               ) : (
                 <>
-                  <PlusCircle className="mr-2 h-4 w-4" />
+                  <PlusCircle className="mr-2 h-5 w-5" />
                   Generate Study Plan
                 </>
               )}
@@ -185,31 +186,31 @@ const StudyPlanGenerator = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
+            className="space-y-8"
           >
             <div>
-              <h3 className="text-xl font-semibold mb-2">{studyPlan.title}</h3>
-              <p className="text-muted-foreground">{studyPlan.description}</p>
-              <div className="mt-2 text-sm bg-muted p-2 rounded-md flex items-center">
+              <h3 className="text-2xl font-semibold mb-3">{studyPlan.title}</h3>
+              <p className="text-muted-foreground text-base">{studyPlan.description}</p>
+              <div className="mt-4 text-base bg-muted/50 p-4 rounded-xl flex items-center">
                 <span className="font-medium mr-2">Estimated study time:</span> {studyPlan.estimatedTime}
               </div>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-6">
               {studyPlan.sections.map((section, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="border border-border rounded-lg p-4"
+                  className="border border-border/50 rounded-xl p-6 bg-card/50"
                 >
-                  <h4 className="font-semibold text-primary mb-2">{section.title}</h4>
-                  <p className="text-sm mb-3">{section.content}</p>
-                  <ul className="space-y-1">
+                  <h4 className="font-semibold text-primary text-lg mb-3">{section.title}</h4>
+                  <p className="text-base mb-4">{section.content}</p>
+                  <ul className="space-y-2">
                     {section.keyPoints.map((point, pointIndex) => (
-                      <li key={pointIndex} className="text-sm flex items-start">
-                        <span className="text-primary mr-2">•</span>
+                      <li key={pointIndex} className="text-base flex items-start">
+                        <span className="text-primary mr-3 text-lg">•</span>
                         {point}
                       </li>
                     ))}
@@ -218,15 +219,15 @@ const StudyPlanGenerator = () => {
               ))}
             </div>
             
-            <div className="flex gap-3">
-              <Button onClick={handleSavePlan} className="flex-1">
-                <Save className="mr-2 h-4 w-4" />
+            <div className="flex gap-4 pt-4">
+              <Button onClick={handleSavePlan} className="flex-1 py-6 rounded-xl text-base">
+                <Save className="mr-2 h-5 w-5" />
                 Save Plan
               </Button>
               <Button 
                 variant="outline" 
                 onClick={() => setStudyPlan(null)}
-                className="flex-1"
+                className="flex-1 py-6 rounded-xl text-base"
               >
                 Create New Plan
               </Button>
@@ -234,7 +235,7 @@ const StudyPlanGenerator = () => {
           </motion.div>
         )}
       </CardContent>
-    </Card>
+    </PremiumCard>
   );
 };
 

@@ -17,6 +17,7 @@ import {
   Zap 
 } from "lucide-react";
 import { useChat } from "@/hooks/useChat";
+import { PremiumCard } from "@/components/premium/PremiumCard";
 
 interface ConceptMap {
   title: string;
@@ -132,18 +133,18 @@ const VisualLearningTools = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="mt-4 border border-border rounded-lg p-4 bg-card/50"
+        className="mt-6 border border-border/30 rounded-xl p-6 bg-card/30"
       >
-        <h3 className="text-lg font-semibold mb-4 text-center">{conceptMap.title}</h3>
+        <h3 className="text-xl font-semibold mb-6 text-center">{conceptMap.title}</h3>
         
-        <div className="relative h-[300px] w-full overflow-hidden bg-background/50 rounded-md">
+        <div className="relative h-[350px] w-full overflow-hidden bg-background/30 rounded-xl">
           {/* Nodes */}
           {conceptMap.nodes.map((node, index) => {
             // Calculate position (in a real app, you'd use a proper layout algorithm)
             const angle = (2 * Math.PI * index) / conceptMap.nodes.length;
-            const radius = node.id === "n1" ? 0 : 120; // Center the first node
-            const x = 150 + radius * Math.cos(angle);
-            const y = 150 + radius * Math.sin(angle);
+            const radius = node.id === "n1" ? 0 : 140; // Center the first node
+            const x = 175 + radius * Math.cos(angle);
+            const y = 175 + radius * Math.sin(angle);
             
             return (
               <motion.div
@@ -151,7 +152,7 @@ const VisualLearningTools = () => {
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
-                className="absolute bg-primary/10 border border-primary/30 rounded-lg p-2 w-[100px] text-center"
+                className="absolute bg-primary/10 border border-primary/30 rounded-xl p-3 w-[120px] text-center"
                 style={{
                   left: `${x}px`,
                   top: `${y}px`,
@@ -159,7 +160,7 @@ const VisualLearningTools = () => {
                 }}
                 title={node.description}
               >
-                <span className="text-xs font-medium">{node.label}</span>
+                <span className="text-sm font-medium">{node.label}</span>
               </motion.div>
             );
           })}
@@ -180,13 +181,13 @@ const VisualLearningTools = () => {
               const sourceAngle = (2 * Math.PI * sourceIndex) / conceptMap.nodes.length;
               const targetAngle = (2 * Math.PI * targetIndex) / conceptMap.nodes.length;
               
-              const sourceRadius = sourceNode.id === "n1" ? 0 : 120;
-              const targetRadius = targetNode.id === "n1" ? 0 : 120;
+              const sourceRadius = sourceNode.id === "n1" ? 0 : 140;
+              const targetRadius = targetNode.id === "n1" ? 0 : 140;
               
-              const x1 = 150 + sourceRadius * Math.cos(sourceAngle);
-              const y1 = 150 + sourceRadius * Math.sin(sourceAngle);
-              const x2 = 150 + targetRadius * Math.cos(targetAngle);
-              const y2 = 150 + targetRadius * Math.sin(targetAngle);
+              const x1 = 175 + sourceRadius * Math.cos(sourceAngle);
+              const y1 = 175 + sourceRadius * Math.sin(sourceAngle);
+              const x2 = 175 + targetRadius * Math.cos(targetAngle);
+              const y2 = 175 + targetRadius * Math.sin(targetAngle);
               
               // Calculate midpoint for label
               const mx = (x1 + x2) / 2;
@@ -203,7 +204,7 @@ const VisualLearningTools = () => {
                     x2={x2}
                     y2={y2}
                     stroke="currentColor"
-                    strokeWidth="1"
+                    strokeWidth="1.5"
                     strokeDasharray="4 2"
                     className="text-primary/50"
                   />
@@ -215,7 +216,7 @@ const VisualLearningTools = () => {
                     y={my}
                     textAnchor="middle"
                     alignmentBaseline="middle"
-                    className="text-[8px] fill-muted-foreground bg-background px-1"
+                    className="text-[10px] fill-muted-foreground bg-background px-1"
                   >
                     {conn.label}
                   </motion.text>
@@ -225,7 +226,7 @@ const VisualLearningTools = () => {
           </svg>
         </div>
         
-        <div className="mt-4 text-sm text-muted-foreground">
+        <div className="mt-6 text-sm text-muted-foreground">
           <p className="text-center">This is a simplified visualization. In a complete implementation, you would be able to interact with the nodes, rearrange them, and export the diagram.</p>
         </div>
       </motion.div>
@@ -242,8 +243,8 @@ const VisualLearningTools = () => {
     const currentTopics = topics[type as keyof typeof topics] || [];
     
     return (
-      <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">
+      <div className="space-y-6">
+        <p className="text-base text-muted-foreground">
           {type === "concept-maps" 
             ? "Concept maps help visualize relationships between ideas and concepts."
             : type === "flowcharts" 
@@ -252,30 +253,30 @@ const VisualLearningTools = () => {
           }
         </p>
         
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-4">
           {currentTopics.map((topic) => (
             <Button
               key={topic}
               variant="outline"
-              size="sm"
+              size="lg"
               onClick={() => handleGenerateVisual(type, topic)}
               disabled={isGenerating}
-              className="justify-start"
+              className="justify-start py-5 px-4 rounded-xl"
             >
-              <Zap className="mr-2 h-4 w-4 text-primary" />
+              <Zap className="mr-3 h-5 w-5 text-primary" />
               {topic}
             </Button>
           ))}
         </div>
         
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Pencil className="h-4 w-4 text-muted-foreground" />
+        <div className="relative mt-4">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+            <Pencil className="h-5 w-5 text-muted-foreground" />
           </div>
           <input
             type="text"
             placeholder="Enter your own topic..."
-            className="pl-10 w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="pl-12 w-full h-14 rounded-xl border border-input/40 bg-background px-4 py-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             onKeyDown={(e) => {
               if (e.key === "Enter" && e.currentTarget.value) {
                 handleGenerateVisual(type, e.currentTarget.value);
@@ -287,9 +288,9 @@ const VisualLearningTools = () => {
         </div>
         
         {isGenerating && (
-          <div className="flex items-center justify-center p-8">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2 text-sm">Generating visualization for "{currentTopic}"...</span>
+          <div className="flex items-center justify-center p-12">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            <span className="ml-4 text-base">Generating visualization for "{currentTopic}"...</span>
           </div>
         )}
         
@@ -299,25 +300,25 @@ const VisualLearningTools = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Brain className="h-5 w-5 text-primary" />
+    <PremiumCard className="h-full">
+      <CardHeader className="px-8 pt-8 pb-4">
+        <CardTitle className="flex items-center gap-3 text-2xl">
+          <Brain className="h-6 w-6 text-primary" />
           Visual Learning Tools
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-8 pb-8">
         <Tabs defaultValue="concept-maps" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="concept-maps" className="flex items-center gap-2">
+          <TabsList className="grid grid-cols-3 mb-8 p-1">
+            <TabsTrigger value="concept-maps" className="flex items-center gap-2 py-3">
               <Network className="h-4 w-4" />
               <span>Concept Maps</span>
             </TabsTrigger>
-            <TabsTrigger value="flowcharts" className="flex items-center gap-2">
+            <TabsTrigger value="flowcharts" className="flex items-center gap-2 py-3">
               <GitBranch className="h-4 w-4" />
               <span>Flowcharts</span>
             </TabsTrigger>
-            <TabsTrigger value="mind-maps" className="flex items-center gap-2">
+            <TabsTrigger value="mind-maps" className="flex items-center gap-2 py-3">
               <BrainCircuit className="h-4 w-4" />
               <span>Mind Maps</span>
             </TabsTrigger>
@@ -336,7 +337,7 @@ const VisualLearningTools = () => {
           </TabsContent>
         </Tabs>
       </CardContent>
-    </Card>
+    </PremiumCard>
   );
 };
 
