@@ -21,7 +21,8 @@ import {
   HashIcon,
   UsersIcon,
   TrophyIcon,
-  AwardIcon
+  AwardIcon,
+  HistoryIcon
 } from "@/components/ui/icons";
 
 interface SlidingSidebarProps {
@@ -56,6 +57,11 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       icon: MessageIcon,
       label: "AI Chat",
       path: "/chat",
+    },
+    {
+      icon: HistoryIcon,
+      label: "Study Tracker",
+      path: "/study-tracker",
     },
     {
       icon: AwardIcon,

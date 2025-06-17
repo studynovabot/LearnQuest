@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useUserContext } from '@/context/UserContext';
-import { Trophy, Crown, BarChart, ArrowUp, ArrowDown, Minus, Award } from 'lucide-react';
+import { Trophy, Crown, BarChart, ArrowUp, ArrowDown, Minus, Award, Loader2 } from 'lucide-react';
+import { config } from '@/config';
 
 interface LeaderboardUser {
   id: string;
@@ -25,8 +26,78 @@ interface LeaderboardProps {
 const Leaderboard: React.FC<LeaderboardProps> = ({ users = [] }) => {
   const { user } = useUserContext();
   const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardUser[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
-  // Mock data if no users are provided
+  // Fetch leaderboard data from API
+  useEffect(() => {
+    const fetchLeaderboardData = async () => {
+      if (!user?.id) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const response = await fetch(`${config.apiUrl}/user-activity?action=leaderboard&timeframe=${timeframe}&limit=10`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.id}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch leaderboard: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.users) {
+          // Mark current user in the leaderboard
+          const leaderboardWithCurrentUser = data.users.map((leaderboardUser: any) => ({
+            ...leaderboardUser,
+            isCurrentUser: leaderboardUser.id === user.id
+          }));
+          
+          // If current user is not in top users, add them at the end
+          const currentUserInList = leaderboardWithCurrentUser.some((u: LeaderboardUser) => u.id === user.id);
+          
+          if (!currentUserInList) {
+            // Create current user entry with rank beyond the displayed list
+            const currentUserRank = data.users.length + 1; // Default to just beyond the list
+            
+            leaderboardWithCurrentUser.push({
+              id: user.id,
+              name: user.displayName || 'You',
+              avatar: user.profilePic || null,
+              studyPoints: user.studyPoints || 0,
+              novaCoins: user.novaCoins || 0,
+              rank: currentUserRank,
+              previousRank: null, // We don't know the previous rank
+              level: Math.floor((user.studyPoints || 0) / 500) + 1,
+              isCurrentUser: true,
+              isGoat: user.subscriptionPlan === 'goat',
+              title: user.equippedTitle || 'Student'
+            });
+          }
+          
+          setLeaderboardData(leaderboardWithCurrentUser);
+        } else {
+          console.log('No leaderboard data found or empty response');
+        }
+      } catch (err) {
+        console.error('Error fetching leaderboard data:', err);
+        setError('Failed to load leaderboard');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchLeaderboardData();
+  }, [user?.id, timeframe]);
+  
+  // Mock data if no users are provided and no leaderboard data fetched
   const mockUsers: LeaderboardUser[] = [
     {
       id: 'user-1',
@@ -128,7 +199,17 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ users = [] }) => {
     }
   ];
   
-  const leaderboardUsers = users.length > 0 ? users : mockUsers;
+  // Use provided users, or fetched leaderboard data, or mock users
+  const leaderboardUsers = users.length > 0 
+    ? users 
+    : leaderboardData.length > 0 
+      ? leaderboardData 
+      : mockUsers;
+      
+  // Handle timeframe change
+  const handleTimeframeChange = (newTimeframe: 'daily' | 'weekly' | 'monthly') => {
+    setTimeframe(newTimeframe);
+  };
   
   // Sort users by rank
   const sortedUsers = [...leaderboardUsers].sort((a, b) => a.rank - b.rank);
@@ -172,7 +253,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ users = [] }) => {
                 variant={timeframe === 'daily' ? 'default' : 'outline'} 
                 size="sm" 
                 className="text-xs"
-                onClick={() => setTimeframe('daily')}
+                onClick={() => handleTimeframeChange('daily')}
+                disabled={loading}
               >
                 Daily
               </Button>
@@ -180,7 +262,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ users = [] }) => {
                 variant={timeframe === 'weekly' ? 'default' : 'outline'} 
                 size="sm" 
                 className="text-xs"
-                onClick={() => setTimeframe('weekly')}
+                onClick={() => handleTimeframeChange('weekly')}
+                disabled={loading}
               >
                 Weekly
               </Button>
@@ -188,10 +271,12 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ users = [] }) => {
                 variant={timeframe === 'monthly' ? 'default' : 'outline'} 
                 size="sm" 
                 className="text-xs"
-                onClick={() => setTimeframe('monthly')}
+                onClick={() => handleTimeframeChange('monthly')}
+                disabled={loading}
               >
                 Monthly
               </Button>
+              {loading && <Loader2 className="h-4 w-4 animate-spin ml-2" />}
             </div>
             <Button variant="ghost" size="sm" className="text-xs">
               <BarChart className="h-3 w-3 mr-1" />

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Calendar, Target, Flame, Zap, Coins, BookOpen } from 'lucide-react';
+import { Calendar, Target, Flame, Zap, Coins, BookOpen, Loader2 } from 'lucide-react';
+import { useUserContext } from '@/context/UserContext';
+import { config } from '@/config';
 
 interface Activity {
   id: string;
@@ -17,7 +19,87 @@ interface PointsActivityProps {
 }
 
 const PointsActivity: React.FC<PointsActivityProps> = ({ activities = [] }) => {
-  // Default activities if none provided
+  const { user } = useUserContext();
+  const [userActivities, setUserActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Fetch user activities from the API
+  useEffect(() => {
+    const fetchUserActivities = async () => {
+      if (!user?.id) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const response = await fetch(`${config.apiUrl}/user-activity?action=history&limit=5`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.id}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch activities: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.activities) {
+          // Convert API response to Activity format
+          const formattedActivities: Activity[] = data.activities.map((activity: any) => {
+            // Map API activity to component Activity format
+            return {
+              id: activity.id,
+              type: activity.activityType,
+              points: activity.pointsEarned || 0,
+              coins: activity.novaCoinsEarned || 0,
+              description: activity.description || getDefaultDescription(activity),
+              timestamp: activity.timestamp,
+              multiplied: activity.multiplied || false
+            };
+          });
+          
+          setUserActivities(formattedActivities);
+        } else {
+          console.log('No activities found or empty response');
+        }
+      } catch (err) {
+        console.error('Error fetching user activities:', err);
+        setError('Failed to load activities');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUserActivities();
+  }, [user?.id]);
+  
+  // Helper function to generate default descriptions
+  const getDefaultDescription = (activity: any): string => {
+    switch (activity.activityType) {
+      case 'quiz_completed':
+        return `Completed ${activity.subject || 'quiz'} with ${activity.score || ''}% score`;
+      case 'streak':
+        return `Maintained a ${activity.streakDays || ''}-day streak`;
+      case 'question_answered':
+        return `Answered a question in ${activity.subject || 'a subject'}`;
+      case 'study_session':
+        return `Completed a ${activity.duration || ''}-minute study session`;
+      case 'nova_coins_earned':
+        return `Earned Nova Coins from ${activity.source || 'activity'}`;
+      case 'material_shared':
+        return `Shared study material with others`;
+      case 'rank_up':
+        return `Ranked up to ${activity.newRank || 'a new rank'}`;
+      default:
+        return `Completed an activity`;
+    }
+  };
+  
+  // Default activities if none provided and no user activities fetched
   const defaultActivities: Activity[] = [
     {
       id: 'act-1',
@@ -61,7 +143,12 @@ const PointsActivity: React.FC<PointsActivityProps> = ({ activities = [] }) => {
     }
   ];
   
-  const displayActivities = activities.length > 0 ? activities : defaultActivities;
+  // Use provided activities, or fetched user activities, or default activities
+  const displayActivities = activities.length > 0 
+    ? activities 
+    : userActivities.length > 0 
+      ? userActivities 
+      : defaultActivities;
   
   // Format timestamp to relative time
   const formatRelativeTime = (timestamp: string) => {

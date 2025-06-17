@@ -27,6 +27,7 @@ import Terms from "@/pages/Terms";
 import AdminUsers from "@/pages/AdminUsers";
 import Ranks from "@/pages/Ranks";
 import GamificationPage from "@/pages/GamificationPage";
+import StudyTracker from "@/pages/StudyTracker";
 import AdminRoute from "@/components/AdminRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout";
@@ -196,6 +197,13 @@ function Router() {
         <ProtectedRoute>
           <MainLayout>
             <GamificationPage />
+          </MainLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/study-tracker">
+        <ProtectedRoute>
+          <MainLayout>
+            <StudyTracker />
           </MainLayout>
         </ProtectedRoute>
       </Route>

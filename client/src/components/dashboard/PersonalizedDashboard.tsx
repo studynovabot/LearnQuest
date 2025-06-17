@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -18,12 +18,14 @@ import {
   PieChart, 
   PlusCircle,
   Target, 
-  TrendingUp 
+  TrendingUp,
+  AlertCircle
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { PremiumCard } from "@/components/premium/PremiumCard";
+import { config } from "@/config";
 
 interface StudySession {
   id: string;
@@ -49,13 +51,132 @@ interface SubjectProgress {
   color: string;
 }
 
+interface PerformanceData {
+  subject: string;
+  accuracy: number;
+  progress: number;
+  status: string;
+  interactions: number;
+  timeSpent: number;
+  lastUpdated: string;
+}
+
 const PersonalizedDashboard = () => {
   const [activeTab, setActiveTab] = useState("progress");
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  const [userSessions, setUserSessions] = useState<StudySession[]>([]);
+  const [userGoals, setUserGoals] = useState<StudyGoal[]>([]);
+  const [userSubjectProgress, setUserSubjectProgress] = useState<SubjectProgress[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasData, setHasData] = useState(false);
+  
+  // Fetch user performance data
+  useEffect(() => {
+    const fetchUserPerformance = async () => {
+      if (!user?.id) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const response = await fetch(`${config.apiUrl}/student-analytics?action=performance-summary`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.id}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch performance data: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.summary) {
+          // Process subject summaries into subject progress
+          if (data.summary.subjectSummaries && data.summary.subjectSummaries.length > 0) {
+            const colors = ["bg-blue-500", "bg-green-500", "bg-red-500", "bg-purple-500", "bg-amber-500", "bg-teal-500", "bg-indigo-500"];
+            
+            const subjectProgressData: SubjectProgress[] = data.summary.subjectSummaries.map((subject: PerformanceData, index: number) => ({
+              subject: subject.subject,
+              progress: subject.progress || 0,
+              color: colors[index % colors.length]
+            }));
+            
+            setUserSubjectProgress(subjectProgressData);
+            setHasData(true);
+          }
+          
+          // Process learning history into study sessions
+          if (data.summary.learningHistory && data.summary.learningHistory.recentInteractions) {
+            const sessionsData: StudySession[] = data.summary.learningHistory.recentInteractions
+              .filter((interaction: any) => interaction.interactionType === 'study_session')
+              .map((session: any, index: number) => ({
+                id: session.id || `session-${index}`,
+                subject: session.subject || 'General',
+                topic: session.content || 'Study Session',
+                duration: session.duration || 30,
+                date: session.timestamp,
+                progress: session.progress || Math.floor(Math.random() * 40) + 60 // Random progress between 60-100 if not provided
+              }));
+            
+            if (sessionsData.length > 0) {
+              setUserSessions(sessionsData);
+              setHasData(true);
+            }
+          }
+          
+          // Create goals based on subject progress
+          if (data.summary.subjectSummaries && data.summary.subjectSummaries.length > 0) {
+            // Find subjects that need improvement (progress < 70%)
+            const lowProgressSubjects = data.summary.subjectSummaries
+              .filter((subject: PerformanceData) => subject.progress < 70)
+              .slice(0, 3); // Take top 3 subjects that need improvement
+            
+            if (lowProgressSubjects.length > 0) {
+              const goalsData: StudyGoal[] = lowProgressSubjects.map((subject: PerformanceData, index: number) => {
+                // Create a goal with target based on current progress
+                const currentProgress = Math.floor(subject.progress);
+                const targetProgress = Math.min(100, currentProgress + 20); // Target 20% improvement
+                
+                // Calculate due date (2 weeks from now)
+                const dueDate = new Date();
+                dueDate.setDate(dueDate.getDate() + 14);
+                
+                return {
+                  id: `goal-${index}`,
+                  title: `Improve ${subject.subject} Progress`,
+                  target: targetProgress,
+                  current: currentProgress,
+                  unit: '%',
+                  dueDate: dueDate.toISOString().split('T')[0]
+                };
+              });
+              
+              setUserGoals(goalsData);
+              setHasData(true);
+            }
+          }
+        } else {
+          console.log('No performance data found or empty response');
+        }
+      } catch (err) {
+        console.error('Error fetching performance data:', err);
+        setError('Failed to load performance data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUserPerformance();
+  }, [user?.id]);
 
-  // Mock data for study sessions
-  const studySessions: StudySession[] = [
+  // Mock data for study sessions (used if no real data available)
+  const mockStudySessions: StudySession[] = [
     {
       id: "1",
       subject: "Mathematics",
@@ -82,8 +203,8 @@ const PersonalizedDashboard = () => {
     }
   ];
 
-  // Mock data for study goals
-  const studyGoals: StudyGoal[] = [
+  // Mock data for study goals (used if no real data available)
+  const mockStudyGoals: StudyGoal[] = [
     {
       id: "1",
       title: "Complete Calculus Review",
@@ -110,14 +231,19 @@ const PersonalizedDashboard = () => {
     }
   ];
 
-  // Mock data for subject progress
-  const subjectProgress: SubjectProgress[] = [
+  // Mock data for subject progress (used if no real data available)
+  const mockSubjectProgress: SubjectProgress[] = [
     { subject: "Mathematics", progress: 78, color: "bg-blue-500" },
     { subject: "Physics", progress: 65, color: "bg-green-500" },
     { subject: "Chemistry", progress: 42, color: "bg-red-500" },
     { subject: "Biology", progress: 89, color: "bg-purple-500" },
     { subject: "History", progress: 55, color: "bg-amber-500" }
   ];
+  
+  // Use real data if available, otherwise use mock data
+  const studySessions = userSessions.length > 0 ? userSessions : mockStudySessions;
+  const studyGoals = userGoals.length > 0 ? userGoals : mockStudyGoals;
+  const subjectProgress = userSubjectProgress.length > 0 ? userSubjectProgress : mockSubjectProgress;
 
   // Calculate total study time
   const totalStudyTime = studySessions.reduce((total, session) => total + session.duration, 0);
@@ -204,17 +330,48 @@ const PersonalizedDashboard = () => {
               {/* Subject Progress */}
               <div>
                 <h3 className="text-lg font-medium mb-4">Subject Progress</h3>
-                <div className="space-y-5">
-                  {subjectProgress.map((subject) => (
-                    <div key={subject.subject} className="space-y-2">
-                      <div className="flex justify-between text-base">
-                        <span>{subject.subject}</span>
-                        <span className="text-muted-foreground">{subject.progress}%</span>
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 text-primary animate-spin mb-4" />
+                    <p className="text-muted-foreground">Loading your progress data...</p>
+                  </div>
+                ) : error ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <AlertCircle className="h-8 w-8 text-red-500 mb-4" />
+                    <p className="text-muted-foreground mb-2">Failed to load your progress data</p>
+                    <p className="text-xs text-muted-foreground">{error}</p>
+                  </div>
+                ) : hasData ? (
+                  <div className="space-y-5">
+                    {subjectProgress.map((subject) => (
+                      <div key={subject.subject} className="space-y-2">
+                        <div className="flex justify-between text-base">
+                          <span>{subject.subject}</span>
+                          <span className="text-muted-foreground">{subject.progress}%</span>
+                        </div>
+                        <Progress value={subject.progress} className={subject.color} />
                       </div>
-                      <Progress value={subject.progress} className={subject.color} />
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-center border border-dashed border-muted-foreground/20 rounded-lg">
+                    <BarChart3 className="h-8 w-8 text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground mb-2">Not enough data to show your progress</p>
+                    <p className="text-xs text-muted-foreground mb-4">Complete more activities to see personalized insights</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        toast({
+                          title: "Let's get started!",
+                          description: "Try answering some questions or completing quizzes to build your progress data.",
+                        });
+                      }}
+                    >
+                      Start an Activity
+                    </Button>
+                  </div>
+                )}
               </div>
               
               {/* Recommended Actions */}
@@ -252,7 +409,18 @@ const PersonalizedDashboard = () => {
                 </Button>
               </div>
               
-              {studySessions.length === 0 ? (
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-12 border border-dashed border-border/50 rounded-xl bg-muted/20">
+                  <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
+                  <p className="text-base text-muted-foreground mb-4">Loading your study sessions...</p>
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center py-12 border border-dashed border-border/50 rounded-xl bg-muted/20">
+                  <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+                  <p className="text-base text-muted-foreground mb-4">Failed to load your study sessions</p>
+                  <p className="text-sm text-muted-foreground">{error}</p>
+                </div>
+              ) : studySessions.length === 0 || !hasData ? (
                 <div className="flex flex-col items-center justify-center py-12 border border-dashed border-border/50 rounded-xl bg-muted/20">
                   <Clock className="h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-base text-muted-foreground mb-4">No study sessions recorded yet</p>
@@ -315,14 +483,32 @@ const PersonalizedDashboard = () => {
                 </Button>
               </div>
               
-              {studyGoals.length === 0 ? (
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-12 border border-dashed border-border/50 rounded-xl bg-muted/20">
+                  <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
+                  <p className="text-base text-muted-foreground mb-4">Loading your study goals...</p>
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center py-12 border border-dashed border-border/50 rounded-xl bg-muted/20">
+                  <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+                  <p className="text-base text-muted-foreground mb-4">Failed to load your study goals</p>
+                  <p className="text-sm text-muted-foreground">{error}</p>
+                </div>
+              ) : studyGoals.length === 0 || !hasData ? (
                 <div className="flex flex-col items-center justify-center py-12 border border-dashed border-border/50 rounded-xl bg-muted/20">
                   <Target className="h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-base text-muted-foreground mb-4">No study goals set yet</p>
+                  <p className="text-sm text-muted-foreground mb-4">Complete more activities to get personalized goal recommendations</p>
                   <Button 
                     variant="outline" 
                     size="lg"
                     className="py-5 px-6 rounded-xl"
+                    onClick={() => {
+                      toast({
+                        title: "Let's set a goal!",
+                        description: "Try answering some questions or completing quizzes to get personalized goal recommendations.",
+                      });
+                    }}
                   >
                     Create Your First Goal
                   </Button>

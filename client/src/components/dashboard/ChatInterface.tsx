@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { config } from "@/config";
 
 const ChatInterface = () => {
   const { agentMessages, isLoading, sendMessage } = useChat();
@@ -27,12 +28,68 @@ const ChatInterface = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [agentMessages]);
 
+  // Track user activity
+  const trackChatActivity = async (message: string) => {
+    if (!user?.id) return;
+    
+    try {
+      // Extract potential subject from message
+      const subjects = ['math', 'physics', 'chemistry', 'biology', 'history', 'geography', 'literature'];
+      const detectedSubject = subjects.find(subject => 
+        message.toLowerCase().includes(subject)
+      ) || 'general';
+      
+      // Determine message type/intent
+      let messageType = 'general_question';
+      if (message.toLowerCase().includes('explain') || message.toLowerCase().includes('what is')) {
+        messageType = 'explanation_request';
+      } else if (message.toLowerCase().includes('how to') || message.toLowerCase().includes('steps')) {
+        messageType = 'procedure_request';
+      } else if (message.toLowerCase().includes('example') || message.toLowerCase().includes('sample')) {
+        messageType = 'example_request';
+      } else if (message.toLowerCase().includes('quiz') || message.toLowerCase().includes('test')) {
+        messageType = 'quiz_request';
+      }
+      
+      // Track the activity
+      const response = await fetch(`${config.apiUrl}/user-activity`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.id}`
+        },
+        body: JSON.stringify({
+          activityType: 'question_asked',
+          activityData: {
+            subject: detectedSubject,
+            messageType,
+            messageLength: message.length,
+            timestamp: new Date().toISOString(),
+            description: `Asked a question about ${detectedSubject}`,
+            pointsEarned: 5 // Base points for asking a question
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        console.warn('Failed to track chat activity:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error tracking chat activity:', error);
+      // Don't show error to user, just log it
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || isSending) return;
 
     setIsSending(true);
     try {
+      // Track the user's question
+      trackChatActivity(inputMessage);
+      
+      // Send the message
       await sendMessage(inputMessage);
       setInputMessage("");
     } catch (error) {

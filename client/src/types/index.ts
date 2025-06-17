@@ -21,6 +21,7 @@ export interface User {
   streakInsurance?: number; // Number of streak insurance tokens remaining
   profilePic?: string | null; // Profile picture URL
   lastSPReset?: Date; // Last time the daily SP was reset
+  equippedTitle?: string; // User's currently equipped title
 }
 
 export interface Subject {
