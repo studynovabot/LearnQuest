@@ -49,7 +49,7 @@ export interface ChatMessage {
 export interface EducationalContent {
   id: string;
   title: string;
-  type: 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
+  type: 'flow-charts' | 'ncert-solutions';
   board: string; // CBSE, ICSE, etc.
   class: string; // 6, 7, 8, 9, 10, 11, 12
   subject: string;
@@ -74,7 +74,7 @@ export interface EducationalContent {
 export interface ContentUpload {
   id: string;
   title: string;
-  type: 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
+  type: 'flow-charts' | 'ncert-solutions';
   originalFileName: string;
   fileSize: number;
   mimeType: string;
@@ -104,7 +104,7 @@ export interface ContentFilter {
 }
 
 export interface ContentRequest {
-  type: 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
+  type: 'flow-charts' | 'ncert-solutions';
   // ... existing code ...
 }
 

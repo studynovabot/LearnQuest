@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 interface UploadedContent {
   id: string;
   filename: string;
-  type: 'flow-charts' | 'ncert-solutions' | 'textbook-solutions';
+  type: 'flow-charts' | 'ncert-solutions';
   board: string;
   class: string;
   subject: string;
@@ -61,7 +61,6 @@ const ContentManager = () => {
   const contentTypes = [
     { value: 'flow-charts', label: 'Flow Charts' },
     { value: 'ncert-solutions', label: 'NCERT Solutions' },
-    { value: 'textbook-solutions', label: 'Textbook Solutions' },
   ];
   const statusOptions = [
     { value: '', label: 'All Status' },

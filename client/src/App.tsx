@@ -8,7 +8,6 @@ import { UserProvider } from "@/context/UserContext";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import ChatAgents from "@/pages/ChatAgents";
-import ClassServer from "@/pages/ClassServer";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import OTPLogin from "@/pages/OTPLogin";
@@ -18,7 +17,6 @@ import Themes from "@/pages/Themes";
 import Subscription from "@/pages/Subscription";
 import FlowCharts from "@/pages/FlowCharts";
 import NCERTSolutions from "@/pages/NCERTSolutions";
-import TextbookSolutions from "@/pages/TextbookSolutions";
 import ImageTools from "@/pages/ImageTools";
 import PersonalizedAgent from "@/pages/PersonalizedAgent";
 import ContentManager from "@/pages/ContentManager";
@@ -79,13 +77,7 @@ function Router() {
           </MainLayout>
         </ProtectedRoute>
       </Route>
-      <Route path="/class-server">
-        <ProtectedRoute>
-          <MainLayout>
-            <ClassServer />
-          </MainLayout>
-        </ProtectedRoute>
-      </Route>
+
       <Route path="/login">
         <Login />
       </Route>
@@ -139,13 +131,7 @@ function Router() {
           </MainLayout>
         </ProtectedRoute>
       </Route>
-      <Route path="/textbook-solutions">
-        <ProtectedRoute>
-          <MainLayout>
-            <TextbookSolutions />
-          </MainLayout>
-        </ProtectedRoute>
-      </Route>
+
       <Route path="/image-tools">
         <ProtectedRoute>
           <MainLayout>

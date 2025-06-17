@@ -47,11 +47,6 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       path: "/ncert-solutions",
     },
     {
-      icon: BookIcon,
-      label: "Textbook Solutions",
-      path: "/textbook-solutions",
-    },
-    {
       icon: ImageIcon,
       label: "Image Tools",
       path: "/image-tools",
@@ -60,11 +55,6 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       icon: MessageIcon,
       label: "AI Chat",
       path: "/chat",
-    },
-    {
-      icon: HashIcon,
-      label: "Class Servers",
-      path: "/class-server",
     },
     {
       icon: PaletteIcon,
