@@ -14,7 +14,7 @@ import DailyChallenge from "@/components/gamification/DailyChallenge";
 import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { PremiumCard, StatCard, TutorCard } from "@/components/premium/PremiumCard";
+import { PremiumCard, StatCard } from "@/components/premium/PremiumCard";
 import { PremiumButton } from "@/components/premium/PremiumButton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -156,7 +156,7 @@ const Dashboard = () => {
     {
       id: "4",
       name: user?.displayName || "You",
-      avatar: user?.profileImage || undefined,
+      avatar: user?.profilePic || undefined,
       points: 750,
       rank: 4,
       previousRank: 6,
@@ -384,344 +384,356 @@ const Dashboard = () => {
               <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
                 className="mb-20"
               >
-                <div className="flex items-center justify-between mb-10">
-                  <div>
-                    <h2 className="text-3xl font-display font-bold text-foreground mb-3">
-                      Your AI Tutors
-                    </h2>
-                    <p className="text-muted-foreground text-lg">Choose your AI tutor and start learning instantly</p>
-                  </div>
-                  <div className="flex items-center space-x-2 px-5 py-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">All tutors online</span>
-                  </div>
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-display font-bold">AI Tutors</h2>
+                  <PremiumButton variant="outline" size="sm">
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Explore More Tutors
+                  </PremiumButton>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {aiTutors.map((tutor, index) => (
                     <motion.div
                       key={tutor.name}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: 0.1 * index }}
+                      transition={{ duration: 0.5, delay: 0.1 * index }}
                     >
-                      <TutorCard {...tutor} />
+                      <PremiumCard className="p-6 h-full">
+                        <div className="flex items-start space-x-4 mb-4">
+                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl">
+                            {tutor.avatar}
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-lg">{tutor.name}</h3>
+                            <p className="text-sm text-muted-foreground">{tutor.subject}</p>
+                          </div>
+                        </div>
+                        
+                        <p className="text-muted-foreground mb-6 text-sm">
+                          {tutor.description}
+                        </p>
+                        
+                        <div className="mt-auto">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+                              <span>{tutor.status}</span>
+                            </div>
+                            <span>Last used: {tutor.lastUsed}</span>
+                          </div>
+                          
+                          <PremiumButton variant="outline" className="w-full">
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Chat Now
+                          </PremiumButton>
+                        </div>
+                      </PremiumCard>
                     </motion.div>
                   ))}
                 </div>
-                
-                {/* View All Button with more whitespace */}
-                <div className="flex justify-center mt-10">
-                  <PremiumButton variant="outline" className="px-8 py-3 rounded-xl">
-                    View All Tutors
-                    <ArrowRight className="h-4 w-4 ml-2" />
+              </motion.section>
+              
+              {/* Gamification Section - More engaging with visual elements */}
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="mb-20"
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-display font-bold">Your Progress</h2>
+                  <PremiumButton variant="outline" size="sm">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    View Detailed Stats
                   </PremiumButton>
                 </div>
-              </motion.section>
-
-              {/* Quick Actions - More spacious and cleaner */}
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                className="mb-20"
-              >
-                <h2 className="text-3xl font-display font-bold text-foreground mb-10">
-                  Quick Actions
-                </h2>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                  <Link href="/ncert-solutions">
-                    <PremiumButton variant="secondary" className="flex-col h-32 space-y-4 hover:bg-primary/5">
-                      <BookOpen className="h-8 w-8" />
-                      <span className="text-base">NCERT Solutions</span>
-                    </PremiumButton>
-                  </Link>
-                  <Link href="/chat">
-                    <PremiumButton variant="secondary" className="flex-col h-32 space-y-4 hover:bg-primary/5">
-                      <MessageSquare className="h-8 w-8" />
-                      <span className="text-base">AI Chat</span>
-                    </PremiumButton>
-                  </Link>
-                  <Link href="/dashboard">
-                    <PremiumButton variant="secondary" className="flex-col h-32 space-y-4 hover:bg-primary/5">
-                      <BarChart3 className="h-8 w-8" />
-                      <span className="text-base">Progress</span>
-                    </PremiumButton>
-                  </Link>
-                  <Link href="/settings">
-                    <PremiumButton variant="secondary" className="flex-col h-32 space-y-4 hover:bg-primary/5">
-                      <Settings className="h-8 w-8" />
-                      <span className="text-base">Settings</span>
-                    </PremiumButton>
-                  </Link>
-                </div>
-              </motion.section>
-
-              {/* Ranking and Activity - Inspired by Brainly */}
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.7 }}
-                className="mb-20"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                  <RankingSystem 
-                    currentPoints={rankingData.currentPoints}
-                    nextRankPoints={rankingData.nextRankPoints}
-                    currentRank={rankingData.currentRank}
-                  />
-                  <PointsActivity activities={pointsActivities} />
-                </div>
-              </motion.section>
-            </TabsContent>
-
-            <TabsContent value="learning">
-              {/* Study Plan Generator and Personalized Dashboard */}
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="mb-20"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                  >
-                    <StudyPlanGenerator />
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                  >
-                    <PersonalizedDashboard />
-                  </motion.div>
-                </div>
-              </motion.section>
-
-              {/* Visual Learning Tools and Textbook Connector */}
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="mb-20"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.5 }}
-                  >
-                    <VisualLearningTools />
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.5 }}
-                  >
-                    <TextbookConnector />
-                  </motion.div>
-                </div>
-              </motion.section>
-            </TabsContent>
-
-            <TabsContent value="challenges">
-              {/* Daily Challenges - Inspired by Brainly */}
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="mb-20"
-              >
-                <DailyChallenge challenges={dailyChallenges} streak={7} />
-              </motion.section>
-
-              {/* Achievement Badges - Inspired by Brainly */}
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="mb-20"
-              >
-                <PremiumCard className="p-8">
-                  <div className="flex items-center justify-between mb-8">
-                    <div>
-                      <h2 className="text-2xl font-bold flex items-center">
-                        <Medal className="h-6 w-6 mr-3 text-amber-500" />
-                        Your Achievements
-                      </h2>
-                      <p className="text-muted-foreground mt-2">
-                        Collect badges by completing challenges and milestones
-                      </p>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <PremiumCard className="p-6">
+                    <div className="flex items-center mb-4">
+                      <Trophy className="h-5 w-5 text-amber-500 mr-2" />
+                      <h3 className="font-bold">Ranking</h3>
                     </div>
-                    <PremiumButton variant="outline" size="sm">
-                      View All Badges
-                    </PremiumButton>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                    {[
-                      { name: "First Answer", icon: "🎯", color: "bg-blue-100 dark:bg-blue-900/30", earned: true },
-                      { name: "Week Streak", icon: "🔥", color: "bg-amber-100 dark:bg-amber-900/30", earned: true },
-                      { name: "Quiz Master", icon: "🧠", color: "bg-purple-100 dark:bg-purple-900/30", earned: true },
-                      { name: "Helper", icon: "🤝", color: "bg-green-100 dark:bg-green-900/30", earned: true },
-                      { name: "Early Bird", icon: "🌅", color: "bg-orange-100 dark:bg-orange-900/30", earned: false },
-                      { name: "Math Whiz", icon: "🔢", color: "bg-indigo-100 dark:bg-indigo-900/30", earned: false },
-                    ].map((badge, index) => (
-                      <motion.div
-                        key={badge.name}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.4, delay: 0.1 * index }}
-                        className={`flex flex-col items-center justify-center p-6 rounded-xl ${badge.color} ${!badge.earned && 'opacity-40 grayscale'}`}
-                      >
-                        <div className="text-4xl mb-3">{badge.icon}</div>
-                        <p className="text-center font-medium text-sm">{badge.name}</p>
-                        {badge.earned && (
-                          <div className="mt-2 flex items-center text-xs text-emerald-600 dark:text-emerald-400">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Earned
-                          </div>
-                        )}
-                      </motion.div>
-                    ))}
-                  </div>
-                </PremiumCard>
-              </motion.section>
-            </TabsContent>
-
-            <TabsContent value="community">
-              {/* Leaderboard - Inspired by Brainly */}
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="mb-20"
-              >
-                <Leaderboard users={leaderboardUsers} />
-              </motion.section>
-
-              {/* Community Questions - Inspired by Brainly */}
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="mb-20"
-              >
-                <PremiumCard className="p-8">
-                  <div className="flex items-center justify-between mb-8">
-                    <div>
-                      <h2 className="text-2xl font-bold flex items-center">
-                        <MessageSquare className="h-6 w-6 mr-3 text-primary" />
-                        Community Questions
-                      </h2>
-                      <p className="text-muted-foreground mt-2">
-                        Help other students by answering their questions and earn points
-                      </p>
+                    
+                    <div className="flex items-center justify-center my-6">
+                      <div className="relative">
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+                          <span className="text-white text-3xl font-bold">#4</span>
+                        </div>
+                        <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full px-2 py-1 font-medium">
+                          +2 ↑
+                        </div>
+                      </div>
                     </div>
-                    <PremiumButton variant="outline" size="sm">
-                      Ask a Question
-                    </PremiumButton>
-                  </div>
-
-                  <div className="space-y-6">
-                    {[
-                      { 
-                        subject: "Mathematics", 
-                        title: "How do I solve this quadratic equation?", 
-                        points: 10, 
-                        time: "10 minutes ago",
-                        answers: 0
-                      },
-                      { 
-                        subject: "Physics", 
-                        title: "Can someone explain Newton's third law with examples?", 
-                        points: 15, 
-                        time: "25 minutes ago",
-                        answers: 1
-                      },
-                      { 
-                        subject: "Chemistry", 
-                        title: "What's the difference between covalent and ionic bonds?", 
-                        points: 12, 
-                        time: "1 hour ago",
-                        answers: 2
-                      },
-                    ].map((question, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.1 * index }}
-                        className="p-6 border border-border/30 rounded-xl bg-card/50"
-                      >
-                        <div className="flex items-start">
-                          <div className="bg-primary/10 text-primary rounded-lg p-3 mr-4">
-                            <Lightbulb className="h-6 w-6" />
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Current Rank</span>
+                          <span className="font-medium">{rankingData.currentRank}</span>
+                        </div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Points</span>
+                          <span className="font-medium">{rankingData.currentPoints} / {rankingData.nextRankPoints}</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2 mb-4">
+                          <div 
+                            className="bg-gradient-to-r from-amber-400 to-amber-600 h-2 rounded-full" 
+                            style={{ width: `${(rankingData.currentPoints / rankingData.nextRankPoints) * 100}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      <PremiumButton variant="outline" size="sm" className="w-full">
+                        <Users className="h-4 w-4 mr-2" />
+                        View Leaderboard
+                      </PremiumButton>
+                    </div>
+                  </PremiumCard>
+                  
+                  <PremiumCard className="p-6">
+                    <div className="flex items-center mb-4">
+                      <Flame className="h-5 w-5 text-orange-500 mr-2" />
+                      <h3 className="font-bold">Daily Streak</h3>
+                    </div>
+                    
+                    <div className="flex items-center justify-center my-6">
+                      <div className="relative">
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
+                          <div className="text-white text-center">
+                            <div className="text-3xl font-bold">7</div>
+                            <div className="text-xs">days</div>
                           </div>
-                          
-                          <div className="flex-1">
-                            <div className="flex items-center text-sm text-muted-foreground mb-2">
-                              <span className="font-medium text-primary">{question.subject}</span>
-                              <span className="mx-2">•</span>
-                              <span>{question.time}</span>
-                              <span className="mx-2">•</span>
-                              <span>{question.answers} answers</span>
+                        </div>
+                        <div className="absolute -bottom-2 -right-2">
+                          <div className="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs rounded-full w-8 h-8 flex items-center justify-center">
+                            <Gift className="h-4 w-4" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <div className="space-y-1">
+                          <div className="text-sm font-medium">Next reward in</div>
+                          <div className="text-muted-foreground text-xs">3 days (10-day streak)</div>
+                        </div>
+                        <div className="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs rounded-full px-2 py-1">
+                          +50 XP
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <div className="flex space-x-1">
+                          {Array.from({ length: 7 }).map((_, i) => (
+                            <div 
+                              key={i} 
+                              className="w-4 h-4 rounded-full bg-orange-500"
+                            ></div>
+                          ))}
+                          {Array.from({ length: 3 }).map((_, i) => (
+                            <div 
+                              key={i + 7} 
+                              className="w-4 h-4 rounded-full bg-muted"
+                            ></div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <PremiumButton variant="outline" size="sm" className="w-full">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        View Calendar
+                      </PremiumButton>
+                    </div>
+                  </PremiumCard>
+                  
+                  <PremiumCard className="p-6">
+                    <div className="flex items-center mb-4">
+                      <Award className="h-5 w-5 text-purple-500 mr-2" />
+                      <h3 className="font-bold">Achievements</h3>
+                    </div>
+                    
+                    <div className="flex items-center justify-center my-6">
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                          <Brain className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                          <Rocket className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                          <Target className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                          <Trophy className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                        </div>
+                        <div className="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                          <Medal className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                        </div>
+                        <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
+                          <PlusCircle className="h-6 w-6 text-muted-foreground" />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Achievements Unlocked</span>
+                          <span className="font-medium">12 / 30</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2 mb-4">
+                          <div 
+                            className="bg-gradient-to-r from-purple-400 to-indigo-600 h-2 rounded-full" 
+                            style={{ width: `${(12 / 30) * 100}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      <PremiumButton variant="outline" size="sm" className="w-full">
+                        <Star className="h-4 w-4 mr-2" />
+                        View All Achievements
+                      </PremiumButton>
+                    </div>
+                  </PremiumCard>
+                </div>
+              </motion.section>
+              
+              {/* Recent Activity Section */}
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-display font-bold">Recent Activity</h2>
+                  <PremiumButton variant="outline" size="sm">
+                    <Clock className="h-4 w-4 mr-2" />
+                    View All Activity
+                  </PremiumButton>
+                </div>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <PremiumCard className="p-6">
+                    <div className="flex items-center mb-6">
+                      <Zap className="h-5 w-5 text-primary mr-2" />
+                      <h3 className="font-bold">Points Activity</h3>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {pointsActivities.slice(0, 3).map((activity) => (
+                        <div key={activity.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                          <div className="flex items-center">
+                            <div className="mr-3 p-2 rounded-full bg-primary/10">
+                              {activity.type === 'question_answered' && <MessageSquare className="h-4 w-4 text-primary" />}
+                              {activity.type === 'streak' && <Flame className="h-4 w-4 text-orange-500" />}
+                              {activity.type === 'challenge_completed' && <Target className="h-4 w-4 text-emerald-500" />}
+                              {activity.type === 'upvote_received' && <TrendingUp className="h-4 w-4 text-blue-500" />}
+                              {activity.type === 'study_session' && <Clock className="h-4 w-4 text-purple-500" />}
                             </div>
-                            
-                            <h3 className="text-lg font-medium mb-4">{question.title}</h3>
-                            
-                            <div className="flex justify-between items-center">
-                              <PremiumButton variant="outline" size="sm">
-                                Answer
-                              </PremiumButton>
-                              
-                              <div className="flex items-center bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-medium">
-                                <Gift className="h-4 w-4 mr-1" />
-                                {question.points} pts
+                            <div>
+                              <div className="text-sm font-medium">{activity.description}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {new Date(activity.timestamp).toLocaleString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric', 
+                                  hour: 'numeric', 
+                                  minute: 'numeric' 
+                                })}
                               </div>
                             </div>
                           </div>
+                          <div className="text-sm font-medium text-primary">+{activity.points} XP</div>
                         </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                      ))}
+                      
+                      <PremiumButton variant="outline" size="sm" className="w-full">
+                        <Zap className="h-4 w-4 mr-2" />
+                        View All Points Activity
+                      </PremiumButton>
+                    </div>
+                  </PremiumCard>
                   
-                  <div className="flex justify-center mt-8">
-                    <PremiumButton variant="outline">
-                      View More Questions
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </PremiumButton>
-                  </div>
-                </PremiumCard>
+                  <PremiumCard className="p-6">
+                    <div className="flex items-center mb-6">
+                      <Target className="h-5 w-5 text-primary mr-2" />
+                      <h3 className="font-bold">Daily Challenges</h3>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {dailyChallenges.slice(0, 3).map((challenge) => (
+                        <div key={challenge.id} className="p-3 rounded-lg bg-muted/50">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <div className="text-sm font-medium">{challenge.title}</div>
+                              <div className="text-xs text-muted-foreground">{challenge.description}</div>
+                            </div>
+                            <div className="text-sm font-medium text-primary">+{challenge.points} XP</div>
+                          </div>
+                          
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="w-full max-w-[180px]">
+                              <div className="flex justify-between mb-1">
+                                <span>{challenge.progress} / {challenge.target}</span>
+                                {challenge.expiresIn && (
+                                  <span className="text-muted-foreground">Expires in {challenge.expiresIn}</span>
+                                )}
+                              </div>
+                              <div className="w-full bg-muted rounded-full h-1.5">
+                                <div 
+                                  className={`h-1.5 rounded-full ${challenge.completed ? 'bg-emerald-500' : 'bg-primary'}`}
+                                  style={{ width: `${(challenge.progress / challenge.target) * 100}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                            
+                            {challenge.completed ? (
+                              <div className="ml-4 p-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                                <CheckCircle className="h-4 w-4 text-emerald-500" />
+                              </div>
+                            ) : (
+                              <PremiumButton variant="outline" size="sm" className="ml-4 h-7 px-2 text-xs">
+                                Start
+                              </PremiumButton>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      
+                      <PremiumButton variant="outline" size="sm" className="w-full">
+                        <Target className="h-4 w-4 mr-2" />
+                        View All Challenges
+                      </PremiumButton>
+                    </div>
+                  </PremiumCard>
+                </div>
               </motion.section>
             </TabsContent>
+            
+            <TabsContent value="learning">
+              <div className="flex items-center justify-center h-64 text-muted-foreground">
+                Learning content will appear here
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="challenges">
+              <div className="flex items-center justify-center h-64 text-muted-foreground">
+                Challenges content will appear here
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="community">
+              <div className="flex items-center justify-center h-64 text-muted-foreground">
+                Community content will appear here
+              </div>
+            </TabsContent>
           </Tabs>
-
-          {/* Explore More Section - Clean and spacious */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="mb-10"
-          >
-            <PremiumCard className="p-12 text-center">
-              <h3 className="text-2xl font-display font-bold mb-6">Ready to explore more?</h3>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
-                Discover all the powerful features StudyNova AI has to offer and take your learning to the next level.
-              </p>
-              <PremiumButton variant="gradient" size="lg" className="px-8 py-4 rounded-xl">
-                <Sparkles className="h-5 w-5 mr-2" />
-                Explore All Features
-              </PremiumButton>
-            </PremiumCard>
-          </motion.section>
         </div>
       </div>
     </>

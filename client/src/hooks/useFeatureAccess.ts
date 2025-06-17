@@ -19,7 +19,7 @@ export function useFeatureAccess() {
   if (user) {
     // First check the new subscriptionPlan field
     if (user.subscriptionPlan) {
-      userPlan = user.subscriptionPlan;
+      userPlan = user.subscriptionPlan === 'pro' ? SUBSCRIPTION_PLANS.PREMIUM : SUBSCRIPTION_PLANS.FREE;
     } 
     // Fallback to the isPro boolean for backward compatibility
     else if (user.isPro) {
