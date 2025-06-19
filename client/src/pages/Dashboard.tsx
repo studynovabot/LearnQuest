@@ -15,7 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { useEmotionalDesign } from "@/context/EmotionalDesignContext";
+import { useEmotionalDesign, useEmotionalDesignSystems } from "@/context/EmotionalDesignContext";
 import { 
   NovaBot, 
   MascotDialogue, 
@@ -63,6 +63,7 @@ import {
 const Dashboard = () => {
   const { user } = useAuth();
   const emotionalDesign = useEmotionalDesign();
+  const { mascot, interactions } = useEmotionalDesignSystems();
   const [showWelcome, setShowWelcome] = useState(false);
   const [currentStreak, setCurrentStreak] = useState(7);
   const [xpGain, setXpGain] = useState(false);
@@ -77,7 +78,7 @@ const Dashboard = () => {
     } else {
       // Show welcome back message for returning users
       setTimeout(() => {
-        emotionalDesign.showWelcomeMessage();
+        emotionalDesign.showWelcome(true);
       }, 1000);
     }
   }, [isFirstTime, emotionalDesign]);
@@ -856,7 +857,7 @@ const Dashboard = () => {
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   className="cursor-pointer"
-                  onClick={() => emotionalDesign.sound.playSound('achievement')}
+                  onClick={() => emotionalDesign.celebrateAchievement('AI Tutor Access')}
                 >
                   <PremiumCard className="p-6 h-full bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
                     <div className="flex items-center mb-4">
@@ -975,7 +976,7 @@ const Dashboard = () => {
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     className="cursor-pointer"
-                    onClick={() => emotionalDesign.sound.playSound('achievement')}
+                    onClick={() => emotionalDesign.celebrateAchievement('Questions Answered')}
                   >
                     <PremiumCard className="p-6 text-center bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
                       <MessageSquare className="h-12 w-12 text-green-500 mx-auto mb-4" />
@@ -1054,25 +1055,7 @@ const Dashboard = () => {
           </motion.button>
         </div>
 
-        {/* Sound Toggle Button - Top Right */}
-        <motion.button
-          className={`fixed top-24 right-6 z-40 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all ${
-            emotionalDesign.soundEnabled 
-              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' 
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-          }`}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => {
-            emotionalDesign.setSoundEnabled(!emotionalDesign.soundEnabled);
-            if (emotionalDesign.soundEnabled) {
-              emotionalDesign.sound.playSound('button-click');
-            }
-          }}
-          title={emotionalDesign.soundEnabled ? 'Mute Sounds' : 'Enable Sounds'}
-        >
-          {emotionalDesign.soundEnabled ? '🔊' : '🔇'}
-        </motion.button>
+        {/* Sound system disabled for stability */}
 
         {/* Progress Ring for Daily Goal */}
         <div className="fixed bottom-24 right-6 z-40">

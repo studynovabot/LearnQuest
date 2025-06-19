@@ -31,9 +31,6 @@ const EmotionalDesignSettings: React.FC = () => {
 
   const handleTest = (type: string) => {
     switch (type) {
-      case 'sound':
-        emotionalDesign.sound.playSound('notification');
-        break;
       case 'correct':
         emotionalDesign.celebrateCorrectAnswer();
         break;
@@ -44,7 +41,7 @@ const EmotionalDesignSettings: React.FC = () => {
         emotionalDesign.celebrateAchievement('Settings Master');
         break;
       case 'welcome':
-        emotionalDesign.showWelcomeMessage();
+        emotionalDesign.showWelcome();
         break;
       case 'encouragement':
         emotionalDesign.showEncouragement();
@@ -53,12 +50,10 @@ const EmotionalDesignSettings: React.FC = () => {
   };
 
   const resetToDefaults = () => {
-    emotionalDesign.setSoundEnabled(true);
     emotionalDesign.setAnimationsEnabled(true);
     emotionalDesign.setMascotEnabled(true);
     setVolumeLevel([70]);
     setAnimationSpeed([100]);
-    emotionalDesign.sound.playSound('notification');
   };
 
   return (
@@ -86,63 +81,8 @@ const EmotionalDesignSettings: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Sound Settings */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  {emotionalDesign.soundEnabled ? (
-                    <Volume2 className="h-5 w-5 text-blue-600" />
-                  ) : (
-                    <VolumeX className="h-5 w-5 text-gray-400" />
-                  )}
-                  <div>
-                    <Label className="text-base font-medium">Sound Effects</Label>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Play audio feedback for interactions
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={emotionalDesign.soundEnabled}
-                  onCheckedChange={emotionalDesign.setSoundEnabled}
-                />
-              </div>
-
-              {emotionalDesign.soundEnabled && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="pl-8 space-y-3"
-                >
-                  <div>
-                    <Label className="text-sm">Volume Level</Label>
-                    <Slider
-                      value={volumeLevel}
-                      onValueChange={setVolumeLevel}
-                      max={100}
-                      step={10}
-                      className="mt-2"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>Quiet</span>
-                      <span>{volumeLevel[0]}%</span>
-                      <span>Loud</span>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleTest('sound')}
-                    className="flex items-center space-x-2"
-                  >
-                    <TestTube className="h-4 w-4" />
-                    <span>Test Sound</span>
-                  </Button>
-                </motion.div>
-              )}
-            </div>
-
+            {/* Sound system disabled for stability */}
+            
             <Separator />
 
             {/* Animation Settings */}

@@ -220,9 +220,9 @@ const EmotionalDesignDemo: React.FC = () => {
               </div>
               
               <div className="flex flex-wrap gap-3">
-                <Button onClick={() => showMascot('login')}>Welcome Message</Button>
-                <Button onClick={() => showMascot('encouragement')}>Encouragement</Button>
-                <Button onClick={() => showMascot('reminder')}>Study Reminder</Button>
+                <Button onClick={() => showMascot('happy', 'Welcome to StudyNova! I\'m Nova, your AI learning companion!')}>Welcome Message</Button>
+                <Button onClick={() => showMascot('encouraging', 'Keep going! You\'re doing wonderfully!')}>Encouragement</Button>
+                <Button onClick={() => showMascot('thinking', 'Ready to continue your learning journey?')}>Study Reminder</Button>
                 <Button onClick={hideMascot} variant="outline">Hide Mascot</Button>
               </div>
             </CardContent>
@@ -367,9 +367,9 @@ const EmotionalDesignDemo: React.FC = () => {
       {/* Mascot Dialogue */}
       {mascotState.isVisible && (
         <MascotDialogue
-          trigger={mascotState.trigger}
-          context={mascotState.context}
-          position={mascotState.position}
+          message={mascotState.message}
+          emotion={mascotState.emotion}
+          position={mascotState.position === 'bottom-right' ? 'right' : mascotState.position === 'bottom-left' ? 'left' : 'center'}
           onClose={hideMascot}
         />
       )}

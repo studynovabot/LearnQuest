@@ -8,11 +8,13 @@ interface EmotionalDesignContextType {
   animationsEnabled: boolean;
   mascotEnabled: boolean;
   showWelcomeMessage: boolean;
+  soundEnabled: boolean;
   
   // Actions
   setAnimationsEnabled: (enabled: boolean) => void;
   setMascotEnabled: (enabled: boolean) => void;
   setWelcomeMessage: (show: boolean) => void;
+  setSoundEnabled: (enabled: boolean) => void;
   
   // Emotional responses
   celebrateCorrectAnswer: () => void;
@@ -55,6 +57,11 @@ export const EmotionalDesignProvider: React.FC<EmotionalDesignProviderProps> = (
 
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(true);
 
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    const saved = localStorage.getItem('nova-sound-enabled');
+    return saved ? JSON.parse(saved) : false; // Disabled by default for stability
+  });
+
   // Initialize systems
   const mascot = useMascot();
   const interactions = useMicroInteractions();
@@ -73,6 +80,11 @@ export const EmotionalDesignProvider: React.FC<EmotionalDesignProviderProps> = (
   const handleShowWelcomeMessage = useCallback((show: boolean) => {
     setShowWelcomeMessage(show);
     localStorage.setItem('nova-welcome-message', JSON.stringify(show));
+  }, []);
+
+  const handleSetSoundEnabled = useCallback((enabled: boolean) => {
+    setSoundEnabled(enabled);
+    localStorage.setItem('nova-sound-enabled', JSON.stringify(enabled));
   }, []);
 
   // Emotional response handlers
@@ -163,11 +175,13 @@ export const EmotionalDesignProvider: React.FC<EmotionalDesignProviderProps> = (
     animationsEnabled,
     mascotEnabled,
     showWelcomeMessage,
+    soundEnabled,
     
     // Actions
     setAnimationsEnabled: handleSetAnimationsEnabled,
     setMascotEnabled: handleSetMascotEnabled,
     setWelcomeMessage: handleShowWelcomeMessage,
+    setSoundEnabled: handleSetSoundEnabled,
     
     // Emotional responses
     celebrateCorrectAnswer,

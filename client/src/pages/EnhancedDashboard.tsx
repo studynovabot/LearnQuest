@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet';
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
-import { useEmotionalDesign } from "@/context/EmotionalDesignContext";
+import { useEmotionalDesign, useEmotionalDesignSystems } from "@/context/EmotionalDesignContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -69,6 +69,7 @@ import {
 const EnhancedDashboard = () => {
   const { user } = useAuth();
   const emotionalDesign = useEmotionalDesign();
+  const { mascot, interactions } = useEmotionalDesignSystems();
   const [activeTab, setActiveTab] = useState('overview');
   const [showWelcome, setShowWelcome] = useState(false);
   const [showAchievement, setShowAchievement] = useState(false);
@@ -85,7 +86,7 @@ const EnhancedDashboard = () => {
     } else {
       // Show welcome back message for returning users
       setTimeout(() => {
-        emotionalDesign.showWelcomeMessage();
+        emotionalDesign.showWelcome(true);
       }, 1000);
     }
   }, [isFirstTime, emotionalDesign]);
@@ -115,8 +116,7 @@ const EnhancedDashboard = () => {
       status: "online" as const,
       lastUsed: "2 minutes ago",
       onClick: () => {
-        emotionalDesign.sound.playSound('button-click');
-        emotionalDesign.interactions.triggerSuccessRipple();
+        emotionalDesign.celebrateCorrectAnswer();
       }
     },
     {
@@ -127,7 +127,7 @@ const EnhancedDashboard = () => {
       status: "online" as const,
       lastUsed: "1 hour ago",
       onClick: () => {
-        emotionalDesign.sound.playSound('button-click');
+        emotionalDesign.showEncouragement();
       }
     },
     {
@@ -138,7 +138,7 @@ const EnhancedDashboard = () => {
       status: "online" as const,
       lastUsed: "3 hours ago",
       onClick: () => {
-        emotionalDesign.sound.playSound('button-click');
+        emotionalDesign.celebrateAchievement('Science Master');
       }
     }
   ];
@@ -200,7 +200,7 @@ const EnhancedDashboard = () => {
                 variant="primary"
                 size="sm"
                 onClick={() => {
-                  emotionalDesign.sound.playSound('button-click');
+                  emotionalDesign.celebrateCorrectAnswer();
                   action?.();
                 }}
               >
@@ -224,23 +224,7 @@ const EnhancedDashboard = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            {emotionalDesign.soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-            <span>Sound Effects</span>
-          </div>
-          <Button
-            variant={emotionalDesign.soundEnabled ? "default" : "outline"}
-            size="sm"
-            onClick={() => {
-              const newState = !emotionalDesign.soundEnabled;
-              emotionalDesign.setSoundEnabled(newState);
-              if (newState) emotionalDesign.sound.playSound('notification');
-            }}
-          >
-            {emotionalDesign.soundEnabled ? 'On' : 'Off'}
-          </Button>
-        </div>
+        {/* Sound system disabled for stability */}
         
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -267,7 +251,7 @@ const EnhancedDashboard = () => {
             onClick={() => {
               const newState = !emotionalDesign.mascotEnabled;
               emotionalDesign.setMascotEnabled(newState);
-              if (newState) emotionalDesign.showWelcomeMessage();
+              if (newState) emotionalDesign.showWelcome();
             }}
           >
             {emotionalDesign.mascotEnabled ? 'On' : 'Off'}
@@ -428,7 +412,7 @@ const EnhancedDashboard = () => {
                         description="Complete today's learning challenge for bonus XP"
                         color="green"
                         action={() => {
-                          emotionalDesign.interactions.triggerTaskCompletion('Daily Challenge', 30);
+                          interactions.triggerTaskCompletion('Daily Challenge', 30);
                         }}
                       />
                       <ActivityCard
@@ -588,24 +572,24 @@ const EnhancedDashboard = () => {
         </main>
 
         {/* Floating Feedback System */}
-        {emotionalDesign.interactions.feedbacks.map(feedback => (
+        {interactions.feedbacks.map(feedback => (
           <FloatingFeedback
             key={feedback.id}
             type={feedback.type}
             message={feedback.message}
             position={feedback.position}
             value={feedback.value}
-            onComplete={() => emotionalDesign.interactions.removeFeedback(feedback.id)}
+            onComplete={() => interactions.removeFeedback(feedback.id)}
           />
         ))}
 
         {/* Mascot Dialogue System */}
-        {emotionalDesign.mascot.mascotState.isVisible && (
+        {mascot.mascotState.isVisible && (
           <MascotDialogue
-            trigger={emotionalDesign.mascot.mascotState.trigger}
-            context={emotionalDesign.mascot.mascotState.context}
-            position={emotionalDesign.mascot.mascotState.position}
-            onClose={emotionalDesign.mascot.hideMascot}
+            message={mascot.mascotState.message}
+            emotion={mascot.mascotState.emotion}
+            position={mascot.mascotState.position === 'bottom-right' ? 'right' : mascot.mascotState.position === 'bottom-left' ? 'left' : 'center'}
+            onClose={mascot.hideMascot}
           />
         )}
       </div>
