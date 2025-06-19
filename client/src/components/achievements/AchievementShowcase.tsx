@@ -188,7 +188,7 @@ const AchievementShowcase: React.FC = () => {
   const handleAchievementClick = (achievement: Achievement) => {
     if (achievement.unlocked) {
       setShowSparkles(achievement.id);
-      emotionalDesign.sound.playSound('achievement');
+      // Sound functionality removed
       setTimeout(() => setShowSparkles(null), 2000);
     }
   };

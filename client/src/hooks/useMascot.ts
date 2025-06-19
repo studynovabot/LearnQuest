@@ -1,82 +1,114 @@
 import { useState, useCallback } from 'react';
 
-interface MascotContext {
-  streak?: number;
-  xp?: number;
-  level?: number;
-  itemName?: string;
-}
+type MascotEmotion = 'idle' | 'happy' | 'excited' | 'thinking' | 'encouraging' | 'celebrating' | 'confused' | 'proud' | 'sleepy' | 'focused';
 
 interface MascotState {
+  emotion: MascotEmotion;
+  message: string;
   isVisible: boolean;
-  trigger: 'login' | 'correct' | 'wrong' | 'streak' | 'purchase' | 'levelup' | 'encouragement' | 'reminder';
-  context: MascotContext;
+  showMessage: boolean;
   position: 'bottom-right' | 'bottom-left' | 'center' | 'top-right';
 }
 
 export const useMascot = () => {
   const [mascotState, setMascotState] = useState<MascotState>({
+    emotion: 'idle',
+    message: '',
     isVisible: false,
-    trigger: 'encouragement',
-    context: {},
+    showMessage: false,
     position: 'bottom-right'
   });
 
+  const setEmotion = useCallback((emotion: MascotEmotion) => {
+    setMascotState(prev => ({ ...prev, emotion }));
+  }, []);
+
+  const showMessage = useCallback((message: string, emotion: MascotEmotion = 'happy') => {
+    setMascotState(prev => ({
+      ...prev,
+      emotion,
+      message,
+      showMessage: true,
+      isVisible: true
+    }));
+
+    // Auto-hide message after 5 seconds
+    setTimeout(() => {
+      setMascotState(prev => ({ ...prev, showMessage: false }));
+    }, 5000);
+  }, []);
+
+  const hideMessage = useCallback(() => {
+    setMascotState(prev => ({ ...prev, showMessage: false, message: '' }));
+  }, []);
+
   const showMascot = useCallback((
-    trigger: MascotState['trigger'],
-    context: MascotContext = {},
+    emotion: MascotEmotion = 'happy',
+    message: string = '',
     position: MascotState['position'] = 'bottom-right'
   ) => {
     setMascotState({
+      emotion,
+      message,
       isVisible: true,
-      trigger,
-      context,
+      showMessage: message.length > 0,
       position
     });
   }, []);
 
   const hideMascot = useCallback(() => {
-    setMascotState(prev => ({ ...prev, isVisible: false }));
+    setMascotState(prev => ({ ...prev, isVisible: false, showMessage: false }));
   }, []);
 
-  // Specific helper functions
+  // Specific helper functions for backwards compatibility
   const celebrateCorrectAnswer = useCallback(() => {
-    showMascot('correct');
-  }, [showMascot]);
+    showMessage('Great job! You got it right!', 'happy');
+  }, [showMessage]);
 
   const encourageWrongAnswer = useCallback(() => {
-    showMascot('wrong');
-  }, [showMascot]);
+    showMessage('No worries! Learning happens through practice.', 'encouraging');
+  }, [showMessage]);
 
   const celebrateStreak = useCallback((streak: number) => {
-    showMascot('streak', { streak });
-  }, [showMascot]);
+    showMessage(`Amazing! ${streak} correct answers in a row!`, 'excited');
+  }, [showMessage]);
 
   const celebratePurchase = useCallback((itemName: string) => {
-    showMascot('purchase', { itemName });
-  }, [showMascot]);
+    showMessage(`Awesome choice! You got ${itemName}!`, 'excited');
+  }, [showMessage]);
 
   const celebrateLevelUp = useCallback((level: number) => {
-    showMascot('levelup', { level }, 'center');
-  }, [showMascot]);
+    showMessage(`Fantastic! You've reached level ${level}!`, 'celebrating');
+  }, [showMessage]);
 
   const welcomeUser = useCallback(() => {
-    showMascot('login');
-  }, [showMascot]);
+    showMessage('Welcome to StudyNova! I\'m Nova, your AI learning companion!', 'happy');
+  }, [showMessage]);
 
   const encourageUser = useCallback(() => {
-    showMascot('encouragement');
-  }, [showMascot]);
+    showMessage('Keep going! You\'re doing wonderfully!', 'encouraging');
+  }, [showMessage]);
 
   const remindUser = useCallback(() => {
-    showMascot('reminder');
-  }, [showMascot]);
+    showMessage('Ready to continue your learning journey?', 'thinking');
+  }, [showMessage]);
 
   return {
+    // State
     mascotState,
+    emotion: mascotState.emotion,
+    message: mascotState.message,
+    isVisible: mascotState.isVisible,
+    showingMessage: mascotState.showMessage,
+    
+    // Core functions
+    setEmotion,
+    showMessage,
+    hideMessage,
     showMascot,
     hideMascot,
-    // Helper functions
+    
+    // Helper functions for backwards compatibility
     celebrateCorrectAnswer,
     encourageWrongAnswer,
     celebrateStreak,

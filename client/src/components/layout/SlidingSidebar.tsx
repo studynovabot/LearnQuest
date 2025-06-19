@@ -22,7 +22,8 @@ import {
   UsersIcon,
   TrophyIcon,
   AwardIcon,
-  HistoryIcon
+  HistoryIcon,
+  StarIcon
 } from "@/components/ui/icons";
 
 interface SlidingSidebarProps {
@@ -77,6 +78,11 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       icon: PaletteIcon,
       label: "Themes",
       path: "/themes",
+    },
+    {
+      icon: StarIcon,
+      label: "Meet Nova",
+      path: "/nova-showcase",
     },
     {
       icon: SettingsIcon,

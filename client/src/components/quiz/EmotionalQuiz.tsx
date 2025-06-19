@@ -64,7 +64,7 @@ const EmotionalQuiz: React.FC<EmotionalQuizProps> = ({
     if (showResult) return;
     
     setSelectedAnswer(answerIndex);
-    emotionalDesign.sound.playSound('button-click');
+    // Sound functionality removed
   };
 
   const handleSubmitAnswer = () => {
@@ -80,17 +80,17 @@ const EmotionalQuiz: React.FC<EmotionalQuizProps> = ({
       setStreakCount(prev => prev + 1);
       
       // Celebrate correct answer
-      emotionalDesign.celebrateCorrectAnswer({ x: 50, y: 40 });
+      emotionalDesign.celebrateCorrectAnswer();
       
       // Bonus celebration for streaks
       if (streakCount >= 2) {
         setTimeout(() => {
-          emotionalDesign.interactions.triggerStreakBonus(streakCount + 1, { x: 70, y: 30 });
+          emotionalDesign.celebrateStreak(streakCount + 1);
         }, 1000);
       }
     } else {
       setStreakCount(0);
-      emotionalDesign.handleIncorrectAnswer({ x: 50, y: 40 });
+      emotionalDesign.handleIncorrectAnswer();
     }
 
     // Auto-advance after showing result

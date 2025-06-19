@@ -32,7 +32,7 @@ import AdminRoute from "@/components/AdminRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { useHealthCheck } from "@/hooks/useHealthCheck";
+// import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { useEffect } from "react";
 import { useUserContext } from "@/context/UserContext";
 import { EmotionalDesignProvider } from "@/context/EmotionalDesignContext";
@@ -40,13 +40,14 @@ import PricingPage from "@/pages/PricingPage";
 import EnhancedDashboard from "@/pages/EnhancedDashboard";
 import EmotionalDesignDemo from "@/components/demo/EmotionalDesignDemo";
 import EmotionalDesignShowcase from "@/pages/EmotionalDesignShowcase";
+import NovaShowcase from "@/components/mascot/NovaShowcase";
 // import { Analytics } from "@vercel/analytics/react";
 // import { SpeedInsights } from "@vercel/speed-insights/react";
 
 function Router() {
   const [location] = useLocation();
   const { trackPageView } = useAnalytics();
-  const { user } = useUserContext();
+  // const { user } = useUserContext();
 
   // Track page views when location changes
   useEffect(() => {
@@ -98,6 +99,14 @@ function Router() {
         <ProtectedRoute>
           <MainLayout>
             <EmotionalDesignShowcase />
+          </MainLayout>
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/nova-showcase">
+        <ProtectedRoute>
+          <MainLayout>
+            <NovaShowcase />
           </MainLayout>
         </ProtectedRoute>
       </Route>
