@@ -12,8 +12,20 @@ import PointsActivity from "@/components/gamification/PointsActivity";
 import Leaderboard from "@/components/gamification/Leaderboard";
 import DailyChallenge from "@/components/gamification/DailyChallenge";
 import { useAuth } from "@/hooks/useAuth";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
+import { useEmotionalDesign } from "@/context/EmotionalDesignContext";
+import { 
+  NovaBot, 
+  MascotDialogue, 
+  AnimatedXPSystem, 
+  AnimatedStreakSystem,
+  AnimatedButton,
+  FloatingFeedback,
+  SparkleEffect,
+  MagicalWelcome
+} from "@/components/emotional-design";
 import { PremiumCard, StatCard } from "@/components/premium/PremiumCard";
 import { PremiumButton } from "@/components/premium/PremiumButton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -44,11 +56,46 @@ import {
   Lightbulb,
   Rocket,
   Medal,
-  Gift
+  Gift,
+  Heart
 } from "lucide-react";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const emotionalDesign = useEmotionalDesign();
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [currentStreak, setCurrentStreak] = useState(7);
+  const [xpGain, setXpGain] = useState(false);
+
+  // Check if user is new (first time visiting)
+  const isFirstTime = !localStorage.getItem('user-visited-dashboard');
+
+  useEffect(() => {
+    if (isFirstTime) {
+      setShowWelcome(true);
+      localStorage.setItem('user-visited-dashboard', 'true');
+    } else {
+      // Show welcome back message for returning users
+      setTimeout(() => {
+        emotionalDesign.showWelcomeMessage();
+      }, 1000);
+    }
+  }, [isFirstTime, emotionalDesign]);
+
+  // Simulate daily login streak check
+  useEffect(() => {
+    const lastLogin = localStorage.getItem('last-login-date');
+    const today = new Date().toDateString();
+    
+    if (lastLogin !== today) {
+      localStorage.setItem('last-login-date', today);
+      
+      // Simulate streak bonus after a few seconds
+      setTimeout(() => {
+        emotionalDesign.celebrateStreak(currentStreak);
+      }, 3000);
+    }
+  }, [currentStreak, emotionalDesign]);
 
   // Mock data for AI tutors
   const aiTutors = [
@@ -130,7 +177,7 @@ const Dashboard = () => {
       id: "1",
       name: "Sophia Chen",
       avatar: "https://i.pravatar.cc/150?img=1",
-      points: 1250,
+      studyPoints: 1250,
       rank: 1,
       previousRank: 2,
       level: 4
@@ -139,7 +186,7 @@ const Dashboard = () => {
       id: "2",
       name: "Alex Johnson",
       avatar: "https://i.pravatar.cc/150?img=2",
-      points: 1180,
+      studyPoints: 1180,
       rank: 2,
       previousRank: 1,
       level: 4
@@ -148,7 +195,7 @@ const Dashboard = () => {
       id: "3",
       name: "Maya Patel",
       avatar: "https://i.pravatar.cc/150?img=3",
-      points: 980,
+      studyPoints: 980,
       rank: 3,
       previousRank: 3,
       level: 3
@@ -157,7 +204,7 @@ const Dashboard = () => {
       id: "4",
       name: user?.displayName || "You",
       avatar: user?.profilePic || undefined,
-      points: 750,
+      studyPoints: 750,
       rank: 4,
       previousRank: 6,
       level: 3,
@@ -167,7 +214,7 @@ const Dashboard = () => {
       id: "5",
       name: "David Kim",
       avatar: "https://i.pravatar.cc/150?img=4",
-      points: 720,
+      studyPoints: 720,
       rank: 5,
       previousRank: 4,
       level: 3
@@ -176,7 +223,7 @@ const Dashboard = () => {
       id: "6",
       name: "Emma Wilson",
       avatar: "https://i.pravatar.cc/150?img=5",
-      points: 690,
+      studyPoints: 690,
       rank: 6,
       previousRank: 5,
       level: 3
@@ -185,7 +232,7 @@ const Dashboard = () => {
       id: "7",
       name: "James Rodriguez",
       avatar: "https://i.pravatar.cc/150?img=6",
-      points: 650,
+      studyPoints: 650,
       rank: 7,
       previousRank: 7,
       level: 2
@@ -246,7 +293,42 @@ const Dashboard = () => {
         <meta name="description" content="Experience the future of learning with personalized AI tutors, real-time progress tracking, and adaptive study plans." />
       </Helmet>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        {/* Welcome Flow for New Users */}
+        <AnimatePresence>
+          {showWelcome && (
+            <MagicalWelcome
+              isFirstTime={isFirstTime}
+              onComplete={() => {
+                setShowWelcome(false);
+                emotionalDesign.celebrateAchievement('Welcome to Study Nova!');
+              }}
+              onSkip={() => setShowWelcome(false)}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Floating NovaBot Mascot */}
+        {emotionalDesign.mascotEnabled && (
+          <motion.div
+            className="fixed bottom-6 right-6 z-50"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 2, type: "spring", stiffness: 300 }}
+            whileHover={{ scale: 1.1 }}
+            onClick={() => emotionalDesign.showEncouragement()}
+          >
+            <div className="relative cursor-pointer">
+              <NovaBot emotion="happy" size="lg" />
+              <motion.div
+                className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+            </div>
+          </motion.div>
+        )}
+
         {/* Subtle Background Elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
           <div className="absolute top-40 right-40 w-96 h-96 bg-purple-200/20 dark:bg-purple-900/10 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
@@ -717,23 +799,322 @@ const Dashboard = () => {
             </TabsContent>
             
             <TabsContent value="learning">
-              <div className="flex items-center justify-center h-64 text-muted-foreground">
-                Learning content will appear here
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {/* Interactive Learning Cards */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="cursor-pointer"
+                  onClick={() => emotionalDesign.celebrateCorrectAnswer()}
+                >
+                  <PremiumCard className="p-6 h-full bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mr-4">
+                        <BookOpen className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg">Quick Study</h3>
+                        <p className="text-sm text-muted-foreground">15 min session</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Jump into a focused study session with AI-powered learning
+                    </p>
+                    <AnimatedButton variant="primary" className="w-full">
+                      Start Now ⚡
+                    </AnimatedButton>
+                  </PremiumCard>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="cursor-pointer"
+                  onClick={() => emotionalDesign.celebrateAchievement('Practice Master!')}
+                >
+                  <PremiumCard className="p-6 h-full bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mr-4">
+                        <Target className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg">Practice Tests</h3>
+                        <p className="text-sm text-muted-foreground">AI-generated</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Test your knowledge with adaptive practice questions
+                    </p>
+                    <AnimatedButton variant="success" className="w-full">
+                      Take Test 🎯
+                    </AnimatedButton>
+                  </PremiumCard>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="cursor-pointer"
+                  onClick={() => emotionalDesign.sound.playSound('achievement')}
+                >
+                  <PremiumCard className="p-6 h-full bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center mr-4">
+                        <Brain className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg">AI Tutor Chat</h3>
+                        <p className="text-sm text-muted-foreground">24/7 available</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Get instant help from your personal AI tutor
+                    </p>
+                    <AnimatedButton variant="secondary" className="w-full">
+                      Chat Now 💬
+                    </AnimatedButton>
+                  </PremiumCard>
+                </motion.div>
+              </motion.div>
             </TabsContent>
             
             <TabsContent value="challenges">
-              <div className="flex items-center justify-center h-64 text-muted-foreground">
-                Challenges content will appear here
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold mb-2">🎯 Daily Challenges</h2>
+                  <p className="text-muted-foreground">Complete challenges to earn XP and maintain your streak!</p>
+                </div>
+                
+                <DailyChallenge challenges={dailyChallenges} streak={currentStreak} />
+                
+                {/* Challenge Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="cursor-pointer"
+                    onClick={() => emotionalDesign.celebrateStreak(currentStreak)}
+                  >
+                    <PremiumCard className="p-6 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center">
+                          <Flame className="h-8 w-8 text-orange-500 mr-3 animate-pulse" />
+                          <div>
+                            <h3 className="font-bold text-lg">Streak Challenge</h3>
+                            <p className="text-sm text-muted-foreground">Keep your learning streak alive!</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-orange-500">{currentStreak}</div>
+                          <div className="text-xs">days</div>
+                        </div>
+                      </div>
+                      <AnimatedButton variant="primary" className="w-full">
+                        Extend Streak 🔥
+                      </AnimatedButton>
+                    </PremiumCard>
+                  </motion.div>
+
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="cursor-pointer"
+                    onClick={() => emotionalDesign.celebrateLevelUp(4)}
+                  >
+                    <PremiumCard className="p-6 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center">
+                          <Trophy className="h-8 w-8 text-yellow-500 mr-3" />
+                          <div>
+                            <h3 className="font-bold text-lg">Weekly Goal</h3>
+                            <p className="text-sm text-muted-foreground">7 study sessions this week</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-yellow-500">5/7</div>
+                          <div className="text-xs">sessions</div>
+                        </div>
+                      </div>
+                      <AnimatedButton variant="success" className="w-full">
+                        Complete Goal 🏆
+                      </AnimatedButton>
+                    </PremiumCard>
+                  </motion.div>
+                </div>
+              </motion.div>
             </TabsContent>
             
             <TabsContent value="community">
-              <div className="flex items-center justify-center h-64 text-muted-foreground">
-                Community content will appear here
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold mb-2">👥 Learning Community</h2>
+                  <p className="text-muted-foreground">Connect with fellow learners and share your progress!</p>
+                </div>
+
+                {/* Community Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="cursor-pointer"
+                    onClick={() => emotionalDesign.celebrateAchievement('Community Champion!')}
+                  >
+                    <PremiumCard className="p-6 text-center bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20">
+                      <Users className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+                      <div className="text-2xl font-bold text-blue-600">2,847</div>
+                      <div className="text-sm text-muted-foreground">Active Learners</div>
+                    </PremiumCard>
+                  </motion.div>
+
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="cursor-pointer"
+                    onClick={() => emotionalDesign.sound.playSound('achievement')}
+                  >
+                    <PremiumCard className="p-6 text-center bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
+                      <MessageSquare className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                      <div className="text-2xl font-bold text-green-600">156</div>
+                      <div className="text-sm text-muted-foreground">Questions Answered</div>
+                    </PremiumCard>
+                  </motion.div>
+
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="cursor-pointer"
+                    onClick={() => emotionalDesign.showEncouragement()}
+                  >
+                    <PremiumCard className="p-6 text-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+                      <Heart className="h-12 w-12 text-purple-500 mx-auto mb-4" />
+                      <div className="text-2xl font-bold text-purple-600">89</div>
+                      <div className="text-sm text-muted-foreground">Helpful Votes</div>
+                    </PremiumCard>
+                  </motion.div>
+                </div>
+
+                {/* Leaderboard Preview */}
+                <PremiumCard className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold flex items-center">
+                      <Crown className="h-6 w-6 text-yellow-500 mr-2" />
+                      Weekly Leaderboard
+                    </h3>
+                    <AnimatedButton variant="secondary" size="sm">
+                      View Full Board
+                    </AnimatedButton>
+                  </div>
+                  <Leaderboard users={leaderboardUsers.slice(0, 5)} />
+                </PremiumCard>
+              </motion.div>
             </TabsContent>
           </Tabs>
+        </div>
+
+        {/* Floating Action Buttons - Duolingo Style */}
+        <div className="fixed bottom-6 left-6 z-40 flex flex-col space-y-4">
+          <motion.button
+            className="w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg flex items-center justify-center text-white hover:shadow-xl transition-all"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => {
+              emotionalDesign.celebrateCorrectAnswer();
+            }}
+            title="Practice Questions"
+          >
+            <Brain className="h-6 w-6" />
+          </motion.button>
+          
+          <motion.button
+            className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full shadow-lg flex items-center justify-center text-white hover:shadow-xl transition-all"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => {
+              emotionalDesign.showEncouragement();
+            }}
+            title="Daily Motivation"
+          >
+            <Heart className="h-5 w-5" />
+          </motion.button>
+          
+          <motion.button
+            className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-lg flex items-center justify-center text-white hover:shadow-xl transition-all"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => {
+              emotionalDesign.celebrateAchievement('Quick Study Session!');
+            }}
+            title="Quick Study"
+          >
+            <Zap className="h-5 w-5" />
+          </motion.button>
+        </div>
+
+        {/* Sound Toggle Button - Top Right */}
+        <motion.button
+          className={`fixed top-24 right-6 z-40 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all ${
+            emotionalDesign.soundEnabled 
+              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' 
+              : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+          }`}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => {
+            emotionalDesign.setSoundEnabled(!emotionalDesign.soundEnabled);
+            if (emotionalDesign.soundEnabled) {
+              emotionalDesign.sound.playSound('button-click');
+            }
+          }}
+          title={emotionalDesign.soundEnabled ? 'Mute Sounds' : 'Enable Sounds'}
+        >
+          {emotionalDesign.soundEnabled ? '🔊' : '🔇'}
+        </motion.button>
+
+        {/* Progress Ring for Daily Goal */}
+        <div className="fixed bottom-24 right-6 z-40">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 1, type: "spring" }}
+            className="relative w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center"
+          >
+            <div className="absolute inset-1 rounded-full border-4 border-gray-200 dark:border-gray-600"></div>
+            <div 
+              className="absolute inset-1 rounded-full border-4 border-blue-500 border-t-transparent transform -rotate-90"
+              style={{ 
+                borderRightColor: 'transparent',
+                borderBottomColor: 'transparent',
+                borderLeftColor: 'transparent'
+              }}
+            ></div>
+            <div className="text-xs font-bold text-center z-10">
+              <div className="text-blue-600">65%</div>
+              <div className="text-xs text-gray-500">Daily</div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Floating XP Indicator */}
+        <AnimatePresence>
+          {xpGain && (
+            <FloatingFeedback
+              type="correct"
+              message="Great job!"
+              value={25}
+              position={{ x: 80, y: 20 }}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Sparkle Effects for Interactions */}
+        <div className="fixed inset-0 pointer-events-none z-30">
+          <SparkleEffect trigger={xpGain}>
+            <div />
+          </SparkleEffect>
         </div>
       </div>
     </>
