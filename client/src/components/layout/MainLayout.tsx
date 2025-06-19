@@ -9,7 +9,7 @@ import ProfileSettingsModal from "@/components/profile/ProfileSettingsModal";
 import NovaLogo from "@/components/ui/NovaLogo";
 import { ThemeToggle, ThemeToggleCompact } from "@/components/ui/theme-toggle";
 import { FloatingNav } from "@/components/ui/floating-nav";
-import { NovaIntegration } from "@/components/mascot/NovaIntegration";
+
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -120,8 +120,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         {/* Premium Floating Navigation for Mobile - replaces bottom nav */}
         {isMobile && <FloatingNav variant="bottom" />}
         
-        {/* Nova AI Mascot Integration */}
-        <NovaIntegration />
+
       </div>
     </div>
   );

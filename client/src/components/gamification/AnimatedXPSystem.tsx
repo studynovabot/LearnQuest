@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { useUserContext } from '@/context/UserContext';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
-import { useMascot } from '@/hooks/useMascot';
+
 import { Zap, Award, Star, Crown, Sparkles } from 'lucide-react';
-import confetti from 'canvas-confetti';
+
 
 interface AnimatedXPSystemProps {
   showXPGain?: boolean;
@@ -20,7 +20,7 @@ const AnimatedXPSystem: React.FC<AnimatedXPSystemProps> = ({
 }) => {
   const { user } = useUserContext();
   const { getDailySPCap, getSPMultiplier } = useFeatureAccess();
-  const { celebrateLevelUp } = useMascot();
+
   
   const [animatingXP, setAnimatingXP] = useState(false);
   const [displayXP, setDisplayXP] = useState(user?.studyPoints || 0);
@@ -66,13 +66,6 @@ const AnimatedXPSystem: React.FC<AnimatedXPSystemProps> = ({
           // Check for level up
           if (level > previousLevel) {
             setLevelUpEffect(true);
-            celebrateLevelUp(level);
-            confetti({
-              particleCount: 100,
-              spread: 70,
-              origin: { y: 0.6 },
-              colors: ['#FFD700', '#FFA500', '#FF6347', '#32CD32', '#1E90FF']
-            });
             setTimeout(() => setLevelUpEffect(false), 3000);
           }
         }
@@ -80,7 +73,7 @@ const AnimatedXPSystem: React.FC<AnimatedXPSystemProps> = ({
       
       animateCounter();
     }
-  }, [showXPGain, xpGained, studyPoints, displayXP, level, previousLevel, celebrateLevelUp, onXPAnimationComplete]);
+  }, [showXPGain, xpGained, studyPoints, displayXP, level, previousLevel, onXPAnimationComplete]);
 
   const getLevelIcon = (currentLevel: number) => {
     if (currentLevel >= 50) return Crown;

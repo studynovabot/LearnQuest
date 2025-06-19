@@ -1,31 +1,11 @@
 import { Helmet } from 'react-helmet';
-import SubjectOverview from "@/components/dashboard/SubjectOverview";
-import AITutors from "@/components/dashboard/AITutors";
-import NovaLogo from "@/components/ui/NovaLogo";
-import WelcomeMessage from "@/components/dashboard/WelcomeMessage";
-import StudyPlanGenerator from "@/components/dashboard/StudyPlanGenerator";
-import VisualLearningTools from "@/components/dashboard/VisualLearningTools";
-import TextbookConnector from "@/components/dashboard/TextbookConnector";
-import PersonalizedDashboard from "@/components/dashboard/PersonalizedDashboard";
-import RankingSystem from "@/components/gamification/RankingSystem";
-import PointsActivity from "@/components/gamification/PointsActivity";
+
 import Leaderboard from "@/components/gamification/Leaderboard";
 import DailyChallenge from "@/components/gamification/DailyChallenge";
 import { useAuth } from "@/hooks/useAuth";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-import { Link } from "wouter";
-import { useEmotionalDesign, useEmotionalDesignSystems } from "@/context/EmotionalDesignContext";
-import { 
-  NovaBot, 
-  MascotDialogue, 
-  AnimatedXPSystem, 
-  AnimatedStreakSystem,
-  AnimatedButton,
-  FloatingFeedback,
-  SparkleEffect,
-  MagicalWelcome
-} from "@/components/emotional-design";
+import { motion } from "framer-motion";
+import { useState } from "react";
+
 import { PremiumCard, StatCard } from "@/components/premium/PremiumCard";
 import { PremiumButton } from "@/components/premium/PremiumButton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,7 +19,7 @@ import {
   Flame, 
   CheckCircle,
   ArrowRight,
-  Sparkles,
+
   Trophy,
   Star,
   BookOpen,
@@ -47,13 +27,9 @@ import {
   BarChart3,
   Calendar,
   MessageSquare,
-  Settings,
+
   Crown,
-  FileText,
-  BrainCircuit,
-  Link as LinkIcon,
   PlusCircle,
-  Lightbulb,
   Rocket,
   Medal,
   Gift,
@@ -62,41 +38,12 @@ import {
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const emotionalDesign = useEmotionalDesign();
-  const { mascot, interactions } = useEmotionalDesignSystems();
-  const [showWelcome, setShowWelcome] = useState(false);
-  const [currentStreak, setCurrentStreak] = useState(7);
-  const [xpGain, setXpGain] = useState(false);
+  const [currentStreak] = useState(7);
+  
+  const SPACE_CHAR = ' ';
+  const DEMO_TEXT = 'Demo';
 
-  // Check if user is new (first time visiting)
-  const isFirstTime = !localStorage.getItem('user-visited-dashboard');
 
-  useEffect(() => {
-    if (isFirstTime) {
-      setShowWelcome(true);
-      localStorage.setItem('user-visited-dashboard', 'true');
-    } else {
-      // Show welcome back message for returning users
-      setTimeout(() => {
-        emotionalDesign.showWelcome(true);
-      }, 1000);
-    }
-  }, [isFirstTime, emotionalDesign]);
-
-  // Simulate daily login streak check
-  useEffect(() => {
-    const lastLogin = localStorage.getItem('last-login-date');
-    const today = new Date().toDateString();
-    
-    if (lastLogin !== today) {
-      localStorage.setItem('last-login-date', today);
-      
-      // Simulate streak bonus after a few seconds
-      setTimeout(() => {
-        emotionalDesign.celebrateStreak(currentStreak);
-      }, 3000);
-    }
-  }, [currentStreak, emotionalDesign]);
 
   // Mock data for AI tutors
   const aiTutors = [
@@ -295,40 +242,6 @@ const Dashboard = () => {
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        {/* Welcome Flow for New Users */}
-        <AnimatePresence>
-          {showWelcome && (
-            <MagicalWelcome
-              isFirstTime={isFirstTime}
-              onComplete={() => {
-                setShowWelcome(false);
-                emotionalDesign.celebrateAchievement('Welcome to Study Nova!');
-              }}
-              onSkip={() => setShowWelcome(false)}
-            />
-          )}
-        </AnimatePresence>
-
-        {/* Floating NovaBot Mascot */}
-        {emotionalDesign.mascotEnabled && (
-          <motion.div
-            className="fixed bottom-6 right-6 z-50"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 2, type: "spring", stiffness: 300 }}
-            whileHover={{ scale: 1.1 }}
-            onClick={() => emotionalDesign.showEncouragement()}
-          >
-            <div className="relative cursor-pointer">
-              <NovaBot emotion="happy" size="lg" />
-              <motion.div
-                className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </div>
-          </motion.div>
-        )}
 
         {/* Subtle Background Elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
@@ -357,7 +270,7 @@ const Dashboard = () => {
                     </div>
                     <div>
                       <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground">
-                        Welcome, <span className="text-gradient">{user?.displayName?.split(' ')[0] || 'Demo'}</span>
+                        Welcome, <span className="text-gradient">{user?.displayName?.split(SPACE_CHAR)[0] || DEMO_TEXT}</span>
                       </h1>
                       <p className="text-muted-foreground text-xl mt-2">Ready to continue your learning journey?</p>
                     </div>
@@ -809,7 +722,7 @@ const Dashboard = () => {
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   className="cursor-pointer"
-                  onClick={() => emotionalDesign.celebrateCorrectAnswer()}
+                  onClick={() => {}}
                 >
                   <PremiumCard className="p-6 h-full bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
                     <div className="flex items-center mb-4">
@@ -824,16 +737,16 @@ const Dashboard = () => {
                     <p className="text-sm text-muted-foreground mb-4">
                       Jump into a focused study session with AI-powered learning
                     </p>
-                    <AnimatedButton variant="primary" className="w-full">
+                    <PremiumButton variant="primary" className="w-full">
                       Start Now ⚡
-                    </AnimatedButton>
+                    </PremiumButton>
                   </PremiumCard>
                 </motion.div>
 
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   className="cursor-pointer"
-                  onClick={() => emotionalDesign.celebrateAchievement('Practice Master!')}
+                  onClick={() => {}}
                 >
                   <PremiumCard className="p-6 h-full bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
                     <div className="flex items-center mb-4">
@@ -848,16 +761,16 @@ const Dashboard = () => {
                     <p className="text-sm text-muted-foreground mb-4">
                       Test your knowledge with adaptive practice questions
                     </p>
-                    <AnimatedButton variant="success" className="w-full">
+                    <PremiumButton variant="primary" className="w-full">
                       Take Test 🎯
-                    </AnimatedButton>
+                    </PremiumButton>
                   </PremiumCard>
                 </motion.div>
 
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   className="cursor-pointer"
-                  onClick={() => emotionalDesign.celebrateAchievement('AI Tutor Access')}
+                  onClick={() => {}}
                 >
                   <PremiumCard className="p-6 h-full bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
                     <div className="flex items-center mb-4">
@@ -872,9 +785,9 @@ const Dashboard = () => {
                     <p className="text-sm text-muted-foreground mb-4">
                       Get instant help from your personal AI tutor
                     </p>
-                    <AnimatedButton variant="secondary" className="w-full">
+                    <PremiumButton variant="secondary" className="w-full">
                       Chat Now 💬
-                    </AnimatedButton>
+                    </PremiumButton>
                   </PremiumCard>
                 </motion.div>
               </motion.div>
@@ -898,7 +811,7 @@ const Dashboard = () => {
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     className="cursor-pointer"
-                    onClick={() => emotionalDesign.celebrateStreak(currentStreak)}
+                    onClick={() => {}}
                   >
                     <PremiumCard className="p-6 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20">
                       <div className="flex items-center justify-between mb-4">
@@ -914,16 +827,16 @@ const Dashboard = () => {
                           <div className="text-xs">days</div>
                         </div>
                       </div>
-                      <AnimatedButton variant="primary" className="w-full">
+                      <PremiumButton variant="primary" className="w-full">
                         Extend Streak 🔥
-                      </AnimatedButton>
+                      </PremiumButton>
                     </PremiumCard>
                   </motion.div>
 
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     className="cursor-pointer"
-                    onClick={() => emotionalDesign.celebrateLevelUp(4)}
+                    onClick={() => {}}
                   >
                     <PremiumCard className="p-6 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20">
                       <div className="flex items-center justify-between mb-4">
@@ -939,9 +852,9 @@ const Dashboard = () => {
                           <div className="text-xs">sessions</div>
                         </div>
                       </div>
-                      <AnimatedButton variant="success" className="w-full">
+                      <PremiumButton variant="gradient" className="w-full">
                         Complete Goal 🏆
-                      </AnimatedButton>
+                      </PremiumButton>
                     </PremiumCard>
                   </motion.div>
                 </div>
@@ -964,7 +877,7 @@ const Dashboard = () => {
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     className="cursor-pointer"
-                    onClick={() => emotionalDesign.celebrateAchievement('Community Champion!')}
+                    onClick={() => {}}
                   >
                     <PremiumCard className="p-6 text-center bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20">
                       <Users className="h-12 w-12 text-blue-500 mx-auto mb-4" />
@@ -976,7 +889,7 @@ const Dashboard = () => {
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     className="cursor-pointer"
-                    onClick={() => emotionalDesign.celebrateAchievement('Questions Answered')}
+                    onClick={() => {}}
                   >
                     <PremiumCard className="p-6 text-center bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
                       <MessageSquare className="h-12 w-12 text-green-500 mx-auto mb-4" />
@@ -988,7 +901,7 @@ const Dashboard = () => {
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     className="cursor-pointer"
-                    onClick={() => emotionalDesign.showEncouragement()}
+                    onClick={() => {}}
                   >
                     <PremiumCard className="p-6 text-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
                       <Heart className="h-12 w-12 text-purple-500 mx-auto mb-4" />
@@ -1005,9 +918,9 @@ const Dashboard = () => {
                       <Crown className="h-6 w-6 text-yellow-500 mr-2" />
                       Weekly Leaderboard
                     </h3>
-                    <AnimatedButton variant="secondary" size="sm">
+                    <PremiumButton variant="secondary" size="sm">
                       View Full Board
-                    </AnimatedButton>
+                    </PremiumButton>
                   </div>
                   <Leaderboard users={leaderboardUsers.slice(0, 5)} />
                 </PremiumCard>
@@ -1022,9 +935,7 @@ const Dashboard = () => {
             className="w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg flex items-center justify-center text-white hover:shadow-xl transition-all"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => {
-              emotionalDesign.celebrateCorrectAnswer();
-            }}
+            onClick={() => {}}
             title="Practice Questions"
           >
             <Brain className="h-6 w-6" />
@@ -1034,9 +945,7 @@ const Dashboard = () => {
             className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full shadow-lg flex items-center justify-center text-white hover:shadow-xl transition-all"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => {
-              emotionalDesign.showEncouragement();
-            }}
+            onClick={() => {}}
             title="Daily Motivation"
           >
             <Heart className="h-5 w-5" />
@@ -1046,9 +955,7 @@ const Dashboard = () => {
             className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-lg flex items-center justify-center text-white hover:shadow-xl transition-all"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => {
-              emotionalDesign.celebrateAchievement('Quick Study Session!');
-            }}
+            onClick={() => {}}
             title="Quick Study"
           >
             <Zap className="h-5 w-5" />
@@ -1081,24 +988,7 @@ const Dashboard = () => {
           </motion.div>
         </div>
 
-        {/* Floating XP Indicator */}
-        <AnimatePresence>
-          {xpGain && (
-            <FloatingFeedback
-              type="correct"
-              message="Great job!"
-              value={25}
-              position={{ x: 80, y: 20 }}
-            />
-          )}
-        </AnimatePresence>
 
-        {/* Sparkle Effects for Interactions */}
-        <div className="fixed inset-0 pointer-events-none z-30">
-          <SparkleEffect trigger={xpGain}>
-            <div />
-          </SparkleEffect>
-        </div>
       </div>
     </>
   );

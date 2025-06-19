@@ -19,7 +19,7 @@ import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import confetti from 'canvas-confetti';
+
 import {
   SendIcon,
   MessageSquareIcon,
@@ -150,13 +150,7 @@ const ClassServer = () => {
     
     setShowNitroAnimation(true);
     
-    // Trigger confetti
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#5865F2', '#EB459E', '#FEE75C', '#57F287']
-    });
+
     
     // Animate avatar
     avatarControls.start({

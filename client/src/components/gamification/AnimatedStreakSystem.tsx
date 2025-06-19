@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { useUserContext } from '@/context/UserContext';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
-import { useMascot } from '@/hooks/useMascot';
+
 import { Flame, Shield, Calendar, AlertTriangle, Sparkles, Crown, Zap } from 'lucide-react';
 import FeatureAccess from '@/components/subscription/FeatureAccess';
-import confetti from 'canvas-confetti';
+
 
 interface AnimatedStreakSystemProps {
   onStreakUpdate?: (newStreak: number) => void;
@@ -20,7 +20,7 @@ const AnimatedStreakSystem: React.FC<AnimatedStreakSystemProps> = ({
 }) => {
   const { user } = useUserContext();
   const { getStreakInsurance } = useFeatureAccess();
-  const { celebrateStreak } = useMascot();
+
   
   const [streak, setStreak] = useState(user?.streak || 0);
   const [isStreakAnimating, setIsStreakAnimating] = useState(false);
@@ -77,15 +77,7 @@ const AnimatedStreakSystem: React.FC<AnimatedStreakSystemProps> = ({
       if (reachedMilestone) {
         setMilestoneReached(reachedMilestone);
         setShowMilestoneEffect(true);
-        celebrateStreak(streak);
-        
-        // Confetti for major milestones
-        confetti({
-          particleCount: reachedMilestone >= 30 ? 150 : 100,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ['#FF6B6B', '#FFE66D', '#FF8E53', '#4ECDC4', '#45B7D1']
-        });
+
         
         setTimeout(() => setShowMilestoneEffect(false), 4000);
       }
@@ -93,7 +85,7 @@ const AnimatedStreakSystem: React.FC<AnimatedStreakSystemProps> = ({
       setIsStreakAnimating(true);
       setTimeout(() => setIsStreakAnimating(false), 1000);
     }
-  }, [showStreakGain, streak, celebrateStreak]);
+  }, [showStreakGain, streak]);
 
   // Streak benefits configuration
   const streakBenefits = [

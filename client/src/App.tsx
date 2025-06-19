@@ -35,12 +35,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 // import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { useEffect } from "react";
 import { useUserContext } from "@/context/UserContext";
-import { EmotionalDesignProvider } from "@/context/EmotionalDesignContext";
 import PricingPage from "@/pages/PricingPage";
-import EnhancedDashboard from "@/pages/EnhancedDashboard";
-import EmotionalDesignDemo from "@/components/demo/EmotionalDesignDemo";
-import EmotionalDesignShowcase from "@/pages/EmotionalDesignShowcase";
-import NovaShowcase from "@/components/mascot/NovaShowcase";
 // import { Analytics } from "@vercel/analytics/react";
 // import { SpeedInsights } from "@vercel/speed-insights/react";
 
@@ -79,37 +74,7 @@ function Router() {
         </ProtectedRoute>
       </Route>
       
-      <Route path="/enhanced-dashboard">
-        <ProtectedRoute>
-          <MainLayout>
-            <EnhancedDashboard />
-          </MainLayout>
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path="/emotional-design-demo">
-        <ProtectedRoute>
-          <MainLayout>
-            <EmotionalDesignDemo />
-          </MainLayout>
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path="/emotional-design">
-        <ProtectedRoute>
-          <MainLayout>
-            <EmotionalDesignShowcase />
-          </MainLayout>
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path="/nova-showcase">
-        <ProtectedRoute>
-          <MainLayout>
-            <NovaShowcase />
-          </MainLayout>
-        </ProtectedRoute>
-      </Route>
+
       <Route path="/chat">
         <ProtectedRoute>
           <MainLayout>
@@ -269,12 +234,10 @@ function InnerApp() {
       storageKey="learnquest-theme-mode"
     >
       <UserProvider>
-        <EmotionalDesignProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
-        </EmotionalDesignProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
       </UserProvider>
     </ThemeProvider>
   );
