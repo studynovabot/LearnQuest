@@ -12,12 +12,18 @@
     </style>
 </head>
 <body>
-    <h1>NCERT Solutions API Test</h1>
+    <h1>NCERT Solutions API Test - REAL DATA</h1>
     
-    <button onclick="testSolutions()">Test Solutions API</button>
-    <button onclick="testStats()">Test Stats API</button>
-    <button onclick="testTestSolutions()">Test Mock Solutions API</button>
-    <button onclick="testTestStats()">Test Mock Stats API</button>
+    <div style="background: #e3f2fd; padding: 15px; margin: 10px 0; border-radius: 5px;">
+        <strong>🎉 Now Testing REAL PDF Data!</strong><br>
+        Using: Class 10 Science Chapter 1 - Chemical Reactions And Equations<br>
+        Mock data has been completely removed.
+    </div>
+    
+    <button onclick="testSolutions()">Test Real Solutions API</button>
+    <button onclick="testStats()">Test Real Stats API</button>
+    <button onclick="testSolutionContent()">Test Solution Content</button>
+    <button onclick="testTestSolutions()">Test Old Mock API (should be empty)</button>
     
     <div id="results"></div>
 
@@ -56,6 +62,10 @@
         
         function testTestStats() {
             testAPI(`${API_BASE}/ncert-solutions-test?action=stats`, 'Mock Stats API');
+        }
+        
+        function testSolutionContent() {
+            testAPI(`${API_BASE}/ncert-solutions/cbse-class10-science-ch1/content`, 'Solution Content API');
         }
     </script>
 </body>

@@ -210,46 +210,18 @@ const NCERTSolutions: React.FC = () => {
         ...(difficultyFilter && difficultyFilter !== 'all' && { difficulty: difficultyFilter }),
       });
 
-      // Try the main API first, fallback to test API if it fails
-      let response;
-      let data;
-      
-      try {
-        response = await fetch(`${config.apiUrl}/api/ncert-solutions?${params}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
-        });
+      const response = await fetch(`${config.apiUrl}/api/ncert-solutions?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        data = await response.json();
-      } catch (mainApiError) {
-        console.warn('Main API failed, trying test API:', mainApiError);
-        
-        // Fallback to test API
-        response = await fetch(`${config.apiUrl}/api/ncert-solutions-test?action=solutions`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Both main and test APIs failed');
-        }
-
-        data = await response.json();
-        
-        toast({
-          title: "Info",
-          description: "Using demo data - full functionality will be available soon",
-          variant: "default",
-        });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+
+      const data = await response.json();
       setSolutions(data.solutions || []);
       setPagination(prev => ({
         ...prev,
@@ -271,41 +243,18 @@ const NCERTSolutions: React.FC = () => {
     setStatsLoading(true);
     
     try {
-      // Try the main API first, fallback to test API if it fails
-      let response;
-      let stats;
-      
-      try {
-        response = await fetch(`${config.apiUrl}/api/ncert-solutions/stats`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
-        });
+      const response = await fetch(`${config.apiUrl}/api/ncert-solutions/stats`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        stats = await response.json();
-      } catch (mainApiError) {
-        console.warn('Main stats API failed, trying test API:', mainApiError);
-        
-        // Fallback to test API
-        response = await fetch(`${config.apiUrl}/api/ncert-solutions-test?action=stats`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Both main and test stats APIs failed');
-        }
-
-        stats = await response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      
+
+      const stats = await response.json();
       setSolutionStats(stats);
     } catch (err) {
       console.error('Error fetching solution stats:', err);
