@@ -1,44 +1,10 @@
-// Real NCERT Solutions API with actual PDF processing
+// Real NCERT Solutions API with advanced PDF processing
 import { handleCors } from '../utils/cors.js';
-import { processNCERTPDF, copyPDFToSolutions } from '../utils/pdf-processor-simple.js';
-import fs from 'fs';
-import path from 'path';
+import { getAllProcessedSolutions, getSolutionById } from './admin-pdf-upload.js';
 
-// In-memory storage for solutions (in production, use a database)
-let solutionsData = [];
-let isInitialized = false;
+// This API now serves processed Q&A data from the admin upload system
 
-// Initialize with the PDF file
-function initializeSolutions() {
-  if (isInitialized) return;
-  
-  try {
-    const pdfPath = path.join(process.cwd(), 'NCERT Solutions for Class 10 Science Chapter 1 Chemical Reactions And Equations - Free PDF Download.pdf');
-    
-    if (fs.existsSync(pdfPath)) {
-      console.log('📄 Processing NCERT PDF file...');
-      
-      // Process the PDF
-      const solutionData = processNCERTPDF(pdfPath);
-      
-      // Copy PDF to public solutions directory
-      const webPath = copyPDFToSolutions(pdfPath, solutionData.id);
-      solutionData.solutionFile = webPath;
-      
-      // Add to solutions array
-      solutionsData.push(solutionData);
-      
-      console.log('✅ NCERT PDF processed successfully:', solutionData.id);
-      isInitialized = true;
-    } else {
-      console.warn('⚠️ NCERT PDF file not found, using empty data');
-      isInitialized = true;
-    }
-  } catch (error) {
-    console.error('❌ Error initializing solutions:', error);
-    isInitialized = true; // Set to true to prevent repeated attempts
-  }
-}
+// No initialization needed - data comes from admin upload system
 
 // Get solutions with filtering and pagination
 function getSolutions(query = {}) {
@@ -50,36 +16,34 @@ function getSolutions(query = {}) {
     class: className = '',
     subject = '',
     difficulty = '',
-    sortBy = 'chapterNumber',
-    sortOrder = 'asc'
+    sortBy = 'processedAt',
+    sortOrder = 'desc'
   } = query;
 
-  let filteredSolutions = [...solutionsData];
+  // Get all processed solutions from admin upload system
+  const allSolutions = getAllProcessedSolutions();
+  let filteredSolutions = [...allSolutions];
 
   // Apply filters
   if (search) {
     const searchLower = search.toLowerCase();
     filteredSolutions = filteredSolutions.filter(sol => 
-      sol.chapter.toLowerCase().includes(searchLower) ||
-      sol.subject.toLowerCase().includes(searchLower) ||
-      sol.description?.toLowerCase().includes(searchLower)
+      sol.metadata.chapter.toLowerCase().includes(searchLower) ||
+      sol.metadata.subject.toLowerCase().includes(searchLower) ||
+      sol.filename.toLowerCase().includes(searchLower)
     );
   }
 
   if (board && board !== 'all') {
-    filteredSolutions = filteredSolutions.filter(sol => sol.board === board);
+    filteredSolutions = filteredSolutions.filter(sol => sol.metadata.board === board);
   }
 
   if (className && className !== 'all') {
-    filteredSolutions = filteredSolutions.filter(sol => sol.class === className);
+    filteredSolutions = filteredSolutions.filter(sol => sol.metadata.class === className);
   }
 
   if (subject && subject !== 'all') {
-    filteredSolutions = filteredSolutions.filter(sol => sol.subject === subject);
-  }
-
-  if (difficulty && difficulty !== 'all') {
-    filteredSolutions = filteredSolutions.filter(sol => sol.difficulty === difficulty);
+    filteredSolutions = filteredSolutions.filter(sol => sol.metadata.subject === subject);
   }
 
   // Sort solutions
@@ -114,39 +78,32 @@ function getSolutions(query = {}) {
 
 // Get statistics
 function getStatistics() {
-  const totalSolutions = solutionsData.length;
-  const availableSolutions = solutionsData.filter(sol => sol.isAvailable).length;
+  const allSolutions = getAllProcessedSolutions();
+  const totalSolutions = allSolutions.length;
+  const availableSolutions = allSolutions.filter(sol => sol.status === 'active').length;
   
-  // Count by difficulty
-  const easySolutions = solutionsData.filter(sol => sol.difficulty === 'easy').length;
-  const mediumSolutions = solutionsData.filter(sol => sol.difficulty === 'medium').length;
-  const hardSolutions = solutionsData.filter(sol => sol.difficulty === 'hard').length;
-  
-  // Most viewed
-  const mostViewed = Math.max(...solutionsData.map(sol => sol.viewCount), 0);
+  // Count total questions across all solutions
+  const totalQuestions = allSolutions.reduce((sum, sol) => sum + sol.totalQuestions, 0);
   
   // By class and subject
   const solutionsByClass = {};
   const solutionsBySubject = {};
   
-  solutionsData.forEach(sol => {
-    const key = `Class ${sol.class}`;
+  allSolutions.forEach(sol => {
+    const key = `Class ${sol.metadata.class}`;
     solutionsByClass[key] = (solutionsByClass[key] || 0) + 1;
-    solutionsBySubject[sol.subject] = (solutionsBySubject[sol.subject] || 0) + 1;
+    solutionsBySubject[sol.metadata.subject] = (solutionsBySubject[sol.metadata.subject] || 0) + 1;
   });
 
   return {
     totalSolutions,
     availableSolutions,
+    totalQuestions,
     pendingApproval: totalSolutions - availableSolutions,
-    easySolutions,
-    mediumSolutions,
-    hardSolutions,
-    mostViewed,
     solutionsByClass,
     solutionsBySubject,
-    recentUploads: solutionsData.filter(sol => {
-      const uploadDate = new Date(sol.uploadedAt);
+    recentUploads: allSolutions.filter(sol => {
+      const uploadDate = new Date(sol.processedAt);
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       return uploadDate > sevenDaysAgo;
@@ -155,22 +112,14 @@ function getStatistics() {
   };
 }
 
-// Get solution by ID
-function getSolutionById(id) {
-  const solution = solutionsData.find(sol => sol.id === id);
-  if (solution) {
-    // Increment view count
-    solution.viewCount += 1;
-    solution.lastViewed = new Date().toISOString();
-  }
-  return solution;
+// Get solution by ID with Q&A pairs
+function getSolutionWithQA(id) {
+  const solution = getSolutionById(id);
+  return solution; // This already includes Q&A pairs from admin upload system
 }
 
 export default function handler(req, res) {
   return handleCors(req, res, async (req, res) => {
-    // Initialize solutions if not done yet
-    initializeSolutions();
-    
     const { action, id } = req.query;
     const path = req.url;
     
@@ -185,14 +134,14 @@ export default function handler(req, res) {
           return res.status(400).json({ error: 'Solution ID is required' });
         }
         
-        const solution = getSolutionById(id);
+        const solution = getSolutionWithQA(id);
         if (!solution) {
           return res.status(404).json({ error: 'Solution not found' });
         }
         
         return res.status(200).json({
           solution,
-          message: 'Solution content fetched successfully'
+          message: 'Solution with Q&A pairs fetched successfully'
         });
         
       } else if (action === 'solutions' || req.method === 'GET') {

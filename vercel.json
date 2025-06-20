@@ -142,6 +142,27 @@
       }
     },
     {
+      "src": "/api/admin-pdf-upload",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/admin-pdf-upload.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept"
+      }
+    },
+    {
+      "src": "/api/ai-explanation",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/ai-explanation.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
+        "Content-Type": "application/json"
+      }
+    },
+    {
       "src": "/api/ncert-solutions-test",
       "methods": ["OPTIONS", "GET", "POST"],
       "dest": "/api/ncert-solutions-test.js",

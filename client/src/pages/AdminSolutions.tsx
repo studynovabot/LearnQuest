@@ -25,6 +25,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -49,7 +55,11 @@ import {
   TrendingUp,
   Loader2,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Brain,
+  Database,
+  Download,
+  RefreshCw
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -80,6 +90,34 @@ interface NCERTSolution {
   contentExtracted?: boolean;
 }
 
+interface QAPair {
+  question: string;
+  answer: string;
+  questionNumber: number;
+  board: string;
+  class: string;
+  subject: string;
+  chapter: string;
+  confidence: number;
+}
+
+interface ProcessingSession {
+  sessionId: string;
+  status: 'pending_review' | 'uploaded_to_database' | 'rejected';
+  metadata: {
+    board: string;
+    class: string;
+    subject: string;
+    chapter: string;
+    originalFilename: string;
+    fileSize: number;
+    uploadedAt: string;
+  };
+  qaPairs: QAPair[];
+  totalQuestions: number;
+  createdAt: string;
+}
+
 const AdminSolutions: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -90,6 +128,12 @@ const AdminSolutions: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
+  
+  // Smart PDF Upload State
+  const [processingSessions, setProcessingSessions] = useState<ProcessingSession[]>([]);
+  const [selectedSession, setSelectedSession] = useState<ProcessingSession | null>(null);
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const [uploadingToDatabase, setUploadingToDatabase] = useState(false);
   
   // Upload form state
   const [uploadData, setUploadData] = useState({
@@ -102,6 +146,15 @@ const AdminSolutions: React.FC = () => {
     difficulty: 'medium' as 'easy' | 'medium' | 'hard',
     file: null as File | null,
     thumbnailImage: null as File | null
+  });
+
+  // Smart PDF upload form state
+  const [smartUploadData, setSmartUploadData] = useState({
+    board: '',
+    class: '',
+    subject: '',
+    chapter: '',
+    pdfFile: null as File | null
   });
 
   // Check admin access
@@ -235,10 +288,150 @@ const AdminSolutions: React.FC = () => {
     }
   };
 
+  // Handle smart PDF upload
+  const handleSmartPDFUpload = async () => {
+    if (!smartUploadData.pdfFile || !smartUploadData.board || !smartUploadData.class || 
+        !smartUploadData.subject || !smartUploadData.chapter) {
+      toast({
+        title: "Error",
+        description: "Please fill all fields and select a PDF file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadLoading(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('board', smartUploadData.board);
+      formData.append('class', smartUploadData.class);
+      formData.append('subject', smartUploadData.subject);
+      formData.append('chapter', smartUploadData.chapter);
+      formData.append('pdfFile', smartUploadData.pdfFile);
+
+      const response = await fetch(`${config.apiUrl}/api/smart-pdf-upload?action=upload`, {
+        method: 'POST',
+        headers: {
+          'x-user-id': user?.uid || 'admin',
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to process PDF');
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: "PDF Processed Successfully! 🎉",
+          description: `Extracted ${result.totalQuestions} Q&A pairs. Ready for review.`,
+        });
+
+        // Reset form
+        setSmartUploadData({
+          board: '',
+          class: '',
+          subject: '',
+          chapter: '',
+          pdfFile: null
+        });
+
+        // Refresh processing sessions
+        fetchProcessingSessions();
+      } else {
+        throw new Error(result.message || 'Failed to process PDF');
+      }
+
+    } catch (err) {
+      console.error('Error processing PDF:', err);
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Failed to process PDF",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  // Fetch processing sessions
+  const fetchProcessingSessions = async () => {
+    try {
+      const response = await fetch(`${config.apiUrl}/api/smart-pdf-upload?action=sessions`, {
+        headers: {
+          'x-user-id': user?.uid || 'admin',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProcessingSessions(data.sessions || []);
+      }
+    } catch (error) {
+      console.error('Error fetching processing sessions:', error);
+    }
+  };
+
+  // Handle upload to database
+  const handleUploadToDatabase = async (sessionId: string) => {
+    setUploadingToDatabase(true);
+    
+    try {
+      const response = await fetch(`${config.apiUrl}/api/smart-pdf-upload?action=upload-to-database`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': user?.uid || 'admin',
+        },
+        body: JSON.stringify({ sessionId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload to database');
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: "Success! 🚀",
+          description: `Uploaded ${result.uploadedCount} Q&A pairs to database`,
+        });
+
+        // Refresh data
+        fetchProcessingSessions();
+        fetchData();
+        setIsReviewDialogOpen(false);
+      } else {
+        throw new Error(result.message || 'Failed to upload to database');
+      }
+
+    } catch (err) {
+      console.error('Error uploading to database:', err);
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Failed to upload to database",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingToDatabase(false);
+    }
+  };
+
+  // Open review dialog
+  const openReviewDialog = (session: ProcessingSession) => {
+    setSelectedSession(session);
+    setIsReviewDialogOpen(true);
+  };
+
   // Initial load
   useEffect(() => {
     if (user?.role === 'admin') {
       fetchData();
+      fetchProcessingSessions();
     }
   }, [user]);
 
@@ -273,11 +466,11 @@ const AdminSolutions: React.FC = () => {
           
           <div className="flex gap-2">
             <Button onClick={() => setIsUploadDialogOpen(true)}>
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Solution
+              <Brain className="w-4 h-4 mr-2" />
+              Smart PDF Upload
             </Button>
-            <Button variant="outline" onClick={fetchData}>
-              <FileText className="w-4 h-4 mr-2" />
+            <Button variant="outline" onClick={() => {fetchData(); fetchProcessingSessions();}}>
+              <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
             </Button>
           </div>
@@ -327,6 +520,90 @@ const AdminSolutions: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Processing Sessions */}
+        {processingSessions.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="h-5 w-5" />
+                PDF Processing Sessions
+              </CardTitle>
+              <CardDescription>
+                Review and approve AI-extracted Q&A pairs from uploaded PDFs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>PDF File</TableHead>
+                    <TableHead>Board/Class</TableHead>
+                    <TableHead>Subject</TableHead>
+                    <TableHead>Chapter</TableHead>
+                    <TableHead>Questions</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {processingSessions.map((session) => (
+                    <TableRow key={session.sessionId}>
+                      <TableCell className="font-medium">
+                        {session.metadata.originalFilename}
+                      </TableCell>
+                      <TableCell>
+                        {session.metadata.board} / Class {session.metadata.class}
+                      </TableCell>
+                      <TableCell>{session.metadata.subject}</TableCell>
+                      <TableCell>{session.metadata.chapter}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">
+                          {session.totalQuestions} Q&A pairs
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={
+                          session.status === 'pending_review' ? 'default' :
+                          session.status === 'uploaded_to_database' ? 'secondary' : 'destructive'
+                        }>
+                          {session.status === 'pending_review' ? 'Pending Review' :
+                           session.status === 'uploaded_to_database' ? 'Uploaded' : 'Rejected'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => openReviewDialog(session)}
+                          >
+                            <Eye className="w-4 h-4" />
+                            Review
+                          </Button>
+                          {session.status === 'pending_review' && (
+                            <Button 
+                              size="sm"
+                              onClick={() => handleUploadToDatabase(session.sessionId)}
+                              disabled={uploadingToDatabase}
+                            >
+                              {uploadingToDatabase ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Database className="w-4 h-4" />
+                              )}
+                              Upload to DB
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Solutions Table */}
         <Card>

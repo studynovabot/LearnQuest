@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useAuth } from '@/hooks/useAuth';
 import { config } from '@/config';
+import QACard from '@/components/QACard';
 import {
   Card,
   CardContent,
@@ -76,6 +77,33 @@ import {
 import { useToast } from '@/hooks/use-toast';
 
 // Enhanced interfaces for real solution data
+interface QAPair {
+  board: string;
+  class: string;
+  subject: string;
+  chapter: string;
+  question: string;
+  answer: string;
+  questionNumber: number;
+  extractedAt: string;
+  confidence: number;
+}
+
+interface ProcessedSolution {
+  id: string;
+  metadata: {
+    board: string;
+    class: string;
+    subject: string;
+    chapter: string;
+  };
+  qaPairs: QAPair[];
+  filename: string;
+  totalQuestions: number;
+  processedAt: string;
+  status: string;
+}
+
 interface NCERTSolution {
   id: string;
   board: string;
@@ -140,8 +168,17 @@ const NCERTSolutions: React.FC = () => {
   
   // State for solutions data
   const [solutions, setSolutions] = useState<NCERTSolution[]>([]);
+  const [processedSolutions, setProcessedSolutions] = useState<ProcessedSolution[]>([]);
+  const [selectedProcessedSolution, setSelectedProcessedSolution] = useState<ProcessedSolution | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Mock user data - in production get from auth
+  const [userData] = useState({
+    id: user?.uid || 'user123',
+    tier: (user?.customClaims?.tier || 'free') as 'free' | 'pro' | 'goat',
+    name: user?.displayName || 'User'
+  });
   const [pagination, setPagination] = useState<PaginationData>({
     total: 0,
     page: 1,

@@ -1,0 +1,1860 @@
+{
+    "checksum": "05c7243dbc09b6832db3850a57aa84d2616504984c3f4b67104fddc6b42dc9c9",
+    "data": {
+    "id": "01cf1b21-791b-4a06-aee6-461c89ad680b",
+    "createdAt": 1750417919474,
+    "updatedAt": 1750419144061,
+    "title": "Getting Started with Zencoder",
+    "messages": [
+        {
+            "id": "9921db7e-7479-4f1f-afd9-f83915bce4e6",
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "hi"
+                }
+            ],
+            "context": {
+                "codebaseEnabled": true
+            },
+            "createdAt": 1750417919529,
+            "isInternal": false,
+            "rawContent": {
+                "type": "doc",
+                "content": [
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "hi"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "85ef22ca-5680-418d-afca-d99145e2dfeb",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Hello! I'm here to help you analyze and resolve any software development issues you're encountering. \n\nI can assist you with:\n- Debugging code problems\n- Analyzing error messages\n- Reviewing and fixing implementation issues\n- Understanding codebase structure\n- Suggesting improvements and solutions\n\nWhat issue are you working on today? Please share:\n- The specific problem you're facing\n- Any error messages you're seeing\n- Relevant code snippets or file paths\n- What you were trying to accomplish when the issue occurred\n\nI'll analyze the context you provide and help you find a solution!"
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "c7841c5c-440a-423f-a532-9e4e378cbdf8"
+            },
+            "createdAt": 1750417932442,
+            "isInternal": false
+        },
+        {
+            "id": "48776ad4-6906-4df2-8261-3ae8b6082fac",
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Here's a precise and fully detailed prompt you can give to your AI coder to implement exactly what you want clearly and error-free:"
+                },
+                {
+                    "type": "text",
+                    "text": "🧠💻 AI Developer Prompt: Implement Smart PDF Upload + AI Explanation System for Study Nova Web App"
+                },
+                {
+                    "type": "text",
+                    "text": "📌 Objective:"
+                },
+                {
+                    "type": "text",
+                    "text": "Create a seamless system for uploading educational PDFs (by admin), extracting QA content, and enabling AI-powered explanation features only for Pro/Goat users. The goal is to simplify the flow so that students can easily access processed study materials with one-click AI help."
+                },
+                {
+                    "type": "text",
+                    "text": "🔧 Feature Requirements & Tech Implementation:"
+                },
+                {
+                    "type": "text",
+                    "text": "1. ✅ Single Method for PDF Upload (Admin Only):"
+                },
+                {
+                    "type": "text",
+                    "text": "Remove the “Vector Upload” vs “Admin Upload” confusion. Use only one, reliable method."
+                },
+                {
+                    "type": "text",
+                    "text": "Use a robust backend library like pdf-parse, pdfjs, or a Python microservice with PyMuPDF or pdfplumber to extract text from PDFs."
+                },
+                {
+                    "type": "text",
+                    "text": "Admin should upload a PDF file and assign:"
+                },
+                {
+                    "type": "text",
+                    "text": "Board (e.g. CBSE)"
+                },
+                {
+                    "type": "text",
+                    "text": "Class (e.g. Class 9)"
+                },
+                {
+                    "type": "text",
+                    "text": "Subject (e.g. Science)"
+                },
+                {
+                    "type": "text",
+                    "text": "Chapter (e.g. Force and Laws of Motion)"
+                },
+                {
+                    "type": "text",
+                    "text": "2. 🧠 Auto Processing of PDF:"
+                },
+                {
+                    "type": "text",
+                    "text": "Parse the PDF to detect questions and answers automatically."
+                },
+                {
+                    "type": "text",
+                    "text": "Structure them into a .jsonl format like:"
+                },
+                {
+                    "type": "codeSnippet",
+                    "text": "{\"question\": \"What is inertia?\", \"answer\": \"Inertia is the tendency of an object to resist a change in its state of motion.\", \"board\": \"CBSE\", \"class\": \"9\", \"subject\": \"Science\", \"chapter\": \"Force and Laws of Motion\"}\n",
+                    "language": "json"
+                },
+                {
+                    "type": "text",
+                    "text": "This jsonl file should be saved to the database or storage (e.g. MongoDB or Firebase, or S3 bucket)."
+                },
+                {
+                    "type": "text",
+                    "text": "3. 🔐 Access Restrictions:"
+                },
+                {
+                    "type": "text",
+                    "text": "Only Pro and Goat users will see a CTA button on each question: \"Get AI Help 🧠✨\"."
+                },
+                {
+                    "type": "text",
+                    "text": "This button should not appear for Free users."
+                },
+                {
+                    "type": "text",
+                    "text": "4. 💬 AI-Powered Help (via Groq or Ollama API):"
+                },
+                {
+                    "type": "text",
+                    "text": "When Pro/Goat user clicks “Get AI Help”:"
+                },
+                {
+                    "type": "text",
+                    "text": "Send the selected question and its answer as a prompt to the AI."
+                },
+                {
+                    "type": "text",
+                    "text": "Append an instruction: \"Explain this question and answer in more detail in a way that a Class X student can understand.\" (If user is in Class 9, use Class 10-level explanation to challenge but educate them.)"
+                },
+                {
+                    "type": "text",
+                    "text": "The AI should return a detailed and simplified explanation which is shown below the answer."
+                },
+                {
+                    "type": "text",
+                    "text": "5. 🔄 Caching or Rate Limit (Optional):"
+                },
+                {
+                    "type": "text",
+                    "text": "Implement caching or limit AI help usage per user per day if needed (e.g. 10/day)."
+                },
+                {
+                    "type": "text",
+                    "text": "Store AI response in database to avoid re-processing same questions."
+                },
+                {
+                    "type": "text",
+                    "text": "📁 Final JSONL Output Format:"
+                },
+                {
+                    "type": "text",
+                    "text": "Ensure that every parsed question-answer set from the PDF is stored with this structure:"
+                },
+                {
+                    "type": "codeSnippet",
+                    "text": "{\n  \"board\": \"CBSE\",\n  \"class\": \"9\",\n  \"subject\": \"Math\",\n  \"chapter\": \"Linear Equations\",\n  \"question\": \"What is the general form of a linear equation in one variable?\",\n  \"answer\": \"The general form is ax + b = 0, where a and b are real numbers and a ≠ 0.\"\n}\n",
+                    "language": "json"
+                },
+                {
+                    "type": "text",
+                    "text": "🎯 Final Notes:"
+                },
+                {
+                    "type": "text",
+                    "text": "Focus on error-free PDF parsing and accurate QA extraction."
+                },
+                {
+                    "type": "text",
+                    "text": "No multiple upload systems — use just one clean workflow for the admin."
+                },
+                {
+                    "type": "text",
+                    "text": "Make sure the AI “Explain” feature is contextual and adapted to user class level."
+                },
+                {
+                    "type": "text",
+                    "text": "Ensure the feature is scalable and can process hundreds of PDFs monthly."
+                }
+            ],
+            "context": {
+                "codebaseEnabled": true
+            },
+            "createdAt": 1750417999601,
+            "isInternal": false,
+            "rawContent": {
+                "type": "doc",
+                "content": [
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Here's a precise and fully detailed prompt you can give to your AI coder to implement exactly what you want clearly and error-free:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "🧠💻 AI Developer Prompt: Implement Smart PDF Upload + AI Explanation System for Study Nova Web App"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "📌 Objective:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Create a seamless system for uploading educational PDFs (by admin), extracting QA content, and enabling AI-powered explanation features only for Pro/Goat users. The goal is to simplify the flow so that students can easily access processed study materials with one-click AI help."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "🔧 Feature Requirements & Tech Implementation:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "1. ✅ Single Method for PDF Upload (Admin Only):"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Remove the “Vector Upload” vs “Admin Upload” confusion. Use only one, reliable method."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Use a robust backend library like pdf-parse, pdfjs, or a Python microservice with PyMuPDF or pdfplumber to extract text from PDFs."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Admin should upload a PDF file and assign:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Board (e.g. CBSE)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Class (e.g. Class 9)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Subject (e.g. Science)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Chapter (e.g. Force and Laws of Motion)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "2. 🧠 Auto Processing of PDF:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Parse the PDF to detect questions and answers automatically."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Structure them into a .jsonl format like:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "codeBlock",
+                        "attrs": {
+                            "language": "json"
+                        },
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "{\"question\": \"What is inertia?\", \"answer\": \"Inertia is the tendency of an object to resist a change in its state of motion.\", \"board\": \"CBSE\", \"class\": \"9\", \"subject\": \"Science\", \"chapter\": \"Force and Laws of Motion\"}\n"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "This jsonl file should be saved to the database or storage (e.g. MongoDB or Firebase, or S3 bucket)."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "3. 🔐 Access Restrictions:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Only Pro and Goat users will see a CTA button on each question: \"Get AI Help 🧠✨\"."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "This button should not appear for Free users."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "4. 💬 AI-Powered Help (via Groq or Ollama API):"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "When Pro/Goat user clicks “Get AI Help”:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Send the selected question and its answer as a prompt to the AI."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Append an instruction: \"Explain this question and answer in more detail in a way that a Class X student can understand.\" (If user is in Class 9, use Class 10-level explanation to challenge but educate them.)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "The AI should return a detailed and simplified explanation which is shown below the answer."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "5. 🔄 Caching or Rate Limit (Optional):"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Implement caching or limit AI help usage per user per day if needed (e.g. 10/day)."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Store AI response in database to avoid re-processing same questions."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "📁 Final JSONL Output Format:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Ensure that every parsed question-answer set from the PDF is stored with this structure:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "codeBlock",
+                        "attrs": {
+                            "language": "json"
+                        },
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "{\n  \"board\": \"CBSE\",\n  \"class\": \"9\",\n  \"subject\": \"Math\",\n  \"chapter\": \"Linear Equations\",\n  \"question\": \"What is the general form of a linear equation in one variable?\",\n  \"answer\": \"The general form is ax + b = 0, where a and b are real numbers and a ≠ 0.\"\n}\n"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "🎯 Final Notes:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Focus on error-free PDF parsing and accurate QA extraction."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No multiple upload systems — use just one clean workflow for the admin."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Make sure the AI “Explain” feature is contextual and adapted to user class level."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Ensure the feature is scalable and can process hundreds of PDFs monthly."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "425e8ac7-8292-4a51-9fce-39b4f0396903",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "I'll help you implement this Smart PDF Upload + AI Explanation System for your Study Nova web app. Let me first analyze your current codebase structure to understand the existing implementation and then create a comprehensive solution."
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01MSrN45JbQ5zC1Uupp2bigY",
+                    "statusText": "Viewed folder",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": ".",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\."
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "Great! I can see you have a comprehensive Study Nova web app with existing PDF processing capabilities. Let me examine the current PDF processing implementation and related files to understand the existing structure."
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01976B7zFXrntWKpuzdp4D6K",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "utils/pdf-processor.js",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\utils\\pdf-processor.js"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01BSsQxHnM6QYukGenL7naUq",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "utils/pdf-content-extractor.js",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\utils\\pdf-content-extractor.js"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01XDnZpa3fWSzeD4bg8cR5TA",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "api/ncert-management.js",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\api\\ncert-management.js"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01KUEFFupavbsUd66QUPBCq8",
+                    "statusText": "Viewed folder",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "processed-qa",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\processed-qa"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01FsqsaaCg9FG7kZTtMhuRpc",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "processed-qa/cbse-class10-science-chemical-reactions.jsonl",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\processed-qa\\cbse-class10-science-chemical-reactions.jsonl"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_017Zs3jiko3Hz36mFKJvjEwn",
+                    "statusText": "Viewed folder",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01Kv8Y5HGugESp1M3Fz2hgxj",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/components/VectorUpload.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\components\\VectorUpload.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "Now let me check the existing user management and subscription system to understand the current user tiers:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01JrACvFPiqckXQ2YNvkAAZS",
+                    "title": "Fulltext search",
+                    "statusText": "Done",
+                    "status": "SUCCESS",
+                    "isHidden": false
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_017SV39mhPeHR9xkjerJUZHp",
+                    "title": "Fulltext search",
+                    "statusText": "Done",
+                    "status": "SUCCESS",
+                    "isHidden": false
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01BfVgKPbcjnBJWqRWjVXpd1",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/constants/PremiumFeatures.ts",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\constants\\PremiumFeatures.ts"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "Perfect! Now I have a good understanding of your current system. Let me check the AI services to see how Groq is currently implemented:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_011wReSW42TDW2nztz2hgnk5",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "api/ai-services.js",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\api\\ai-services.js"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "Now let me check if there's a package.json to understand the current dependencies:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01G1w9qgto5s9RUPyaZmSfsX",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "package.json",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\package.json"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "Perfect! Now I have a comprehensive understanding of your Study Nova system. Let me implement the Smart PDF Upload + AI Explanation System according to your requirements. I'll create a streamlined solution that:\n\n1. **Simplifies PDF upload** (admin only, single method)\n2. **Auto-processes PDFs** into Q&A format\n3. **Restricts AI help** to Pro/Goat users only\n4. **Provides contextual AI explanations** adapted to user class level\n\nLet me start by creating the enhanced PDF processing system:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_0111jE44hvvZciN1BUt2xU4Y",
+                    "statusText": "Analyzing file",
+                    "status": "IN_PROGRESS",
+                    "isHidden": false
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "94d223e4-6a49-4754-a2f2-c38c0b5c047e"
+            },
+            "createdAt": 1750418002705,
+            "isInternal": false
+        },
+        {
+            "id": "e056ad1f-b871-4abf-95c3-36d97f08856e",
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Absolutely! Here's a precise and detailed prompt to give to your AI coder that fully reflects what you're trying to build:"
+                },
+                {
+                    "type": "text",
+                    "text": "📤🧠 AI Developer Prompt: Smart Admin PDF Upload to JSONL → Manual Review → Database Insertion for NCERT Solutions Page"
+                },
+                {
+                    "type": "text",
+                    "text": "📌 Objective:"
+                },
+                {
+                    "type": "text",
+                    "text": "Implement a complete backend and frontend flow that allows the admin to upload any NCERT solution PDF, auto-convert it to question-answer pairs (JSONL format), review it, and upload it to the database by clicking a CTA button. The NCERT Solutions page on the sidebar should dynamically fetch this data from the database, not from hardcoded content."
+                },
+                {
+                    "type": "text",
+                    "text": "🧩 Workflow & Feature Requirements:"
+                },
+                {
+                    "type": "text",
+                    "text": "✅ Step 1: Admin PDF Upload Panel"
+                },
+                {
+                    "type": "text",
+                    "text": "In the admin panel, create a clean UI to:"
+                },
+                {
+                    "type": "text",
+                    "text": "Upload a PDF."
+                },
+                {
+                    "type": "text",
+                    "text": "Select:"
+                },
+                {
+                    "type": "text",
+                    "text": "Board (Dropdown)"
+                },
+                {
+                    "type": "text",
+                    "text": "Class (Dropdown)"
+                },
+                {
+                    "type": "text",
+                    "text": "Subject (Dropdown)"
+                },
+                {
+                    "type": "text",
+                    "text": "Chapter (Dropdown or Manual Input)"
+                },
+                {
+                    "type": "text",
+                    "text": "🔄 Step 2: PDF Processing into Q&A (JSONL)"
+                },
+                {
+                    "type": "text",
+                    "text": "Once uploaded:"
+                },
+                {
+                    "type": "text",
+                    "text": "Use a backend service (Node.js, Python, or microservice) to:"
+                },
+                {
+                    "type": "text",
+                    "text": "Parse the PDF."
+                },
+                {
+                    "type": "text",
+                    "text": "Extract text and split it into question-answer pairs."
+                },
+                {
+                    "type": "text",
+                    "text": "Output the extracted data in .jsonl format with fields like:"
+                },
+                {
+                    "type": "codeSnippet",
+                    "text": "{\"question\": \"...\", \"answer\": \"...\", \"board\": \"CBSE\", \"class\": \"10\", \"subject\": \"Math\", \"chapter\": \"Real Numbers\"}\n",
+                    "language": "json"
+                },
+                {
+                    "type": "text",
+                    "text": "👀 Step 3: Admin Review UI"
+                },
+                {
+                    "type": "text",
+                    "text": "Show the extracted JSONL as a preview table in the admin panel:"
+                },
+                {
+                    "type": "text",
+                    "text": "Each row shows:"
+                },
+                {
+                    "type": "text",
+                    "text": "Question ✅"
+                },
+                {
+                    "type": "text",
+                    "text": "Answer ✅"
+                },
+                {
+                    "type": "text",
+                    "text": "Edit button (optional for quick fixes)"
+                },
+                {
+                    "type": "text",
+                    "text": "☑️ Step 4: CTA Button: “Upload to Database”"
+                },
+                {
+                    "type": "text",
+                    "text": "Once the admin is satisfied, show a CTA button:"
+                },
+                {
+                    "type": "text",
+                    "text": "\"Upload JSONL to Database 🚀\""
+                },
+                {
+                    "type": "text",
+                    "text": "On click:"
+                },
+                {
+                    "type": "text",
+                    "text": "Upload all pairs to the database."
+                },
+                {
+                    "type": "text",
+                    "text": "Each pair should store its metadata: board, class, subject, chapter."
+                },
+                {
+                    "type": "text",
+                    "text": "🧩 Step 5: Database Schema"
+                },
+                {
+                    "type": "text",
+                    "text": "Use a collection/table named ncert_solutions."
+                },
+                {
+                    "type": "text",
+                    "text": "Structure:"
+                },
+                {
+                    "type": "codeSnippet",
+                    "text": "{\n  \"board\": \"CBSE\",\n  \"class\": \"10\",\n  \"subject\": \"Science\",\n  \"chapter\": \"Life Processes\",\n  \"question\": \"...\",\n  \"answer\": \"...\"\n}\n",
+                    "language": "json"
+                },
+                {
+                    "type": "text",
+                    "text": "📂 Step 6: NCERT Solutions Page (User-Side)"
+                },
+                {
+                    "type": "text",
+                    "text": "Add a link on the sidebar: \"NCERT Solutions 📘\""
+                },
+                {
+                    "type": "text",
+                    "text": "User flow:"
+                },
+                {
+                    "type": "text",
+                    "text": "User selects:"
+                },
+                {
+                    "type": "text",
+                    "text": "Board, Class, Subject, Chapter"
+                },
+                {
+                    "type": "text",
+                    "text": "Frontend should fetch the Q&A pairs dynamically from the ncert_solutions database collection and display them beautifully."
+                },
+                {
+                    "type": "text",
+                    "text": "⚠️ Important Notes:"
+                },
+                {
+                    "type": "text",
+                    "text": "❌ Do NOT hardcode the PDF content or questions into the NCERT Solutions page."
+                },
+                {
+                    "type": "text",
+                    "text": "✅ All data should be pulled from the database based on user selection."
+                },
+                {
+                    "type": "text",
+                    "text": "Ensure smooth error handling during:"
+                },
+                {
+                    "type": "text",
+                    "text": "PDF parsing"
+                },
+                {
+                    "type": "text",
+                    "text": "JSONL generation"
+                },
+                {
+                    "type": "text",
+                    "text": "Upload confirmation"
+                }
+            ],
+            "context": {
+                "codebaseEnabled": true
+            },
+            "createdAt": 1750418499159,
+            "isInternal": false,
+            "rawContent": {
+                "type": "doc",
+                "content": [
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Absolutely! Here's a precise and detailed prompt to give to your AI coder that fully reflects what you're trying to build:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "📤🧠 AI Developer Prompt: Smart Admin PDF Upload to JSONL → Manual Review → Database Insertion for NCERT Solutions Page"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "📌 Objective:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Implement a complete backend and frontend flow that allows the admin to upload any NCERT solution PDF, auto-convert it to question-answer pairs (JSONL format), review it, and upload it to the database by clicking a CTA button. The NCERT Solutions page on the sidebar should dynamically fetch this data from the database, not from hardcoded content."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "🧩 Workflow & Feature Requirements:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "✅ Step 1: Admin PDF Upload Panel"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "In the admin panel, create a clean UI to:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Upload a PDF."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Select:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Board (Dropdown)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Class (Dropdown)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Subject (Dropdown)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Chapter (Dropdown or Manual Input)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "🔄 Step 2: PDF Processing into Q&A (JSONL)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Once uploaded:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Use a backend service (Node.js, Python, or microservice) to:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Parse the PDF."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Extract text and split it into question-answer pairs."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Output the extracted data in .jsonl format with fields like:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "codeBlock",
+                        "attrs": {
+                            "language": "json"
+                        },
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "{\"question\": \"...\", \"answer\": \"...\", \"board\": \"CBSE\", \"class\": \"10\", \"subject\": \"Math\", \"chapter\": \"Real Numbers\"}\n"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "👀 Step 3: Admin Review UI"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Show the extracted JSONL as a preview table in the admin panel:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Each row shows:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Question ✅"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Answer ✅"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Edit button (optional for quick fixes)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "☑️ Step 4: CTA Button: “Upload to Database”"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Once the admin is satisfied, show a CTA button:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "\"Upload JSONL to Database 🚀\""
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "On click:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Upload all pairs to the database."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Each pair should store its metadata: board, class, subject, chapter."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "🧩 Step 5: Database Schema"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Use a collection/table named ncert_solutions."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Structure:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "codeBlock",
+                        "attrs": {
+                            "language": "json"
+                        },
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "{\n  \"board\": \"CBSE\",\n  \"class\": \"10\",\n  \"subject\": \"Science\",\n  \"chapter\": \"Life Processes\",\n  \"question\": \"...\",\n  \"answer\": \"...\"\n}\n"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "📂 Step 6: NCERT Solutions Page (User-Side)"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Add a link on the sidebar: \"NCERT Solutions 📘\""
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "User flow:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "User selects:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Board, Class, Subject, Chapter"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Frontend should fetch the Q&A pairs dynamically from the ncert_solutions database collection and display them beautifully."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "⚠️ Important Notes:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "❌ Do NOT hardcode the PDF content or questions into the NCERT Solutions page."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "✅ All data should be pulled from the database based on user selection."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Ensure smooth error handling during:"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "PDF parsing"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "JSONL generation"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Upload confirmation"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "61734b27-345f-414d-8c3f-931759093819",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Perfect! I understand exactly what you need. Let me implement this Smart Admin PDF Upload to JSONL system with manual review and database insertion for your NCERT Solutions. I'll create a complete workflow from admin upload to user consumption.\n\nLet me start by analyzing your current system and then implement the solution step by step."
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01XicYdGDmghZ87jTXcR2rvt",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/AdminSolutions.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\AdminSolutions.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "Now let me implement the complete Smart PDF Upload system. I'll start by creating the enhanced PDF processor with proper PDF parsing capabilities:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01Qrnarcikg8ttVvZf8bgKWv",
+                    "status": "IN_PROGRESS",
+                    "isHidden": true,
+                    "localResult": "{\"status\":\"SUCCESS\",\"exitCode\":0,\"output\":\"\\u001b[?9001h\\u001b[?1004h\\u001b[?25l\\u001b[2J\\u001b[m\\u001b[H\\u001b]0;npm\\u0007\\u001b[?25h\\u001b[?25l\\u001b[8;3;158t\\u001b[K\\r\\n\\u001b[K\\r\\n\\u001b[K\\u001b[H\\u001b[?25h\\u001b]0;npm install pdf-parse pdf2pic multer\\u0007\\\\\\u001b[K\\u001b[?25l\\u001b[H|\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H/\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H-\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H\\\\\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H|\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H/\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H-\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H\\\\\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H|\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H/\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H-\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H\\\\\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H|\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H/\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H-\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H\\\\\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H|\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H/\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H-\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H\\\\\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H|\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H/\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[H-\\u001b[K\\u001b[?25h\\u001b[?25l\\u001b[1m\\u001b[Hnpm\\u001b[22m \\u001b[33mwarn \\u001b[94mdeprecated \\u001b[mgm@1.25.1: The gm module has been sunset. Please migrate to an alternative. https://github.com/aheckmann/gm?tab=readme-ov-file#2025-02-24-this-project-is-not-maintained\\r\\n-\\u001b[K\\u001b[?25h\\r\\\\\\u001b[K\\r|\\u001b[K\\r/\\u001b[K\\r-\\u001b[K\\r\\\\\\u001b[K\\r|\\u001b[K\\r/\\u001b[K\\r-\\u001b[K\\r\\\\\\u001b[K\\r|\\u001b[K\\r/\\u001b[K\\r-\\u001b[K\\r\\\\\\u001b[K\\r|\\u001b[K\\r/\\u001b[K\\r-\\u001b[K\\r\\\\\\u001b[K\\r|\\u001b[K\\r/\\u001b[K\\r-\\u001b[K\\r\\\\\\u001b[K\\r|\\u001b[K\\r/\\u001b[K\\r-\\u001b[K\\r\\\\\\u001b[K\\r|\\u001b[K\\r/\\u001b[K\\r-\\u001b[K\\r\\\\\\u001b[K\\r|\\u001b[K\\r/\\u001b[K\\r-\\u001b[K\\r\\\\\\u001b[K\\r|\\u001b[K\\r/\\u001b[K\\r-\\u001b[K\\r\\\\\\u001b[K\\r\\u001b[K\\nadded 17 packages, and audited 1294 packages in 17s\\r\\n\\n220 packages are looking for funding\\r\\n  run `npm fund` for details\\r\\n|\\r\\u001b[K\\n\\u001b[31m\\u001b[1m13\\u001b[m vulnerabilities (1 \\u001b[1mlow\\u001b[22m, 12 \\u001b[33m\\u001b[1mmoderate\\u001b[m)\\u001b[K\\r\\n\\nTo address issues that do not require attention, run:\\r\\n  npm audit fix\\r\\n\\nTo address all issues (including breaking changes), run:\\r\\n  npm audit fix --force\\r\\n\\nRun `npm audit` for details.\\r\\n\\u001b]0;C:\\\\WINDOWS\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\\u0007\"}"
+                },
+                {
+                    "type": "shellCommand",
+                    "command": "npm install pdf-parse pdf2pic multer",
+                    "id": "4cc06fcc-262b-418d-b5a7-501c4a82e033",
+                    "status": "SUCCESS",
+                    "toolCallId": "toolu_01Qrnarcikg8ttVvZf8bgKWv",
+                    "commandsRequiringConfirmation": [
+                        {
+                            "name": "npm",
+                            "arguments": [
+                                "install",
+                                "pdf-parse",
+                                "pdf2pic",
+                                "multer"
+                            ]
+                        }
+                    ],
+                    "exitCode": 0,
+                    "output": "\u001b[?9001h\u001b[?1004h\u001b[?25l\u001b[2J\u001b[m\u001b[H\u001b]0;npm\u0007\u001b[?25h\u001b[?25l\u001b[8;3;158t\u001b[K\r\n\u001b[K\r\n\u001b[K\u001b[H\u001b[?25h\u001b]0;npm install pdf-parse pdf2pic multer\u0007\\\u001b[K\u001b[?25l\u001b[H|\u001b[K\u001b[?25h\u001b[?25l\u001b[H/\u001b[K\u001b[?25h\u001b[?25l\u001b[H-\u001b[K\u001b[?25h\u001b[?25l\u001b[H\\\u001b[K\u001b[?25h\u001b[?25l\u001b[H|\u001b[K\u001b[?25h\u001b[?25l\u001b[H/\u001b[K\u001b[?25h\u001b[?25l\u001b[H-\u001b[K\u001b[?25h\u001b[?25l\u001b[H\\\u001b[K\u001b[?25h\u001b[?25l\u001b[H|\u001b[K\u001b[?25h\u001b[?25l\u001b[H/\u001b[K\u001b[?25h\u001b[?25l\u001b[H-\u001b[K\u001b[?25h\u001b[?25l\u001b[H\\\u001b[K\u001b[?25h\u001b[?25l\u001b[H|\u001b[K\u001b[?25h\u001b[?25l\u001b[H/\u001b[K\u001b[?25h\u001b[?25l\u001b[H-\u001b[K\u001b[?25h\u001b[?25l\u001b[H\\\u001b[K\u001b[?25h\u001b[?25l\u001b[H|\u001b[K\u001b[?25h\u001b[?25l\u001b[H/\u001b[K\u001b[?25h\u001b[?25l\u001b[H-\u001b[K\u001b[?25h\u001b[?25l\u001b[H\\\u001b[K\u001b[?25h\u001b[?25l\u001b[H|\u001b[K\u001b[?25h\u001b[?25l\u001b[H/\u001b[K\u001b[?25h\u001b[?25l\u001b[H-\u001b[K\u001b[?25h\u001b[?25l\u001b[1m\u001b[Hnpm\u001b[22m \u001b[33mwarn \u001b[94mdeprecated \u001b[mgm@1.25.1: The gm module has been sunset. Please migrate to an alternative. https://github.com/aheckmann/gm?tab=readme-ov-file#2025-02-24-this-project-is-not-maintained\r\n-\u001b[K\u001b[?25h\r\\\u001b[K\r|\u001b[K\r/\u001b[K\r-\u001b[K\r\\\u001b[K\r|\u001b[K\r/\u001b[K\r-\u001b[K\r\\\u001b[K\r|\u001b[K\r/\u001b[K\r-\u001b[K\r\\\u001b[K\r|\u001b[K\r/\u001b[K\r-\u001b[K\r\\\u001b[K\r|\u001b[K\r/\u001b[K\r-\u001b[K\r\\\u001b[K\r|\u001b[K\r/\u001b[K\r-\u001b[K\r\\\u001b[K\r|\u001b[K\r/\u001b[K\r-\u001b[K\r\\\u001b[K\r|\u001b[K\r/\u001b[K\r-\u001b[K\r\\\u001b[K\r|\u001b[K\r/\u001b[K\r-\u001b[K\r\\\u001b[K\r\u001b[K\nadded 17 packages, and audited 1294 packages in 17s\r\n\n220 packages are looking for funding\r\n  run `npm fund` for details\r\n|\r\u001b[K\n\u001b[31m\u001b[1m13\u001b[m vulnerabilities (1 \u001b[1mlow\u001b[22m, 12 \u001b[33m\u001b[1mmoderate\u001b[m)\u001b[K\r\n\nTo address issues that do not require attention, run:\r\n  npm audit fix\r\n\nTo address all issues (including breaking changes), run:\r\n  npm audit fix --force\r\n\nRun `npm audit` for details.\r\n\u001b]0;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007"
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "2010da25-e48f-4e8b-b6e5-43c2b0be5983"
+            },
+            "createdAt": 1750418502129,
+            "isInternal": false
+        },
+        {
+            "id": "7f3fcf74-5b89-4b7d-acdb-81f8de3c8a8a",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Great! Now let me create the enhanced PDF processor with proper PDF parsing capabilities:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01WpbTGvdYtL18GtZu12Ryfm",
+                    "statusText": "Change generated",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "utils/smart-pdf-processor.js",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\utils\\smart-pdf-processor.js"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "codeHunk",
+                    "lineBasedDiff": "--- utils/smart-pdf-processor.js\n+++ utils/smart-pdf-processor.js\n@@ -0,0 +1,350 @@\n+// Smart PDF Processor for NCERT Solutions - Extracts Q&A pairs from PDFs\n+import fs from 'fs';\n+import path from 'path';\n+import pdfParse from 'pdf-parse';\n+\n+// AI API configuration\n+const GROQ_API_KEY = process.env.GROQ_API_KEY;\n+\n+/**\n+ * Extract text from PDF using pdf-parse\n+ */\n+export async function extractTextFromPDF(filePath) {\n+  try {\n+    console.log('📄 Extracting text from PDF:', filePath);\n+    \n+    // Read PDF file\n+    const dataBuffer = fs.readFileSync(filePath);\n+    \n+    // Parse PDF\n+    const data = await pdfParse(dataBuffer);\n+    \n+    console.log(`✅ PDF parsed successfully. Pages: ${data.numpages}, Text length: ${data.text.length}`);\n+    \n+    return {\n+      text: data.text,\n+      numPages: data.numpages,\n+      info: data.info,\n+      metadata: data.metadata\n+    };\n+  } catch (error) {\n+    console.error('❌ PDF text extraction error:', error);\n+    throw new Error(`Failed to extract text from PDF: ${error.message}`);\n+  }\n+}\n+\n+/**\n+ * Process extracted text into Q&A pairs using AI\n+ */\n+export async function processTextToQAPairs(extractedText, metadata) {\n+  try {\n+    console.log('🧠 Processing text into Q&A pairs using AI...');\n+    \n+    const { board, class: className, subject, chapter } = metadata;\n+    \n+    // Create AI prompt for Q&A extraction\n+    const prompt = `\n+You are an expert educational content processor. Extract question-answer pairs from the following NCERT solution text.\n+\n+IMPORTANT INSTRUCTIONS:\n+1. Extract ONLY clear question-answer pairs\n+2. Questions should be complete and meaningful\n+3. Answers should be detailed and educational\n+4. Return ONLY a valid JSON array, no other text\n+5. Each object should have exactly these fields: \"question\", \"answer\"\n+6. Minimum 5 pairs, maximum 50 pairs\n+7. Skip any incomplete or unclear content\n+\n+Subject: ${subject}\n+Class: ${className}\n+Board: ${board}\n+Chapter: ${chapter}\n+\n+Text to process:\n+${extractedText.substring(0, 8000)} // Limit text to avoid token limits\n+\n+Return format (JSON array only):\n+[\n+  {\n+    \"question\": \"Complete question text here\",\n+    \"answer\": \"Complete detailed answer here\"\n+  }\n+]\n+`;\n+\n+    // Call Groq API\n+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {\n+      method: 'POST',\n+      headers: {\n+        'Authorization': `Bearer ${GROQ_API_KEY}`,\n+        'Content-Type': 'application/json'\n+      },\n+      body: JSON.stringify({\n+        model: 'llama-3.3-70b-versatile',\n+        messages: [\n+          {\n+            role: 'system',\n+            content: 'You are an expert educational content processor. Extract question-answer pairs and return only valid JSON array.'\n+          },\n+          {\n+            role: 'user',\n+            content: prompt\n+          }\n+        ],\n+        max_tokens: 4000,\n+        temperature: 0.3\n+      })\n+    });\n+\n+    if (!response.ok) {\n+      throw new Error(`AI processing failed: ${response.statusText}`);\n+    }\n+\n+    const data = await response.json();\n+    const aiResponse = data.choices[0].message.content;\n+\n+    // Parse AI response to extract JSON\n+    let qaPairs;\n+    try {\n+      // Try to extract JSON from the response\n+      const jsonMatch = aiResponse.match(/\\[[\\s\\S]*\\]/);\n+      if (jsonMatch) {\n+        qaPairs = JSON.parse(jsonMatch[0]);\n+      } else {\n+        // Fallback: try parsing the entire response\n+        qaPairs = JSON.parse(aiResponse);\n+      }\n+    } catch (parseError) {\n+      console.error('❌ Failed to parse AI response as JSON:', parseError);\n+      // Fallback: create basic Q&A pairs from text\n+      qaPairs = createFallbackQAPairs(extractedText, metadata);\n+    }\n+\n+    // Validate and clean Q&A pairs\n+    const validPairs = qaPairs\n+      .filter(pair => pair.question && pair.answer)\n+      .filter(pair => pair.question.length > 10 && pair.answer.length > 20)\n+      .map((pair, index) => ({\n+        question: pair.question.trim(),\n+        answer: pair.answer.trim(),\n+        questionNumber: index + 1,\n+        board,\n+        class: className,\n+        subject,\n+        chapter,\n+        extractedAt: new Date().toISOString(),\n+        confidence: 0.95\n+      }));\n+\n+    console.log(`✅ Extracted ${validPairs.length} Q&A pairs`);\n+    return validPairs;\n+\n+  } catch (error) {\n+    console.error('❌ AI processing error:', error);\n+    // Return fallback Q&A pairs\n+    return createFallbackQAPairs(extractedText, metadata);\n+  }\n+}\n+\n+/**\n+ * Create fallback Q&A pairs when AI processing fails\n+ */\n+function createFallbackQAPairs(text, metadata) {\n+  console.log('⚠️ Creating fallback Q&A pairs...');\n+  \n+  const { board, class: className, subject, chapter } = metadata;\n+  \n+  // Simple text processing to find potential Q&A patterns\n+  const lines = text.split('\\n').filter(line => line.trim().length > 0);\n+  const pairs = [];\n+  \n+  let currentQuestion = '';\n+  let currentAnswer = '';\n+  let questionNumber = 1;\n+  \n+  for (let i = 0; i < lines.length; i++) {\n+    const line = lines[i].trim();\n+    \n+    // Look for question patterns\n+    if (line.match(/^\\d+\\./) || line.includes('?') || line.toLowerCase().includes('question')) {\n+      if (currentQuestion && currentAnswer) {\n+        pairs.push({\n+          question: currentQuestion.trim(),\n+          answer: currentAnswer.trim(),\n+          questionNumber: questionNumber++,\n+          board,\n+          class: className,\n+          subject,\n+          chapter,\n+          extractedAt: new Date().toISOString(),\n+          confidence: 0.7\n+        });\n+      }\n+      currentQuestion = line;\n+      currentAnswer = '';\n+    } else if (currentQuestion && line.length > 20) {\n+      currentAnswer += (currentAnswer ? ' ' : '') + line;\n+    }\n+  }\n+  \n+  // Add the last pair\n+  if (currentQuestion && currentAnswer) {\n+    pairs.push({\n+      question: currentQuestion.trim(),\n+      answer: currentAnswer.trim(),\n+      questionNumber: questionNumber,\n+      board,\n+      class: className,\n+      subject,\n+      chapter,\n+      extractedAt: new Date().toISOString(),\n+      confidence: 0.7\n+    });\n+  }\n+  \n+  // If no pairs found, create a generic one\n+  if (pairs.length === 0) {\n+    pairs.push({\n+      question: `What is covered in ${chapter} of ${subject} for Class ${className}?`,\n+      answer: text.substring(0, 500) + '...',\n+      questionNumber: 1,\n+      board,\n+      class: className,\n+      subject,\n+      chapter,\n+      extractedAt: new Date().toISOString(),\n+      confidence: 0.5\n+    });\n+  }\n+  \n+  console.log(`⚠️ Created ${pairs.length} fallback Q&A pairs`);\n+  return pairs.slice(0, 20); // Limit to 20 pairs\n+}\n+\n+/**\n+ * Convert Q&A pairs to JSONL format\n+ */\n+export function convertToJSONL(qaPairs) {\n+  return qaPairs.map(pair => JSON.stringify(pair)).join('\\n');\n+}\n+\n+/**\n+ * Save JSONL to file\n+ */\n+export async function saveJSONLToFile(jsonlContent, outputPath) {\n+  try {\n+    // Ensure directory exists\n+    const dir = path.dirname(outputPath);\n+    if (!fs.existsSync(dir)) {\n+      fs.mkdirSync(dir, { recursive: true });\n+    }\n+    \n+    // Write JSONL file\n+    fs.writeFileSync(outputPath, jsonlContent, 'utf8');\n+    console.log(`✅ JSONL saved to: ${outputPath}`);\n+    \n+    return outputPath;\n+  } catch (error) {\n+    console.error('❌ Error saving JSONL file:', error);\n+    throw new Error(`Failed to save JSONL file: ${error.message}`);\n+  }\n+}\n+\n+/**\n+ * Main function to process PDF to JSONL\n+ */\n+export async function processPDFToJSONL(pdfPath, metadata) {\n+  try {\n+    console.log('🚀 Starting PDF to JSONL processing...');\n+    \n+    // Step 1: Extract text from PDF\n+    const extractedData = await extractTextFromPDF(pdfPath);\n+    \n+    // Step 2: Process text into Q&A pairs\n+    const qaPairs = await processTextToQAPairs(extractedData.text, metadata);\n+    \n+    // Step 3: Convert to JSONL\n+    const jsonlContent = convertToJSONL(qaPairs);\n+    \n+    // Step 4: Generate output filename\n+    const { board, class: className, subject, chapter } = metadata;\n+    const filename = `${board.toLowerCase()}-class${className}-${subject.toLowerCase()}-${chapter.toLowerCase().replace(/\\s+/g, '-')}.jsonl`;\n+    const outputPath = path.join(process.cwd(), 'processed-qa', filename);\n+    \n+    // Step 5: Save JSONL file\n+    await saveJSONLToFile(jsonlContent, outputPath);\n+    \n+    return {\n+      success: true,\n+      qaPairs,\n+      jsonlContent,\n+      outputPath,\n+      filename,\n+      totalQuestions: qaPairs.length,\n+      metadata: {\n+        ...metadata,\n+        processedAt: new Date().toISOString(),\n+        pdfPages: extractedData.numPages,\n+        textLength: extractedData.text.length\n+      }\n+    };\n+    \n+  } catch (error) {\n+    console.error('❌ PDF to JSONL processing failed:', error);\n+    return {\n+      success: false,\n+      error: error.message,\n+      qaPairs: [],\n+      totalQuestions: 0\n+    };\n+  }\n+}\n+\n+/**\n+ * Validate JSONL content\n+ */\n+export function validateJSONL(jsonlContent) {\n+  try {\n+    const lines = jsonlContent.split('\\n').filter(line => line.trim());\n+    const errors = [];\n+    \n+    lines.forEach((line, index) => {\n+      try {\n+        const obj = JSON.parse(line);\n+        \n+        // Check required fields\n+        const requiredFields = ['question', 'answer', 'board', 'class', 'subject', 'chapter'];\n+        const missingFields = requiredFields.filter(field => !obj[field]);\n+        \n+        if (missingFields.length > 0) {\n+          errors.push(`Line ${index + 1}: Missing fields: ${missingFields.join(', ')}`);\n+        }\n+        \n+        // Check field lengths\n+        if (obj.question && obj.question.length < 10) {\n+          errors.push(`Line ${index + 1}: Question too short`);\n+        }\n+        \n+        if (obj.answer && obj.answer.length < 20) {\n+          errors.push(`Line ${index + 1}: Answer too short`);\n+        }\n+        \n+      } catch (parseError) {\n+        errors.push(`Line ${index + 1}: Invalid JSON format`);\n+      }\n+    });\n+    \n+    return {\n+      isValid: errors.length === 0,\n+      errors,\n+      totalLines: lines.length\n+    };\n+    \n+  } catch (error) {\n+    return {\n+      isValid: false,\n+      errors: [`Validation error: ${error.message}`],\n+      totalLines: 0\n+    };\n+  }\n+}",
+                    "refToolCallId": "toolu_01WpbTGvdYtL18GtZu12Ryfm"
+                },
+                {
+                    "type": "text",
+                    "text": "Now let me create the API endpoint for handling the smart PDF upload:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01FLBtBm3Bdh6zxiNqxkdEky",
+                    "statusText": "Change generated",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "api/smart-pdf-upload.js",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\api\\smart-pdf-upload.js"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "codeHunk",
+                    "lineBasedDiff": "--- api/smart-pdf-upload.js\n+++ api/smart-pdf-upload.js\n@@ -0,0 +1,449 @@\n+// Smart PDF Upload API - Handles PDF upload, processing, and JSONL generation\n+import { handleCors } from '../utils/cors.js';\n+import { initializeFirebaseAdmin, getFirestoreAdminDb } from '../utils/firebase-admin.js';\n+import { processPDFToJSONL, validateJSONL } from '../utils/smart-pdf-processor.js';\n+import multiparty from 'multiparty';\n+import fs from 'fs';\n+import path from 'path';\n+\n+// Ensure upload directories exist\n+const UPLOAD_DIR = path.join(process.cwd(), 'uploads');\n+const PROCESSED_QA_DIR = path.join(process.cwd(), 'processed-qa');\n+\n+if (!fs.existsSync(UPLOAD_DIR)) {\n+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });\n+}\n+\n+if (!fs.existsSync(PROCESSED_QA_DIR)) {\n+  fs.mkdirSync(PROCESSED_QA_DIR, { recursive: true });\n+}\n+\n+// Handle PDF upload and processing\n+async function handlePDFUpload(req, res) {\n+  if (req.method !== 'POST') {\n+    return res.status(405).json({ \n+      success: false, \n+      message: 'Method not allowed' \n+    });\n+  }\n+\n+  try {\n+    initializeFirebaseAdmin();\n+    const db = getFirestoreAdminDb();\n+\n+    // Parse multipart form data\n+    const form = new multiparty.Form();\n+    \n+    const { fields, files } = await new Promise((resolve, reject) => {\n+      form.parse(req, (err, fields, files) => {\n+        if (err) reject(err);\n+        else resolve({ fields, files });\n+      });\n+    });\n+\n+    // Extract form data\n+    const board = fields.board?.[0];\n+    const className = fields.class?.[0];\n+    const subject = fields.subject?.[0];\n+    const chapter = fields.chapter?.[0];\n+    const pdfFile = files.pdfFile?.[0];\n+\n+    // Validate required fields\n+    if (!board || !className || !subject || !chapter || !pdfFile) {\n+      return res.status(400).json({\n+        success: false,\n+        message: 'Missing required fields: board, class, subject, chapter, and PDF file are required'\n+      });\n+    }\n+\n+    // Validate file type\n+    if (!pdfFile.originalFilename.toLowerCase().endsWith('.pdf')) {\n+      return res.status(400).json({\n+        success: false,\n+        message: 'Only PDF files are allowed'\n+      });\n+    }\n+\n+    // Validate file size (max 50MB)\n+    if (pdfFile.size > 50 * 1024 * 1024) {\n+      return res.status(400).json({\n+        success: false,\n+        message: 'File size must be less than 50MB'\n+      });\n+    }\n+\n+    console.log(`📤 Processing PDF upload: ${pdfFile.originalFilename}`);\n+    console.log(`📋 Metadata: ${board} | Class ${className} | ${subject} | ${chapter}`);\n+\n+    // Create metadata object\n+    const metadata = {\n+      board,\n+      class: className,\n+      subject,\n+      chapter,\n+      originalFilename: pdfFile.originalFilename,\n+      fileSize: pdfFile.size,\n+      uploadedAt: new Date().toISOString()\n+    };\n+\n+    // Process PDF to JSONL\n+    const processingResult = await processPDFToJSONL(pdfFile.path, metadata);\n+\n+    if (!processingResult.success) {\n+      return res.status(500).json({\n+        success: false,\n+        message: 'Failed to process PDF',\n+        error: processingResult.error\n+      });\n+    }\n+\n+    // Create processing session in database for admin review\n+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;\n+    \n+    const sessionData = {\n+      sessionId,\n+      status: 'pending_review',\n+      metadata,\n+      processingResult: {\n+        totalQuestions: processingResult.totalQuestions,\n+        filename: processingResult.filename,\n+        outputPath: processingResult.outputPath,\n+        processedAt: processingResult.metadata.processedAt\n+      },\n+      jsonlContent: processingResult.jsonlContent,\n+      qaPairs: processingResult.qaPairs,\n+      createdAt: new Date(),\n+      uploadedBy: req.headers['x-user-id'] || 'admin'\n+    };\n+\n+    // Save session to database\n+    await db.collection('pdf_processing_sessions').doc(sessionId).set(sessionData);\n+\n+    // Clean up uploaded file\n+    try {\n+      fs.unlinkSync(pdfFile.path);\n+    } catch (cleanupError) {\n+      console.warn('⚠️ Failed to cleanup uploaded file:', cleanupError.message);\n+    }\n+\n+    console.log(`✅ PDF processed successfully. Session ID: ${sessionId}`);\n+\n+    return res.status(200).json({\n+      success: true,\n+      message: 'PDF processed successfully',\n+      sessionId,\n+      totalQuestions: processingResult.totalQuestions,\n+      qaPairs: processingResult.qaPairs,\n+      metadata: processingResult.metadata\n+    });\n+\n+  } catch (error) {\n+    console.error('❌ PDF upload error:', error);\n+    return res.status(500).json({\n+      success: false,\n+      message: 'Internal server error',\n+      error: error.message\n+    });\n+  }\n+}\n+\n+// Get processing session details\n+async function getProcessingSession(req, res) {\n+  if (req.method !== 'GET') {\n+    return res.status(405).json({ message: 'Method not allowed' });\n+  }\n+\n+  try {\n+    initializeFirebaseAdmin();\n+    const db = getFirestoreAdminDb();\n+\n+    const { sessionId } = req.query;\n+\n+    if (!sessionId) {\n+      return res.status(400).json({\n+        success: false,\n+        message: 'Session ID is required'\n+      });\n+    }\n+\n+    const sessionDoc = await db.collection('pdf_processing_sessions').doc(sessionId).get();\n+\n+    if (!sessionDoc.exists) {\n+      return res.status(404).json({\n+        success: false,\n+        message: 'Processing session not found'\n+      });\n+    }\n+\n+    const sessionData = sessionDoc.data();\n+\n+    return res.status(200).json({\n+      success: true,\n+      session: {\n+        sessionId: sessionDoc.id,\n+        ...sessionData,\n+        createdAt: sessionData.createdAt?.toDate?.()?.toISOString?.() || sessionData.createdAt\n+      }\n+    });\n+\n+  } catch (error) {\n+    console.error('❌ Get session error:', error);\n+    return res.status(500).json({\n+      success: false,\n+      message: 'Failed to get processing session',\n+      error: error.message\n+    });\n+  }\n+}\n+\n+// Get all processing sessions\n+async function getAllProcessingSessions(req, res) {\n+  if (req.method !== 'GET') {\n+    return res.status(405).json({ message: 'Method not allowed' });\n+  }\n+\n+  try {\n+    initializeFirebaseAdmin();\n+    const db = getFirestoreAdminDb();\n+\n+    const { status, limit = 50 } = req.query;\n+\n+    let query = db.collection('pdf_processing_sessions')\n+      .orderBy('createdAt', 'desc')\n+      .limit(parseInt(limit));\n+\n+    if (status) {\n+      query = query.where('status', '==', status);\n+    }\n+\n+    const snapshot = await query.get();\n+    const sessions = [];\n+\n+    snapshot.forEach(doc => {\n+      const data = doc.data();\n+      sessions.push({\n+        sessionId: doc.id,\n+        ...data,\n+        createdAt: data.createdAt?.toDate?.()?.toISOString?.() || data.createdAt,\n+        // Don't include full JSONL content in list view\n+        jsonlContent: undefined,\n+        qaPairs: data.qaPairs ? data.qaPairs.slice(0, 3) : [] // Only first 3 for preview\n+      });\n+    });\n+\n+    return res.status(200).json({\n+      success: true,\n+      sessions,\n+      totalCount: sessions.length\n+    });\n+\n+  } catch (error) {\n+    console.error('❌ Get sessions error:', error);\n+    return res.status(500).json({\n+      success: false,\n+      message: 'Failed to get processing sessions',\n+      error: error.message\n+    });\n+  }\n+}\n+\n+// Upload JSONL to database (after admin review)\n+async function uploadJSONLToDatabase(req, res) {\n+  if (req.method !== 'POST') {\n+    return res.status(405).json({ message: 'Method not allowed' });\n+  }\n+\n+  try {\n+    initializeFirebaseAdmin();\n+    const db = getFirestoreAdminDb();\n+\n+    const { sessionId, approvedQAPairs } = req.body;\n+\n+    if (!sessionId) {\n+      return res.status(400).json({\n+        success: false,\n+        message: 'Session ID is required'\n+      });\n+    }\n+\n+    // Get processing session\n+    const sessionDoc = await db.collection('pdf_processing_sessions').doc(sessionId).get();\n+\n+    if (!sessionDoc.exists) {\n+      return res.status(404).json({\n+        success: false,\n+        message: 'Processing session not found'\n+      });\n+    }\n+\n+    const sessionData = sessionDoc.data();\n+    const qaPairsToUpload = approvedQAPairs || sessionData.qaPairs;\n+\n+    if (!qaPairsToUpload || qaPairsToUpload.length === 0) {\n+      return res.status(400).json({\n+        success: false,\n+        message: 'No Q&A pairs to upload'\n+      });\n+    }\n+\n+    console.log(`📤 Uploading ${qaPairsToUpload.length} Q&A pairs to database...`);\n+\n+    // Upload each Q&A pair to the ncert_solutions collection\n+    const uploadPromises = qaPairsToUpload.map(async (pair, index) => {\n+      const docId = `${sessionId}_q${index + 1}`;\n+      \n+      const solutionData = {\n+        id: docId,\n+        board: pair.board,\n+        class: parseInt(pair.class),\n+        subject: pair.subject,\n+        chapter: pair.chapter,\n+        questionNumber: pair.questionNumber || index + 1,\n+        question: pair.question,\n+        answer: pair.answer,\n+        difficulty: 'medium', // Default difficulty\n+        tags: [],\n+        views: 0,\n+        likes: 0,\n+        isApproved: true,\n+        extractedFromPDF: true,\n+        sessionId: sessionId,\n+        uploadedBy: req.headers['x-user-id'] || 'admin',\n+        createdAt: new Date(),\n+        updatedAt: new Date()\n+      };\n+\n+      await db.collection('ncert_solutions').doc(docId).set(solutionData);\n+      return docId;\n+    });\n+\n+    const uploadedIds = await Promise.all(uploadPromises);\n+\n+    // Update session status\n+    await db.collection('pdf_processing_sessions').doc(sessionId).update({\n+      status: 'uploaded_to_database',\n+      uploadedAt: new Date(),\n+      uploadedIds: uploadedIds,\n+      uploadedCount: uploadedIds.length\n+    });\n+\n+    console.log(`✅ Successfully uploaded ${uploadedIds.length} Q&A pairs to database`);\n+\n+    return res.status(200).json({\n+      success: true,\n+      message: `Successfully uploaded ${uploadedIds.length} Q&A pairs to database`,\n+      uploadedCount: uploadedIds.length,\n+      uploadedIds: uploadedIds\n+    });\n+\n+  } catch (error) {\n+    console.error('❌ Upload to database error:', error);\n+    return res.status(500).json({\n+      success: false,\n+      message: 'Failed to upload to database',\n+      error: error.message\n+    });\n+  }\n+}\n+\n+// Update Q&A pair in session\n+async function updateQAPair(req, res) {\n+  if (req.method !== 'PUT') {\n+    return res.status(405).json({ message: 'Method not allowed' });\n+  }\n+\n+  try {\n+    initializeFirebaseAdmin();\n+    const db = getFirestoreAdminDb();\n+\n+    const { sessionId, pairIndex, updatedPair } = req.body;\n+\n+    if (!sessionId || pairIndex === undefined || !updatedPair) {\n+      return res.status(400).json({\n+        success: false,\n+        message: 'Session ID, pair index, and updated pair data are required'\n+      });\n+    }\n+\n+    // Get processing session\n+    const sessionDoc = await db.collection('pdf_processing_sessions').doc(sessionId).get();\n+\n+    if (!sessionDoc.exists) {\n+      return res.status(404).json({\n+        success: false,\n+        message: 'Processing session not found'\n+      });\n+    }\n+\n+    const sessionData = sessionDoc.data();\n+    const qaPairs = [...sessionData.qaPairs];\n+\n+    if (pairIndex < 0 || pairIndex >= qaPairs.length) {\n+      return res.status(400).json({\n+        success: false,\n+        message: 'Invalid pair index'\n+      });\n+    }\n+\n+    // Update the specific Q&A pair\n+    qaPairs[pairIndex] = {\n+      ...qaPairs[pairIndex],\n+      ...updatedPair,\n+      updatedAt: new Date().toISOString()\n+    };\n+\n+    // Update session in database\n+    await db.collection('pdf_processing_sessions').doc(sessionId).update({\n+      qaPairs: qaPairs,\n+      lastModified: new Date()\n+    });\n+\n+    return res.status(200).json({\n+      success: true,\n+      message: 'Q&A pair updated successfully',\n+      updatedPair: qaPairs[pairIndex]\n+    });\n+\n+  } catch (error) {\n+    console.error('❌ Update Q&A pair error:', error);\n+    return res.status(500).json({\n+      success: false,\n+      message: 'Failed to update Q&A pair',\n+      error: error.message\n+    });\n+  }\n+}\n+\n+// Main handler with routing\n+export default function handler(req, res) {\n+  return handleCors(req, res, async (req, res) => {\n+    const { action, sessionId } = req.query;\n+\n+    try {\n+      switch (action) {\n+        case 'upload':\n+          return await handlePDFUpload(req, res);\n+        case 'session':\n+          return await getProcessingSession(req, res);\n+        case 'sessions':\n+          return await getAllProcessingSessions(req, res);\n+        case 'upload-to-database':\n+          return await uploadJSONLToDatabase(req, res);\n+        case 'update-pair':\n+          return await updateQAPair(req, res);\n+        default:\n+          return res.status(400).json({\n+            success: false,\n+            message: 'Invalid action. Use: upload, session, sessions, upload-to-database, or update-pair'\n+          });\n+      }\n+    } catch (error) {\n+      console.error('Smart PDF Upload API Error:', error);\n+      return res.status(500).json({\n+        success: false,\n+        message: 'Internal server error',\n+        error: error.message\n+      });\n+    }\n+  });\n+}",
+                    "refToolCallId": "toolu_01FLBtBm3Bdh6zxiNqxkdEky"
+                },
+                {
+                    "type": "text",
+                    "text": "Now let me create the enhanced Admin Solutions page with the smart PDF upload functionality:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01F1N69pYHa2uuSgpf2fR8ME",
+                    "statusText": "Change generated",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/AdminSolutions.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\AdminSolutions.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "codeHunk",
+                    "lineBasedDiff": "--- client/src/pages/AdminSolutions.tsx\n+++ client/src/pages/AdminSolutions.tsx\n@@ -25,6 +25,12 @@\n   DialogHeader,\n   DialogTitle,\n } from \"@/components/ui/dialog\";\n+import {\n+  Tabs,\n+  TabsContent,\n+  TabsList,\n+  TabsTrigger,\n+} from \"@/components/ui/tabs\";\n import { Button } from '@/components/ui/button';\n import { Input } from '@/components/ui/input';\n import { Label } from '@/components/ui/label';\n@@ -49,7 +55,11 @@\n   TrendingUp,\n   Loader2,\n   CheckCircle,\n-  AlertCircle\n+  AlertCircle,\n+  Brain,\n+  Database,\n+  Download,\n+  RefreshCw\n } from 'lucide-react';\n import { useToast } from '@/hooks/use-toast';\n ",
+                    "refToolCallId": "toolu_01F1N69pYHa2uuSgpf2fR8ME"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_019wZ1go72r4qUejSsGjkuMX",
+                    "statusText": "Change generated",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/AdminSolutions.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\AdminSolutions.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "codeHunk",
+                    "lineBasedDiff": "--- client/src/pages/AdminSolutions.tsx\n+++ client/src/pages/AdminSolutions.tsx\n@@ -90,6 +90,34 @@\n   contentExtracted?: boolean;\n }\n \n+interface QAPair {\n+  question: string;\n+  answer: string;\n+  questionNumber: number;\n+  board: string;\n+  class: string;\n+  subject: string;\n+  chapter: string;\n+  confidence: number;\n+}\n+\n+interface ProcessingSession {\n+  sessionId: string;\n+  status: 'pending_review' | 'uploaded_to_database' | 'rejected';\n+  metadata: {\n+    board: string;\n+    class: string;\n+    subject: string;\n+    chapter: string;\n+    originalFilename: string;\n+    fileSize: number;\n+    uploadedAt: string;\n+  };\n+  qaPairs: QAPair[];\n+  totalQuestions: number;\n+  createdAt: string;\n+}\n+\n const AdminSolutions: React.FC = () => {\n   const { user } = useAuth();\n   const { toast } = useToast();",
+                    "refToolCallId": "toolu_019wZ1go72r4qUejSsGjkuMX"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01MV87wRFyxJMJBabUrGrrA8",
+                    "statusText": "Change generated",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/AdminSolutions.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\AdminSolutions.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "codeHunk",
+                    "lineBasedDiff": "--- client/src/pages/AdminSolutions.tsx\n+++ client/src/pages/AdminSolutions.tsx\n@@ -129,6 +129,12 @@\n   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);\n   const [uploadLoading, setUploadLoading] = useState(false);\n   \n+  // Smart PDF Upload State\n+  const [processingSessions, setProcessingSessions] = useState<ProcessingSession[]>([]);\n+  const [selectedSession, setSelectedSession] = useState<ProcessingSession | null>(null);\n+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);\n+  const [uploadingToDatabase, setUploadingToDatabase] = useState(false);\n+  \n   // Upload form state\n   const [uploadData, setUploadData] = useState({\n     board: '',\n@@ -140,6 +146,15 @@\n     difficulty: 'medium' as 'easy' | 'medium' | 'hard',\n     file: null as File | null,\n     thumbnailImage: null as File | null\n+  });\n+\n+  // Smart PDF upload form state\n+  const [smartUploadData, setSmartUploadData] = useState({\n+    board: '',\n+    class: '',\n+    subject: '',\n+    chapter: '',\n+    pdfFile: null as File | null\n   });\n \n   // Check admin access",
+                    "refToolCallId": "toolu_01MV87wRFyxJMJBabUrGrrA8"
+                },
+                {
+                    "type": "text",
+                    "text": "Now let me add the smart PDF upload functions and UI components:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01Hc8rqnFrZbTuyhTMzgqDZp",
+                    "statusText": "Change generated",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/AdminSolutions.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\AdminSolutions.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "codeHunk",
+                    "lineBasedDiff": "--- client/src/pages/AdminSolutions.tsx\n+++ client/src/pages/AdminSolutions.tsx\n@@ -288,6 +288,145 @@\n     }\n   };\n \n+  // Handle smart PDF upload\n+  const handleSmartPDFUpload = async () => {\n+    if (!smartUploadData.pdfFile || !smartUploadData.board || !smartUploadData.class || \n+        !smartUploadData.subject || !smartUploadData.chapter) {\n+      toast({\n+        title: \"Error\",\n+        description: \"Please fill all fields and select a PDF file\",\n+        variant: \"destructive\",\n+      });\n+      return;\n+    }\n+\n+    setUploadLoading(true);\n+    \n+    try {\n+      const formData = new FormData();\n+      formData.append('board', smartUploadData.board);\n+      formData.append('class', smartUploadData.class);\n+      formData.append('subject', smartUploadData.subject);\n+      formData.append('chapter', smartUploadData.chapter);\n+      formData.append('pdfFile', smartUploadData.pdfFile);\n+\n+      const response = await fetch(`${config.apiUrl}/api/smart-pdf-upload?action=upload`, {\n+        method: 'POST',\n+        headers: {\n+          'x-user-id': user?.uid || 'admin',\n+        },\n+        body: formData,\n+      });\n+\n+      if (!response.ok) {\n+        throw new Error('Failed to process PDF');\n+      }\n+\n+      const result = await response.json();\n+      \n+      if (result.success) {\n+        toast({\n+          title: \"PDF Processed Successfully! 🎉\",\n+          description: `Extracted ${result.totalQuestions} Q&A pairs. Ready for review.`,\n+        });\n+\n+        // Reset form\n+        setSmartUploadData({\n+          board: '',\n+          class: '',\n+          subject: '',\n+          chapter: '',\n+          pdfFile: null\n+        });\n+\n+        // Refresh processing sessions\n+        fetchProcessingSessions();\n+      } else {\n+        throw new Error(result.message || 'Failed to process PDF');\n+      }\n+\n+    } catch (err) {\n+      console.error('Error processing PDF:', err);\n+      toast({\n+        title: \"Error\",\n+        description: err instanceof Error ? err.message : \"Failed to process PDF\",\n+        variant: \"destructive\",\n+      });\n+    } finally {\n+      setUploadLoading(false);\n+    }\n+  };\n+\n+  // Fetch processing sessions\n+  const fetchProcessingSessions = async () => {\n+    try {\n+      const response = await fetch(`${config.apiUrl}/api/smart-pdf-upload?action=sessions`, {\n+        headers: {\n+          'x-user-id': user?.uid || 'admin',\n+        },\n+      });\n+\n+      if (response.ok) {\n+        const data = await response.json();\n+        setProcessingSessions(data.sessions || []);\n+      }\n+    } catch (error) {\n+      console.error('Error fetching processing sessions:', error);\n+    }\n+  };\n+\n+  // Handle upload to database\n+  const handleUploadToDatabase = async (sessionId: string) => {\n+    setUploadingToDatabase(true);\n+    \n+    try {\n+      const response = await fetch(`${config.apiUrl}/api/smart-pdf-upload?action=upload-to-database`, {\n+        method: 'POST',\n+        headers: {\n+          'Content-Type': 'application/json',\n+          'x-user-id': user?.uid || 'admin',\n+        },\n+        body: JSON.stringify({ sessionId }),\n+      });\n+\n+      if (!response.ok) {\n+        throw new Error('Failed to upload to database');\n+      }\n+\n+      const result = await response.json();\n+      \n+      if (result.success) {\n+        toast({\n+          title: \"Success! 🚀\",\n+          description: `Uploaded ${result.uploadedCount} Q&A pairs to database`,\n+        });\n+\n+        // Refresh data\n+        fetchProcessingSessions();\n+        fetchData();\n+        setIsReviewDialogOpen(false);\n+      } else {\n+        throw new Error(result.message || 'Failed to upload to database');\n+      }\n+\n+    } catch (err) {\n+      console.error('Error uploading to database:', err);\n+      toast({\n+        title: \"Error\",\n+        description: err instanceof Error ? err.message : \"Failed to upload to database\",\n+        variant: \"destructive\",\n+      });\n+    } finally {\n+      setUploadingToDatabase(false);\n+    }\n+  };\n+\n+  // Open review dialog\n+  const openReviewDialog = (session: ProcessingSession) => {\n+    setSelectedSession(session);\n+    setIsReviewDialogOpen(true);\n+  };\n+\n   // Initial load\n   useEffect(() => {\n     if (user?.role === 'admin') {",
+                    "refToolCallId": "toolu_01Hc8rqnFrZbTuyhTMzgqDZp"
+                },
+                {
+                    "type": "text",
+                    "text": "Now let me update the useEffect to fetch processing sessions and modify the UI to include the smart PDF upload functionality:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01DYp5pwHsC7z7ZeXMmzoar4",
+                    "statusText": "Change generated",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/AdminSolutions.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\AdminSolutions.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "codeHunk",
+                    "lineBasedDiff": "--- client/src/pages/AdminSolutions.tsx\n+++ client/src/pages/AdminSolutions.tsx\n@@ -431,6 +431,7 @@\n   useEffect(() => {\n     if (user?.role === 'admin') {\n       fetchData();\n+      fetchProcessingSessions();\n     }\n   }, [user]);\n ",
+                    "refToolCallId": "toolu_01DYp5pwHsC7z7ZeXMmzoar4"
+                },
+                {
+                    "type": "text",
+                    "text": "Now let me update the main UI to include tabs for different upload methods:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_019NdWPGKtbem6cbrsFsxkw6",
+                    "statusText": "Change generated",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/AdminSolutions.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\AdminSolutions.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "codeHunk",
+                    "lineBasedDiff": "--- client/src/pages/AdminSolutions.tsx\n+++ client/src/pages/AdminSolutions.tsx\n@@ -466,11 +466,11 @@\n           \n           <div className=\"flex gap-2\">\n             <Button onClick={() => setIsUploadDialogOpen(true)}>\n-              <Upload className=\"w-4 h-4 mr-2\" />\n-              Upload Solution\n+              <Brain className=\"w-4 h-4 mr-2\" />\n+              Smart PDF Upload\n             </Button>\n-            <Button variant=\"outline\" onClick={fetchData}>\n-              <FileText className=\"w-4 h-4 mr-2\" />\n+            <Button variant=\"outline\" onClick={() => {fetchData(); fetchProcessingSessions();}}>\n+              <RefreshCw className=\"w-4 h-4 mr-2\" />\n               Refresh\n             </Button>\n           </div>",
+                    "refToolCallId": "toolu_019NdWPGKtbem6cbrsFsxkw6"
+                },
+                {
+                    "type": "text",
+                    "text": "Now let me add the processing sessions table after the stats cards:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01J7L5RB4pFXyQ5QodwVjXcj",
+                    "statusText": "Change generated",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/AdminSolutions.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\AdminSolutions.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "codeHunk",
+                    "lineBasedDiff": "--- client/src/pages/AdminSolutions.tsx\n+++ client/src/pages/AdminSolutions.tsx\n@@ -521,6 +521,90 @@\n           </Card>\n         </div>\n \n+        {/* Processing Sessions */}\n+        {processingSessions.length > 0 && (\n+          <Card>\n+            <CardHeader>\n+              <CardTitle className=\"flex items-center gap-2\">\n+                <Brain className=\"h-5 w-5\" />\n+                PDF Processing Sessions\n+              </CardTitle>\n+              <CardDescription>\n+                Review and approve AI-extracted Q&A pairs from uploaded PDFs\n+              </CardDescription>\n+            </CardHeader>\n+            <CardContent>\n+              <Table>\n+                <TableHeader>\n+                  <TableRow>\n+                    <TableHead>PDF File</TableHead>\n+                    <TableHead>Board/Class</TableHead>\n+                    <TableHead>Subject</TableHead>\n+                    <TableHead>Chapter</TableHead>\n+                    <TableHead>Questions</TableHead>\n+                    <TableHead>Status</TableHead>\n+                    <TableHead>Actions</TableHead>\n+                  </TableRow>\n+                </TableHeader>\n+                <TableBody>\n+                  {processingSessions.map((session) => (\n+                    <TableRow key={session.sessionId}>\n+                      <TableCell className=\"font-medium\">\n+                        {session.metadata.originalFilename}\n+                      </TableCell>\n+                      <TableCell>\n+                        {session.metadata.board} / Class {session.metadata.class}\n+                      </TableCell>\n+                      <TableCell>{session.metadata.subject}</TableCell>\n+                      <TableCell>{session.metadata.chapter}</TableCell>\n+                      <TableCell>\n+                        <Badge variant=\"secondary\">\n+                          {session.totalQuestions} Q&A pairs\n+                        </Badge>\n+                      </TableCell>\n+                      <TableCell>\n+                        <Badge variant={\n+                          session.status === 'pending_review' ? 'default' :\n+                          session.status === 'uploaded_to_database' ? 'secondary' : 'destructive'\n+                        }>\n+                          {session.status === 'pending_review' ? 'Pending Review' :\n+                           session.status === 'uploaded_to_database' ? 'Uploaded' : 'Rejected'}\n+                        </Badge>\n+                      </TableCell>\n+                      <TableCell>\n+                        <div className=\"flex items-center gap-2\">\n+                          <Button \n+                            size=\"sm\" \n+                            variant=\"outline\"\n+                            onClick={() => openReviewDialog(session)}\n+                          >\n+                            <Eye className=\"w-4 h-4\" />\n+                            Review\n+                          </Button>\n+                          {session.status === 'pending_review' && (\n+                            <Button \n+                              size=\"sm\"\n+                              onClick={() => handleUploadToDatabase(session.sessionId)}\n+                              disabled={uploadingToDatabase}\n+                            >\n+                              {uploadingToDatabase ? (\n+                                <Loader2 className=\"w-4 h-4 animate-spin\" />\n+                              ) : (\n+                                <Database className=\"w-4 h-4\" />\n+                              )}\n+                              Upload to DB\n+                            </Button>\n+                          )}\n+                        </div>\n+                      </TableCell>\n+                    </TableRow>\n+                  ))}\n+                </TableBody>\n+              </Table>\n+            </CardContent>\n+          </Card>\n+        )}\n+\n         {/* Solutions Table */}\n         <Card>\n           <CardHeader>",
+                    "refToolCallId": "toolu_01J7L5RB4pFXyQ5QodwVjXcj"
+                },
+                {
+                    "type": "text",
+                    "text": "Now let me update the upload dialog to include the smart PDF upload functionality:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01KaTXmiQzEUXSkWvTB5mznV",
+                    "title": "",
+                    "statusText": "Text to replace not found",
+                    "status": "WARNING",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/AdminSolutions.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\AdminSolutions.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "Let me check the current structure of the file to find the upload dialog:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01U69t5VAqVLRHi6RjJ6Auf5",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/AdminSolutions.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\AdminSolutions.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "codePatch",
+                    "diffs": [
+                        {
+                            "path": "client/src/pages/AdminSolutions.tsx",
+                            "patch": "@@ -551,16 +551,112 @@\n alog%22;%0D%0A\n+import %7B%0D%0A  Tabs,%0D%0A  TabsContent,%0D%0A  TabsList,%0D%0A  TabsTrigger,%0D%0A%7D from %22@/components/ui/tabs%22;%0D%0A\n import %7B\n@@ -1167,16 +1167,66 @@\n rtCircle\n+,%0D%0A  Brain,%0D%0A  Database,%0D%0A  Download,%0D%0A  RefreshCw\n %0D%0A%7D from\n@@ -1875,16 +1875,587 @@\n ;%0D%0A%7D%0D%0A%0D%0A\n+interface QAPair %7B%0D%0A  question: string;%0D%0A  answer: string;%0D%0A  questionNumber: number;%0D%0A  board: string;%0D%0A  class: string;%0D%0A  subject: string;%0D%0A  chapter: string;%0D%0A  confidence: number;%0D%0A%7D%0D%0A%0D%0Ainterface ProcessingSession %7B%0D%0A  sessionId: string;%0D%0A  status: 'pending_review' %7C 'uploaded_to_database' %7C 'rejected';%0D%0A  metadata: %7B%0D%0A    board: string;%0D%0A    class: string;%0D%0A    subject: string;%0D%0A    chapter: string;%0D%0A    originalFilename: string;%0D%0A    fileSize: number;%0D%0A    uploadedAt: string;%0D%0A  %7D;%0D%0A  qaPairs: QAPair%5B%5D;%0D%0A  totalQuestions: number;%0D%0A  createdAt: string;%0D%0A%7D%0D%0A%0D%0A\n const Ad\n@@ -2888,16 +2888,376 @@\n );%0D%0A  %0D%0A\n+  // Smart PDF Upload State%0D%0A  const %5BprocessingSessions, setProcessingSessions%5D = useState%3CProcessingSession%5B%5D%3E(%5B%5D);%0D%0A  const %5BselectedSession, setSelectedSession%5D = useState%3CProcessingSession %7C null%3E(null);%0D%0A  const %5BisReviewDialogOpen, setIsReviewDialogOpen%5D = useState(false);%0D%0A  const %5BuploadingToDatabase, setUploadingToDatabase%5D = useState(false);%0D%0A  %0D%0A\n   // Upl\n@@ -3567,24 +3567,229 @@\n l%0D%0A  %7D);%0D%0A%0D%0A\n+  // Smart PDF upload form state%0D%0A  const %5BsmartUploadData, setSmartUploadData%5D = useState(%7B%0D%0A    board: '',%0D%0A    class: '',%0D%0A    subject: '',%0D%0A    chapter: '',%0D%0A    pdfFile: null as File %7C null%0D%0A  %7D);%0D%0A%0D%0A\n   // Check a\n@@ -7600,24 +7600,4071 @@\n  %7D%0D%0A  %7D;%0D%0A%0D%0A\n+  // Handle smart PDF upload%0D%0A  const handleSmartPDFUpload = async () =%3E %7B%0D%0A    if (!smartUploadData.pdfFile %7C%7C !smartUploadData.board %7C%7C !smartUploadData.class %7C%7C %0D%0A        !smartUploadData.subject %7C%7C !smartUploadData.chapter) %7B%0D%0A      toast(%7B%0D%0A        title: %22Error%22,%0D%0A        description: %22Please fill all fields and select a PDF file%22,%0D%0A        variant: %22destructive%22,%0D%0A      %7D);%0D%0A      return;%0D%0A    %7D%0D%0A%0D%0A    setUploadLoading(true);%0D%0A    %0D%0A    try %7B%0D%0A      const formData = new FormData();%0D%0A      formData.append('board', smartUploadData.board);%0D%0A      formData.append('class', smartUploadData.class);%0D%0A      formData.append('subject', smartUploadData.subject);%0D%0A      formData.append('chapter', smartUploadData.chapter);%0D%0A      formData.append('pdfFile', smartUploadData.pdfFile);%0D%0A%0D%0A      const response = await fetch(%60$%7Bconfig.apiUrl%7D/api/smart-pdf-upload?action=upload%60, %7B%0D%0A        method: 'POST',%0D%0A        headers: %7B%0D%0A          'x-user-id': user?.uid %7C%7C 'admin',%0D%0A        %7D,%0D%0A        body: formData,%0D%0A      %7D);%0D%0A%0D%0A      if (!response.ok) %7B%0D%0A        throw new Error('Failed to process PDF');%0D%0A      %7D%0D%0A%0D%0A      const result = await response.json();%0D%0A      %0D%0A      if (result.success) %7B%0D%0A        toast(%7B%0D%0A          title: %22PDF Processed Successfully! %F0%9F%8E%89%22,%0D%0A          description: %60Extracted $%7Bresult.totalQuestions%7D Q&A pairs. Ready for review.%60,%0D%0A        %7D);%0D%0A%0D%0A        // Reset form%0D%0A        setSmartUploadData(%7B%0D%0A          board: '',%0D%0A          class: '',%0D%0A          subject: '',%0D%0A          chapter: '',%0D%0A          pdfFile: null%0D%0A        %7D);%0D%0A%0D%0A        // Refresh processing sessions%0D%0A        fetchProcessingSessions();%0D%0A      %7D else %7B%0D%0A        throw new Error(result.message %7C%7C 'Failed to process PDF');%0D%0A      %7D%0D%0A%0D%0A    %7D catch (err) %7B%0D%0A      console.error('Error processing PDF:', err);%0D%0A      toast(%7B%0D%0A        title: %22Error%22,%0D%0A        description: err instanceof Error ? err.message : %22Failed to process PDF%22,%0D%0A        variant: %22destructive%22,%0D%0A      %7D);%0D%0A    %7D finally %7B%0D%0A      setUploadLoading(false);%0D%0A    %7D%0D%0A  %7D;%0D%0A%0D%0A  // Fetch processing sessions%0D%0A  const fetchProcessingSessions = async () =%3E %7B%0D%0A    try %7B%0D%0A      const response = await fetch(%60$%7Bconfig.apiUrl%7D/api/smart-pdf-upload?action=sessions%60, %7B%0D%0A        headers: %7B%0D%0A          'x-user-id': user?.uid %7C%7C 'admin',%0D%0A        %7D,%0D%0A      %7D);%0D%0A%0D%0A      if (response.ok) %7B%0D%0A        const data = await response.json();%0D%0A        setProcessingSessions(data.sessions %7C%7C %5B%5D);%0D%0A      %7D%0D%0A    %7D catch (error) %7B%0D%0A      console.error('Error fetching processing sessions:', error);%0D%0A    %7D%0D%0A  %7D;%0D%0A%0D%0A  // Handle upload to database%0D%0A  const handleUploadToDatabase = async (sessionId: string) =%3E %7B%0D%0A    setUploadingToDatabase(true);%0D%0A    %0D%0A    try %7B%0D%0A      const response = await fetch(%60$%7Bconfig.apiUrl%7D/api/smart-pdf-upload?action=upload-to-database%60, %7B%0D%0A        method: 'POST',%0D%0A        headers: %7B%0D%0A          'Content-Type': 'application/json',%0D%0A          'x-user-id': user?.uid %7C%7C 'admin',%0D%0A        %7D,%0D%0A        body: JSON.stringify(%7B sessionId %7D),%0D%0A      %7D);%0D%0A%0D%0A      if (!response.ok) %7B%0D%0A        throw new Error('Failed to upload to database');%0D%0A      %7D%0D%0A%0D%0A      const result = await response.json();%0D%0A      %0D%0A      if (result.success) %7B%0D%0A        toast(%7B%0D%0A          title: %22Success! %F0%9F%9A%80%22,%0D%0A          description: %60Uploaded $%7Bresult.uploadedCount%7D Q&A pairs to database%60,%0D%0A        %7D);%0D%0A%0D%0A        // Refresh data%0D%0A        fetchProcessingSessions();%0D%0A        fetchData();%0D%0A        setIsReviewDialogOpen(false);%0D%0A      %7D else %7B%0D%0A        throw new Error(result.message %7C%7C 'Failed to upload to database');%0D%0A      %7D%0D%0A%0D%0A    %7D catch (err) %7B%0D%0A      console.error('Error uploading to database:', err);%0D%0A      toast(%7B%0D%0A        title: %22Error%22,%0D%0A        description: err instanceof Error ? err.message : %22Failed to upload to database%22,%0D%0A        variant: %22destructive%22,%0D%0A      %7D);%0D%0A    %7D finally %7B%0D%0A      setUploadingToDatabase(false);%0D%0A    %7D%0D%0A  %7D;%0D%0A%0D%0A  // Open review dialog%0D%0A  const openReviewDialog = (session: ProcessingSession) =%3E %7B%0D%0A    setSelectedSession(session);%0D%0A    setIsReviewDialogOpen(true);%0D%0A  %7D;%0D%0A%0D%0A\n   // Initial\n@@ -11742,24 +11742,58 @@\n tchData();%0D%0A\n+      fetchProcessingSessions();%0D%0A\n     %7D%0D%0A  %7D, \n@@ -12953,38 +12953,37 @@\n %0A              %3C\n-Upload\n+Brain\n  className=%22w-4 \n@@ -13006,39 +13006,40 @@\n             \n-Upload Solution\n+Smart PDF Upload\n %0D%0A          \n@@ -13097,16 +13097,23 @@\n onClick=\n+%7B() =%3E \n %7BfetchDa\n@@ -13114,16 +13114,47 @@\n etchData\n+(); fetchProcessingSessions();%7D\n %7D%3E%0D%0A    \n@@ -13164,24 +13164,25 @@\n        %3C\n-FileText\n+RefreshCw\n  classNa\n@@ -15385,32 +15385,3813 @@\n       %3C/div%3E%0D%0A%0D%0A\n+        %7B/* Processing Sessions */%7D%0D%0A        %7BprocessingSessions.length %3E 0 && (%0D%0A          %3CCard%3E%0D%0A            %3CCardHeader%3E%0D%0A              %3CCardTitle className=%22flex items-center gap-2%22%3E%0D%0A                %3CBrain className=%22h-5 w-5%22 /%3E%0D%0A                PDF Processing Sessions%0D%0A              %3C/CardTitle%3E%0D%0A              %3CCardDescription%3E%0D%0A                Review and approve AI-extracted Q&A pairs from uploaded PDFs%0D%0A              %3C/CardDescription%3E%0D%0A            %3C/CardHeader%3E%0D%0A            %3CCardContent%3E%0D%0A              %3CTable%3E%0D%0A                %3CTableHeader%3E%0D%0A                  %3CTableRow%3E%0D%0A                    %3CTableHead%3EPDF File%3C/TableHead%3E%0D%0A                    %3CTableHead%3EBoard/Class%3C/TableHead%3E%0D%0A                    %3CTableHead%3ESubject%3C/TableHead%3E%0D%0A                    %3CTableHead%3EChapter%3C/TableHead%3E%0D%0A                    %3CTableHead%3EQuestions%3C/TableHead%3E%0D%0A                    %3CTableHead%3EStatus%3C/TableHead%3E%0D%0A                    %3CTableHead%3EActions%3C/TableHead%3E%0D%0A                  %3C/TableRow%3E%0D%0A                %3C/TableHeader%3E%0D%0A                %3CTableBody%3E%0D%0A                  %7BprocessingSessions.map((session) =%3E (%0D%0A                    %3CTableRow key=%7Bsession.sessionId%7D%3E%0D%0A                      %3CTableCell className=%22font-medium%22%3E%0D%0A                        %7Bsession.metadata.originalFilename%7D%0D%0A                      %3C/TableCell%3E%0D%0A                      %3CTableCell%3E%0D%0A                        %7Bsession.metadata.board%7D / Class %7Bsession.metadata.class%7D%0D%0A                      %3C/TableCell%3E%0D%0A                      %3CTableCell%3E%7Bsession.metadata.subject%7D%3C/TableCell%3E%0D%0A                      %3CTableCell%3E%7Bsession.metadata.chapter%7D%3C/TableCell%3E%0D%0A                      %3CTableCell%3E%0D%0A                        %3CBadge variant=%22secondary%22%3E%0D%0A                          %7Bsession.totalQuestions%7D Q&A pairs%0D%0A                        %3C/Badge%3E%0D%0A                      %3C/TableCell%3E%0D%0A                      %3CTableCell%3E%0D%0A                        %3CBadge variant=%7B%0D%0A                          session.status === 'pending_review' ? 'default' :%0D%0A                          session.status === 'uploaded_to_database' ? 'secondary' : 'destructive'%0D%0A                        %7D%3E%0D%0A                          %7Bsession.status === 'pending_review' ? 'Pending Review' :%0D%0A                           session.status === 'uploaded_to_database' ? 'Uploaded' : 'Rejected'%7D%0D%0A                        %3C/Badge%3E%0D%0A                      %3C/TableCell%3E%0D%0A                      %3CTableCell%3E%0D%0A                        %3Cdiv className=%22flex items-center gap-2%22%3E%0D%0A                          %3CButton %0D%0A                            size=%22sm%22 %0D%0A                            variant=%22outline%22%0D%0A                            onClick=%7B() =%3E openReviewDialog(session)%7D%0D%0A                          %3E%0D%0A                            %3CEye className=%22w-4 h-4%22 /%3E%0D%0A                            Review%0D%0A                          %3C/Button%3E%0D%0A                          %7Bsession.status === 'pending_review' && (%0D%0A                            %3CButton %0D%0A                              size=%22sm%22%0D%0A                              onClick=%7B() =%3E handleUploadToDatabase(session.sessionId)%7D%0D%0A                              disabled=%7BuploadingToDatabase%7D%0D%0A                            %3E%0D%0A                              %7BuploadingToDatabase ? (%0D%0A                                %3CLoader2 className=%22w-4 h-4 animate-spin%22 /%3E%0D%0A                              ) : (%0D%0A                                %3CDatabase className=%22w-4 h-4%22 /%3E%0D%0A                              )%7D%0D%0A                              Upload to DB%0D%0A                            %3C/Button%3E%0D%0A                          )%7D%0D%0A                        %3C/div%3E%0D%0A                      %3C/TableCell%3E%0D%0A                    %3C/TableRow%3E%0D%0A                  ))%7D%0D%0A                %3C/TableBody%3E%0D%0A              %3C/Table%3E%0D%0A            %3C/CardContent%3E%0D%0A          %3C/Card%3E%0D%0A        )%7D%0D%0A%0D%0A\n         %7B/* Solu\n",
+                            "isNew": false,
+                            "isApplied": true
+                        },
+                        {
+                            "path": "utils/smart-pdf-processor.js",
+                            "patch": "@@ -0,0 +1,10231 @@\n+// Smart PDF Processor for NCERT Solutions - Extracts Q&A pairs from PDFs%0D%0Aimport fs from 'fs';%0D%0Aimport path from 'path';%0D%0Aimport pdfParse from 'pdf-parse';%0D%0A%0D%0A// AI API configuration%0D%0Aconst GROQ_API_KEY = process.env.GROQ_API_KEY;%0D%0A%0D%0A/**%0D%0A * Extract text from PDF using pdf-parse%0D%0A */%0D%0Aexport async function extractTextFromPDF(filePath) %7B%0D%0A  try %7B%0D%0A    console.log('%F0%9F%93%84 Extracting text from PDF:', filePath);%0D%0A    %0D%0A    // Read PDF file%0D%0A    const dataBuffer = fs.readFileSync(filePath);%0D%0A    %0D%0A    // Parse PDF%0D%0A    const data = await pdfParse(dataBuffer);%0D%0A    %0D%0A    console.log(%60%E2%9C%85 PDF parsed successfully. Pages: $%7Bdata.numpages%7D, Text length: $%7Bdata.text.length%7D%60);%0D%0A    %0D%0A    return %7B%0D%0A      text: data.text,%0D%0A      numPages: data.numpages,%0D%0A      info: data.info,%0D%0A      metadata: data.metadata%0D%0A    %7D;%0D%0A  %7D catch (error) %7B%0D%0A    console.error('%E2%9D%8C PDF text extraction error:', error);%0D%0A    throw new Error(%60Failed to extract text from PDF: $%7Berror.message%7D%60);%0D%0A  %7D%0D%0A%7D%0D%0A%0D%0A/**%0D%0A * Process extracted text into Q&A pairs using AI%0D%0A */%0D%0Aexport async function processTextToQAPairs(extractedText, metadata) %7B%0D%0A  try %7B%0D%0A    console.log('%F0%9F%A7%A0 Processing text into Q&A pairs using AI...');%0D%0A    %0D%0A    const %7B board, class: className, subject, chapter %7D = metadata;%0D%0A    %0D%0A    // Create AI prompt for Q&A extraction%0D%0A    const prompt = %60%0D%0AYou are an expert educational content processor. Extract question-answer pairs from the following NCERT solution text.%0D%0A%0D%0AIMPORTANT INSTRUCTIONS:%0D%0A1. Extract ONLY clear question-answer pairs%0D%0A2. Questions should be complete and meaningful%0D%0A3. Answers should be detailed and educational%0D%0A4. Return ONLY a valid JSON array, no other text%0D%0A5. Each object should have exactly these fields: %22question%22, %22answer%22%0D%0A6. Minimum 5 pairs, maximum 50 pairs%0D%0A7. Skip any incomplete or unclear content%0D%0A%0D%0ASubject: $%7Bsubject%7D%0D%0AClass: $%7BclassName%7D%0D%0ABoard: $%7Bboard%7D%0D%0AChapter: $%7Bchapter%7D%0D%0A%0D%0AText to process:%0D%0A$%7BextractedText.substring(0, 8000)%7D // Limit text to avoid token limits%0D%0A%0D%0AReturn format (JSON array only):%0D%0A%5B%0D%0A  %7B%0D%0A    %22question%22: %22Complete question text here%22,%0D%0A    %22answer%22: %22Complete detailed answer here%22%0D%0A  %7D%0D%0A%5D%0D%0A%60;%0D%0A%0D%0A    // Call Groq API%0D%0A    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', %7B%0D%0A      method: 'POST',%0D%0A      headers: %7B%0D%0A        'Authorization': %60Bearer $%7BGROQ_API_KEY%7D%60,%0D%0A        'Content-Type': 'application/json'%0D%0A      %7D,%0D%0A      body: JSON.stringify(%7B%0D%0A        model: 'llama-3.3-70b-versatile',%0D%0A        messages: %5B%0D%0A          %7B%0D%0A            role: 'system',%0D%0A            content: 'You are an expert educational content processor. Extract question-answer pairs and return only valid JSON array.'%0D%0A          %7D,%0D%0A          %7B%0D%0A            role: 'user',%0D%0A            content: prompt%0D%0A          %7D%0D%0A        %5D,%0D%0A        max_tokens: 4000,%0D%0A        temperature: 0.3%0D%0A      %7D)%0D%0A    %7D);%0D%0A%0D%0A    if (!response.ok) %7B%0D%0A      throw new Error(%60AI processing failed: $%7Bresponse.statusText%7D%60);%0D%0A    %7D%0D%0A%0D%0A    const data = await response.json();%0D%0A    const aiResponse = data.choices%5B0%5D.message.content;%0D%0A%0D%0A    // Parse AI response to extract JSON%0D%0A    let qaPairs;%0D%0A    try %7B%0D%0A      // Try to extract JSON from the response%0D%0A      const jsonMatch = aiResponse.match(/%5C%5B%5B%5Cs%5CS%5D*%5C%5D/);%0D%0A      if (jsonMatch) %7B%0D%0A        qaPairs = JSON.parse(jsonMatch%5B0%5D);%0D%0A      %7D else %7B%0D%0A        // Fallback: try parsing the entire response%0D%0A        qaPairs = JSON.parse(aiResponse);%0D%0A      %7D%0D%0A    %7D catch (parseError) %7B%0D%0A      console.error('%E2%9D%8C Failed to parse AI response as JSON:', parseError);%0D%0A      // Fallback: create basic Q&A pairs from text%0D%0A      qaPairs = createFallbackQAPairs(extractedText, metadata);%0D%0A    %7D%0D%0A%0D%0A    // Validate and clean Q&A pairs%0D%0A    const validPairs = qaPairs%0D%0A      .filter(pair =%3E pair.question && pair.answer)%0D%0A      .filter(pair =%3E pair.question.length %3E 10 && pair.answer.length %3E 20)%0D%0A      .map((pair, index) =%3E (%7B%0D%0A        question: pair.question.trim(),%0D%0A        answer: pair.answer.trim(),%0D%0A        questionNumber: index + 1,%0D%0A        board,%0D%0A        class: className,%0D%0A        subject,%0D%0A        chapter,%0D%0A        extractedAt: new Date().toISOString(),%0D%0A        confidence: 0.95%0D%0A      %7D));%0D%0A%0D%0A    console.log(%60%E2%9C%85 Extracted $%7BvalidPairs.length%7D Q&A pairs%60);%0D%0A    return validPairs;%0D%0A%0D%0A  %7D catch (error) %7B%0D%0A    console.error('%E2%9D%8C AI processing error:', error);%0D%0A    // Return fallback Q&A pairs%0D%0A    return createFallbackQAPairs(extractedText, metadata);%0D%0A  %7D%0D%0A%7D%0D%0A%0D%0A/**%0D%0A * Create fallback Q&A pairs when AI processing fails%0D%0A */%0D%0Afunction createFallbackQAPairs(text, metadata) %7B%0D%0A  console.log('%E2%9A%A0%EF%B8%8F Creating fallback Q&A pairs...');%0D%0A  %0D%0A  const %7B board, class: className, subject, chapter %7D = metadata;%0D%0A  %0D%0A  // Simple text processing to find potential Q&A patterns%0D%0A  const lines = text.split('%5Cn').filter(line =%3E line.trim().length %3E 0);%0D%0A  const pairs = %5B%5D;%0D%0A  %0D%0A  let currentQuestion = '';%0D%0A  let currentAnswer = '';%0D%0A  let questionNumber = 1;%0D%0A  %0D%0A  for (let i = 0; i %3C lines.length; i++) %7B%0D%0A    const line = lines%5Bi%5D.trim();%0D%0A    %0D%0A    // Look for question patterns%0D%0A    if (line.match(/%5E%5Cd+%5C./) %7C%7C line.includes('?') %7C%7C line.toLowerCase().includes('question')) %7B%0D%0A      if (currentQuestion && currentAnswer) %7B%0D%0A        pairs.push(%7B%0D%0A          question: currentQuestion.trim(),%0D%0A          answer: currentAnswer.trim(),%0D%0A          questionNumber: questionNumber++,%0D%0A          board,%0D%0A          class: className,%0D%0A          subject,%0D%0A          chapter,%0D%0A          extractedAt: new Date().toISOString(),%0D%0A          confidence: 0.7%0D%0A        %7D);%0D%0A      %7D%0D%0A      currentQuestion = line;%0D%0A      currentAnswer = '';%0D%0A    %7D else if (currentQuestion && line.length %3E 20) %7B%0D%0A      currentAnswer += (currentAnswer ? ' ' : '') + line;%0D%0A    %7D%0D%0A  %7D%0D%0A  %0D%0A  // Add the last pair%0D%0A  if (currentQuestion && currentAnswer) %7B%0D%0A    pairs.push(%7B%0D%0A      question: currentQuestion.trim(),%0D%0A      answer: currentAnswer.trim(),%0D%0A      questionNumber: questionNumber,%0D%0A      board,%0D%0A      class: className,%0D%0A      subject,%0D%0A      chapter,%0D%0A      extractedAt: new Date().toISOString(),%0D%0A      confidence: 0.7%0D%0A    %7D);%0D%0A  %7D%0D%0A  %0D%0A  // If no pairs found, create a generic one%0D%0A  if (pairs.length === 0) %7B%0D%0A    pairs.push(%7B%0D%0A      question: %60What is covered in $%7Bchapter%7D of $%7Bsubject%7D for Class $%7BclassName%7D?%60,%0D%0A      answer: text.substring(0, 500) + '...',%0D%0A      questionNumber: 1,%0D%0A      board,%0D%0A      class: className,%0D%0A      subject,%0D%0A      chapter,%0D%0A      extractedAt: new Date().toISOString(),%0D%0A      confidence: 0.5%0D%0A    %7D);%0D%0A  %7D%0D%0A  %0D%0A  console.log(%60%E2%9A%A0%EF%B8%8F Created $%7Bpairs.length%7D fallback Q&A pairs%60);%0D%0A  return pairs.slice(0, 20); // Limit to 20 pairs%0D%0A%7D%0D%0A%0D%0A/**%0D%0A * Convert Q&A pairs to JSONL format%0D%0A */%0D%0Aexport function convertToJSONL(qaPairs) %7B%0D%0A  return qaPairs.map(pair =%3E JSON.stringify(pair)).join('%5Cn');%0D%0A%7D%0D%0A%0D%0A/**%0D%0A * Save JSONL to file%0D%0A */%0D%0Aexport async function saveJSONLToFile(jsonlContent, outputPath) %7B%0D%0A  try %7B%0D%0A    // Ensure directory exists%0D%0A    const dir = path.dirname(outputPath);%0D%0A    if (!fs.existsSync(dir)) %7B%0D%0A      fs.mkdirSync(dir, %7B recursive: true %7D);%0D%0A    %7D%0D%0A    %0D%0A    // Write JSONL file%0D%0A    fs.writeFileSync(outputPath, jsonlContent, 'utf8');%0D%0A    console.log(%60%E2%9C%85 JSONL saved to: $%7BoutputPath%7D%60);%0D%0A    %0D%0A    return outputPath;%0D%0A  %7D catch (error) %7B%0D%0A    console.error('%E2%9D%8C Error saving JSONL file:', error);%0D%0A    throw new Error(%60Failed to save JSONL file: $%7Berror.message%7D%60);%0D%0A  %7D%0D%0A%7D%0D%0A%0D%0A/**%0D%0A * Main function to process PDF to JSONL%0D%0A */%0D%0Aexport async function processPDFToJSONL(pdfPath, metadata) %7B%0D%0A  try %7B%0D%0A    console.log('%F0%9F%9A%80 Starting PDF to JSONL processing...');%0D%0A    %0D%0A    // Step 1: Extract text from PDF%0D%0A    const extractedData = await extractTextFromPDF(pdfPath);%0D%0A    %0D%0A    // Step 2: Process text into Q&A pairs%0D%0A    const qaPairs = await processTextToQAPairs(extractedData.text, metadata);%0D%0A    %0D%0A    // Step 3: Convert to JSONL%0D%0A    const jsonlContent = convertToJSONL(qaPairs);%0D%0A    %0D%0A    // Step 4: Generate output filename%0D%0A    const %7B board, class: className, subject, chapter %7D = metadata;%0D%0A    const filename = %60$%7Bboard.toLowerCase()%7D-class$%7BclassName%7D-$%7Bsubject.toLowerCase()%7D-$%7Bchapter.toLowerCase().replace(/%5Cs+/g, '-')%7D.jsonl%60;%0D%0A    const outputPath = path.join(process.cwd(), 'processed-qa', filename);%0D%0A    %0D%0A    // Step 5: Save JSONL file%0D%0A    await saveJSONLToFile(jsonlContent, outputPath);%0D%0A    %0D%0A    return %7B%0D%0A      success: true,%0D%0A      qaPairs,%0D%0A      jsonlContent,%0D%0A      outputPath,%0D%0A      filename,%0D%0A      totalQuestions: qaPairs.length,%0D%0A      metadata: %7B%0D%0A        ...metadata,%0D%0A        processedAt: new Date().toISOString(),%0D%0A        pdfPages: extractedData.numPages,%0D%0A        textLength: extractedData.text.length%0D%0A      %7D%0D%0A    %7D;%0D%0A    %0D%0A  %7D catch (error) %7B%0D%0A    console.error('%E2%9D%8C PDF to JSONL processing failed:', error);%0D%0A    return %7B%0D%0A      success: false,%0D%0A      error: error.message,%0D%0A      qaPairs: %5B%5D,%0D%0A      totalQuestions: 0%0D%0A    %7D;%0D%0A  %7D%0D%0A%7D%0D%0A%0D%0A/**%0D%0A * Validate JSONL content%0D%0A */%0D%0Aexport function validateJSONL(jsonlContent) %7B%0D%0A  try %7B%0D%0A    const lines = jsonlContent.split('%5Cn').filter(line =%3E line.trim());%0D%0A    const errors = %5B%5D;%0D%0A    %0D%0A    lines.forEach((line, index) =%3E %7B%0D%0A      try %7B%0D%0A        const obj = JSON.parse(line);%0D%0A        %0D%0A        // Check required fields%0D%0A        const requiredFields = %5B'question', 'answer', 'board', 'class', 'subject', 'chapter'%5D;%0D%0A        const missingFields = requiredFields.filter(field =%3E !obj%5Bfield%5D);%0D%0A        %0D%0A        if (missingFields.length %3E 0) %7B%0D%0A          errors.push(%60Line $%7Bindex + 1%7D: Missing fields: $%7BmissingFields.join(', ')%7D%60);%0D%0A        %7D%0D%0A        %0D%0A        // Check field lengths%0D%0A        if (obj.question && obj.question.length %3C 10) %7B%0D%0A          errors.push(%60Line $%7Bindex + 1%7D: Question too short%60);%0D%0A        %7D%0D%0A        %0D%0A        if (obj.answer && obj.answer.length %3C 20) %7B%0D%0A          errors.push(%60Line $%7Bindex + 1%7D: Answer too short%60);%0D%0A        %7D%0D%0A        %0D%0A      %7D catch (parseError) %7B%0D%0A        errors.push(%60Line $%7Bindex + 1%7D: Invalid JSON format%60);%0D%0A      %7D%0D%0A    %7D);%0D%0A    %0D%0A    return %7B%0D%0A      isValid: errors.length === 0,%0D%0A      errors,%0D%0A      totalLines: lines.length%0D%0A    %7D;%0D%0A    %0D%0A  %7D catch (error) %7B%0D%0A    return %7B%0D%0A      isValid: false,%0D%0A      errors: %5B%60Validation error: $%7Berror.message%7D%60%5D,%0D%0A      totalLines: 0%0D%0A    %7D;%0D%0A  %7D%0D%0A%7D\n",
+                            "isNew": true,
+                            "isApplied": true
+                        },
+                        {
+                            "path": "api/smart-pdf-upload.js",
+                            "patch": "@@ -0,0 +1,13164 @@\n+// Smart PDF Upload API - Handles PDF upload, processing, and JSONL generation%0D%0Aimport %7B handleCors %7D from '../utils/cors.js';%0D%0Aimport %7B initializeFirebaseAdmin, getFirestoreAdminDb %7D from '../utils/firebase-admin.js';%0D%0Aimport %7B processPDFToJSONL, validateJSONL %7D from '../utils/smart-pdf-processor.js';%0D%0Aimport multiparty from 'multiparty';%0D%0Aimport fs from 'fs';%0D%0Aimport path from 'path';%0D%0A%0D%0A// Ensure upload directories exist%0D%0Aconst UPLOAD_DIR = path.join(process.cwd(), 'uploads');%0D%0Aconst PROCESSED_QA_DIR = path.join(process.cwd(), 'processed-qa');%0D%0A%0D%0Aif (!fs.existsSync(UPLOAD_DIR)) %7B%0D%0A  fs.mkdirSync(UPLOAD_DIR, %7B recursive: true %7D);%0D%0A%7D%0D%0A%0D%0Aif (!fs.existsSync(PROCESSED_QA_DIR)) %7B%0D%0A  fs.mkdirSync(PROCESSED_QA_DIR, %7B recursive: true %7D);%0D%0A%7D%0D%0A%0D%0A// Handle PDF upload and processing%0D%0Aasync function handlePDFUpload(req, res) %7B%0D%0A  if (req.method !== 'POST') %7B%0D%0A    return res.status(405).json(%7B %0D%0A      success: false, %0D%0A      message: 'Method not allowed' %0D%0A    %7D);%0D%0A  %7D%0D%0A%0D%0A  try %7B%0D%0A    initializeFirebaseAdmin();%0D%0A    const db = getFirestoreAdminDb();%0D%0A%0D%0A    // Parse multipart form data%0D%0A    const form = new multiparty.Form();%0D%0A    %0D%0A    const %7B fields, files %7D = await new Promise((resolve, reject) =%3E %7B%0D%0A      form.parse(req, (err, fields, files) =%3E %7B%0D%0A        if (err) reject(err);%0D%0A        else resolve(%7B fields, files %7D);%0D%0A      %7D);%0D%0A    %7D);%0D%0A%0D%0A    // Extract form data%0D%0A    const board = fields.board?.%5B0%5D;%0D%0A    const className = fields.class?.%5B0%5D;%0D%0A    const subject = fields.subject?.%5B0%5D;%0D%0A    const chapter = fields.chapter?.%5B0%5D;%0D%0A    const pdfFile = files.pdfFile?.%5B0%5D;%0D%0A%0D%0A    // Validate required fields%0D%0A    if (!board %7C%7C !className %7C%7C !subject %7C%7C !chapter %7C%7C !pdfFile) %7B%0D%0A      return res.status(400).json(%7B%0D%0A        success: false,%0D%0A        message: 'Missing required fields: board, class, subject, chapter, and PDF file are required'%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    // Validate file type%0D%0A    if (!pdfFile.originalFilename.toLowerCase().endsWith('.pdf')) %7B%0D%0A      return res.status(400).json(%7B%0D%0A        success: false,%0D%0A        message: 'Only PDF files are allowed'%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    // Validate file size (max 50MB)%0D%0A    if (pdfFile.size %3E 50 * 1024 * 1024) %7B%0D%0A      return res.status(400).json(%7B%0D%0A        success: false,%0D%0A        message: 'File size must be less than 50MB'%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    console.log(%60%F0%9F%93%A4 Processing PDF upload: $%7BpdfFile.originalFilename%7D%60);%0D%0A    console.log(%60%F0%9F%93%8B Metadata: $%7Bboard%7D %7C Class $%7BclassName%7D %7C $%7Bsubject%7D %7C $%7Bchapter%7D%60);%0D%0A%0D%0A    // Create metadata object%0D%0A    const metadata = %7B%0D%0A      board,%0D%0A      class: className,%0D%0A      subject,%0D%0A      chapter,%0D%0A      originalFilename: pdfFile.originalFilename,%0D%0A      fileSize: pdfFile.size,%0D%0A      uploadedAt: new Date().toISOString()%0D%0A    %7D;%0D%0A%0D%0A    // Process PDF to JSONL%0D%0A    const processingResult = await processPDFToJSONL(pdfFile.path, metadata);%0D%0A%0D%0A    if (!processingResult.success) %7B%0D%0A      return res.status(500).json(%7B%0D%0A        success: false,%0D%0A        message: 'Failed to process PDF',%0D%0A        error: processingResult.error%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    // Create processing session in database for admin review%0D%0A    const sessionId = %60session_$%7BDate.now()%7D_$%7BMath.random().toString(36).substr(2, 9)%7D%60;%0D%0A    %0D%0A    const sessionData = %7B%0D%0A      sessionId,%0D%0A      status: 'pending_review',%0D%0A      metadata,%0D%0A      processingResult: %7B%0D%0A        totalQuestions: processingResult.totalQuestions,%0D%0A        filename: processingResult.filename,%0D%0A        outputPath: processingResult.outputPath,%0D%0A        processedAt: processingResult.metadata.processedAt%0D%0A      %7D,%0D%0A      jsonlContent: processingResult.jsonlContent,%0D%0A      qaPairs: processingResult.qaPairs,%0D%0A      createdAt: new Date(),%0D%0A      uploadedBy: req.headers%5B'x-user-id'%5D %7C%7C 'admin'%0D%0A    %7D;%0D%0A%0D%0A    // Save session to database%0D%0A    await db.collection('pdf_processing_sessions').doc(sessionId).set(sessionData);%0D%0A%0D%0A    // Clean up uploaded file%0D%0A    try %7B%0D%0A      fs.unlinkSync(pdfFile.path);%0D%0A    %7D catch (cleanupError) %7B%0D%0A      console.warn('%E2%9A%A0%EF%B8%8F Failed to cleanup uploaded file:', cleanupError.message);%0D%0A    %7D%0D%0A%0D%0A    console.log(%60%E2%9C%85 PDF processed successfully. Session ID: $%7BsessionId%7D%60);%0D%0A%0D%0A    return res.status(200).json(%7B%0D%0A      success: true,%0D%0A      message: 'PDF processed successfully',%0D%0A      sessionId,%0D%0A      totalQuestions: processingResult.totalQuestions,%0D%0A      qaPairs: processingResult.qaPairs,%0D%0A      metadata: processingResult.metadata%0D%0A    %7D);%0D%0A%0D%0A  %7D catch (error) %7B%0D%0A    console.error('%E2%9D%8C PDF upload error:', error);%0D%0A    return res.status(500).json(%7B%0D%0A      success: false,%0D%0A      message: 'Internal server error',%0D%0A      error: error.message%0D%0A    %7D);%0D%0A  %7D%0D%0A%7D%0D%0A%0D%0A// Get processing session details%0D%0Aasync function getProcessingSession(req, res) %7B%0D%0A  if (req.method !== 'GET') %7B%0D%0A    return res.status(405).json(%7B message: 'Method not allowed' %7D);%0D%0A  %7D%0D%0A%0D%0A  try %7B%0D%0A    initializeFirebaseAdmin();%0D%0A    const db = getFirestoreAdminDb();%0D%0A%0D%0A    const %7B sessionId %7D = req.query;%0D%0A%0D%0A    if (!sessionId) %7B%0D%0A      return res.status(400).json(%7B%0D%0A        success: false,%0D%0A        message: 'Session ID is required'%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    const sessionDoc = await db.collection('pdf_processing_sessions').doc(sessionId).get();%0D%0A%0D%0A    if (!sessionDoc.exists) %7B%0D%0A      return res.status(404).json(%7B%0D%0A        success: false,%0D%0A        message: 'Processing session not found'%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    const sessionData = sessionDoc.data();%0D%0A%0D%0A    return res.status(200).json(%7B%0D%0A      success: true,%0D%0A      session: %7B%0D%0A        sessionId: sessionDoc.id,%0D%0A        ...sessionData,%0D%0A        createdAt: sessionData.createdAt?.toDate?.()?.toISOString?.() %7C%7C sessionData.createdAt%0D%0A      %7D%0D%0A    %7D);%0D%0A%0D%0A  %7D catch (error) %7B%0D%0A    console.error('%E2%9D%8C Get session error:', error);%0D%0A    return res.status(500).json(%7B%0D%0A      success: false,%0D%0A      message: 'Failed to get processing session',%0D%0A      error: error.message%0D%0A    %7D);%0D%0A  %7D%0D%0A%7D%0D%0A%0D%0A// Get all processing sessions%0D%0Aasync function getAllProcessingSessions(req, res) %7B%0D%0A  if (req.method !== 'GET') %7B%0D%0A    return res.status(405).json(%7B message: 'Method not allowed' %7D);%0D%0A  %7D%0D%0A%0D%0A  try %7B%0D%0A    initializeFirebaseAdmin();%0D%0A    const db = getFirestoreAdminDb();%0D%0A%0D%0A    const %7B status, limit = 50 %7D = req.query;%0D%0A%0D%0A    let query = db.collection('pdf_processing_sessions')%0D%0A      .orderBy('createdAt', 'desc')%0D%0A      .limit(parseInt(limit));%0D%0A%0D%0A    if (status) %7B%0D%0A      query = query.where('status', '==', status);%0D%0A    %7D%0D%0A%0D%0A    const snapshot = await query.get();%0D%0A    const sessions = %5B%5D;%0D%0A%0D%0A    snapshot.forEach(doc =%3E %7B%0D%0A      const data = doc.data();%0D%0A      sessions.push(%7B%0D%0A        sessionId: doc.id,%0D%0A        ...data,%0D%0A        createdAt: data.createdAt?.toDate?.()?.toISOString?.() %7C%7C data.createdAt,%0D%0A        // Don't include full JSONL content in list view%0D%0A        jsonlContent: undefined,%0D%0A        qaPairs: data.qaPairs ? data.qaPairs.slice(0, 3) : %5B%5D // Only first 3 for preview%0D%0A      %7D);%0D%0A    %7D);%0D%0A%0D%0A    return res.status(200).json(%7B%0D%0A      success: true,%0D%0A      sessions,%0D%0A      totalCount: sessions.length%0D%0A    %7D);%0D%0A%0D%0A  %7D catch (error) %7B%0D%0A    console.error('%E2%9D%8C Get sessions error:', error);%0D%0A    return res.status(500).json(%7B%0D%0A      success: false,%0D%0A      message: 'Failed to get processing sessions',%0D%0A      error: error.message%0D%0A    %7D);%0D%0A  %7D%0D%0A%7D%0D%0A%0D%0A// Upload JSONL to database (after admin review)%0D%0Aasync function uploadJSONLToDatabase(req, res) %7B%0D%0A  if (req.method !== 'POST') %7B%0D%0A    return res.status(405).json(%7B message: 'Method not allowed' %7D);%0D%0A  %7D%0D%0A%0D%0A  try %7B%0D%0A    initializeFirebaseAdmin();%0D%0A    const db = getFirestoreAdminDb();%0D%0A%0D%0A    const %7B sessionId, approvedQAPairs %7D = req.body;%0D%0A%0D%0A    if (!sessionId) %7B%0D%0A      return res.status(400).json(%7B%0D%0A        success: false,%0D%0A        message: 'Session ID is required'%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    // Get processing session%0D%0A    const sessionDoc = await db.collection('pdf_processing_sessions').doc(sessionId).get();%0D%0A%0D%0A    if (!sessionDoc.exists) %7B%0D%0A      return res.status(404).json(%7B%0D%0A        success: false,%0D%0A        message: 'Processing session not found'%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    const sessionData = sessionDoc.data();%0D%0A    const qaPairsToUpload = approvedQAPairs %7C%7C sessionData.qaPairs;%0D%0A%0D%0A    if (!qaPairsToUpload %7C%7C qaPairsToUpload.length === 0) %7B%0D%0A      return res.status(400).json(%7B%0D%0A        success: false,%0D%0A        message: 'No Q&A pairs to upload'%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    console.log(%60%F0%9F%93%A4 Uploading $%7BqaPairsToUpload.length%7D Q&A pairs to database...%60);%0D%0A%0D%0A    // Upload each Q&A pair to the ncert_solutions collection%0D%0A    const uploadPromises = qaPairsToUpload.map(async (pair, index) =%3E %7B%0D%0A      const docId = %60$%7BsessionId%7D_q$%7Bindex + 1%7D%60;%0D%0A      %0D%0A      const solutionData = %7B%0D%0A        id: docId,%0D%0A        board: pair.board,%0D%0A        class: parseInt(pair.class),%0D%0A        subject: pair.subject,%0D%0A        chapter: pair.chapter,%0D%0A        questionNumber: pair.questionNumber %7C%7C index + 1,%0D%0A        question: pair.question,%0D%0A        answer: pair.answer,%0D%0A        difficulty: 'medium', // Default difficulty%0D%0A        tags: %5B%5D,%0D%0A        views: 0,%0D%0A        likes: 0,%0D%0A        isApproved: true,%0D%0A        extractedFromPDF: true,%0D%0A        sessionId: sessionId,%0D%0A        uploadedBy: req.headers%5B'x-user-id'%5D %7C%7C 'admin',%0D%0A        createdAt: new Date(),%0D%0A        updatedAt: new Date()%0D%0A      %7D;%0D%0A%0D%0A      await db.collection('ncert_solutions').doc(docId).set(solutionData);%0D%0A      return docId;%0D%0A    %7D);%0D%0A%0D%0A    const uploadedIds = await Promise.all(uploadPromises);%0D%0A%0D%0A    // Update session status%0D%0A    await db.collection('pdf_processing_sessions').doc(sessionId).update(%7B%0D%0A      status: 'uploaded_to_database',%0D%0A      uploadedAt: new Date(),%0D%0A      uploadedIds: uploadedIds,%0D%0A      uploadedCount: uploadedIds.length%0D%0A    %7D);%0D%0A%0D%0A    console.log(%60%E2%9C%85 Successfully uploaded $%7BuploadedIds.length%7D Q&A pairs to database%60);%0D%0A%0D%0A    return res.status(200).json(%7B%0D%0A      success: true,%0D%0A      message: %60Successfully uploaded $%7BuploadedIds.length%7D Q&A pairs to database%60,%0D%0A      uploadedCount: uploadedIds.length,%0D%0A      uploadedIds: uploadedIds%0D%0A    %7D);%0D%0A%0D%0A  %7D catch (error) %7B%0D%0A    console.error('%E2%9D%8C Upload to database error:', error);%0D%0A    return res.status(500).json(%7B%0D%0A      success: false,%0D%0A      message: 'Failed to upload to database',%0D%0A      error: error.message%0D%0A    %7D);%0D%0A  %7D%0D%0A%7D%0D%0A%0D%0A// Update Q&A pair in session%0D%0Aasync function updateQAPair(req, res) %7B%0D%0A  if (req.method !== 'PUT') %7B%0D%0A    return res.status(405).json(%7B message: 'Method not allowed' %7D);%0D%0A  %7D%0D%0A%0D%0A  try %7B%0D%0A    initializeFirebaseAdmin();%0D%0A    const db = getFirestoreAdminDb();%0D%0A%0D%0A    const %7B sessionId, pairIndex, updatedPair %7D = req.body;%0D%0A%0D%0A    if (!sessionId %7C%7C pairIndex === undefined %7C%7C !updatedPair) %7B%0D%0A      return res.status(400).json(%7B%0D%0A        success: false,%0D%0A        message: 'Session ID, pair index, and updated pair data are required'%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    // Get processing session%0D%0A    const sessionDoc = await db.collection('pdf_processing_sessions').doc(sessionId).get();%0D%0A%0D%0A    if (!sessionDoc.exists) %7B%0D%0A      return res.status(404).json(%7B%0D%0A        success: false,%0D%0A        message: 'Processing session not found'%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    const sessionData = sessionDoc.data();%0D%0A    const qaPairs = %5B...sessionData.qaPairs%5D;%0D%0A%0D%0A    if (pairIndex %3C 0 %7C%7C pairIndex %3E= qaPairs.length) %7B%0D%0A      return res.status(400).json(%7B%0D%0A        success: false,%0D%0A        message: 'Invalid pair index'%0D%0A      %7D);%0D%0A    %7D%0D%0A%0D%0A    // Update the specific Q&A pair%0D%0A    qaPairs%5BpairIndex%5D = %7B%0D%0A      ...qaPairs%5BpairIndex%5D,%0D%0A      ...updatedPair,%0D%0A      updatedAt: new Date().toISOString()%0D%0A    %7D;%0D%0A%0D%0A    // Update session in database%0D%0A    await db.collection('pdf_processing_sessions').doc(sessionId).update(%7B%0D%0A      qaPairs: qaPairs,%0D%0A      lastModified: new Date()%0D%0A    %7D);%0D%0A%0D%0A    return res.status(200).json(%7B%0D%0A      success: true,%0D%0A      message: 'Q&A pair updated successfully',%0D%0A      updatedPair: qaPairs%5BpairIndex%5D%0D%0A    %7D);%0D%0A%0D%0A  %7D catch (error) %7B%0D%0A    console.error('%E2%9D%8C Update Q&A pair error:', error);%0D%0A    return res.status(500).json(%7B%0D%0A      success: false,%0D%0A      message: 'Failed to update Q&A pair',%0D%0A      error: error.message%0D%0A    %7D);%0D%0A  %7D%0D%0A%7D%0D%0A%0D%0A// Main handler with routing%0D%0Aexport default function handler(req, res) %7B%0D%0A  return handleCors(req, res, async (req, res) =%3E %7B%0D%0A    const %7B action, sessionId %7D = req.query;%0D%0A%0D%0A    try %7B%0D%0A      switch (action) %7B%0D%0A        case 'upload':%0D%0A          return await handlePDFUpload(req, res);%0D%0A        case 'session':%0D%0A          return await getProcessingSession(req, res);%0D%0A        case 'sessions':%0D%0A          return await getAllProcessingSessions(req, res);%0D%0A        case 'upload-to-database':%0D%0A          return await uploadJSONLToDatabase(req, res);%0D%0A        case 'update-pair':%0D%0A          return await updateQAPair(req, res);%0D%0A        default:%0D%0A          return res.status(400).json(%7B%0D%0A            success: false,%0D%0A            message: 'Invalid action. Use: upload, session, sessions, upload-to-database, or update-pair'%0D%0A          %7D);%0D%0A      %7D%0D%0A    %7D catch (error) %7B%0D%0A      console.error('Smart PDF Upload API Error:', error);%0D%0A      return res.status(500).json(%7B%0D%0A        success: false,%0D%0A        message: 'Internal server error',%0D%0A        error: error.message%0D%0A      %7D);%0D%0A    %7D%0D%0A  %7D);%0D%0A%7D\n",
+                            "isNew": true,
+                            "isApplied": true
+                        }
+                    ]
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "93e41be6-99e6-4dc5-9bdf-2b677ec6ad48"
+            },
+            "createdAt": 1750418546975,
+            "isInternal": false
+        },
+        {
+            "id": "044ce248-21d2-40f7-93fc-da2b67eb4ae8",
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "go on"
+                }
+            ],
+            "context": {
+                "codebaseEnabled": true
+            },
+            "createdAt": 1750418885886,
+            "isInternal": false,
+            "rawContent": {
+                "type": "doc",
+                "content": [
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "go on"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "0295e3e7-aad3-429d-a66f-383378899523",
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "go on"
+                }
+            ],
+            "context": {
+                "codebaseEnabled": true
+            },
+            "createdAt": 1750419144061,
+            "isInternal": false,
+            "rawContent": {
+                "type": "doc",
+                "content": [
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "go on"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "isAgent": true,
+    "isNameGenerated": true,
+    "isCustomAgent": false,
+    "isUnitTestsAgent": false,
+    "isE2EAgent": false,
+    "autoApply": false
+}
+}
