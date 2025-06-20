@@ -89,7 +89,7 @@
     {
       "src": "/api/ncert-solutions",
       "methods": ["OPTIONS", "GET", "POST"],
-      "dest": "/api/ncert-management.js?action=solutions",
+      "dest": "/api/ncert-solutions-test.js",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -111,7 +111,7 @@
     {
       "src": "/api/ncert-solutions/stats",
       "methods": ["OPTIONS", "GET", "POST"],
-      "dest": "/api/ncert-management.js?action=stats",
+      "dest": "/api/ncert-solutions-test.js?action=stats",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -221,6 +221,13 @@
       }
     },
     { "src": "/favicon.ico", "dest": "/client/favicon.ico" },
+    { 
+      "src": "/site.webmanifest", 
+      "dest": "/client/site.webmanifest",
+      "headers": {
+        "Content-Type": "application/manifest+json"
+      }
+    },
     { "src": "/assets/(.*)", "dest": "/client/assets/$1" },
     { "handle": "filesystem" },
     {

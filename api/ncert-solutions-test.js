@@ -53,29 +53,30 @@ const mockStats = {
 export default function handler(req, res) {
   return handleCors(req, res, async (req, res) => {
     const { action } = req.query;
+    const path = req.url;
     
     try {
-      switch (action) {
-        case 'solutions':
-          return res.status(200).json({
-            solutions: mockSolutions,
-            total: mockSolutions.length,
-            page: 1,
-            limit: 20,
-            pages: 1,
-            message: 'Mock NCERT solutions data'
-          });
-          
-        case 'stats':
-          return res.status(200).json({
-            ...mockStats,
-            message: 'Mock NCERT statistics'
-          });
-          
-        default:
-          return res.status(400).json({ 
-            error: 'Invalid action parameter. Use: solutions or stats' 
-          });
+      // Handle different endpoint patterns
+      if (path.includes('/stats') || action === 'stats') {
+        return res.status(200).json({
+          ...mockStats,
+          message: 'Mock NCERT statistics'
+        });
+      } else if (action === 'solutions' || req.method === 'GET') {
+        return res.status(200).json({
+          solutions: mockSolutions,
+          total: mockSolutions.length,
+          page: 1,
+          limit: 20,
+          pages: 1,
+          message: 'Mock NCERT solutions data'
+        });
+      } else {
+        return res.status(400).json({ 
+          error: 'Invalid endpoint or action parameter',
+          path: path,
+          action: action
+        });
       }
     } catch (error) {
       console.error('NCERT Test API Error:', error);
