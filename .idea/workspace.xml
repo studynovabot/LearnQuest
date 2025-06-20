@@ -5,16 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change afterPath="$PROJECT_DIR$/api/smart-pdf-upload.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/smart-pdf-processor.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/ai/explain.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/ncert-solutions.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/pages/AdminSolutions.tsx.new" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/ncert-solutions-real.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/ncert-solutions-real.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/pages/AdminSolutions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/AdminSolutions.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/NCERTSolutions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/NCERTSolutions.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vercel.json" beforeDir="false" afterPath="$PROJECT_DIR$/vercel.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +55,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "ai.zencoder.plugin.settings",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "ts.external.directory.path": "E:\\IntelliJ IDEA 2025.1.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
     "vue.rearranger.settings.migration": "true"
   }
@@ -129,6 +125,7 @@
       <workItem from="1749625295315" duration="1984000" />
       <workItem from="1749627435333" duration="32000" />
       <workItem from="1750417893430" duration="1285000" />
+      <workItem from="1750419231303" duration="1421000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -717,20 +714,13 @@
       <map>
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750419093657" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750419093657" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750420432171" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750420432171" />
         <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749626800561" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
-        <entry key="$PROJECT_DIR$/api/chat.js" value="9223372036854775807" />
-        <entry key="$PROJECT_DIR$/api/image-analysis.js" value="9223372036854775807" />
-        <entry key="$PROJECT_DIR$/api/image-generation.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions-real.js" value="1750417927058" />
-        <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/smart-pdf-upload.js" value="1750418980800" />
-        <entry key="$PROJECT_DIR$/api/student-analytics.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/tutors.js" value="1749192394666" />
-        <entry key="$PROJECT_DIR$/api/user-profile.js" value="9223372036854775807" />
-        <entry key="$PROJECT_DIR$/api/vector-upload.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/client/package.json" value="1749147224393" />
         <entry key="$PROJECT_DIR$/client/public/images/hero-image.svg" value="1749573895681" />
         <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749110092207" />
@@ -764,9 +754,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1750417927058" />
       </map>
     </option>
-    <option name="lastCommitHash" value="42867415e909643932ecc86d22da4b18983a35ca" />
-    <option name="lastIndexTimestamp" value="1750419093657" />
-    <option name="repoAccumulatedChanges" value="218" />
+    <option name="lastCommitHash" value="71ee26fbca0f06796219b65bfc5038caa7cdde7d" />
+    <option name="lastIndexTimestamp" value="1750420432171" />
+    <option name="repoAccumulatedChanges" value="9" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />
