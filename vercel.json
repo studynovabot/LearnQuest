@@ -11,8 +11,8 @@
   "routes": [
     {
       "src": "/api/chat",
-      "methods": ["OPTIONS"],
-      "dest": "/api/chat.js",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/ai-services.js?service=chat",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -21,9 +21,9 @@
       }
     },
     {
-      "src": "/api/chat",
-      "methods": ["GET", "POST"],
-      "dest": "/api/chat.js",
+      "src": "/api/ai/help",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/ai-services.js?service=help",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -32,9 +32,9 @@
       }
     },
     {
-      "src": "/api/chat-fallback",
-      "methods": ["OPTIONS"],
-      "dest": "/api/chat-fallback.js",
+      "src": "/api/user-profile",
+      "methods": ["OPTIONS", "GET", "POST", "PUT"],
+      "dest": "/api/user-management.js?action=profile",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -43,9 +43,119 @@
       }
     },
     {
-      "src": "/api/chat-fallback",
-      "methods": ["GET", "POST"],
-      "dest": "/api/chat-fallback.js",
+      "src": "/api/user-activity",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/user-management.js?action=activity",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/api/student-analytics",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/user-management.js?action=analytics",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/api/admin-users",
+      "methods": ["OPTIONS", "GET", "POST", "PUT", "DELETE"],
+      "dest": "/api/user-management.js?action=admin-users",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/api/ncert-data",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/ncert-management.js?action=data",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/api/ncert-solutions",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/ncert-management.js?action=solutions",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/api/ncert-upload",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/ncert-management.js?action=upload",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/api/ncert-solutions/stats",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/ncert-management.js?action=stats",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/api/ncert-solutions/upload",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/ncert-management.js?action=upload",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/api/ncert-solutions/([^/]+)/content",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/ncert-management.js?action=content&id=$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/api/image-analysis",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/media-services.js?service=image-analysis",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/api/image-generation",
+      "methods": ["OPTIONS", "GET", "POST"],
+      "dest": "/api/media-services.js?service=image-generation",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
