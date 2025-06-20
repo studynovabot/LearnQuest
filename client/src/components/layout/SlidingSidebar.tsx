@@ -116,6 +116,14 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       description: "User Management",
       adminOnly: true,
       feature: ADMIN_FEATURES.USER_MANAGEMENT
+    },
+    {
+      icon: BookIcon,
+      label: "Admin Solutions",
+      path: "/admin-solutions",
+      description: "Solutions Management",
+      adminOnly: true,
+      feature: ADMIN_FEATURES.CONTENT_MODERATION
     }
   ];
 

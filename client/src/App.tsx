@@ -25,6 +25,7 @@ import VectorUploadPage from "@/pages/VectorUploadPage";
 import LandingPage from "@/pages/LandingPage";
 import Terms from "@/pages/Terms";
 import AdminUsers from "@/pages/AdminUsers";
+import AdminSolutions from "@/pages/AdminSolutions";
 import Ranks from "@/pages/Ranks";
 import GamificationPage from "@/pages/GamificationPage";
 import StudyTracker from "@/pages/StudyTracker";
@@ -174,6 +175,15 @@ function Router() {
           <MainLayout>
             <AdminRoute>
               <AdminUsers />
+            </AdminRoute>
+          </MainLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin-solutions">
+        <ProtectedRoute>
+          <MainLayout>
+            <AdminRoute>
+              <AdminSolutions />
             </AdminRoute>
           </MainLayout>
         </ProtectedRoute>
