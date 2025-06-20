@@ -1,0 +1,62 @@
+{
+    "checksum": "6732c80b018c98c27f4aa8b03fb06df4e3a29dd8316b3b62d4879a40377a015c",
+    "data": {
+    "id": "e532a6cd-a05d-4bb0-9ffc-cd824e2d27f0",
+    "createdAt": 1750419312659,
+    "updatedAt": 1750419319463,
+    "title": "Getting Started with Coding",
+    "messages": [
+        {
+            "id": "bf1a3f15-c48c-4e98-949b-390f980e2005",
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "hi"
+                }
+            ],
+            "context": {
+                "codebaseEnabled": true
+            },
+            "createdAt": 1750419312680,
+            "isInternal": false,
+            "rawContent": {
+                "type": "doc",
+                "content": [
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "hi"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "2333f1c0-6c94-4ed6-a88f-c66da7645faf",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Hello! I'm here to help you with any software development issues or questions you might have. How can I assist you today? Whether you need help with debugging, code optimization, or implementing a new feature, I'm ready to help.\n\nFeel free to share any specific problems you're facing, and we can work through them together."
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "86bbaab7-8655-46e5-9e50-f136d5b93f5c"
+            },
+            "createdAt": 1750419317059,
+            "isInternal": false
+        }
+    ],
+    "isAgent": true,
+    "isNameGenerated": true,
+    "isCustomAgent": false,
+    "isUnitTestsAgent": false,
+    "isE2EAgent": false,
+    "autoApply": false
+}
+}
