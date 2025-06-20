@@ -1,6 +1,6 @@
 // Consolidated NCERT Management API
 import { handleCors } from '../utils/cors.js';
-import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
+import { initializeFirebaseAdmin, getFirestoreAdminDb } from '../utils/firebase-admin.js';
 
 // Handle NCERT Data service
 async function handleNCERTData(req, res) {
@@ -26,8 +26,8 @@ async function handleNCERTData(req, res) {
   }
   
   try {
-    initializeFirebase();
-    const db = getFirestoreDb();
+    initializeFirebaseAdmin();
+    const db = getFirestoreAdminDb();
     
     // Get query parameters
     const { chapterPath, class: className, subject } = req.query;
@@ -82,8 +82,8 @@ async function handleNCERTData(req, res) {
 // Handle NCERT Solutions service
 async function handleNCERTSolutions(req, res) {
   try {
-    initializeFirebase();
-    const db = getFirestoreDb();
+    initializeFirebaseAdmin();
+    const db = getFirestoreAdminDb();
     
     if (req.method === 'GET') {
       const { class: className, subject, chapter, exercise, limit = 50 } = req.query;
@@ -147,8 +147,8 @@ async function handleNCERTUpload(req, res) {
   }
 
   try {
-    initializeFirebase();
-    const db = getFirestoreDb();
+    initializeFirebaseAdmin();
+    const db = getFirestoreAdminDb();
     
     const { 
       class: className, 
@@ -223,8 +223,16 @@ async function handleNCERTStats(req, res) {
   }
 
   try {
-    initializeFirebase();
-    const db = getFirestoreDb();
+    initializeFirebaseAdmin();
+    const db = getFirestoreAdminDb();
+    
+    if (!db) {
+      console.error('❌ Failed to initialize Firestore Admin DB');
+      return res.status(500).json({
+        message: 'Database connection failed',
+        error: 'Failed to initialize Firestore Admin DB'
+      });
+    }
     
     console.log('📊 Fetching NCERT solutions statistics...');
     
@@ -310,8 +318,8 @@ async function handleNCERTContent(req, res, id) {
   }
   
   try {
-    initializeFirebase();
-    const db = getFirestoreDb();
+    initializeFirebaseAdmin();
+    const db = getFirestoreAdminDb();
     
     if (req.method === 'GET') {
       console.log(`📖 Fetching NCERT solution content for ID: ${id}`);

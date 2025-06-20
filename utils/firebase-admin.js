@@ -80,11 +80,16 @@ export function getFirestoreAdminDb() {
   
   // Initialize Firestore Admin
   try {
-    adminFirestore = adminApp.firestore();
+    adminFirestore = admin.firestore(adminApp);
+    
+    // Verify the connection by setting some default settings
+    adminFirestore.settings({ ignoreUndefinedProperties: true });
+    
     console.log('📄 Firestore Admin initialized successfully');
     return adminFirestore;
   } catch (error) {
     console.error('❌ Firestore Admin initialization error:', error);
+    console.error('Error details:', error.message);
     return null;
   }
 }
