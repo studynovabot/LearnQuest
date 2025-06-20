@@ -313,7 +313,7 @@ const AdminSolutions: React.FC = () => {
       const response = await fetch(`${config.apiUrl}/api/smart-pdf-upload?action=upload`, {
         method: 'POST',
         headers: {
-          'x-user-id': user?.uid || 'admin',
+          'x-user-id': user?.id || 'admin',
         },
         body: formData,
       });
@@ -362,7 +362,7 @@ const AdminSolutions: React.FC = () => {
     try {
       const response = await fetch(`${config.apiUrl}/api/smart-pdf-upload?action=sessions`, {
         headers: {
-          'x-user-id': user?.uid || 'admin',
+          'x-user-id': user?.id || 'admin',
         },
       });
 
@@ -384,7 +384,7 @@ const AdminSolutions: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': user?.uid || 'admin',
+          'x-user-id': user?.id || 'admin',
         },
         body: JSON.stringify({ sessionId }),
       });

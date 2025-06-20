@@ -5,12 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change afterPath="$PROJECT_DIR$/api/ai/explain.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/ncert-solutions.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/pages/AdminSolutions.tsx.new" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/pages/AdminSolutions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/AdminSolutions.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/NCERTSolutions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/NCERTSolutions.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,32 +32,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "JavaScript Debug.localhost:5000.executor": "Debug",
-    "JavaScript Debug.localhost:8080.executor": "Debug",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.zencoder-patch-add-chat-message-raw-content": "true",
-    "RunOnceActivity.zencoder-patch-chat-storage-migration": "true",
-    "RunOnceActivity.zencoder-patch-generate-chat-message-id": "true",
-    "RunOnceActivity.zencoder-patch-migrate-custom-instruction": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "E:/LearnQuest/LearnQuest",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "E:\\IntelliJ IDEA 2025.1.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;JavaScript Debug.localhost:5000.executor&quot;: &quot;Debug&quot;,
+    &quot;JavaScript Debug.localhost:8080.executor&quot;: &quot;Debug&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.zencoder-patch-add-chat-message-raw-content&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.zencoder-patch-chat-storage-migration&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.zencoder-patch-generate-chat-message-id&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.zencoder-patch-migrate-custom-instruction&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/LearnQuest/LearnQuest&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ai.zencoder.plugin.settings&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;E:\\IntelliJ IDEA 2025.1.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -125,7 +123,8 @@
       <workItem from="1749625295315" duration="1984000" />
       <workItem from="1749627435333" duration="32000" />
       <workItem from="1750417893430" duration="1285000" />
-      <workItem from="1750419231303" duration="1421000" />
+      <workItem from="1750419231303" duration="1660000" />
+      <workItem from="1750420933553" duration="331000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -714,11 +713,13 @@
       <map>
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750420432171" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750420432171" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750420873561" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750420873561" />
         <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749626800561" />
+        <entry key="$PROJECT_DIR$/api/ai/explain.js" value="1750420732387" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions-real.js" value="1750417927058" />
+        <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1750420732387" />
         <entry key="$PROJECT_DIR$/api/smart-pdf-upload.js" value="1750418980800" />
         <entry key="$PROJECT_DIR$/api/tutors.js" value="1749192394666" />
         <entry key="$PROJECT_DIR$/client/package.json" value="1749147224393" />
@@ -733,7 +734,8 @@
         <entry key="$PROJECT_DIR$/client/src/context/UserContext.tsx" value="1749201077415" />
         <entry key="$PROJECT_DIR$/client/src/hooks/useChat.ts" value="1749192394666" />
         <entry key="$PROJECT_DIR$/client/src/lib/queryClient.ts" value="1749192394666" />
-        <entry key="$PROJECT_DIR$/client/src/pages/AdminSolutions.tsx" value="1750418980800" />
+        <entry key="$PROJECT_DIR$/client/src/pages/AdminSolutions.tsx" value="1750420732387" />
+        <entry key="$PROJECT_DIR$/client/src/pages/AdminSolutions.tsx.new" value="1750420732387" />
         <entry key="$PROJECT_DIR$/client/src/pages/ChatAgents.tsx" value="1749192698909" />
         <entry key="$PROJECT_DIR$/client/src/pages/LandingPage.tsx" value="1749575993054" />
         <entry key="$PROJECT_DIR$/client/src/pages/Login.tsx" value="1749573895681" />
@@ -754,11 +756,11 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1750417927058" />
       </map>
     </option>
-    <option name="lastCommitHash" value="71ee26fbca0f06796219b65bfc5038caa7cdde7d" />
-    <option name="lastIndexTimestamp" value="1750420432171" />
-    <option name="repoAccumulatedChanges" value="9" />
+    <option name="lastCommitHash" value="4b704f4b786ccb07c43f587cdb57fa357f4809f4" />
+    <option name="lastIndexTimestamp" value="1750420873561" />
+    <option name="repoAccumulatedChanges" value="24" />
     <option name="repoTotalFiles" value="234" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
-    <option name="state" value="FULLY_INDEXED" />
+    <option name="state" value="UPDATING_INDEX" />
   </component>
 </project>

@@ -175,8 +175,8 @@ const NCERTSolutions: React.FC = () => {
   
   // Mock user data - in production get from auth
   const [userData] = useState({
-    id: user?.uid || 'user123',
-    tier: (user?.customClaims?.tier || 'free') as 'free' | 'pro' | 'goat',
+    id: user?.id || 'user123',
+    tier: (user?.subscriptionPlan || 'free') as 'free' | 'pro' | 'goat',
     name: user?.displayName || 'User'
   });
   const [pagination, setPagination] = useState<PaginationData>({
