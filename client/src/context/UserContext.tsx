@@ -25,74 +25,55 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Check if user is already logged in on mount
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const initializeAuth = async () => {
       try {
-        if (firebaseUser) {
-          console.log('Firebase user authenticated:', firebaseUser.email);
-          
-          // Convert Firebase user to app User
-          const { signInWithEmail, convertFirebaseUserToUser } = await import('@/utils/firebase');
-          const userData = await convertFirebaseUserToUser(firebaseUser);
-          
-          // Special case for admin users
-          if (userData.email === 'thakurranveersingh505@gmail.com' || userData.email === 'tradingproffical@gmail.com') {
-            userData.role = 'admin';
-            userData.subscriptionPlan = 'goat';
-            userData.subscriptionStatus = 'active';
-            userData.subscriptionExpiry = new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000); // 100 years from now
-            userData.isPro = true;
-          }
-          
-          setUser(userData);
-          localStorage.setItem('user', JSON.stringify(userData));
-          console.log('User loaded from Firebase auth:', userData);
-        } else {
-          console.log('No Firebase user found, checking localStorage...');
-          
-          // Try to get user from localStorage as fallback
-          const storedUser = localStorage.getItem('user');
-          if (storedUser) {
-            try {
-              const parsedUser = JSON.parse(storedUser);
-              
-              // Check if this is a mock user
-              if (parsedUser.id === 'user-123' || parsedUser.id.startsWith('demo-user') || 
-                  parsedUser.id.startsWith('mock-') || parsedUser.id.startsWith('fallback-') ||
-                  parsedUser.id === 'admin_user_001') {
-                console.log('Found mock user, clearing...');
-                localStorage.removeItem('user');
-                setUser(null);
-                
-                // No auto-login, user must authenticate manually
-                console.log('No stored user found, user must login manually');
-              } else {
-                // Use the stored user data
-                setUser(parsedUser);
-                console.log('User loaded from localStorage:', parsedUser);
+        console.log('🔍 Checking for stored authentication...');
+        
+        const storedUser = localStorage.getItem('user');
+        const storedToken = localStorage.getItem('token');
+        
+        if (storedUser && storedToken) {
+          try {
+            const parsedUser = JSON.parse(storedUser);
+            
+            // Validate token is still valid by making a test API call
+            const response = await fetch(`${config.apiUrl}/user-management`, {
+              headers: {
+                'Authorization': `Bearer ${storedToken}`,
+                'Content-Type': 'application/json'
               }
-            } catch (parseError) {
-              console.error('Failed to parse stored user data:', parseError);
+            });
+            
+            if (response.ok) {
+              // Token is valid, restore user session
+              setUser(parsedUser);
+              console.log('✅ User session restored from token:', parsedUser.email);
+            } else {
+              // Token is invalid or expired
+              console.log('❌ Stored token is invalid, clearing session');
               localStorage.removeItem('user');
+              localStorage.removeItem('token');
               setUser(null);
             }
-          } else {
-            // No user found
+          } catch (parseError) {
+            console.error('Failed to parse stored user data:', parseError);
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
             setUser(null);
-            
-            // No auto-login, user must authenticate manually
-            console.log('No user found, user must login manually');
           }
+        } else {
+          console.log('📭 No stored user or token found');
+          setUser(null);
         }
       } catch (error) {
-        console.error("Authentication check failed:", error);
+        console.error('Auth initialization error:', error);
         setUser(null);
       } finally {
         setLoading(false);
       }
-    });
+    };
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
+    initializeAuth();
   }, []);
 
   // No developer auto-login functionality
@@ -103,21 +84,39 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
-      console.log('🔄 Starting login process with Firebase...');
+      console.log('🔄 Starting login process with API...');
       console.log('📤 Login request:', { email });
 
-      // Use Firebase authentication
-      const userData = await signInWithEmail(email, password);
-      console.log('✅ Login successful:', userData);
+      // Use API authentication with JWT
+      const response = await fetch(`${config.apiUrl}/auth`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'login',
+          email,
+          password
+        })
+      });
 
-      // Store the user data
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+
+      const data = await response.json();
+      console.log('✅ Login successful:', data);
+
+      // Store the user data and JWT token
       const userWithFirstLogin = {
-        ...userData,
-        isFirstLogin: false
+        ...data.user,
+        isFirstLogin: data.isFirstLogin || false
       };
 
       setUser(userWithFirstLogin);
       localStorage.setItem('user', JSON.stringify(userWithFirstLogin));
+      localStorage.setItem('token', data.token); // Store JWT token
 
       return true;
     } catch (error) {
@@ -134,7 +133,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (email: string, displayName: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
-      console.log('🔄 Starting registration process with Firebase...');
+      console.log('🔄 Starting registration process with API...');
       console.log('📤 Registration request:', { 
         email, 
         displayName, 
@@ -144,18 +143,37 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         role: 'user'
       });
 
-      // Use Firebase authentication
-      const userData = await registerWithEmail(email, displayName, password);
-      console.log('✅ Registration successful:', userData);
+      // Use API authentication with JWT
+      const response = await fetch(`${config.apiUrl}/auth`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'register',
+          email,
+          displayName,
+          password
+        })
+      });
 
-      // Store the user data with first login flag
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Registration failed');
+      }
+
+      const data = await response.json();
+      console.log('✅ Registration successful:', data);
+
+      // Store the user data and JWT token
       const userWithFirstLogin = {
-        ...userData,
-        isFirstLogin: true // Registration is always first login
+        ...data.user,
+        isFirstLogin: data.isFirstLogin || true // Registration is always first login
       };
 
       setUser(userWithFirstLogin);
       localStorage.setItem('user', JSON.stringify(userWithFirstLogin));
+      localStorage.setItem('token', data.token); // Store JWT token
 
       return true;
     } catch (error) {
@@ -169,9 +187,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Logout function
   const logout = async () => {
     try {
-      await signOutUser();
       setUser(null);
       localStorage.removeItem('user');
+      localStorage.removeItem('token'); // Remove JWT token
+      console.log('✅ User logged out successfully');
     } catch (error) {
       console.error("Logout error:", error);
     }

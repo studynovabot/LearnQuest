@@ -2,6 +2,7 @@
 import { handleCors } from '../utils/cors.js';
 import { initializeFirebase } from '../utils/firebase.js';
 import { storage } from '../utils/storage.js';
+import { generateToken } from '../utils/jwt-auth.js';
 import bcrypt from 'bcryptjs';
 
 export default function handler(req, res) {
@@ -71,9 +72,13 @@ export default function handler(req, res) {
                 isFirstLogin
               };
 
+              // Generate JWT token
+              const token = generateToken(userWithoutPassword);
+              
               console.log('Firebase login successful for:', email);
               return res.status(200).json({
                 user: userWithoutPassword,
+                token,
                 isFirstLogin
               });
             }
@@ -134,9 +139,13 @@ export default function handler(req, res) {
             isFirstLogin: true
           };
 
+          // Generate JWT token
+          const token = generateToken(userWithoutPassword);
+          
           console.log('Registration successful for:', email);
           return res.status(201).json({
             user: userWithoutPassword,
+            token,
             isFirstLogin: true
           });
 

@@ -4,6 +4,7 @@ import { initializeFirebaseAdmin, getFirestoreAdminDb } from '../utils/firebase-
 import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
 import { sanitizeUserData } from '../utils/privacy.js';
 import { loadEnvVariables } from '../utils/env-loader.js';
+import { extractUserFromRequest } from '../utils/jwt-auth.js';
 
 // Ensure environment variables are loaded
 loadEnvVariables();
@@ -44,16 +45,18 @@ async function handleUserProfile(req, res) {
       });
     }
 
-    // Get user ID from Authorization header
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ error: 'Authorization header required' });
+    // Extract and validate user from JWT token
+    const authResult = extractUserFromRequest(req);
+    if (!authResult.valid) {
+      return res.status(401).json({ 
+        error: 'Authentication required',
+        message: authResult.error
+      });
     }
+    
+    const user = authResult.user;
 
-    const userId = authHeader.replace('Bearer ', '');
-    if (!userId) {
-      return res.status(401).json({ error: 'Invalid user ID' });
-    }
+    const userId = user.id;
 
     if (req.method === 'GET') {
       console.log(`Fetching profile for user: ${userId}`);

@@ -1,6 +1,8 @@
-// NCERT Solutions API - Handles fetching solutions from the database
+// NCERT Solutions API - Handles fetching solutions from the database and processed data
 import { handleCors } from '../utils/cors.js';
 import { initializeFirebaseAdmin, getFirestoreAdminDb } from '../utils/firebase-admin.js';
+import { getAllProcessedSolutions, getSolutionById } from './admin-pdf-upload.js';
+import { extractUserFromRequest, checkTierAccess } from '../utils/jwt-auth.js';
 
 // Get NCERT solutions based on filters
 async function getSolutions(req, res) {
@@ -13,15 +15,20 @@ async function getSolutions(req, res) {
     const db = getFirestoreAdminDb();
 
     const { board, class: className, subject, chapter, limit, isAdmin } = req.query;
+    
+    // Use authenticated user info
+    const user = req.user;
+    const userTier = req.userTier;
+    const isAdminUser = user?.isAdmin || isAdmin;
 
-    console.log(`🔍 Fetching NCERT solutions${isAdmin ? ' (Admin)' : ''}: ${board || 'All'} | Class ${className || 'All'} | ${subject || 'All'}${chapter ? ` | ${chapter}` : ''}`);
+    console.log(`🔍 Fetching NCERT solutions${isAdminUser ? ' (Admin)' : ''}: ${board || 'All'} | Class ${className || 'All'} | ${subject || 'All'}${chapter ? ` | ${chapter}` : ''} | User: ${user?.email || 'anonymous'}`);
 
     // Build query based on parameters
     let query = db.collection('ncert_solutions');
 
     // For admin, show all solutions regardless of approval status
     // For public, only show approved solutions
-    if (!isAdmin) {
+    if (!isAdminUser) {
       // Validate required parameters for public access
       if (!board || !className || !subject) {
         return res.status(400).json({
@@ -180,7 +187,83 @@ async function getSubjects(req, res) {
   }
 }
 
-// Get solution statistics for admin dashboard
+// Get processed solutions with filtering and pagination (from admin upload system)
+function getProcessedSolutions(query = {}) {
+  const {
+    page = 1,
+    limit = 20,
+    search = '',
+    board = '',
+    class: className = '',
+    subject = '',
+    difficulty = '',
+    sortBy = 'processedAt',
+    sortOrder = 'desc'
+  } = query;
+
+  // Get all processed solutions from admin upload system
+  const allSolutions = getAllProcessedSolutions();
+  let filteredSolutions = [...allSolutions];
+
+  // Apply filters
+  if (search) {
+    const searchLower = search.toLowerCase();
+    filteredSolutions = filteredSolutions.filter(sol => 
+      sol.metadata.chapter.toLowerCase().includes(searchLower) ||
+      sol.metadata.subject.toLowerCase().includes(searchLower) ||
+      sol.filename.toLowerCase().includes(searchLower)
+    );
+  }
+
+  if (board && board !== 'all') {
+    filteredSolutions = filteredSolutions.filter(sol => sol.metadata.board === board);
+  }
+
+  if (className && className !== 'all') {
+    filteredSolutions = filteredSolutions.filter(sol => sol.metadata.class === className);
+  }
+
+  if (subject && subject !== 'all') {
+    filteredSolutions = filteredSolutions.filter(sol => sol.metadata.subject === subject);
+  }
+
+  // Sort solutions
+  filteredSolutions.sort((a, b) => {
+    let aVal = a[sortBy];
+    let bVal = b[sortBy];
+    
+    if (typeof aVal === 'string') {
+      aVal = aVal.toLowerCase();
+      bVal = bVal.toLowerCase();
+    }
+    
+    if (sortOrder === 'desc') {
+      return bVal > aVal ? 1 : -1;
+    }
+    return aVal > bVal ? 1 : -1;
+  });
+
+  // Pagination
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const paginatedSolutions = filteredSolutions.slice(startIndex, endIndex);
+
+  return {
+    solutions: paginatedSolutions,
+    total: filteredSolutions.length,
+    page: parseInt(page),
+    limit: parseInt(limit),
+    pages: Math.ceil(filteredSolutions.length / limit)
+  };
+}
+
+// Get solution by ID with Q&A pairs (from admin upload system)
+function getSolutionWithQA(id) {
+  const solution = getSolutionById(id);
+  return solution; // This already includes Q&A pairs from admin upload system
+}
+
+// Get solution statistics for admin dashboard (Firebase + processed solutions)
 async function getStats(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' });
@@ -192,10 +275,10 @@ async function getStats(req, res) {
 
     console.log('📊 Calculating NCERT solutions statistics...');
 
-    // Get all solutions
+    // Get Firebase solutions
     const snapshot = await db.collection('ncert_solutions').get();
     
-    let totalSolutions = 0;
+    let firebaseSolutions = 0;
     let availableSolutions = 0;
     let easySolutions = 0;
     let mediumSolutions = 0;
@@ -204,7 +287,7 @@ async function getStats(req, res) {
 
     snapshot.forEach(doc => {
       const data = doc.data();
-      totalSolutions++;
+      firebaseSolutions++;
       
       if (data.isApproved) {
         availableSolutions++;
@@ -226,17 +309,51 @@ async function getStats(req, res) {
       totalViews += data.views || 0;
     });
 
+    // Get processed solutions statistics
+    const allSolutions = getAllProcessedSolutions();
+    const processedSolutions = allSolutions.length;
+    const activeProcessed = allSolutions.filter(sol => sol.status === 'active').length;
+    
+    // Count total questions across all solutions
+    const totalQuestions = allSolutions.reduce((sum, sol) => sum + sol.totalQuestions, 0);
+    
+    // By class and subject
+    const solutionsByClass = {};
+    const solutionsBySubject = {};
+    
+    allSolutions.forEach(sol => {
+      const key = `Class ${sol.metadata.class}`;
+      solutionsByClass[key] = (solutionsByClass[key] || 0) + 1;
+      solutionsBySubject[sol.metadata.subject] = (solutionsBySubject[sol.metadata.subject] || 0) + 1;
+    });
+
     const stats = {
-      totalSolutions,
+      // Firebase stats
+      firebaseSolutions,
       availableSolutions,
       easySolutions,
       mediumSolutions,
       hardSolutions,
       totalViews,
+      // Processed solutions stats
+      processedSolutions,
+      activeProcessed,
+      totalQuestions,
+      pendingApproval: processedSolutions - activeProcessed,
+      solutionsByClass,
+      solutionsBySubject,
+      recentUploads: allSolutions.filter(sol => {
+        const uploadDate = new Date(sol.processedAt);
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        return uploadDate > sevenDaysAgo;
+      }).length,
+      // Combined totals
+      totalSolutions: firebaseSolutions + processedSolutions,
       generatedAt: new Date().toISOString()
     };
 
-    console.log(`✅ Statistics calculated: Total: ${totalSolutions}, Available: ${availableSolutions}, Views: ${totalViews}`);
+    console.log(`✅ Statistics calculated: Firebase: ${firebaseSolutions}, Processed: ${processedSolutions}, Total Views: ${totalViews}`);
 
     return res.status(200).json(stats);
 
@@ -253,20 +370,77 @@ async function getStats(req, res) {
 // Main handler with routing
 export default function handler(req, res) {
   return handleCors(req, res, async (req, res) => {
-    const { path } = req.query;
+    const { path, action, id } = req.query;
+
+    // Extract user information (optional for most endpoints)
+    const authResult = extractUserFromRequest(req);
+    let user = null;
+    let userTier = 'free';
+    let isAuthenticated = false;
+    
+    if (authResult.valid) {
+      user = authResult.user;
+      userTier = user.tier;
+      isAuthenticated = true;
+    }
+    
+    // Pass user info to request for use in handlers
+    req.user = user;
+    req.userTier = userTier;
+    req.isAuthenticated = isAuthenticated;
+    
+    console.log(`📚 NCERT Solutions API: ${path || action || 'default'} | User: ${user?.email || 'anonymous'} | Tier: ${userTier}`);
 
     try {
-      switch (path) {
-        case 'subjects':
-          return await getSubjects(req, res);
-        case 'stats':
-          return await getStats(req, res);
-        case 'upload':
-          // Delegate upload handling to the upload API
-          const uploadHandler = await import('./ncert-solutions-upload.js');
-          return await uploadHandler.default(req, res);
-        default:
-          return await getSolutions(req, res);
+      // Handle different endpoint patterns
+      if (path === 'subjects') {
+        return await getSubjects(req, res);
+      } else if (path === 'stats' || action === 'stats') {
+        return await getStats(req, res);
+      } else if (path === 'upload') {
+        // Delegate upload handling to the upload API
+        const uploadHandler = await import('./ncert-solutions-upload.js');
+        return await uploadHandler.default(req, res);
+      } else if (path === 'processed' || action === 'processed') {
+        // Handle processed solutions from admin upload system
+        const solutions = getProcessedSolutions(req.query);
+        return res.status(200).json(solutions);
+      } else if (path === 'content' || action === 'content') {
+        // Get solution with Q&A pairs (requires authentication for premium content)
+        if (!id) {
+          return res.status(400).json({ error: 'Solution ID is required' });
+        }
+        
+        const solution = getSolutionWithQA(id);
+        if (!solution) {
+          return res.status(404).json({ error: 'Solution not found' });
+        }
+        
+        // Check if solution requires premium access
+        const requiredTier = solution.metadata?.requiredTier || 'free';
+        if (requiredTier !== 'free' && !checkTierAccess(userTier, requiredTier)) {
+          return res.status(403).json({
+            error: 'Premium access required',
+            message: `This solution requires ${requiredTier} tier access. Current tier: ${userTier}`,
+            requiredTier,
+            userTier,
+            upgradeRequired: true,
+            loginRequired: !isAuthenticated
+          });
+        }
+        
+        return res.status(200).json({
+          solution,
+          userAccess: {
+            tier: userTier,
+            hasAccess: true,
+            isAuthenticated
+          },
+          message: 'Solution with Q&A pairs fetched successfully'
+        });
+      } else {
+        // Default to Firebase solutions
+        return await getSolutions(req, res);
       }
     } catch (error) {
       console.error('❌ NCERT Solutions API Error:', error);
