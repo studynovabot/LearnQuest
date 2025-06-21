@@ -277,9 +277,24 @@ async function getProcessingSession(req, res) {
         createdAt: data.createdAt?.toDate?.()?.toISOString?.() || data.createdAt,
         uploadedBy: data.uploadedBy || 'unknown',
         // Don't include full JSONL content in list view for performance
-        jsonlContent: undefined,
+        jsonlContent: data.jsonlContent || '',
         // Include first 3 Q&A pairs for preview
         qaPairs: data.qaPairs ? data.qaPairs.slice(0, 3) : []
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching sessions:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch processing sessions'
+    });
+  }
+}
+
+// Get specific processing session details
+async function getProcessingSession(req, res) {
+  try {
     initializeFirebaseAdmin();
     const db = getFirestoreAdminDb();
 
