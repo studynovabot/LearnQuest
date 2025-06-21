@@ -22,6 +22,9 @@ export class FirebaseStorage {
       password: userData.password, // Already hashed
       displayName: userData.displayName,
       isPro: userData.isPro || false,
+      subscriptionPlan: userData.subscriptionPlan || 'free',
+      subscriptionStatus: userData.subscriptionStatus || 'trial',
+      subscriptionExpiry: userData.subscriptionExpiry || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       className: userData.className || '',
       board: userData.board || '',
       role: userData.role || 'user',

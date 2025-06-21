@@ -37,6 +37,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           // Special case for admin users
           if (userData.email === 'thakurranveersingh505@gmail.com' || userData.email === 'tradingproffical@gmail.com') {
             userData.role = 'admin';
+            userData.subscriptionPlan = 'goat';
+            userData.subscriptionStatus = 'active';
+            userData.subscriptionExpiry = new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000); // 100 years from now
+            userData.isPro = true;
           }
           
           setUser(userData);
