@@ -175,13 +175,13 @@ const AdminSolutions: React.FC = () => {
     setLoading(true);
     try {
       const [solutionsResponse, statsResponse] = await Promise.all([
-        fetch(`${config.apiUrl}/api/ncert-solutions?limit=100`, {
+        fetch(`${config.apiUrl}/ncert-solutions?limit=100`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json',
           },
         }),
-        fetch(`${config.apiUrl}/api/ncert-solutions/stats`, {
+        fetch(`${config.apiUrl}/ncert-solutions/stats`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json',
@@ -239,7 +239,7 @@ const AdminSolutions: React.FC = () => {
         formData.append('thumbnailImage', uploadData.thumbnailImage);
       }
 
-      const response = await fetch(`${config.apiUrl}/api/ncert-solutions/upload`, {
+      const response = await fetch(`${config.apiUrl}/ncert-solutions/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -310,7 +310,7 @@ const AdminSolutions: React.FC = () => {
       formData.append('chapter', smartUploadData.chapter);
       formData.append('pdfFile', smartUploadData.pdfFile);
 
-      const response = await fetch(`${config.apiUrl}/api/smart-pdf-upload?action=upload`, {
+      const response = await fetch(`${config.apiUrl}/smart-pdf-upload?action=upload`, {
         method: 'POST',
         headers: {
           'x-user-id': user?.id || 'admin',
@@ -360,7 +360,7 @@ const AdminSolutions: React.FC = () => {
   // Fetch processing sessions
   const fetchProcessingSessions = async () => {
     try {
-      const response = await fetch(`${config.apiUrl}/api/smart-pdf-upload?action=sessions`, {
+      const response = await fetch(`${config.apiUrl}/smart-pdf-upload?action=sessions`, {
         headers: {
           'x-user-id': user?.id || 'admin',
         },
@@ -380,7 +380,7 @@ const AdminSolutions: React.FC = () => {
     setUploadingToDatabase(true);
     
     try {
-      const response = await fetch(`${config.apiUrl}/api/smart-pdf-upload?action=upload-to-database`, {
+      const response = await fetch(`${config.apiUrl}/smart-pdf-upload?action=upload-to-database`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

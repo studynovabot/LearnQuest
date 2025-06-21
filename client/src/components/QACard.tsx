@@ -58,7 +58,7 @@ export default function QACard({
     setIsLoadingExplanation(true);
 
     try {
-      const response = await fetch(`${config.apiUrl}/api/ai-explanation`, {
+      const response = await fetch(`${config.apiUrl}/ai-explanation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -89,7 +89,7 @@ export default function AdminPDFUpload() {
       formData.append('subject', uploadData.subject);
       formData.append('chapter', uploadData.chapter);
 
-      const response = await fetch(`${config.apiUrl}/api/admin-pdf-upload`, {
+      const response = await fetch(`${config.apiUrl}/admin-pdf-upload`, {
         method: 'POST',
         body: formData,
       });
@@ -133,7 +133,7 @@ export default function AdminPDFUpload() {
     const pollInterval = setInterval(async () => {
       try {
         const response = await fetch(
-          `${config.apiUrl}/api/admin-pdf-upload?action=status&id=${processingId}`
+          `${config.apiUrl}/admin-pdf-upload?action=status&id=${processingId}`
         );
         
         if (response.ok) {

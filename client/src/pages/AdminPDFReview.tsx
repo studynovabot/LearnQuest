@@ -67,7 +67,7 @@ export default function AdminPDFReview() {
   // Fetch pending reviews
   const fetchPendingReviews = async () => {
     try {
-      const response = await fetch(`${config.apiUrl}/api/admin-pdf-upload?action=pending-reviews`);
+      const response = await fetch(`${config.apiUrl}/admin-pdf-upload?action=pending-reviews`);
       if (!response.ok) throw new Error('Failed to fetch pending reviews');
       
       const data = await response.json();
@@ -113,7 +113,7 @@ export default function AdminPDFReview() {
       formData.append('subject', metadata.subject);
       formData.append('chapter', metadata.chapter);
 
-      const response = await fetch(`${config.apiUrl}/api/admin-pdf-upload`, {
+      const response = await fetch(`${config.apiUrl}/admin-pdf-upload`, {
         method: 'POST',
         body: formData,
       });
@@ -149,7 +149,7 @@ export default function AdminPDFReview() {
   const pollUploadStatus = async (processingId: string) => {
     const poll = async () => {
       try {
-        const response = await fetch(`${config.apiUrl}/api/admin-pdf-upload?action=status&id=${processingId}`);
+        const response = await fetch(`${config.apiUrl}/admin-pdf-upload?action=status&id=${processingId}`);
         if (!response.ok) return;
 
         const status = await response.json();
@@ -182,7 +182,7 @@ export default function AdminPDFReview() {
   const viewReviewDetails = async (reviewId: string) => {
     setReviewLoading(true);
     try {
-      const response = await fetch(`${config.apiUrl}/api/admin-pdf-upload?action=review-details&id=${reviewId}`);
+      const response = await fetch(`${config.apiUrl}/admin-pdf-upload?action=review-details&id=${reviewId}`);
       if (!response.ok) throw new Error('Failed to fetch review details');
       
       const data = await response.json();
@@ -202,7 +202,7 @@ export default function AdminPDFReview() {
   // Approve or reject review
   const handleReviewDecision = async (reviewId: string, approved: boolean) => {
     try {
-      const response = await fetch(`${config.apiUrl}/api/admin-pdf-upload?action=approve-review`, {
+      const response = await fetch(`${config.apiUrl}/admin-pdf-upload?action=approve-review`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

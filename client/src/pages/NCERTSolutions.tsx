@@ -247,7 +247,7 @@ const NCERTSolutions: React.FC = () => {
         ...(difficultyFilter && difficultyFilter !== 'all' && { difficulty: difficultyFilter }),
       });
 
-      const response = await fetch(`${config.apiUrl}/api/ncert-solutions?${params}`, {
+      const response = await fetch(`${config.apiUrl}/ncert-solutions?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
@@ -280,7 +280,7 @@ const NCERTSolutions: React.FC = () => {
     setStatsLoading(true);
     
     try {
-      const response = await fetch(`${config.apiUrl}/api/ncert-solutions/stats`, {
+      const response = await fetch(`${config.apiUrl}/ncert-solutions/stats`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
@@ -333,7 +333,7 @@ const NCERTSolutions: React.FC = () => {
         formData.append('thumbnailImage', uploadData.thumbnailImage);
       }
 
-      const response = await fetch(`${config.apiUrl}/api/ncert-solutions/upload`, {
+      const response = await fetch(`${config.apiUrl}/ncert-solutions/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

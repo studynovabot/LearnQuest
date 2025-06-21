@@ -121,13 +121,12 @@
     },
     {
       "src": "/api/ncert-solutions/upload",
-      "methods": ["OPTIONS", "GET", "POST"],
-      "dest": "/api/ncert-management.js?action=upload",
+      "methods": ["OPTIONS", "POST"],
+      "dest": "/api/ncert-solutions-upload.js",
       "headers": {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
-        "Content-Type": "application/json"
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept"
       }
     },
     {
