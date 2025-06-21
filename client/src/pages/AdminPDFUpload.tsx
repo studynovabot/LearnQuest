@@ -89,8 +89,12 @@ export default function AdminPDFUpload() {
       formData.append('subject', uploadData.subject);
       formData.append('chapter', uploadData.chapter);
 
+      const token = localStorage.getItem('token');
       const response = await fetch(`${config.apiUrl}/admin-pdf-upload`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         body: formData,
       });
 
@@ -132,8 +136,14 @@ export default function AdminPDFUpload() {
   const pollProcessingStatus = async (processingId: string) => {
     const pollInterval = setInterval(async () => {
       try {
+        const token = localStorage.getItem('token');
         const response = await fetch(
-          `${config.apiUrl}/admin-pdf-upload?action=status&id=${processingId}`
+          `${config.apiUrl}/admin-pdf-upload?action=status&id=${processingId}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          }
         );
         
         if (response.ok) {

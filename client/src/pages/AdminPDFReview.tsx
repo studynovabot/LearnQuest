@@ -67,7 +67,12 @@ export default function AdminPDFReview() {
   // Fetch pending reviews
   const fetchPendingReviews = async () => {
     try {
-      const response = await fetch(`${config.apiUrl}/admin-pdf-upload?action=pending-reviews`);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${config.apiUrl}/admin-pdf-upload?action=pending-reviews`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       if (!response.ok) throw new Error('Failed to fetch pending reviews');
       
       const data = await response.json();
@@ -113,8 +118,12 @@ export default function AdminPDFReview() {
       formData.append('subject', metadata.subject);
       formData.append('chapter', metadata.chapter);
 
+      const token = localStorage.getItem('token');
       const response = await fetch(`${config.apiUrl}/admin-pdf-upload`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         body: formData,
       });
 
@@ -149,7 +158,12 @@ export default function AdminPDFReview() {
   const pollUploadStatus = async (processingId: string) => {
     const poll = async () => {
       try {
-        const response = await fetch(`${config.apiUrl}/admin-pdf-upload?action=status&id=${processingId}`);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${config.apiUrl}/admin-pdf-upload?action=status&id=${processingId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
         if (!response.ok) return;
 
         const status = await response.json();
@@ -182,7 +196,12 @@ export default function AdminPDFReview() {
   const viewReviewDetails = async (reviewId: string) => {
     setReviewLoading(true);
     try {
-      const response = await fetch(`${config.apiUrl}/admin-pdf-upload?action=review-details&id=${reviewId}`);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${config.apiUrl}/admin-pdf-upload?action=review-details&id=${reviewId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       if (!response.ok) throw new Error('Failed to fetch review details');
       
       const data = await response.json();
@@ -202,10 +221,12 @@ export default function AdminPDFReview() {
   // Approve or reject review
   const handleReviewDecision = async (reviewId: string, approved: boolean) => {
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`${config.apiUrl}/admin-pdf-upload?action=approve-review`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           reviewId,

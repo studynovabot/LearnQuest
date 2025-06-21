@@ -37,7 +37,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const parsedUser = JSON.parse(storedUser);
             
             // Validate token is still valid by making a test API call
-            const response = await fetch(`${config.apiUrl}/user-management`, {
+            const response = await fetch(`${config.apiUrl}/user-profile`, {
               headers: {
                 'Authorization': `Bearer ${storedToken}`,
                 'Content-Type': 'application/json'

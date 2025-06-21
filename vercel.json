@@ -89,7 +89,7 @@
     {
       "src": "/api/ncert-solutions",
       "methods": ["OPTIONS", "GET", "POST"],
-      "dest": "/api/ncert-solutions-real.js",
+      "dest": "/api/ncert-solutions.js",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -109,9 +109,9 @@
       }
     },
     {
-      "src": "/api/ncert-solutions/stats",
+      "src": "/api/ncert-solutions/stats",   
       "methods": ["OPTIONS", "GET", "POST"],
-      "dest": "/api/ncert-solutions-real.js?action=stats",
+      "dest": "/api/ncert-solutions.js?action=stats",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -132,7 +132,7 @@
     {
       "src": "/api/ncert-solutions/([^/]+)/content",
       "methods": ["OPTIONS", "GET", "POST"],
-      "dest": "/api/ncert-solutions-real.js?action=content&id=$1",
+      "dest": "/api/ncert-solutions.js?action=content&id=$1",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",

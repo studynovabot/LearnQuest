@@ -210,7 +210,24 @@ const NCERTSolutions: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // Try to get error message from response body if it's JSON
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || errorMessage;
+          }
+        } catch (parseError) {
+          // If we can't parse the error as JSON, keep the original message
+          console.warn('Could not parse error response as JSON:', parseError);
+        }
+        throw new Error(errorMessage);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned invalid response format. Expected JSON but received: ' + (contentType || 'unknown'));
       }
 
       const data = await response.json();
@@ -298,37 +315,145 @@ const NCERTSolutions: React.FC = () => {
     setContentLoading(true);
     
     try {
-      // Mock content for now - in production, fetch from API
-      const content: SolutionContent[] = Array.from({ length: solution.totalQuestions }, (_, i) => ({
-        id: `content-${solution.id}-${i + 1}`,
-        solutionId: solution.id,
-        questionNumber: i + 1,
-        question: `Sample question ${i + 1} for ${solution.chapter}`,
-        solution: `Detailed solution for question ${i + 1}...`,
-        steps: [
-          `Step 1: Understand the problem`,
-          `Step 2: Apply relevant concepts`,
-          `Step 3: Calculate and verify`
-        ]
-      }));
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${config.apiUrl}/ncert-solutions/${solution.id}/content`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
       
-      setSolutionContent(content);
+      if (data.solution && data.solution.qaPairs) {
+        // Convert Q&A pairs to SolutionContent format
+        const content: SolutionContent[] = data.solution.qaPairs.map((qa: QAPair, index: number) => ({
+          id: `content-${solution.id}-${index + 1}`,
+          solutionId: solution.id,
+          questionNumber: qa.questionNumber || index + 1,
+          question: qa.question,
+          solution: qa.answer,
+          steps: qa.answer.split('\n').filter(line => line.trim().startsWith('Step')).slice(0, 5) // Extract steps if available
+        }));
+        
+        setSolutionContent(content);
+      } else {
+        // Fallback to mock data if no Q&A pairs available
+        const content: SolutionContent[] = Array.from({ length: solution.totalQuestions }, (_, i) => ({
+          id: `content-${solution.id}-${i + 1}`,
+          solutionId: solution.id,
+          questionNumber: i + 1,
+          question: `Question ${i + 1} for ${solution.chapter}`,
+          solution: `This solution is being prepared. Please check back later.`,
+          steps: [
+            `Step 1: Identify the problem`,
+            `Step 2: Apply relevant concepts`,
+            `Step 3: Calculate and verify`
+          ]
+        }));
+        
+        setSolutionContent(content);
+      }
 
     } catch (err) {
       console.error('Error loading solution content:', err);
       toast({
         title: "Error",
-        description: "Failed to load solution content",
+        description: "Failed to load solution content. Please try again.",
         variant: "destructive",
       });
+      
+      // Fallback to mock data on error
+      const content: SolutionContent[] = Array.from({ length: solution.totalQuestions || 1 }, (_, i) => ({
+        id: `content-${solution.id}-${i + 1}`,
+        solutionId: solution.id,
+        questionNumber: i + 1,
+        question: `Question ${i + 1} for ${solution.chapter}`,
+        solution: `Solution temporarily unavailable. Please try again later.`,
+        steps: []
+      }));
+      
+      setSolutionContent(content);
     } finally {
       setContentLoading(false);
     }
   };
   
+  // Check if user has access to NCERT solutions
+  const hasAccess = () => {
+    return userData.tier === 'pro' || userData.tier === 'goat';
+  };
+
+  // Access denied component
+  const AccessDeniedComponent = () => (
+    <div className="container mx-auto px-4 py-8">
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-destructive">
+            🔒 Access Denied
+          </CardTitle>
+          <CardDescription className="text-lg">
+            NCERT Solutions require a PRO or GOAT subscription
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="text-center">
+            <p className="text-muted-foreground mb-4">
+              You currently have a <Badge variant="outline">{userData.tier.toUpperCase()}</Badge> plan.
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              Upgrade to PRO or GOAT to access:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span className="text-sm">Complete NCERT Solutions</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span className="text-sm">AI-Powered Help</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span className="text-sm">Step-by-step Solutions</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span className="text-sm">All Subjects & Classes</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-center space-x-4">
+            <Button 
+              onClick={() => window.location.href = '/subscription'}
+              size="lg"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+            >
+              <Zap className="h-4 w-4 mr-2" />
+              Upgrade to PRO
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => window.location.href = '/pricing'}
+              size="lg"
+            >
+              View Pricing
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   // Initial data fetch
   useEffect(() => {
-    fetchSolutions();
+    if (hasAccess()) {
+      fetchSolutions();
+    }
   }, []);
   
   // Fetch when filters or pagination changes
@@ -456,6 +581,19 @@ const NCERTSolutions: React.FC = () => {
       </Pagination>
     );
   };
+
+  // Show access denied for free users
+  if (!hasAccess()) {
+    return (
+      <>
+        <Helmet>
+          <title>NCERT Solutions - LearnQuest</title>
+          <meta name="description" content="Access comprehensive NCERT solutions for all classes and subjects with AI-powered help." />
+        </Helmet>
+        <AccessDeniedComponent />
+      </>
+    );
+  }
 
   return (
     <>

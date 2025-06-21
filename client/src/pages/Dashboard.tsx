@@ -3,6 +3,8 @@ import { Helmet } from 'react-helmet';
 import Leaderboard from "@/components/gamification/Leaderboard";
 import DailyChallenge from "@/components/gamification/DailyChallenge";
 import { useAuth } from "@/hooks/useAuth";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -33,11 +35,15 @@ import {
   Rocket,
   Medal,
   Gift,
-  Heart
+  Heart,
+  Settings,
+  Upload,
+  FileText,
+  UserCheck
 } from "lucide-react";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [currentStreak] = useState(7);
   
   const SPACE_CHAR = ' ';

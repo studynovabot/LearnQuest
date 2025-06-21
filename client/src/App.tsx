@@ -26,6 +26,8 @@ import LandingPage from "@/pages/LandingPage";
 import Terms from "@/pages/Terms";
 import AdminUsers from "@/pages/AdminUsers";
 import AdminSolutions from "@/pages/AdminSolutions";
+import AdminPDFUpload from "@/pages/AdminPDFUpload";
+import AdminPDFReview from "@/pages/AdminPDFReview";
 import Ranks from "@/pages/Ranks";
 import GamificationPage from "@/pages/GamificationPage";
 import StudyTracker from "@/pages/StudyTracker";
@@ -184,6 +186,24 @@ function Router() {
           <MainLayout>
             <AdminRoute>
               <AdminSolutions />
+            </AdminRoute>
+          </MainLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin-pdf-upload">
+        <ProtectedRoute>
+          <MainLayout>
+            <AdminRoute>
+              <AdminPDFUpload />
+            </AdminRoute>
+          </MainLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin-pdf-review">
+        <ProtectedRoute>
+          <MainLayout>
+            <AdminRoute>
+              <AdminPDFReview />
             </AdminRoute>
           </MainLayout>
         </ProtectedRoute>
