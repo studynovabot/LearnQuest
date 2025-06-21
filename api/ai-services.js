@@ -2,9 +2,10 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-// Vercel serverless function for AI services
+// Consolidated AI Services API - handles chat, help, and explanation services
 import { handleCors } from '../utils/cors.js';
 import { initializeFirebase, getFirestoreDb } from '../utils/firebase.js';
+import { initializeFirebaseAdmin, getFirestoreAdminDb } from '../utils/firebase-admin.js';
 
 // Agent-specific system prompts for all 15 AI tutors - Engaging Study Buddy Style with Concise Responses
 const AGENT_PROMPTS = {
@@ -837,6 +838,150 @@ async function handleChat(req, res) {
   }
 }
 
+// Handle AI Help requests for NCERT Solutions
+async function handleAIHelp(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    // Initialize Firebase
+    initializeFirebaseAdmin();
+    const db = getFirestoreAdminDb();
+
+    // Parse request body
+    const { query, context } = req.body;
+
+    if (!query || !context) {
+      return res.status(400).json({ 
+        error: 'Missing required fields',
+        message: 'Both query and context are required'
+      });
+    }
+
+    // Get user from Authorization header (you can implement JWT validation here)
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    // For now, simulate user subscription check
+    // In production, validate JWT and check user subscription
+    const userHasAccess = true; // Replace with actual subscription check
+
+    if (!userHasAccess) {
+      return res.status(403).json({ 
+        error: 'Access denied',
+        message: 'AI Help is available for PRO and GOAT users only'
+      });
+    }
+
+    // Create AI prompt based on NCERT context
+    const systemPrompt = `You are an expert NCERT solutions tutor. Help students understand concepts and solve problems from NCERT textbooks.
+
+Context:
+- Board: ${context.board}
+- Class: ${context.class}
+- Subject: ${context.subject}
+- Chapter: ${context.chapter}
+- Exercise: ${context.exercise || 'General'}
+
+Guidelines:
+1. Provide clear, step-by-step explanations
+2. Use simple language appropriate for the student's grade level
+3. Focus on understanding concepts, not just answers
+4. Include relevant examples when helpful
+5. Encourage critical thinking
+
+Student's Question: ${query}`;
+
+    // Call AI service
+    const aiResult = await callGroqAPI(systemPrompt, query);
+    
+    if (!aiResult.success) {
+      throw new Error(aiResult.error || 'Failed to get AI response');
+    }
+
+    // Log the interaction (optional)
+    console.log(`AI Help requested for ${context.subject} Class ${context.class}`);
+
+    return res.status(200).json({
+      success: true,
+      response: aiResult.response,
+      context: context,
+      provider: aiResult.provider,
+      responseTime: aiResult.responseTime
+    });
+
+  } catch (error) {
+    console.error('AI Help error:', error);
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      message: 'Failed to process AI help request'
+    });
+  }
+}
+
+// Handle AI Explanation requests
+async function handleExplanation(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const { question, answer, context } = req.body;
+
+    if (!question || !answer) {
+      return res.status(400).json({
+        error: 'Missing required fields',
+        message: 'Both question and answer are required'
+      });
+    }
+
+    // Check user authentication
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    // Create explanation prompt
+    const systemPrompt = `You are an expert tutor who explains solutions in simple, clear terms. 
+Explain the following solution step-by-step, focusing on the concepts and reasoning behind each step.
+
+Question: ${question}
+Answer: ${answer}
+
+Please provide:
+1. A brief explanation of what the question is asking
+2. Step-by-step breakdown of the solution
+3. Key concepts involved
+4. Why this approach works
+
+Keep your explanation clear and educational, suitable for a student learning this topic.`;
+
+    // Call AI service
+    const aiResult = await callGroqAPI(systemPrompt, `Explain this solution: ${answer}`);
+    
+    if (!aiResult.success) {
+      throw new Error(aiResult.error || 'Failed to generate explanation');
+    }
+
+    return res.status(200).json({
+      success: true,
+      explanation: aiResult.response,
+      provider: aiResult.provider,
+      responseTime: aiResult.responseTime
+    });
+
+  } catch (error) {
+    console.error('AI Explanation error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to generate explanation'
+    });
+  }
+}
+
 // Main API handler with routing
 async function handler(req, res) {
   try {
@@ -855,9 +1000,11 @@ async function handler(req, res) {
         return await handleChat(req, res);
       case 'help':
         return await handleAIHelp(req, res);
+      case 'explanation':
+        return await handleExplanation(req, res);
       default:
         return res.status(400).json({ 
-          error: 'Invalid service parameter. Use: chat or help' 
+          error: 'Invalid service parameter. Use: chat, help, or explanation' 
         });
     }
   } catch (error) {

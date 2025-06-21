@@ -256,7 +256,7 @@ const NCERTSolutions: React.FC = () => {
     setAiLoading(true);
     
     try {
-      const response = await fetch(`${config.apiUrl}/ai/help`, {
+      const response = await fetch(`${config.apiUrl}/ai-services?service=help`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
