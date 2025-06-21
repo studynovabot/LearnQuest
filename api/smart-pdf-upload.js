@@ -87,14 +87,73 @@ async function handlePDFUpload(req, res) {
     };
 
     // Process PDF to JSONL
-    const processingResult = await processPDFToJSONL(pdfFile.path, metadata);
+    console.log('📄 Starting PDF processing...');
+    leole.log('📄 Starting PDF processing...');
+    let processingResult;
+    
+    try {
+      processingResult;
+    console.log('📄 PDF processing completed:', processingResult.success ? 'SUCCESS' : 'FAILED');
+    } catch (processingError) {
+      console.error('❌ PDF processing exception:', processingError);
+      processingResult = {
+        success: false,
+        error: processingError.message,
+        qaPairs: [],
+        totalQuestions: 0
+      };
+    }
 
     if (!processingResult.success) {
-      return res.status(500).json({
+      console.warn('⚠️ PDF processing failed, but continuing with basic upload');
+      // Don't fail the entire upload, just log the error and continue
+      processingResult = {
         success: false,
-        message: 'Failed to process PDF',
-        error: processingResult.error
-      });
+        error: processingResult.error || 'Unknown processing error',
+        qaPairs: [],
+        totalQuestions: 0,
+        jsonlContent: '',
+        outputPath: '',
+        filename: '',
+        metadata: {
+          ...metadata,
+          processedAt: new Date().toISOString(),
+          pdfPages: 0,
+          textLength: 0
+        }
+      }
+    try {
+     sult = await processPDFToJSONL(pdfFile.path, metadata);
+      console.log('📄 PDF processing completed:', processingResult.success ? 'SUCCESS' : 'FAILED');
+    } catch (processingError) {
+      console.error('❌ PDF processing exception:', processingError);
+      processingResult = {
+        success: processingResult.success,
+        success: false,
+        error: processingError.message,
+        qaPairs: [],
+        totalQuestions: 0
+      };
+    }
+
+    if (!processingResult.success) {
+      console.warn('⚠️ PDF processing failed, but continuing with basic upload');
+      // Don't fail the entire upload, just log the error and continue
+      processingResult = {
+        success: false,
+        error: processingResult.error || 'Unknown processing error',
+        qaPairs: [],
+        totalQuestions: 0,
+        jsonlContent: '' || '',
+        outputPath: '' || '',
+        filename: '',
+        metadata: {
+          ...metadata,
+          processedAt: new Date().toISOString(),
+          pdfPages: 0,
+          textLength: 0
+        }
+      };
     }
 
     // Create processing session in database for admin review
@@ -102,47 +161,105 @@ async function handlePDFUpload(req, res) {
     
     const sessionData = {
       sessionId,
-      status: 'pending_review',
+      status: processingResult.success ? 'pending_review' : 'processing_failed',
       metadata,
       processingResult: {
-        totalQuestions: processingResult.totalQuestions,
-        filename: processingResult.filename,
-        outputPath: processingResult.outputPath,
-        processedAt: processingResult.metadata.processedAt
+        success: processingResult.success,
+        totalQuestions: processingResult.totalQuestions || 0 || 0,
+        filename: processingResult.filename || '',
+        outputPath: processingResult.outputPath || '',
+        processedAt: processingResult.metadata?.processedAt || new Date().toISOString(),
+        error: processingResult.success ? null : processingResult.error
       },
-      jsonlContent: processingResult.jsonlContent,
-      qaPairs: processingResult.qaPairs,
+      jsonlContent: processingResult.jsonlContent || '',
+      qaPairs: processingResult.qaPairs || [],
+      totalQuestions: processingResult.totalQuestions || 0,
       createdAt: new Date(),
       uploadedBy: req.headers['x-user-id'] || 'admin'
     };
 
     // Save session to database
-    await db.collection('pdf_processing_sessions').doc(sessionId).set(sessionData);
+    console.log(`💾 Saving processing session: ${sessionId}`);
+    try {
+      await db.collection('pdf_processing_sessions').doc(sessionId).set(sessionData);
+      console.log(`✅ Processing session saved successfully`);
+    } catch (dbError) {
+      console.error('❌ Failed to save processing session:', dbError);
+      throw new Error(`Failed to save processing session: ${dbError.message}`);
+    }
 
-    // Clean up uploaded file
+    // Clean up uploaded file || [],
+      processingSuccess: processingResult.success,
+      processingError: processingResult.success ? null : processingResult.error,
+      metadata: processingResult.metadata || metadata
+    });
+
+  } catch (error) {
+    console.error('❌ PDF upload error:', error);
+    console.error('❌ Error stack:', error.stack);
+    
+    // Try to clean up any uploaded files
+    try {
+      if (pdfFile?.path && fs.existsSync(pdfFile.path)) {
+        fs.unlinkSync(pdfFile.path);
+      }
+    } catch (cleanupError) {
+      console.warn('⚠️ Failed to cleanup file after error:', cleanupError.message);
+    }
+    
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error during PDF upload',
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     try {
       fs.unlinkSync(pdfFile.path);
     } catch (cleanupError) {
       console.warn('⚠️ Failed to cleanup uploaded file:', cleanupError.message);
     }
 
-    console.log(`✅ PDF processed successfully. Session ID: ${sessionId}`);
+    console.log(`✅ PDF upload completed. Session ID: ${sessionId}`);
+
+    const responseMessage = processingResult.success 
+      ? `PDF processed successfully! Extracted ${processingResult.totalQuestions} Q&A pairs. Review them in the processing sessions.`
+      : `PDF uploaded but processing failed: ${processingResult.error}. You can still review the file manually.`;
 
     return res.status(200).json({
       success: true,
-      message: 'PDF processed successfully',
+      message: responseMessage,
       sessionId,
-      totalQuestions: processingResult.totalQuestions,
-      qaPairs: processingResult.qaPairs,
-      metadata: processingResult.metadata
+      totalQuestions: processingResult.totalQuestions || 0,
+    status: sessionData.status || 'unknown',
+        metadata: sessionData.metadata || {},
+        totalQuestions: sessionData.totalQuestions || 0,
+        processingResult: sessionData.processingResult || {},
+        jsonlContent: sessionData.jsonlContent || '',
+        qaPairs: sessionData.qaPairs || [],
+        createdAt: sessionData.createdAt?.toDate?.()?.toISOString?.() || sessionData.createdAt,
+        uploadedBy: sessionData.uploadedBy || 'unknown'  qaPairs: processingResult.qaPairs || [],
+      processingSuccess: processingResult.success,
+      processingError: processingResult.success ? null : processingResult.error,
+      metadata: processingResult.metadata || metadata
     });
 
   } catch (error) {
     console.error('❌ PDF upload error:', error);
+    console.error('❌ Error stack:', error.stack);
+    
+    // Try to clean up any uploaded files
+    try {
+      if (pdfFile?.path && fs.existsSync(pdfFile.path)) {
+        fs.unlinkSync(pdfFile.path);
+      }
+    } catch (cleanupError) {
+      console.warn('⚠️ Failed to cleanup file after error:', cleanupError.message);
+    }
+    
     return res.status(500).json({
       success: false,
-      message: 'Internal server error',
-      error: error.message
+      message: 'Internal server error during PDF upload',
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }
@@ -153,7 +270,16 @@ async function getProcessingSession(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  try {
+  try {status: data.status || 'unknown',
+        metadata: data.metadata || {},
+        totalQuestions: data.totalQuestions || 0,
+        processingResult: data.processingResult || {},
+        createdAt: data.createdAt?.toDate?.()?.toISOString?.() || data.createdAt,
+        uploadedBy: data.uploadedBy || 'unknown',
+        // Don't include full JSONL content in list view for performance
+        jsonlContent: undefined,
+        // Include first 3 Q&A pairs for preview
+        qaPairs: data.qaPairs ? data.qaPairs.slice(0, 3) : []
     initializeFirebaseAdmin();
     const db = getFirestoreAdminDb();
 
@@ -181,8 +307,14 @@ async function getProcessingSession(req, res) {
       success: true,
       session: {
         sessionId: sessionDoc.id,
-        ...sessionData,
-        createdAt: sessionData.createdAt?.toDate?.()?.toISOString?.() || sessionData.createdAt
+        status: sessionData.status || 'unknown',
+        metadata: sessionData.metadata || {},
+        totalQuestions: sessionData.totalQuestions || 0,
+        processingResult: sessionData.processingResult || {},
+        jsonlContent: sessionData.jsonlContent || '',
+        qaPairs: sessionData.qaPairs || [],
+        createdAt: sessionData.createdAt?.toDate?.()?.toISOString?.() || sessionData.createdAt,
+        uploadedBy: sessionData.uploadedBy || 'unknown'
       }
     });
 
@@ -223,11 +355,16 @@ async function getAllProcessingSessions(req, res) {
       const data = doc.data();
       sessions.push({
         sessionId: doc.id,
-        ...data,
+        status: data.status || 'unknown',
+        metadata: data.metadata || {},
+        totalQuestions: data.totalQuestions || 0,
+        processingResult: data.processingResult || {},
         createdAt: data.createdAt?.toDate?.()?.toISOString?.() || data.createdAt,
-        // Don't include full JSONL content in list view
+        uploadedBy: data.uploadedBy || 'unknown',
+        // Don't include full JSONL content in list view for performance
         jsonlContent: undefined,
-        qaPairs: data.qaPairs ? data.qaPairs.slice(0, 3) : [] // Only first 3 for preview
+        // Include first 3 Q&A pairs for preview
+        qaPairs: data.qaPairs ? data.qaPairs.slice(0, 3) : []
       });
     });
 

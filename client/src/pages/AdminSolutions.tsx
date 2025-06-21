@@ -175,7 +175,7 @@ const AdminSolutions: React.FC = () => {
     setLoading(true);
     try {
       const [solutionsResponse, statsResponse] = await Promise.all([
-        fetch(`${config.apiUrl}/ncert-solutions?limit=100`, {
+        fetch(`${config.apiUrl}/ncert-solutions?limit=100&isAdmin=true`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json',
@@ -243,6 +243,7 @@ const AdminSolutions: React.FC = () => {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'x-user-id': user?.id || 'admin',
         },
         body: formData,
       });
@@ -254,10 +255,10 @@ const AdminSolutions: React.FC = () => {
       const result = await response.json();
       
       toast({
-        title: "Success",
+        title: result.pdfProcessing?.success ? "PDF Processed Successfully! 🎉" : "Solution Uploaded! 📁",
         description: result.pdfProcessing?.success 
-          ? `Solution uploaded and ${result.pdfProcessing.questionsProcessed} questions extracted!`
-          : "Solution uploaded successfully!",
+          ? `Solution uploaded and ${result.data?.totalQuestions || result.pdfProcessing.totalQuestions} Q&A pairs extracted! Check Processing Sessions to review them.`
+          : result.message || "Solution uploaded successfully!",
       });
 
       setIsUploadDialogOpen(false);
@@ -273,8 +274,9 @@ const AdminSolutions: React.FC = () => {
         thumbnailImage: null
       });
       
-      // Refresh data
+      // Refresh data and processing sessions
       fetchData();
+      fetchProcessingSessions();
 
     } catch (err) {
       console.error('Error uploading solution:', err);
@@ -325,9 +327,21 @@ const AdminSolutions: React.FC = () => {
       const result = await response.json();
       
       if (result.success) {
+        const title = result.processingSuccess 
+          ? "PDF Processed Successfully! 🎉"
+          : "PDF Uploaded Successfully! ⚠️";
+        
+        const description = result.processingSuccess 
+          ? `Extracted ${result.totalQuestions} Q&A pairs. Check the Processing Sessions tab to review them.`
+          : `PDF uploaded but processing failed: ${result.processingError}. The file is saved and you can review it manually.`;
+        
         toast({
-          title: "PDF Processed Successfully! 🎉",
-          description: `Extracted ${result.totalQuestions} Q&A pairs. Ready for review.`,
+          title,
+          description,
+        });
+        toast({
+          title,
+          description,
         });
 
         // Reset form

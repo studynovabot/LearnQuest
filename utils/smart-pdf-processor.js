@@ -5,6 +5,7 @@ import pdfParse from 'pdf-parse';
 
 // AI API configuration
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const TOGETHER_AI_API_KEY = process.env.TOGETHER_AI_API_KEY;
 
 /**
  * Extract text from PDF using pdf-parse
@@ -72,36 +73,103 @@ Return format (JSON array only):
 ]
 `;
 
-    // Call Groq API
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert educational content processor. Extract question-answer pairs and return only valid JSON array.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: 4000,
-        temperature: 0.3
-      })
-    });
+    // Try AI APIs in order of preference (GROQ first, then Together AI)
+    let aiResponse = null;
+    let apiUsed = 'none';
 
-    if (!response.ok) {
-      throw new Error(`AI processing failed: ${response.statusText}`);
+    // First try GROQ API
+    if (GROQ_API_KEY) {
+      try {
+        console.log('🧠 Trying GROQ API...');
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${GROQ_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'llama3-8b-8192',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are an expert educational content processor. Extract question-answer pairs and return only valid JSON array.'
+              },
+              {
+                role: 'user',
+                content: prompt
+              }
+            ],
+            max_tokens: 4000,
+            temperature: 0.3
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.choices?.[0]?.message?.content) {
+            aiResponse = data.choices[0].message.content;
+            apiUsed = 'GROQ';
+            console.log('✅ GROQ API responded successfully');
+          }
+        } else {
+          const errorText = await response.text();
+          console.warn(`⚠️ GROQ API failed (${response.status}): ${errorText}`);
+        }
+      } catch (error) {
+        console.warn('⚠️ GROQ API error:', error.message);
+      }
     }
 
-    const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
+    // Fallback to Together AI
+    if (!aiResponse && TOGETHER_AI_API_KEY) {
+      try {
+        console.log('🧠 Trying Together AI API...');
+        const response = await fetch('https://api.together.xyz/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${TOGETHER_AI_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'meta-llama/Llama-3-8b-chat-hf',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are an expert educational content processor. Extract question-answer pairs and return only valid JSON array.'
+              },
+              {
+                role: 'user',
+                content: prompt
+              }
+            ],
+            max_tokens: 4000,
+            temperature: 0.3
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.choices?.[0]?.message?.content) {
+            aiResponse = data.choices[0].message.content;
+            apiUsed = 'Together AI';
+            console.log('✅ Together AI API responded successfully');
+          }
+        } else {
+          const errorText = await response.text();
+          console.warn(`⚠️ Together AI API failed (${response.status}): ${errorText}`);
+        }
+      } catch (error) {
+        console.warn('⚠️ Together AI API error:', error.message);
+      }
+    }
+
+    // If no API worked, throw error to trigger fallback
+    if (!aiResponse) {
+      console.warn('⚠️ All AI APIs failed, using fallback Q&A extraction');
+      throw new Error('All AI APIs failed');
+    }
+
+    console.log(`🧠 Used ${apiUsed} API for processing`);
 
     // Parse AI response to extract JSON
     let qaPairs;
@@ -149,28 +217,50 @@ Return format (JSON array only):
 /**
  * Create fallback Q&A pairs when AI processing fails
  */
-function createFallbackQAPairs(text, metadata) {
+export function createFallbackQAPairs(text, metadata) {
   console.log('⚠️ Creating fallback Q&A pairs...');
   
   const { board, class: className, subject, chapter } = metadata;
   
-  // Simple text processing to find potential Q&A patterns
-  const lines = text.split('\n').filter(line => line.trim().length > 0);
+  // Clean and normalize text
+  const cleanText = text.replace(/\s+/g, ' ').trim();
+  const lines = cleanText.split(/\n|\r\n/).filter(line => line.trim().length > 10);
   const pairs = [];
   
   let currentQuestion = '';
   let currentAnswer = '';
   let questionNumber = 1;
+  let isInAnswer = false;
   
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     
-    // Look for question patterns
-    if (line.match(/^\d+\./) || line.includes('?') || line.toLowerCase().includes('question')) {
+    // Enhanced question detection patterns
+    const isQuestionLine = (
+      line.match(/^\d+\.?\s*/) ||                         // "1. " or "1 "
+      line.match(/^Q\d*\.?\s*/i) ||                       // "Q1." or "Q."
+      line.match(/^Question\s*\d*:?\s*/i) ||              // "Question 1:" or "Question:"
+      line.includes('?') ||                               // Contains question mark
+      line.match(/^[A-Z][^.]*\?$/) ||                     // Sentence ending with ?
+      line.toLowerCase().includes('what is') ||           // Common question starters
+      line.toLowerCase().includes('how to') ||
+      line.toLowerCase().includes('why is') ||
+      line.toLowerCase().includes('define') ||
+      line.toLowerCase().includes('explain') ||
+      line.toLowerCase().includes('describe')
+    );
+    
+    const isAnswerLine = (
+      line.match(/^(Ans|Answer|Solution|Sol)\.?\s*/i) ||  // "Ans.", "Answer:", etc.
+      (isInAnswer && line.length > 30)                    // Continue answer if already in answer mode
+    );
+    
+    if (isQuestionLine && !isAnswerLine) {
+      // Save previous Q&A pair if exists
       if (currentQuestion && currentAnswer) {
         pairs.push({
-          question: currentQuestion.trim(),
-          answer: currentAnswer.trim(),
+          question: currentQuestion.trim().replace(/^\d+\.?\s*/, '').replace(/^Q\d*\.?\s*/i, ''),
+          answer: currentAnswer.trim().replace(/^(Ans|Answer|Solution|Sol)\.?\s*/i, ''),
           questionNumber: questionNumber++,
           board,
           class: className,
@@ -180,18 +270,36 @@ function createFallbackQAPairs(text, metadata) {
           confidence: 0.7
         });
       }
+      
       currentQuestion = line;
       currentAnswer = '';
-    } else if (currentQuestion && line.length > 20) {
-      currentAnswer += (currentAnswer ? ' ' : '') + line;
+      isInAnswer = false;
+    } else if (isAnswerLine || isInAnswer) {
+      isInAnswer = true;
+      if (currentAnswer) {
+        currentAnswer += ' ' + line;
+      } else {
+        currentAnswer = line;
+      }
+    } else if (currentQuestion && !isInAnswer && line.length > 20) {
+      // Might be continuation of question
+      currentQuestion += ' ' + line;
+    } else if (isInAnswer && line.length > 15) {
+      // Continue answer
+      currentAnswer += ' ' + line;
+    }
+    
+    // Stop answer if we hit a new question or empty line
+    if (isInAnswer && (isQuestionLine || line.length < 5)) {
+      isInAnswer = false;
     }
   }
   
   // Add the last pair
   if (currentQuestion && currentAnswer) {
     pairs.push({
-      question: currentQuestion.trim(),
-      answer: currentAnswer.trim(),
+      question: currentQuestion.trim().replace(/^\d+\.?\s*/, '').replace(/^Q\d*\.?\s*/i, ''),
+      answer: currentAnswer.trim().replace(/^(Ans|Answer|Solution|Sol)\.?\s*/i, ''),
       questionNumber: questionNumber,
       board,
       class: className,
@@ -202,11 +310,33 @@ function createFallbackQAPairs(text, metadata) {
     });
   }
   
-  // If no pairs found, create a generic one
+  // If no pairs found, try to create some based on content structure
+  if (pairs.length === 0) {
+    const sentences = cleanText.split(/[.!?]+/).filter(s => s.trim().length > 20);
+    
+    // Try to create Q&A pairs from content
+    for (let i = 0; i < Math.min(sentences.length - 1, 10); i += 2) {
+      if (sentences[i] && sentences[i + 1]) {
+        pairs.push({
+          question: `Explain the concept: ${sentences[i].trim().substring(0, 100)}...`,
+          answer: sentences[i + 1].trim(),
+          questionNumber: pairs.length + 1,
+          board,
+          class: className,
+          subject,
+          chapter,
+          extractedAt: new Date().toISOString(),
+          confidence: 0.5
+        });
+      }
+    }
+  }
+  
+  // Final fallback - create at least one Q&A pair
   if (pairs.length === 0) {
     pairs.push({
-      question: `What is covered in ${chapter} of ${subject} for Class ${className}?`,
-      answer: text.substring(0, 500) + '...',
+      question: `What topics are covered in ${chapter} chapter of ${subject} for Class ${className}?`,
+      answer: cleanText.substring(0, 800) + (cleanText.length > 800 ? '...' : ''),
       questionNumber: 1,
       board,
       class: className,
@@ -217,8 +347,19 @@ function createFallbackQAPairs(text, metadata) {
     });
   }
   
-  console.log(`⚠️ Created ${pairs.length} fallback Q&A pairs`);
-  return pairs.slice(0, 20); // Limit to 20 pairs
+  // Clean up and validate pairs
+  const validPairs = pairs
+    .filter(pair => pair.question && pair.answer)
+    .filter(pair => pair.question.length > 5 && pair.answer.length > 10)
+    .map(pair => ({
+      ...pair,
+      question: pair.question.trim(),
+      answer: pair.answer.trim()
+    }))
+    .slice(0, 25); // Limit to 25 pairs
+  
+  console.log(`⚠️ Created ${validPairs.length} fallback Q&A pairs`);
+  return validPairs;
 }
 
 /**

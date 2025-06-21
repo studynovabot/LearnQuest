@@ -1,8 +1,10 @@
 // NCERT Solutions File Upload Handler
 import { handleCors } from '../utils/cors.js';
 import { initializeFirebaseAdmin, getFirestoreAdminDb } from '../utils/firebase-admin.js';
+import { processPDFToJSONL } from '../utils/smart-pdf-processor.js';
 import multiparty from 'multiparty';
 import fs from 'fs/promises';
+import fsSync from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -68,11 +70,62 @@ async function handleSolutionUpload(req, res) {
     const solutionId = uuidv4();
     const uploadDate = new Date();
     
-    // For now, we'll store file metadata and basic info
-    // In a full implementation, you'd want to:
-    // 1. Upload files to Firebase Storage or similar
-    // 2. Process the solution file (extract text, parse Q&A pairs)
-    // 3. Generate thumbnails if needed
+    // Process PDF to extract Q&A pairs if it's a PDF file
+    let pdfProcessingResult = null;
+    let processingErrors = [];
+    
+    if (solutionFile.originalFilename.toLowerCase().endsWith('.pdf')) {
+      console.log('📄 Processing PDF to extract Q&A pairs...');
+      
+      try {
+        const metadata = {
+          board,
+          class: className,
+          subject,
+          chapter,
+          originalFilename: solutionFile.originalFilename,
+          fileSize: solutionFile.size,
+          uploadedAt: uploadDate.toISOString()
+        };
+
+        pdfProcessingResult = await processPDFToJSONL(solutionFile.path, metadata);
+        
+        if (pdfProcessingResult.success) {
+          console.log(`✅ PDF processed successfully. Extracted ${pdfProcessingResult.totalQuestions} Q&A pairs`);
+          
+          // Create a processing session for review
+          const sessionId = `manual_${solutionId}`;
+          const sessionData = {
+            sessionId,
+            status: 'pending_review',
+            metadata,
+            processingResult: {
+              totalQuestions: pdfProcessingResult.totalQuestions,
+              filename: pdfProcessingResult.filename,
+              outputPath: pdfProcessingResult.outputPath,
+              processedAt: pdfProcessingResult.metadata.processedAt
+            },
+            jsonlContent: pdfProcessingResult.jsonlContent,
+            qaPairs: pdfProcessingResult.qaPairs,
+            createdAt: uploadDate,
+            uploadedBy: req.headers['x-user-id'] || 'admin',
+            sourceType: 'manual_upload',
+            originalSolutionId: solutionId
+          };
+
+          // Save processing session
+          console.log(`💾 Saving manual processing session: ${sessionId}`);
+          await db.collection('pdf_processing_sessions').doc(sessionId).set(sessionData);
+          console.log(`✅ Manual processing session saved successfully`);
+        } else {
+          processingErrors.push(`PDF processing failed: ${pdfProcessingResult.error}`);
+          console.warn('⚠️ PDF processing failed:', pdfProcessingResult.error);
+        }
+      } catch (pdfError) {
+        processingErrors.push(`PDF processing error: ${pdfError.message}`);
+        console.error('❌ PDF processing error:', pdfError);
+      }
+    }
     
     const solutionData = {
       id: solutionId,
@@ -102,8 +155,20 @@ async function handleSolutionUpload(req, res) {
       likes: 0,
       
       // Processing status
-      isProcessed: false,
-      processingStatus: 'uploaded',
+      isProcessed: !!pdfProcessingResult?.success,
+      processingStatus: pdfProcessingResult?.success ? 'processed' : 'uploaded',
+      contentExtracted: !!pdfProcessingResult?.success,
+      extractedFromPDF: !!pdfProcessingResult?.success,
+      totalQuestions: pdfProcessingResult?.totalQuestions || 1,
+      
+      // PDF processing results
+      pdfProcessing: {
+        success: !!pdfProcessingResult?.success,
+        totalQuestions: pdfProcessingResult?.totalQuestions || 0,
+        errors: processingErrors,
+        sessionCreated: !!pdfProcessingResult?.success,
+        sessionId: pdfProcessingResult?.success ? `manual_${solutionId}` : null
+      },
       
       // Authorization
       uploadedBy: req.headers['x-user-id'] || 'anonymous'
@@ -111,11 +176,6 @@ async function handleSolutionUpload(req, res) {
 
     // Save to Firestore
     await db.collection('ncert_solutions').doc(solutionId).set(solutionData);
-
-    // TODO: In a production implementation:
-    // 1. Move files to permanent storage (Firebase Storage, AWS S3, etc.)
-    // 2. Queue file for processing (extract content, generate Q&A pairs)
-    // 3. Send notification to admins for review
 
     // Clean up temporary files
     try {
@@ -131,10 +191,15 @@ async function handleSolutionUpload(req, res) {
 
     console.log(`✅ NCERT solution uploaded successfully with ID: ${solutionId}`);
 
+    const responseMessage = pdfProcessingResult?.success 
+      ? `Solution uploaded and ${pdfProcessingResult.totalQuestions} Q&A pairs extracted! Check processing sessions for review.`
+      : 'Solution uploaded successfully!';
+
     return res.status(201).json({
       success: true,
-      message: 'NCERT solution uploaded successfully',
+      message: responseMessage,
       solutionId,
+      pdfProcessing: solutionData.pdfProcessing,
       data: {
         id: solutionId,
         board,
@@ -142,7 +207,9 @@ async function handleSolutionUpload(req, res) {
         subject,
         chapter,
         status: 'uploaded',
-        uploadedAt: uploadDate.toISOString()
+        uploadedAt: uploadDate.toISOString(),
+        contentExtracted: !!pdfProcessingResult?.success,
+        totalQuestions: pdfProcessingResult?.totalQuestions || 1
       }
     });
 
