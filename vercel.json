@@ -162,17 +162,7 @@
         "Content-Type": "application/json"
       }
     },
-    {
-      "src": "/api/ncert-solutions-test",
-      "methods": ["OPTIONS", "GET", "POST"],
-      "dest": "/api/ncert-solutions-test.js",
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept",
-        "Content-Type": "application/json"
-      }
-    },
+
     {
       "src": "/api/image-analysis",
       "methods": ["OPTIONS", "GET", "POST"],

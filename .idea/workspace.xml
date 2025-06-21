@@ -7,8 +7,6 @@
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/AdminSolutions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/AdminSolutions.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/NCERTSolutions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/NCERTSolutions.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,6 +123,7 @@
       <workItem from="1750417893430" duration="1285000" />
       <workItem from="1750419231303" duration="1660000" />
       <workItem from="1750420933553" duration="331000" />
+      <workItem from="1750421304478" duration="62000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />

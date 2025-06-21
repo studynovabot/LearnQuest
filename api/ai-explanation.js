@@ -28,13 +28,103 @@ export default function handler(req, res) {
   return handleCors(req, res, async (req, res) => {
     
     if (req.method === 'POST') {
-      return await handleExplanationRequest(req, res);
+      // Check if it's a simple explanation request or a solution-based request
+      const { question, answer, solutionId } = req.body;
+      if (question && answer && !solutionId) {
+        return await handleSimpleExplanation(req, res);
+      } else {
+        return await handleExplanationRequest(req, res);
+      }
     } else if (req.method === 'GET') {
       return await handleGetExplanation(req, res);
     } else {
       return res.status(405).json({ error: 'Method not allowed' });
     }
   });
+}
+
+/**
+ * Handle simple AI explanation request (for direct question/answer)
+ */
+async function handleSimpleExplanation(req, res) {
+  try {
+    const { question, answer, userClass, subject } = req.body;
+
+    // Validate required parameters
+    if (!question || !answer) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required parameters: question and answer are required'
+      });
+    }
+
+    // Determine explanation level (one class higher than user's class)
+    const explanationLevel = userClass ? parseInt(userClass) + 1 : 10;
+    
+    console.log(`🧠 Generating AI explanation for question: "${question.substring(0, 50)}..."`);
+    console.log(`📚 Context: Class ${userClass}, Subject: ${subject}, Explanation Level: Class ${explanationLevel}`);
+
+    // Create prompt for AI
+    const prompt = `
+You are an expert educational tutor specializing in ${subject || 'all subjects'} for Class ${userClass || 'school'} students.
+
+I need you to explain the following question and its answer in a way that a Class ${explanationLevel} student can understand.
+
+Question: ${question}
+
+Answer: ${answer}
+
+Please provide:
+1. A clear, detailed explanation of the concept
+2. Break down complex parts into simpler terms
+3. Include relevant examples if helpful
+4. Highlight key points to remember
+5. Explain WHY this is the correct answer, not just WHAT the answer is
+
+Your explanation should be educational, accurate, and engaging for a student.
+`;
+
+    // Call Groq API
+    const response = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        {
+          role: 'system',
+          content: `You are an expert educational tutor for Class ${userClass || 'school'} students. Provide clear, detailed explanations that are educational and engaging.`
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      max_tokens: 1000,
+      temperature: 0.7
+    });
+
+    const explanation = response.choices[0].message.content;
+
+    console.log(`✅ Generated AI explanation (${explanation.length} chars)`);
+
+    return res.status(200).json({
+      success: true,
+      explanation,
+      metadata: {
+        model: 'llama-3.3-70b-versatile',
+        generatedAt: new Date().toISOString(),
+        questionLength: question.length,
+        answerLength: answer.length,
+        explanationLength: explanation.length
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ AI explanation error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to generate AI explanation',
+      error: error.message
+    });
+  }
 }
 
 /**
