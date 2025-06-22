@@ -48,7 +48,7 @@
     },
     {
       "src": "/api/upload-pdf",
-      "dest": "/api/admin-pdf-upload-fixed.js?endpoint=upload-pdf"
+      "dest": "/api/admin-pdf-upload-simple.js"
     },
     {
       "src": "/api/admin-review",
@@ -85,6 +85,10 @@
     {
       "src": "/api/ncert-upload",
       "dest": "/api/ncert-management.js?action=upload"
+    },
+    {
+      "src": "/api/user-profile",
+      "dest": "/api/user-management.js?action=profile"
     },
     {
       "src": "/api/(.*)",
