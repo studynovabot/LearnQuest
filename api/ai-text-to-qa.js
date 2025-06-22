@@ -79,7 +79,10 @@ Format as JSON array with objects containing: question, answer, difficulty, type
 
     console.log('🤖 Calling Groq API...');
 
-    // Call Groq API
+    // Call Groq API with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
+    
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -95,7 +98,10 @@ Format as JSON array with objects containing: question, answer, difficulty, type
         temperature: 0.3,
         max_tokens: 2000,
       }),
+      signal: controller.signal
     });
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
