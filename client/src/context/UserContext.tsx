@@ -37,10 +37,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const parsedUser = JSON.parse(storedUser);
             
             // Validate token is still valid by making a test API call
-            const response = await fetch(`${config.apiUrl}/user-profile`, {
+            const response = await fetch(`${config.apiUrl}/user-management?action=profile`, {
               headers: {
                 'Authorization': `Bearer ${storedToken}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-User-ID': parsedUser.id
               }
             });
             
@@ -226,11 +227,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Fetch the latest user profile from the server
       try {
         console.log(`Fetching user profile for ID: ${userId}`);
-        const response = await fetch(`${config.apiUrl}/user-profile`, {
+        const storedToken = localStorage.getItem('token');
+        const response = await fetch(`${config.apiUrl}/user-management?action=profile`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userId}`,
+            'Authorization': `Bearer ${storedToken}`,
             'X-User-ID': userId
           }
         });

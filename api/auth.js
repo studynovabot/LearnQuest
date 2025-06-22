@@ -1,11 +1,48 @@
 // Clean authentication system for LearnQuest
-import { handleCors } from '../utils/cors.js';
-import { initializeFirebase } from '../utils/firebase.js';
-import { storage } from '../utils/storage.js';
-import { generateToken } from '../utils/jwt-auth.js';
-import bcrypt from 'bcryptjs';
+const bcrypt = require('bcryptjs');
 
-module.exports = function handler(req, res) {
+// Dynamic imports for ES modules
+let handleCors, initializeFirebase, storage, generateToken;
+
+async function loadUtils() {
+  try {
+    const corsModule = await import('../utils/cors.js');
+    const firebaseModule = await import('../utils/firebase.js');
+    const storageModule = await import('../utils/storage.js');
+    const jwtModule = await import('../utils/jwt-auth.js');
+    
+    handleCors = corsModule.handleCors;
+    initializeFirebase = firebaseModule.initializeFirebase;
+    storage = storageModule.storage;
+    generateToken = jwtModule.generateToken;
+    
+    return true;
+  } catch (error) {
+    console.error('Failed to load utils:', error);
+    return false;
+  }
+}
+
+module.exports = async function handler(req, res) {
+  // Load ES modules dynamically
+  const utilsLoaded = await loadUtils();
+  
+  if (!utilsLoaded) {
+    // Fallback CORS handling
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+    
+    return res.status(500).json({
+      success: false,
+      message: 'Authentication service initialization failed'
+    });
+  }
+  
   return handleCors(req, res, async (req, res) => {
     if (req.method !== 'POST') {
       return res.status(405).json({ message: 'Method not allowed' });
@@ -52,6 +89,10 @@ module.exports = function handler(req, res) {
         // Try Firebase authentication first
         try {
           console.log('Attempting Firebase authentication for:', email);
+          
+          // Initialize Firebase if not already done
+          await initializeFirebase();
+          
           const user = await storage.getUserByEmail(email);
           console.log('Firebase user lookup result:', user ? 'User found' : 'User not found');
           

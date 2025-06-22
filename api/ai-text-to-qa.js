@@ -60,13 +60,22 @@ module.exports = async function handler(req, res) {
 
     console.log(`📚 Processing text for ${metadata.subject} (${text.length} chars)`);
 
-    // Check Groq API key
-    const groqApiKey = process.env.GROQ_API_KEY;
+    // Check Groq API key with multiple fallback names
+    const groqApiKey = process.env.GROQ_API_KEY || process.env.GROQ_KEY || process.env.API_KEY;
+    
+    console.log('🔍 API Key check:', {
+      hasGroqApiKey: !!process.env.GROQ_API_KEY,
+      hasGroqKey: !!process.env.GROQ_KEY,
+      finalKeyFound: !!groqApiKey,
+      keyLength: groqApiKey ? groqApiKey.length : 0
+    });
+
     if (!groqApiKey) {
       return res.status(500).json({
         success: false,
         message: 'AI service not configured',
-        error: 'GROQ_API_KEY_MISSING'
+        error: 'GROQ_API_KEY_MISSING',
+        debug: Object.keys(process.env).filter(key => key.includes('GROQ') || key.includes('API'))
       });
     }
 
