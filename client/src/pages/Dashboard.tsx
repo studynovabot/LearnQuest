@@ -340,6 +340,15 @@ const Dashboard = () => {
                 <Users className="h-5 w-5 mr-2" />
                 Community
               </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger 
+                  value="admin" 
+                  className="px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+                >
+                  <Settings className="h-5 w-5 mr-2" />
+                  Admin
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="home">
@@ -932,6 +941,207 @@ const Dashboard = () => {
                 </PremiumCard>
               </motion.div>
             </TabsContent>
+
+            {/* Admin Tab Content */}
+            {isAdmin && (
+              <TabsContent value="admin">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold mb-2">🛠️ Admin Dashboard</h2>
+                    <p className="text-muted-foreground">Manage content, users, and system settings</p>
+                  </div>
+
+                  {/* Admin Quick Actions */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* PDF Upload Card */}
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      className="cursor-pointer"
+                      onClick={() => window.location.href = '/admin-pdf-upload'}
+                    >
+                      <Card className="p-6 h-full bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="flex items-center text-blue-700 dark:text-blue-300">
+                            <Upload className="h-6 w-6 mr-2" />
+                            PDF Upload
+                          </CardTitle>
+                          <CardDescription>
+                            Upload PDF files and extract Q&A pairs using AI
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button 
+                            className="w-full bg-blue-600 hover:bg-blue-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.location.href = '/admin-pdf-upload';
+                            }}
+                          >
+                            <Upload className="h-4 w-4 mr-2" />
+                            Upload PDF
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+
+                    {/* PDF Review Card */}
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      className="cursor-pointer"
+                      onClick={() => window.location.href = '/admin-pdf-review'}
+                    >
+                      <Card className="p-6 h-full bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="flex items-center text-green-700 dark:text-green-300">
+                            <FileText className="h-6 w-6 mr-2" />
+                            Review Q&A
+                          </CardTitle>
+                          <CardDescription>
+                            Review and approve extracted Q&A pairs before publishing
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button 
+                            className="w-full bg-green-600 hover:bg-green-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.location.href = '/admin-pdf-review';
+                            }}
+                          >
+                            <FileText className="h-4 w-4 mr-2" />
+                            Review Content
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+
+                    {/* User Management Card */}
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      className="cursor-pointer"
+                      onClick={() => window.location.href = '/admin-users'}
+                    >
+                      <Card className="p-6 h-full bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200 dark:border-purple-800">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="flex items-center text-purple-700 dark:text-purple-300">
+                            <UserCheck className="h-6 w-6 mr-2" />
+                            User Management
+                          </CardTitle>
+                          <CardDescription>
+                            Manage user accounts, subscriptions, and permissions
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button 
+                            className="w-full bg-purple-600 hover:bg-purple-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.location.href = '/admin-users';
+                            }}
+                          >
+                            <UserCheck className="h-4 w-4 mr-2" />
+                            Manage Users
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+
+                    {/* Solutions Management Card */}
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      className="cursor-pointer"
+                      onClick={() => window.location.href = '/admin-solutions'}
+                    >
+                      <Card className="p-6 h-full bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-800">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="flex items-center text-orange-700 dark:text-orange-300">
+                            <BookOpen className="h-6 w-6 mr-2" />
+                            NCERT Solutions
+                          </CardTitle>
+                          <CardDescription>
+                            Manage published NCERT solutions and Q&A content
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button 
+                            className="w-full bg-orange-600 hover:bg-orange-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.location.href = '/admin-solutions';
+                            }}
+                          >
+                            <BookOpen className="h-4 w-4 mr-2" />
+                            Manage Solutions
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+
+                    {/* Analytics Card */}
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      className="cursor-pointer"
+                    >
+                      <Card className="p-6 h-full bg-gradient-to-br from-gray-50 to-slate-50 dark:from-gray-900/20 dark:to-slate-900/20 border-gray-200 dark:border-gray-800">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="flex items-center text-gray-700 dark:text-gray-300">
+                            <BarChart3 className="h-6 w-6 mr-2" />
+                            System Analytics
+                          </CardTitle>
+                          <CardDescription>
+                            View system performance and usage statistics
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button 
+                            variant="outline"
+                            className="w-full"
+                            disabled
+                          >
+                            <BarChart3 className="h-4 w-4 mr-2" />
+                            Coming Soon
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+
+                    {/* Quick Stats Card */}
+                    <motion.div>
+                      <Card className="p-6 h-full bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border-teal-200 dark:border-teal-800">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="flex items-center text-teal-700 dark:text-teal-300">
+                            <Trophy className="h-6 w-6 mr-2" />
+                            Quick Stats
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">Total Users:</span>
+                            <span className="font-semibold">2,847</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">Solutions:</span>
+                            <span className="font-semibold">1,234</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">Pending Reviews:</span>
+                            <span className="font-semibold text-orange-600">12</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">Active Today:</span>
+                            <span className="font-semibold text-green-600">456</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </TabsContent>
+            )}
           </Tabs>
         </div>
 

@@ -118,6 +118,22 @@ const SlidingSidebar: React.FC<SlidingSidebarProps> = ({ className }) => {
       feature: ADMIN_FEATURES.USER_MANAGEMENT
     },
     {
+      icon: UploadIcon,
+      label: "PDF Upload",
+      path: "/admin-pdf-upload",
+      description: "Upload & Process PDFs",
+      adminOnly: true,
+      feature: ADMIN_FEATURES.CONTENT_MODERATION
+    },
+    {
+      icon: BookIcon,
+      label: "PDF Review",
+      path: "/admin-pdf-review",
+      description: "Review Q&A Pairs",
+      adminOnly: true,
+      feature: ADMIN_FEATURES.CONTENT_MODERATION
+    },
+    {
       icon: BookIcon,
       label: "Admin Solutions",
       path: "/admin-solutions",

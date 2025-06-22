@@ -258,9 +258,57 @@ function getProcessedSolutions(query = {}) {
 }
 
 // Get solution by ID with Q&A pairs (from admin upload system)
-function getSolutionWithQA(id) {
-  const solution = getSolutionById(id);
-  return solution; // This already includes Q&A pairs from admin upload system
+async function getSolutionWithQA(id) {
+  try {
+    // First check if it's a processed solution from admin upload
+    const processedSolution = getSolutionById(id);
+    if (processedSolution && processedSolution.qaPairs) {
+      return processedSolution;
+    }
+
+    // If not found in processed solutions, check Firebase
+    const firebaseEnabled = adminApp && firebaseInitialized;
+    if (firebaseEnabled) {
+      const db = getFirestoreAdminDb();
+      if (db) {
+        const solutionDoc = await db.collection('ncert_solutions').doc(id).get();
+        if (solutionDoc.exists) {
+          const solutionData = solutionDoc.data();
+          
+          // Check if this solution has Q&A pairs stored
+          const qaRef = await db.collection('ncert_solutions').doc(id).collection('qa_pairs').get();
+          const qaPairs = [];
+          
+          qaRef.forEach(qaDoc => {
+            qaPairs.push({
+              id: qaDoc.id,
+              ...qaDoc.data()
+            });
+          });
+
+          return {
+            id: id,
+            metadata: {
+              board: solutionData.board,
+              class: solutionData.class,
+              subject: solutionData.subject,
+              chapter: solutionData.chapter
+            },
+            qaPairs: qaPairs,
+            totalQuestions: qaPairs.length,
+            status: 'approved',
+            processedAt: solutionData.createdAt,
+            filename: solutionData.filename || 'Unknown'
+          };
+        }
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error fetching solution with Q&A:', error);
+    return null;
+  }
 }
 
 // Get solution statistics for admin dashboard (Firebase + processed solutions)
@@ -411,7 +459,7 @@ export default function handler(req, res) {
           return res.status(400).json({ error: 'Solution ID is required' });
         }
         
-        const solution = getSolutionWithQA(id);
+        const solution = await getSolutionWithQA(id);
         if (!solution) {
           return res.status(404).json({ error: 'Solution not found' });
         }

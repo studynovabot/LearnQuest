@@ -116,7 +116,7 @@ const FloatingNav: React.FC<FloatingNavProps> = ({
           exit="exit"
           className={cn(positionClasses, className)}
         >
-          <div className="glass-card-strong rounded-full px-4 py-3 backdrop-blur-premium">
+          <div className="glass-card-strong rounded-full px-4 py-3 backdrop-blur-xl">
             <div className="flex items-center space-x-2">
               {navItems.map((item, index) => {
                 const isActive = location === item.path;

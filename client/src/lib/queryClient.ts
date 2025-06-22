@@ -34,13 +34,16 @@ export async function apiRequest(
   data?: unknown | undefined,
   options?: { signal?: AbortSignal }
 ): Promise<Response> {
-  // Get userId from localStorage if available
+  // Get userId and token from localStorage if available
   const userId = getUserId() || 'guest';
+  const token = localStorage.getItem('token');
   const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
   
   // Add both X-User-ID header and Authorization header for compatibility
   headers["X-User-ID"] = userId;
-  headers["Authorization"] = `Bearer ${userId}`;
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
   
   // Explicitly request JSON response
   headers["Accept"] = "application/json";
@@ -48,6 +51,7 @@ export async function apiRequest(
   // Add debugging information
   console.log(`🌐 Making API request: ${method} ${url}`);
   console.log(`👤 User ID: ${userId}`);
+  console.log(`🔑 Token: ${token ? 'Present' : 'Missing'}`);
   console.log(`📋 Headers:`, headers);
   console.log(`📦 Data:`, data);
   

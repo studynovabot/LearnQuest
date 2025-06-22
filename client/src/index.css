@@ -177,7 +177,7 @@
 }
 
 .glass-card-strong {
-  @apply bg-card/90 backdrop-blur-premium border border-border/70 shadow-md;
+  @apply bg-card/90 backdrop-blur-xl border border-border/70 shadow-md;
   visibility: visible !important;
   opacity: 1 !important;
 }
