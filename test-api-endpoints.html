@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 API Endpoints Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .endpoint-test {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            background: #fafafa;
+        }
+        .endpoint-test.success {
+            border-color: #4CAF50;
+            background: #f8fff8;
+        }
+        .endpoint-test.error {
+            border-color: #f44336;
+            background: #fff8f8;
+        }
+        .endpoint-test.testing {
+            border-color: #2196F3;
+            background: #f8f9ff;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .testing {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 API Endpoints Test</h1>
+        <p>Testing all API endpoints to verify they're working correctly</p>
+
+        <button onclick="testAllEndpoints()">🚀 Test All Endpoints</button>
+        <button onclick="clearResults()">🧹 Clear Results</button>
+
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        const baseUrl = 'https://studynovaai.vercel.app';
+        const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFkbWluXzE3NTA1OTg5NDE4NTAiLCJlbWFpbCI6InRoYWt1cnJhbnZlZXJzaW5naDUwNUBnbWFpbC5jb20iLCJzdWJzY3JpcHRpb25QbGFuIjoiZ29hdCIsInRpZXIiOiJnb2F0Iiwicm9sZSI6ImFkbWluIiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNzUwNTk4OTQxLCJleHAiOjE3NTMxOTA5NDF9.EwvwjO3Lrd3x_knaQKR6h-EHYt6TFbUuEvK247JnDQ8';
+
+        const endpoints = [
+            {
+                name: 'Health Check',
+                url: '/api/health-check',
+                method: 'GET',
+                auth: false
+            },
+            {
+                name: 'User Profile',
+                url: '/api/user-profile',
+                method: 'GET',
+                auth: true
+            },
+            {
+                name: 'Auth API',
+                url: '/api/auth',
+                method: 'GET',
+                auth: false
+            },
+            {
+                name: 'Admin PDF Upload Fixed',
+                url: '/api/admin-pdf-upload-fixed',
+                method: 'GET',
+                auth: true
+            },
+            {
+                name: 'Admin PDF Upload',
+                url: '/api/admin-pdf-upload',
+                method: 'GET',
+                auth: true
+            },
+            {
+                name: 'Upload PDF',
+                url: '/api/upload-pdf',
+                method: 'GET',
+                auth: true
+            },
+            {
+                name: 'NCERT Management',
+                url: '/api/ncert-management?action=solutions&limit=5',
+                method: 'GET',
+                auth: true
+            },
+            {
+                name: 'NCERT Solutions',
+                url: '/api/ncert-solutions',
+                method: 'GET',
+                auth: false
+            },
+            {
+                name: 'AI Services',
+                url: '/api/ai-services',
+                method: 'GET',
+                auth: true
+            }
+        ];
+
+        function createEndpointTest(endpoint) {
+            const testDiv = document.createElement('div');
+            testDiv.className = 'endpoint-test';
+            testDiv.id = `test-${endpoint.name.replace(/\s+/g, '-').toLowerCase()}`;
+            testDiv.innerHTML = `
+                <h3>${endpoint.name}</h3>
+                <p><strong>URL:</strong> ${endpoint.url}</p>
+                <p><strong>Method:</strong> ${endpoint.method} ${endpoint.auth ? '(with auth)' : '(no auth)'}</p>
+                <button onclick="testSingleEndpoint('${endpoint.name}')">Test This Endpoint</button>
+                <div class="result" id="result-${endpoint.name.replace(/\s+/g, '-').toLowerCase()}" style="display: none;"></div>
+            `;
+            return testDiv;
+        }
+
+        function showResult(endpointName, result, isSuccess) {
+            const testDiv = document.getElementById(`test-${endpointName.replace(/\s+/g, '-').toLowerCase()}`);
+            const resultDiv = document.getElementById(`result-${endpointName.replace(/\s+/g, '-').toLowerCase()}`);
+            
+            testDiv.className = `endpoint-test ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.textContent = result;
+            resultDiv.style.display = 'block';
+        }
+
+        function showTesting(endpointName) {
+            const testDiv = document.getElementById(`test-${endpointName.replace(/\s+/g, '-').toLowerCase()}`);
+            const resultDiv = document.getElementById(`result-${endpointName.replace(/\s+/g, '-').toLowerCase()}`);
+            
+            testDiv.className = 'endpoint-test testing';
+            resultDiv.className = 'result testing';
+            resultDiv.textContent = 'Testing...';
+            resultDiv.style.display = 'block';
+        }
+
+        async function testSingleEndpoint(endpointName) {
+            const endpoint = endpoints.find(e => e.name === endpointName);
+            if (!endpoint) return;
+
+            showTesting(endpointName);
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+
+                if (endpoint.auth) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                const response = await fetch(`${baseUrl}${endpoint.url}`, {
+                    method: endpoint.method,
+                    headers: headers
+                });
+
+                const statusText = `Status: ${response.status} ${response.statusText}`;
+                
+                if (response.ok) {
+                    try {
+                        const data = await response.json();
+                        const result = `${statusText}\n\nResponse:\n${JSON.stringify(data, null, 2)}`;
+                        showResult(endpointName, result, true);
+                    } catch (jsonError) {
+                        const text = await response.text();
+                        const result = `${statusText}\n\nResponse (not JSON):\n${text.substring(0, 500)}...`;
+                        showResult(endpointName, result, true);
+                    }
+                } else {
+                    const text = await response.text();
+                    const result = `${statusText}\n\nError:\n${text.substring(0, 500)}...`;
+                    showResult(endpointName, result, false);
+                }
+
+            } catch (error) {
+                const result = `Network Error:\n${error.message}`;
+                showResult(endpointName, result, false);
+            }
+        }
+
+        async function testAllEndpoints() {
+            console.log('🚀 Testing all endpoints...');
+            
+            for (const endpoint of endpoints) {
+                await testSingleEndpoint(endpoint.name);
+                // Small delay between requests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            console.log('✅ All endpoint tests completed');
+        }
+
+        function clearResults() {
+            const testResults = document.getElementById('test-results');
+            testResults.innerHTML = '';
+            setupEndpointTests();
+        }
+
+        function setupEndpointTests() {
+            const testResults = document.getElementById('test-results');
+            testResults.innerHTML = '';
+
+            endpoints.forEach(endpoint => {
+                const testDiv = createEndpointTest(endpoint);
+                testResults.appendChild(testDiv);
+            });
+        }
+
+        // Initialize the page
+        window.addEventListener('load', () => {
+            setupEndpointTests();
+            console.log('🔧 API Endpoints Test loaded');
+        });
+    </script>
+</body>
+</html>
