@@ -4,13 +4,6 @@
 import jwt from 'jsonwebtoken';
 
 export default async function handler(req, res) {
-  try {
-    console.log('🤖 AI Text-to-QA service called:', {
-      method: req.method,
-      hasAuth: !!req.headers.authorization,
-      contentLength: req.headers['content-length']
-    });
-
   // Handle CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -29,6 +22,12 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('🤖 AI Text-to-QA service called:', {
+      method: req.method,
+      hasAuth: !!req.headers.authorization,
+      contentLength: req.headers['content-length']
+    });
+
     // Verify authentication
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -118,119 +117,107 @@ ${text.slice(0, 8000)}`; // Limit text to avoid token limits
 
     const startTime = Date.now();
 
+    // Call Groq API directly
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${groqApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        model: "llama-3.1-70b-versatile",
+        temperature: 0.3,
+        max_tokens: 4000,
+        top_p: 0.9,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Groq API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+    }
+
+    const completion = await response.json();
+    const aiResponse = completion.choices[0]?.message?.content;
+    
+    if (!aiResponse) {
+      throw new Error('No response from AI service');
+    }
+
+    console.log('🤖 AI Response received, parsing...');
+
+    // Parse AI response
+    let qaPairs;
     try {
-      // Call Groq API directly
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${groqApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt }
-          ],
-          model: "llama-3.1-70b-versatile",
-          temperature: 0.3,
-          max_tokens: 4000,
-          top_p: 0.9,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Groq API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
-      }
-
-      const completion = await response.json();
-      const aiResponse = completion.choices[0]?.message?.content;
+      // Clean the response (remove code blocks if present)
+      const cleanResponse = aiResponse
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
       
-      if (!aiResponse) {
-        throw new Error('No response from AI service');
+      qaPairs = JSON.parse(cleanResponse);
+      
+      if (!Array.isArray(qaPairs)) {
+        throw new Error('AI response is not an array');
       }
 
-      console.log('🤖 AI Response received, parsing...');
+      // Validate Q&A pairs
+      qaPairs = qaPairs.filter(qa => 
+        qa.question && qa.answer && 
+        qa.question.trim().length > 0 && 
+        qa.answer.trim().length > 0
+      );
 
-      // Parse AI response
-      let qaPairs;
-      try {
-        // Clean the response (remove code blocks if present)
-        const cleanResponse = aiResponse
-          .replace(/```json\n?/g, '')
-          .replace(/```\n?/g, '')
-          .trim();
-        
-        qaPairs = JSON.parse(cleanResponse);
-        
-        if (!Array.isArray(qaPairs)) {
-          throw new Error('AI response is not an array');
-        }
-
-        // Validate Q&A pairs
-        qaPairs = qaPairs.filter(qa => 
-          qa.question && qa.answer && 
-          qa.question.trim().length > 0 && 
-          qa.answer.trim().length > 0
-        );
-
-        // Ensure required fields
-        qaPairs = qaPairs.map((qa, index) => ({
-          question: qa.question.trim(),
-          answer: qa.answer.trim(),
-          difficulty: qa.difficulty || 'medium',
-          type: qa.type || 'concept',
-          id: `qa_${index + 1}`,
-          metadata: {
-            subject: metadata.subject,
-            class: metadata.class,
-            board: metadata.board,
-            chapter: metadata.chapter
-          }
-        }));
-
-      } catch (parseError) {
-        console.error('❌ Failed to parse AI response:', parseError);
-        console.log('Raw AI response:', aiResponse);
-        
-        return res.status(500).json({
-          success: false,
-          message: 'Failed to parse AI response',
-          error: 'AI_RESPONSE_PARSE_FAILED',
-          details: parseError.message
-        });
-      }
-
-      const processingTime = Date.now() - startTime;
-
-      console.log(`✅ Generated ${qaPairs.length} Q&A pairs in ${processingTime}ms`);
-
-      // Return success response
-      return res.status(200).json({
-        success: true,
-        qaPairs: qaPairs,
-        totalQuestions: qaPairs.length,
-        processingTime: `${processingTime}ms`,
+      // Ensure required fields
+      qaPairs = qaPairs.map((qa, index) => ({
+        question: qa.question.trim(),
+        answer: qa.answer.trim(),
+        difficulty: qa.difficulty || 'medium',
+        type: qa.type || 'concept',
+        id: `qa_${index + 1}`,
         metadata: {
-          userId: userId,
-          textLength: text.length,
           subject: metadata.subject,
           class: metadata.class,
           board: metadata.board,
-          processedAt: new Date().toISOString()
+          chapter: metadata.chapter
         }
-      });
+      }));
 
-    } catch (aiError) {
-      console.error('❌ AI processing failed:', aiError);
+    } catch (parseError) {
+      console.error('❌ Failed to parse AI response:', parseError);
+      console.log('Raw AI response:', aiResponse);
       
       return res.status(500).json({
         success: false,
-        message: 'AI processing failed',
-        error: 'AI_PROCESSING_FAILED',
-        details: aiError.message
+        message: 'Failed to parse AI response',
+        error: 'AI_RESPONSE_PARSE_FAILED',
+        details: parseError.message
       });
     }
+
+    const processingTime = Date.now() - startTime;
+
+    console.log(`✅ Generated ${qaPairs.length} Q&A pairs in ${processingTime}ms`);
+
+    // Return success response
+    return res.status(200).json({
+      success: true,
+      qaPairs: qaPairs,
+      totalQuestions: qaPairs.length,
+      processingTime: `${processingTime}ms`,
+      metadata: {
+        userId: userId,
+        textLength: text.length,
+        subject: metadata.subject,
+        class: metadata.class,
+        board: metadata.board,
+        processedAt: new Date().toISOString()
+      }
+    });
 
   } catch (error) {
     console.error('❌ AI Text-to-QA service error:', error);
