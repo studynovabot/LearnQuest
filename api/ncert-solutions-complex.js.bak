@@ -1,0 +1,618 @@
+// NCERT Solutions API - Handles fetching solutions from the database and processed data
+import { handleCors } from '../utils/cors.js';
+import { initializeFirebaseAdmin, getFirestoreAdminDb } from '../utils/firebase-admin.js';
+import { extractUserFromRequest, checkTierAccess } from '../utils/jwt-auth.js';
+
+// AI service for enhanced explanations
+async function getAIExplanation(question, answer) {
+  try {
+    const prompt = `
+As an educational AI tutor, provide an enhanced explanation for this question and answer:
+
+Question: ${question}
+Answer: ${answer}
+
+Please provide:
+1. A detailed step-by-step explanation
+2. Key concepts involved
+3. Tips to remember this concept
+4. Related topics the student should study
+
+Keep the explanation clear, engaging, and suitable for the student's level.
+`;
+
+    // Use environment variable to determine AI service
+    const aiService = process.env.AI_SERVICE || 'groq';
+    
+    if (aiService === 'groq' && process.env.GROQ_API_KEY) {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-70b-versatile',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert educational tutor helping students understand concepts better.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          max_tokens: 1000,
+          temperature: 0.7
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.choices[0]?.message?.content || 'Enhanced explanation not available.';
+      }
+    }
+
+    // Fallback enhanced explanation
+    return `Enhanced Explanation:
+
+Step-by-step breakdown:
+${answer}
+
+Key Concepts:
+• This relates to fundamental principles in the subject
+• Understanding this concept helps with related topics
+• Practice similar questions to strengthen your grasp
+
+Study Tips:
+• Review the basic concepts first
+• Practice solving similar problems
+• Connect this to real-world applications
+
+This explanation helps you understand not just the answer, but the reasoning behind it.`;
+
+  } catch (error) {
+    console.error('AI explanation error:', error);
+    return 'Enhanced explanation temporarily unavailable. Please refer to the standard answer.';
+  }
+}
+
+// Get NCERT solutions based on filters with role-based access
+async function getSolutions(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
+
+  try {
+    // Extract and verify user
+    const user = extractUserFromRequest(req);
+    
+    // Check tier access for NCERT Solutions
+    const hasAccess = checkTierAccess(user?.tier, 'ncert_solutions');
+    
+    if (!hasAccess) {
+      return res.status(403).json({
+        success: false,
+        message: 'NCERT Solutions access requires Pro or Goat tier subscription',
+        requiredTier: 'pro',
+        upgradeMessage: '🔒 Upgrade to Pro to access full NCERT Solutions with AI explanations'
+      });
+    }
+
+    initializeFirebaseAdmin();
+    const db = getFirestoreAdminDb();
+
+    const { board, class: className, subject, chapter, limit, questionId, aiHelp } = req.query;
+    
+    const isAdminUser = user?.isAdmin;
+
+    console.log(`🔍 Fetching NCERT solutions${isAdminUser ? ' (Admin)' : ''}: ${board || 'All'} | Class ${className || 'All'} | ${subject || 'All'}${chapter ? ` | ${chapter}` : ''} | User: ${user?.email || 'anonymous'}`);
+
+    // Build query based on parameters
+    let query = db.collection('ncert_solutions');
+
+    // For admin, show all solutions regardless of approval status
+    // For public, only show approved solutions
+    if (!isAdminUser) {
+      // Validate required parameters for public access
+      if (!board || !className || !subject) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing required parameters: board, class, and subject are required'
+        });
+      }
+      
+      query = query
+        .where('board', '==', board)
+        .where('class', '==', parseInt(className))
+        .where('subject', '==', subject)
+        .where('isApproved', '==', true);
+        
+      if (chapter) {
+        query = query.where('chapter', '==', chapter);
+      }
+    } else {
+      // Admin can filter by any combination of parameters
+      if (board) query = query.where('board', '==', board);
+      if (className) query = query.where('class', '==', parseInt(className));
+      if (subject) query = query.where('subject', '==', subject);
+      if (chapter) query = query.where('chapter', '==', chapter);
+    }
+
+    // Add ordering and limit
+    query = query.orderBy('createdAt', 'desc');
+    if (limit) {
+      query = query.limit(parseInt(limit));
+    }
+
+    // Execute query
+    const snapshot = await query.get();
+    const solutions = [];
+
+    for (const doc of snapshot.docs) {
+      const data = doc.data();
+      
+      // Process each Q&A pair from the new structure
+      const qaPairs = data.qaPairs || [];
+      
+      for (let i = 0; i < qaPairs.length; i++) {
+        const qa = qaPairs[i];
+        
+        solutions.push({
+          id: `${doc.id}_${i}`,
+          documentId: doc.id,
+          questionNumber: qa.questionNumber || i + 1,
+          question: qa.question,
+          answer: qa.answer,
+          board: data.board,
+          class: data.class,
+          subject: data.subject,
+          chapter: data.chapter,
+          originalFileName: data.originalFileName,
+          uploadedBy: data.uploadedBy,
+          uploadDate: data.uploadDate,
+          reviewedBy: data.reviewedBy,
+          reviewDate: data.reviewDate,
+          totalQuestions: data.totalQuestions,
+          isApproved: data.isApproved || false,
+          status: data.status || 'approved',
+          hasAIHelp: true, // All Pro/Goat users get AI help
+          createdAt: data.uploadDate || new Date().toISOString(),
+          updatedAt: data.reviewDate || data.uploadDate || new Date().toISOString()
+        });
+      }
+    }
+
+    // If specific questionId requested with AI help
+    if (questionId && aiHelp === 'true') {
+      const solution = solutions.find(s => s.id === questionId);
+      
+      if (!solution) {
+        return res.status(404).json({
+          success: false,
+          message: 'Question not found'
+        });
+      }
+
+      console.log('🧠 Generating AI explanation...');
+      const aiExplanation = await getAIExplanation(solution.question, solution.answer);
+
+      return res.status(200).json({
+        success: true,
+        solution: {
+          ...solution,
+          aiExplanation,
+          enhancedAt: new Date().toISOString()
+        }
+      });
+    }
+
+    // Sort solutions by chapter and question number
+    solutions.sort((a, b) => {
+      if (a.chapter !== b.chapter) {
+        return a.chapter.localeCompare(b.chapter);
+      }
+      return (a.questionNumber || 0) - (b.questionNumber || 0);
+    });
+
+    console.log(`✅ Found ${solutions.length} solutions`);
+
+    return res.status(200).json({
+      success: true,
+      solutions,
+      totalCount: solutions.length,
+      userTier: user?.tier || 'free',
+      hasAccess: true,
+      filters: {
+        board: board || null,
+        class: className || null,
+        subject: subject || null,
+        chapter: chapter || null,
+        isAdmin: !!isAdminUser
+      },
+      features: {
+        aiHelp: true,
+        unlimitedAccess: true,
+        downloadable: user?.tier === 'goat'
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Get solutions error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to get solutions',
+      error: error.message
+    });
+  }
+}
+
+// Get available subjects for a board and class
+async function getSubjects(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
+
+  try {
+    initializeFirebaseAdmin();
+    const db = getFirestoreAdminDb();
+
+    const { board, class: className } = req.query;
+
+    if (!board || !className) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required parameters: board and class are required'
+      });
+    }
+
+    // Get all approved solutions for the board and class
+    const snapshot = await db.collection('ncert_solutions')
+      .where('board', '==', board)
+      .where('class', '==', parseInt(className))
+      .where('isApproved', '==', true)
+      .get();
+
+    // Extract unique subjects
+    const subjectsSet = new Set();
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      subjectsSet.add(data.subject);
+    });
+
+    const subjects = Array.from(subjectsSet).sort();
+
+    return res.status(200).json({
+      success: true,
+      subjects,
+      totalCount: subjects.length,
+      filters: {
+        board,
+        class: className
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Get subjects error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to get subjects',
+      error: error.message
+    });
+  }
+}
+
+// Get processed solutions with filtering and pagination (from admin upload system)
+function getProcessedSolutions(query = {}) {
+  const {
+    page = 1,
+    limit = 20,
+    search = '',
+    board = '',
+    class: className = '',
+    subject = '',
+    difficulty = '',
+    sortBy = 'processedAt',
+    sortOrder = 'desc'
+  } = query;
+
+  // Get all processed solutions from admin upload system
+  const allSolutions = getAllProcessedSolutions();
+  let filteredSolutions = [...allSolutions];
+
+  // Apply filters
+  if (search) {
+    const searchLower = search.toLowerCase();
+    filteredSolutions = filteredSolutions.filter(sol => 
+      sol.metadata.chapter.toLowerCase().includes(searchLower) ||
+      sol.metadata.subject.toLowerCase().includes(searchLower) ||
+      sol.filename.toLowerCase().includes(searchLower)
+    );
+  }
+
+  if (board && board !== 'all') {
+    filteredSolutions = filteredSolutions.filter(sol => sol.metadata.board === board);
+  }
+
+  if (className && className !== 'all') {
+    filteredSolutions = filteredSolutions.filter(sol => sol.metadata.class === className);
+  }
+
+  if (subject && subject !== 'all') {
+    filteredSolutions = filteredSolutions.filter(sol => sol.metadata.subject === subject);
+  }
+
+  // Sort solutions
+  filteredSolutions.sort((a, b) => {
+    let aVal = a[sortBy];
+    let bVal = b[sortBy];
+    
+    if (typeof aVal === 'string') {
+      aVal = aVal.toLowerCase();
+      bVal = bVal.toLowerCase();
+    }
+    
+    if (sortOrder === 'desc') {
+      return bVal > aVal ? 1 : -1;
+    }
+    return aVal > bVal ? 1 : -1;
+  });
+
+  // Pagination
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const paginatedSolutions = filteredSolutions.slice(startIndex, endIndex);
+
+  return {
+    solutions: paginatedSolutions,
+    total: filteredSolutions.length,
+    page: parseInt(page),
+    limit: parseInt(limit),
+    pages: Math.ceil(filteredSolutions.length / limit)
+  };
+}
+
+// Get solution by ID with Q&A pairs (from admin upload system)
+async function getSolutionWithQA(id) {
+  try {
+    // First check if it's a processed solution from admin upload
+    const processedSolution = getSolutionById(id);
+    if (processedSolution && processedSolution.qaPairs) {
+      return processedSolution;
+    }
+
+    // If not found in processed solutions, check Firebase
+    const firebaseEnabled = adminApp && firebaseInitialized;
+    if (firebaseEnabled) {
+      const db = getFirestoreAdminDb();
+      if (db) {
+        const solutionDoc = await db.collection('ncert_solutions').doc(id).get();
+        if (solutionDoc.exists) {
+          const solutionData = solutionDoc.data();
+          
+          // Check if this solution has Q&A pairs stored
+          const qaRef = await db.collection('ncert_solutions').doc(id).collection('qa_pairs').get();
+          const qaPairs = [];
+          
+          qaRef.forEach(qaDoc => {
+            qaPairs.push({
+              id: qaDoc.id,
+              ...qaDoc.data()
+            });
+          });
+
+          return {
+            id: id,
+            metadata: {
+              board: solutionData.board,
+              class: solutionData.class,
+              subject: solutionData.subject,
+              chapter: solutionData.chapter
+            },
+            qaPairs: qaPairs,
+            totalQuestions: qaPairs.length,
+            status: 'approved',
+            processedAt: solutionData.createdAt,
+            filename: solutionData.filename || 'Unknown'
+          };
+        }
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error fetching solution with Q&A:', error);
+    return null;
+  }
+}
+
+// Get solution statistics for admin dashboard (Firebase + processed solutions)
+async function getStats(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
+
+  try {
+    initializeFirebaseAdmin();
+    const db = getFirestoreAdminDb();
+
+    console.log('📊 Calculating NCERT solutions statistics...');
+
+    // Get Firebase solutions
+    const snapshot = await db.collection('ncert_solutions').get();
+    
+    let firebaseSolutions = 0;
+    let availableSolutions = 0;
+    let easySolutions = 0;
+    let mediumSolutions = 0;
+    let hardSolutions = 0;
+    let totalViews = 0;
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      firebaseSolutions++;
+      
+      if (data.isApproved) {
+        availableSolutions++;
+      }
+      
+      // Count by difficulty
+      switch (data.difficulty) {
+        case 'easy':
+          easySolutions++;
+          break;
+        case 'hard':
+          hardSolutions++;
+          break;
+        default:
+          mediumSolutions++;
+      }
+      
+      // Sum views
+      totalViews += data.views || 0;
+    });
+
+    // Get processed solutions statistics
+    const allSolutions = getAllProcessedSolutions();
+    const processedSolutions = allSolutions.length;
+    const activeProcessed = allSolutions.filter(sol => sol.status === 'active').length;
+    
+    // Count total questions across all solutions
+    const totalQuestions = allSolutions.reduce((sum, sol) => sum + sol.totalQuestions, 0);
+    
+    // By class and subject
+    const solutionsByClass = {};
+    const solutionsBySubject = {};
+    
+    allSolutions.forEach(sol => {
+      const key = `Class ${sol.metadata.class}`;
+      solutionsByClass[key] = (solutionsByClass[key] || 0) + 1;
+      solutionsBySubject[sol.metadata.subject] = (solutionsBySubject[sol.metadata.subject] || 0) + 1;
+    });
+
+    const stats = {
+      // Firebase stats
+      firebaseSolutions,
+      availableSolutions,
+      easySolutions,
+      mediumSolutions,
+      hardSolutions,
+      totalViews,
+      // Processed solutions stats
+      processedSolutions,
+      activeProcessed,
+      totalQuestions,
+      pendingApproval: processedSolutions - activeProcessed,
+      solutionsByClass,
+      solutionsBySubject,
+      recentUploads: allSolutions.filter(sol => {
+        const uploadDate = new Date(sol.processedAt);
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        return uploadDate > sevenDaysAgo;
+      }).length,
+      // Combined totals
+      totalSolutions: firebaseSolutions + processedSolutions,
+      generatedAt: new Date().toISOString()
+    };
+
+    console.log(`✅ Statistics calculated: Firebase: ${firebaseSolutions}, Processed: ${processedSolutions}, Total Views: ${totalViews}`);
+
+    return res.status(200).json(stats);
+
+  } catch (error) {
+    console.error('❌ Get stats error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to get statistics',
+      error: error.message
+    });
+  }
+}
+
+// Main handler with routing
+export default function handler(req, res) {
+  return handleCors(req, res, async (req, res) => {
+    const { path, action, id } = req.query;
+
+    // Extract user information (optional for most endpoints)
+    const authResult = extractUserFromRequest(req);
+    let user = null;
+    let userTier = 'free';
+    let isAuthenticated = false;
+    
+    if (authResult.valid) {
+      user = authResult.user;
+      userTier = user.tier;
+      isAuthenticated = true;
+    }
+    
+    // Pass user info to request for use in handlers
+    req.user = user;
+    req.userTier = userTier;
+    req.isAuthenticated = isAuthenticated;
+    
+    console.log(`📚 NCERT Solutions API: ${path || action || 'default'} | User: ${user?.email || 'anonymous'} | Tier: ${userTier}`);
+
+    try {
+      // Handle different endpoint patterns
+      if (path === 'subjects') {
+        return await getSubjects(req, res);
+      } else if (path === 'stats' || action === 'stats') {
+        return await getStats(req, res);
+      } else if (path === 'upload') {
+        // Delegate upload handling to the upload API
+        const uploadHandler = await import('./ncert-solutions-upload.js');
+        return await uploadHandler.default(req, res);
+      } else if (path === 'processed' || action === 'processed') {
+        // Handle processed solutions from admin upload system
+        const solutions = getProcessedSolutions(req.query);
+        return res.status(200).json(solutions);
+      } else if (path === 'content' || action === 'content') {
+        // Get solution with Q&A pairs (requires authentication for premium content)
+        if (!id) {
+          return res.status(400).json({ error: 'Solution ID is required' });
+        }
+        
+        const solution = await getSolutionWithQA(id);
+        if (!solution) {
+          return res.status(404).json({ error: 'Solution not found' });
+        }
+        
+        // Check if solution requires premium access
+        const requiredTier = solution.metadata?.requiredTier || 'free';
+        if (requiredTier !== 'free' && !checkTierAccess(userTier, requiredTier)) {
+          return res.status(403).json({
+            error: 'Premium access required',
+            message: `This solution requires ${requiredTier} tier access. Current tier: ${userTier}`,
+            requiredTier,
+            userTier,
+            upgradeRequired: true,
+            loginRequired: !isAuthenticated
+          });
+        }
+        
+        return res.status(200).json({
+          solution,
+          userAccess: {
+            tier: userTier,
+            hasAccess: true,
+            isAuthenticated
+          },
+          message: 'Solution with Q&A pairs fetched successfully'
+        });
+      } else {
+        // Default to Firebase solutions
+        return await getSolutions(req, res);
+      }
+    } catch (error) {
+      console.error('❌ NCERT Solutions API Error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
+    }
+  });
+}

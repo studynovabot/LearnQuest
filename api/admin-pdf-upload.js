@@ -1,7 +1,8 @@
-// Admin PDF Upload and Processing API
+// Admin PDF Upload and Processing API - Enhanced with new workflow
 import { handleCors } from '../utils/cors.js';
 import { parseQAFromText, saveQAToJSONL } from '../utils/simple-qa-parser.js';
 import { extractUserFromRequest, checkTierAccess } from '../utils/jwt-auth.js';
+import { initializeFirebaseAdmin, getFirestoreAdminDb } from '../utils/firebase-admin.js';
 import multiparty from 'multiparty';
 import fs from 'fs/promises';
 import path from 'path';
@@ -48,12 +49,284 @@ let processedSolutions = new Map();
 let processingQueue = new Map();
 let pendingReviews = new Map(); // Store processed PDFs waiting for review
 
+// Enhanced workflow functions
+async function newPDFUploadWorkflow(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
+
+  try {
+    // Verify admin access
+    const user = extractUserFromRequest(req);
+    if (!user?.isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin access required'
+      });
+    }
+
+    console.log('📄 Processing PDF upload...');
+
+    // Parse multipart form data
+    const form = new multiparty.Form({
+      maxFieldsSize: 50 * 1024 * 1024, // 50MB
+      maxFilesSize: 50 * 1024 * 1024   // 50MB
+    });
+
+    const parseFormData = () => {
+      return new Promise((resolve, reject) => {
+        form.parse(req, (err, fields, files) => {
+          if (err) reject(err);
+          else resolve({ fields, files });
+        });
+      });
+    };
+
+    const { fields, files } = await parseFormData();
+
+    // Extract metadata
+    const board = fields.board?.[0]?.toLowerCase() || 'cbse';
+    const className = fields.class?.[0] || '10';
+    const subject = fields.subject?.[0]?.toLowerCase() || 'science';
+    const chapter = fields.chapter?.[0]?.toLowerCase().replace(/\s+/g, '-') || 'unknown';
+
+    // Validate required fields
+    if (!board || !className || !subject || !chapter) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: board, class, subject, chapter'
+      });
+    }
+
+    // Get uploaded file
+    const uploadedFile = files.file?.[0];
+    if (!uploadedFile) {
+      return res.status(400).json({
+        success: false,
+        message: 'No PDF file uploaded'
+      });
+    }
+
+    // Read and parse PDF
+    const pdfBuffer = await fs.readFile(uploadedFile.path);
+    
+    console.log('🔍 Parsing PDF content...');
+    const pdfData = await pdfParse(pdfBuffer);
+    const textContent = pdfData.text;
+
+    if (!textContent || textContent.length < 100) {
+      return res.status(400).json({
+        success: false,
+        message: 'PDF content is too short or could not be extracted'
+      });
+    }
+
+    // Parse Q&A pairs
+    const metadata = {
+      board,
+      class: parseInt(className),
+      subject,
+      chapter,
+      originalFileName: uploadedFile.originalFilename,
+      uploadedBy: user.email,
+      uploadDate: new Date().toISOString()
+    };
+
+    console.log('🧠 Extracting Q&A pairs...');
+    const qaPairs = parseQAFromText(textContent, metadata);
+
+    if (qaPairs.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No Q&A pairs could be extracted from the PDF'
+      });
+    }
+
+    // Generate session ID for review
+    const sessionId = uuidv4();
+    
+    // Store in temporary storage for review
+    pendingReviews.set(sessionId, {
+      metadata,
+      qaPairs,
+      status: 'pending_review',
+      createdAt: new Date().toISOString(),
+      uploadedBy: user.email
+    });
+
+    // Clean up uploaded file
+    try {
+      await fs.unlink(uploadedFile.path);
+    } catch (error) {
+      console.warn('Failed to clean up uploaded file:', error);
+    }
+
+    console.log(`✅ Successfully extracted ${qaPairs.length} Q&A pairs for review`);
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully extracted ${qaPairs.length} Q&A pairs`,
+      sessionId,
+      qaPairs: qaPairs.map(qa => ({
+        question: qa.question,
+        answer: qa.answer,
+        questionNumber: qa.questionNumber
+      })),
+      metadata,
+      totalQuestions: qaPairs.length
+    });
+
+  } catch (error) {
+    console.error('❌ PDF upload error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to process PDF',
+      error: error.message
+    });
+  }
+}
+
+async function reviewSessionHandler(req, res) {
+  const user = extractUserFromRequest(req);
+  if (!user?.isAdmin) {
+    return res.status(403).json({
+      success: false,
+      message: 'Admin access required'
+    });
+  }
+
+  if (req.method === 'GET') {
+    const { sessionId } = req.query;
+    
+    if (!sessionId) {
+      // Return all pending reviews
+      const allSessions = Array.from(pendingReviews.entries()).map(([id, data]) => ({
+        sessionId: id,
+        ...data
+      }));
+
+      return res.status(200).json({
+        success: true,
+        sessions: allSessions,
+        totalCount: allSessions.length
+      });
+    }
+
+    const reviewData = pendingReviews.get(sessionId);
+    
+    if (!reviewData) {
+      return res.status(404).json({
+        success: false,
+        message: 'Review session not found or expired'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: reviewData
+    });
+  }
+
+  if (req.method === 'POST') {
+    // Upload reviewed Q&A pairs to Firebase
+    const { sessionId, qaPairs, metadata } = req.body;
+
+    if (!sessionId || !qaPairs || !metadata) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: sessionId, qaPairs, metadata'
+      });
+    }
+
+    // Verify session exists
+    const reviewData = pendingReviews.get(sessionId);
+    if (!reviewData) {
+      return res.status(404).json({
+        success: false,
+        message: 'Review session not found or expired'
+      });
+    }
+
+    console.log('🔥 Uploading reviewed Q&A pairs to Firebase...');
+
+    // Initialize Firebase
+    initializeFirebaseAdmin();
+    const db = getFirestoreAdminDb();
+
+    // Prepare data for Firebase
+    const firebaseData = {
+      board: metadata.board,
+      class: metadata.class,
+      subject: metadata.subject,
+      chapter: metadata.chapter,
+      originalFileName: metadata.originalFileName,
+      uploadedBy: metadata.uploadedBy,
+      uploadDate: metadata.uploadDate,
+      reviewedBy: user.email,
+      reviewDate: new Date().toISOString(),
+      totalQuestions: qaPairs.length,
+      isApproved: true,
+      status: 'approved',
+      qaPairs: qaPairs.map((qa, index) => ({
+        question: qa.question,
+        answer: qa.answer,
+        questionNumber: qa.questionNumber || index + 1
+      }))
+    };
+
+    // Store in Firebase
+    await db.collection('ncert_solutions').doc().set(firebaseData);
+
+    // Clean up temp storage
+    pendingReviews.delete(sessionId);
+
+    console.log(`✅ Successfully uploaded ${qaPairs.length} Q&A pairs to Firebase`);
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully uploaded ${qaPairs.length} Q&A pairs to Firebase`,
+      totalQuestions: qaPairs.length
+    });
+  }
+
+  return res.status(405).json({ message: 'Method not allowed' });
+}
+
 /**
  * Admin PDF Upload and Processing Handler
  */
 export default function handler(req, res) {
   return handleCors(req, res, async (req, res) => {
-    
+    const { action, workflow, endpoint } = req.query;
+
+    // Handle consolidated endpoints
+    if (endpoint) {
+      switch (endpoint) {
+        case 'upload-pdf':
+          return await newPDFUploadWorkflow(req, res);
+        case 'admin-review':
+          return await reviewSessionHandler(req, res);
+        case 'enhanced-ncert-solutions':
+          // Redirect to ncert-solutions with enhanced flag
+          req.query.enhanced = 'true';
+          const ncertHandler = await import('./ncert-solutions.js');
+          return ncertHandler.default(req, res);
+        case 'admin-pdf-upload':
+          // Continue with normal flow
+          break;
+        default:
+          break;
+      }
+    }
+
+    // New enhanced workflow
+    if (workflow === 'enhanced') {
+      if (action === 'review') {
+        return await reviewSessionHandler(req, res);
+      }
+      return await newPDFUploadWorkflow(req, res);
+    }
+
     // Check authentication for admin endpoints
     const authResult = extractUserFromRequest(req);
     

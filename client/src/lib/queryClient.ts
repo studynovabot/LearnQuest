@@ -143,7 +143,7 @@ export async function apiRequest(
         const timeoutId = setTimeout(() => {
           controller.abort();
           console.log(`Request timeout for ${method} ${requestUrl}`);
-        }, 15000); // 15 second timeout
+        }, 10000); // 10 second timeout (reduced for faster feedback)
         
         // Use the timeout signal (we can't easily combine signals in all environments)
         const signal = controller.signal;

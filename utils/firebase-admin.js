@@ -11,7 +11,7 @@ let adminApp;
 let adminFirestore;
 
 /**
- * Initialize Firebase Admin SDK
+ * Initialize Firebase Admin SDK (Optimized for Vercel)
  * @returns {admin.app.App} Firebase Admin app instance
  */
 export function initializeFirebaseAdmin() {
@@ -19,35 +19,31 @@ export function initializeFirebaseAdmin() {
     try {
       // Check if Firebase Admin is already initialized
       if (admin.apps.length === 0) {
-        // Create credential from private key
+        console.log('🚀 Initializing Firebase Admin (cold start)...');
+        const initStart = Date.now();
+        
+        // Create credential from private key (optimized validation)
         const serviceAccount = {
           projectId: firebaseConfig.projectId,
           clientEmail: firebaseConfig.clientEmail,
           privateKey: firebaseConfig.privateKey
         };
 
-        // Validate service account
+        // Quick validation
         if (!serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
-          console.error('❌ Firebase Admin service account is incomplete:', 
-            JSON.stringify({
-              projectIdPresent: !!serviceAccount.projectId,
-              clientEmailPresent: !!serviceAccount.clientEmail,
-              privateKeyPresent: !!serviceAccount.privateKey
-            })
-          );
+          console.error('❌ Firebase Admin service account incomplete');
           return null;
         }
 
-        // Initialize the app
+        // Initialize the app with minimal config for faster startup
         adminApp = admin.initializeApp({
           credential: admin.credential.cert(serviceAccount),
-          databaseURL: `https://${firebaseConfig.projectId}.firebaseio.com`,
-          storageBucket: firebaseConfig.storageBucket
+          projectId: firebaseConfig.projectId
         });
         
-        console.log('🔥 Firebase Admin initialized successfully');
+        console.log(`✅ Firebase Admin initialized in ${Date.now() - initStart}ms`);
       } else {
-        // Use existing app instance
+        // Use existing app instance (warm start)
         adminApp = admin.app();
         console.log('ℹ️ Using existing Firebase Admin app');
       }

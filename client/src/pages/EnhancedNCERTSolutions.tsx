@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { config } from '@/config';
 import {
   Card,
@@ -49,7 +50,6 @@ import {
   CheckCircle,
   RefreshCw
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 
 interface Solution {
   id: string;

@@ -6,8 +6,9 @@ import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Progress } from '../components/ui/progress';
 import { useToast } from '../hooks/use-toast';
-import { Upload, FileText, Brain, Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, FileText, Brain, Sparkles, CheckCircle, AlertCircle, Eye, Edit } from 'lucide-react';
 import { config } from '../config';
+import { useAuth } from '../hooks/useAuth';
 
 interface UploadStatus {
   processingId: string;
@@ -17,19 +18,22 @@ interface UploadStatus {
   filename: string;
   metadata: any;
   totalQuestions?: number;
+  sessionId?: string;
 }
 
 export default function AdminPDFUpload() {
+  const { user } = useAuth();
   const [uploadData, setUploadData] = useState({
-    board: '',
-    class: '',
-    subject: '',
+    board: 'cbse',
+    class: '10',
+    subject: 'science',
     chapter: ''
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<UploadStatus | null>(null);
   const [processingHistory, setProcessingHistory] = useState<UploadStatus[]>([]);
+  const [extractedQA, setExtractedQA] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -57,6 +61,15 @@ export default function AdminPDFUpload() {
   };
 
   const handleUpload = async () => {
+    if (user?.role !== 'admin') {
+      toast({
+        title: "Access Denied",
+        description: "Admin access required for PDF upload.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!selectedFile) {
       toast({
         title: "No File Selected",
@@ -80,17 +93,18 @@ export default function AdminPDFUpload() {
 
     setIsUploading(true);
     setUploadStatus(null);
+    setExtractedQA([]);
 
     try {
       const formData = new FormData();
-      formData.append('pdf', selectedFile);
+      formData.append('file', selectedFile);
       formData.append('board', uploadData.board);
       formData.append('class', uploadData.class);
       formData.append('subject', uploadData.subject);
       formData.append('chapter', uploadData.chapter);
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`${config.apiUrl}/admin-pdf-upload`, {
+      const response = await fetch(`${config.apiUrl}/upload-pdf`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -99,30 +113,45 @@ export default function AdminPDFUpload() {
       });
 
       if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`);
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Upload failed: ${response.statusText}`);
       }
 
       const result = await response.json();
       
-      setUploadStatus({
-        processingId: result.processingId,
-        status: 'processing',
-        progress: 0,
-        message: 'Upload successful, processing started...',
-        filename: result.filename,
-        metadata: result.metadata
-      });
+      if (result.success) {
+        setUploadStatus({
+          processingId: result.sessionId,
+          status: 'completed',
+          progress: 100,
+          message: `Successfully extracted ${result.totalQuestions} Q&A pairs. Ready for review.`,
+          filename: selectedFile.name,
+          metadata: result.metadata,
+          totalQuestions: result.totalQuestions,
+          sessionId: result.sessionId
+        });
 
-      // Start polling for progress
-      pollProcessingStatus(result.processingId);
+        setExtractedQA(result.qaPairs);
 
-      toast({
-        title: "Upload Successful! 🎉",
-        description: "PDF uploaded successfully. Processing Q&A extraction...",
-      });
+        toast({
+          title: "Upload Successful!",
+          description: `Extracted ${result.totalQuestions} Q&A pairs. Please review before uploading to Firebase.`,
+        });
+      } else {
+        throw new Error(result.message || 'Upload failed');
+      }
 
     } catch (error) {
       console.error('Upload error:', error);
+      setUploadStatus({
+        processingId: '',
+        status: 'failed',
+        progress: 0,
+        message: error instanceof Error ? error.message : 'Upload failed',
+        filename: selectedFile?.name || 'Unknown',
+        metadata: uploadData
+      });
+      
       toast({
         title: "Upload Failed",
         description: error instanceof Error ? error.message : 'Upload failed',
@@ -133,54 +162,76 @@ export default function AdminPDFUpload() {
     }
   };
 
-  const pollProcessingStatus = async (processingId: string) => {
-    const pollInterval = setInterval(async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(
-          `${config.apiUrl}/admin-pdf-upload?action=status&id=${processingId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          }
-        );
-        
-        if (response.ok) {
-          const status = await response.json();
-          setUploadStatus(status);
+  const handleReviewAndUpload = async () => {
+    if (!uploadStatus?.sessionId) {
+      toast({
+        title: "No Session",
+        description: "No upload session found. Please upload a PDF first.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-          if (status.status === 'completed') {
-            clearInterval(pollInterval);
-            setProcessingHistory(prev => [...prev, status]);
-            toast({
-              title: "Processing Completed! ✅",
-              description: `Successfully extracted ${status.totalQuestions} Q&A pairs`,
-            });
-            
-            // Reset form
-            setSelectedFile(null);
-            setUploadData({ board: '', class: '', subject: '', chapter: '' });
-            if (fileInputRef.current) {
-              fileInputRef.current.value = '';
-            }
-          } else if (status.status === 'failed') {
-            clearInterval(pollInterval);
-            toast({
-              title: "Processing Failed",
-              description: status.message || 'PDF processing failed',
-              variant: "destructive",
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Status polling error:', error);
+    try {
+      setIsUploading(true);
+
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${config.apiUrl}/admin-review`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: uploadStatus.sessionId,
+          qaPairs: extractedQA,
+          metadata: uploadStatus.metadata
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Upload to Firebase failed');
       }
-    }, 2000);
 
-    // Stop polling after 5 minutes
-    setTimeout(() => clearInterval(pollInterval), 300000);
+      const result = await response.json();
+
+      if (result.success) {
+        toast({
+          title: "Success! 🎉",
+          description: `Successfully uploaded ${result.totalQuestions} Q&A pairs to Firebase!`,
+        });
+
+        // Reset form
+        setSelectedFile(null);
+        setUploadStatus(null);
+        setExtractedQA([]);
+        setUploadData({
+          board: 'cbse',
+          class: '10',
+          subject: 'science',
+          chapter: ''
+        });
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      } else {
+       throw new Error(result.message || 'Upload to Firebase failed');
+      }
+
+    } catch (error) {
+      console.error('Firebase upload error:', error);
+       toast({
+        title: "Firebase Upload Failed",
+        description: error instanceof Error ? error.message : 'Failed to upload to Firebase',
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
+
+
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -352,6 +403,115 @@ export default function AdminPDFUpload() {
                 <div>
                   <strong>Board:</strong> {uploadStatus.metadata?.board}
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Q&A Review Section */}
+        {extractedQA.length > 0 && uploadStatus?.status === 'completed' && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Eye className="h-5 w-5 text-blue-600" />
+                <span>Review Q&A Pairs ({extractedQA.length})</span>
+              </CardTitle>
+              <CardDescription>
+                Review and edit the extracted question-answer pairs before uploading to Firebase
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="max-h-96 overflow-y-auto space-y-4">
+                {extractedQA.map((qa, index) => (
+                  <div key={index} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-blue-600">
+                        Question {qa.questionNumber || index + 1}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const newQA = extractedQA.filter((_, i) => i !== index);
+                          setExtractedQA(newQA);
+                          toast({
+                            title: "Question Removed",
+                            description: `Removed question ${qa.questionNumber || index + 1}`,
+                          });
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor={`question-${index}`}>Question:</Label>
+                      <textarea
+                        id={`question-${index}`}
+                        className="w-full p-2 border rounded-md min-h-[60px] resize-none"
+                        value={qa.question}
+                        onChange={(e) => {
+                          const newQA = [...extractedQA];
+                          newQA[index].question = e.target.value;
+                          setExtractedQA(newQA);
+                        }}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor={`answer-${index}`}>Answer:</Label>
+                      <textarea
+                        id={`answer-${index}`}
+                        className="w-full p-2 border rounded-md min-h-[80px] resize-none"
+                        value={qa.answer}
+                        onChange={(e) => {
+                          const newQA = [...extractedQA];
+                          newQA[index].answer = e.target.value;
+                          setExtractedQA(newQA);
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex space-x-4 pt-4 border-t">
+                <Button
+                  onClick={handleReviewAndUpload}
+                  disabled={isUploading || extractedQA.length === 0}
+                  className="flex-1"
+                  size="lg"
+                >
+                  {isUploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Uploading to Firebase...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Upload {extractedQA.length} Q&A Pairs to Firebase
+                    </>
+                  )}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    console.log('Preview JSON:', {
+                      metadata: uploadStatus?.metadata,
+                      qaPairs: extractedQA,
+                      totalQuestions: extractedQA.length
+                    });
+                    toast({
+                      title: "Preview Generated",
+                      description: "Check browser console for JSON preview",
+                    });
+                  }}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Preview JSON
+                </Button>
               </div>
             </CardContent>
           </Card>

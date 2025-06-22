@@ -11,7 +11,7 @@ loadEnvVariables();
 
 // Handle User Profile service
 async function handleUserProfile(req, res) {
-  // Set CORS headers
+  // Set CORS headers immediately
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID, Origin, X-Requested-With, Accept');
@@ -20,30 +20,37 @@ async function handleUserProfile(req, res) {
     return res.status(200).end();
   }
 
+  console.log('⚡ Starting user profile request...');
+  const startTime = Date.now();
+
   try {
-    // Initialize Firebase Admin - ensure it's properly initialized
+    // Quick Firebase initialization check (optimized for speed)
+    console.log('🔥 Initializing Firebase...');
+    const initStart = Date.now();
+    
     const adminApp = initializeFirebaseAdmin();
     if (!adminApp) {
-      console.error('Failed to initialize Firebase Admin app');
+      console.error('❌ Firebase Admin initialization failed');
       return res.status(500).json({ 
         error: { 
-          code: "500", 
-          message: "Failed to initialize Firebase Admin. Check your Firebase configuration and service account." 
+          code: "firebase_init_failed", 
+          message: "Firebase Admin initialization failed" 
         } 
       });
     }
     
-    // Get Firestore Admin DB instance
     const db = getFirestoreAdminDb();
     if (!db) {
-      console.error('Failed to get Firestore Admin database instance');
+      console.error('❌ Firestore database connection failed');
       return res.status(500).json({ 
         error: { 
-          code: "500", 
-          message: "Failed to connect to database. Firestore Admin may not be properly configured." 
+          code: "firestore_connection_failed", 
+          message: "Failed to connect to Firestore database" 
         } 
       });
     }
+    
+    console.log(`✅ Firebase initialized in ${Date.now() - initStart}ms`);
 
     // Extract and validate user from JWT token
     const authResult = extractUserFromRequest(req);
@@ -98,25 +105,34 @@ async function handleUserProfile(req, res) {
       if (!updates || Object.keys(updates).length === 0) {
         return res.status(400).json({ 
           error: { 
-            code: "400", 
+            code: "no_updates", 
             message: "No updates provided" 
           } 
         });
       }
 
-      console.log(`Updating profile for user: ${userId}`, updates);
+      console.log(`⚡ Updating profile for user: ${userId}`);
+      const updateStart = Date.now();
       
       try {
-        // Add timestamp for updates
+        // Add timestamp for updates (optimized)
         const updateData = {
           ...updates,
           updatedAt: new Date().toISOString()
         };
 
-        await db.collection('users').doc(userId).update(updateData);
+        // Use set with merge for better performance than update
+        await db.collection('users').doc(userId).set(updateData, { merge: true });
+        
+        console.log(`✅ Profile updated in ${Date.now() - updateStart}ms`);
+        console.log(`🚀 Total request time: ${Date.now() - startTime}ms`);
         
         return res.status(200).json({ 
-          message: 'Profile updated successfully' 
+          message: 'Profile updated successfully',
+          timing: {
+            totalTime: Date.now() - startTime,
+            updateTime: Date.now() - updateStart
+          }
         });
         
       } catch (error) {

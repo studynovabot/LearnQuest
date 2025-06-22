@@ -8,6 +8,20 @@
     },
     { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
+  "functions": {
+    "api/ai-services.js": { "maxDuration": 30 },
+    "api/user-management.js": { "maxDuration": 30 },
+    "api/ncert-solutions.js": { "maxDuration": 30 },
+    "api/admin-pdf-upload.js": { "maxDuration": 30 },
+    "api/media-services.js": { "maxDuration": 30 },
+    "api/tutors.js": { "maxDuration": 30 },
+    "api/auth.js": { "maxDuration": 30 },
+    "api/ncert-management.js": { "maxDuration": 30 },
+    "api/ncert-solutions-upload.js": { "maxDuration": 30 },
+    "api/smart-pdf-upload.js": { "maxDuration": 30 },
+    "api/health-check.js": { "maxDuration": 30 },
+    "api/debug-profile.js": { "maxDuration": 30 }
+  },
   "routes": [
     {
       "src": "/api/test-simple",
