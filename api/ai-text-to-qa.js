@@ -1,9 +1,9 @@
 // 🤖 AI TEXT-TO-QA CONVERSION SERVICE
 // Converts extracted text to Q&A pairs using Groq AI
 
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Handle CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
