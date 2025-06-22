@@ -89,10 +89,6 @@ module.exports = async function handler(req, res) {
         // Try Firebase authentication first
         try {
           console.log('Attempting Firebase authentication for:', email);
-          
-          // Initialize Firebase if not already done
-          await initializeFirebase();
-          
           const user = await storage.getUserByEmail(email);
           console.log('Firebase user lookup result:', user ? 'User found' : 'User not found');
           
