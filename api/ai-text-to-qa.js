@@ -79,9 +79,9 @@ Format as JSON array with objects containing: question, answer, difficulty, type
 
     console.log('🤖 Calling Groq API...');
 
-    // Call Groq API with timeout
+    // Call Groq API with extended timeout for Vercel
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 55000); // 55s timeout (Vercel limit is 60s)
     
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -96,7 +96,7 @@ Format as JSON array with objects containing: question, answer, difficulty, type
         ],
         model: "llama-3.1-70b-versatile",
         temperature: 0.3,
-        max_tokens: 2000,
+        max_tokens: 1000,
       }),
       signal: controller.signal
     });
