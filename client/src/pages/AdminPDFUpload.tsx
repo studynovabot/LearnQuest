@@ -117,10 +117,20 @@ export default function AdminPDFUpload() {
         try {
           const errorData = await response.json();
           errorMessage = errorData.message || errorMessage;
+          
+          // Handle specific serverless PDF processing issues
+          if (response.status === 503 && errorMessage.includes('PDF processing service temporarily unavailable')) {
+            errorMessage = 'PDF processing is temporarily unavailable in our serverless environment. Please try extracting the text from your PDF manually and use the text-based upload option (coming soon).';
+          }
+          
         } catch (jsonError) {
           // If response is not JSON (like HTML error page), use the status text
           console.error('Failed to parse error response as JSON:', jsonError);
           errorMessage = `Server error: ${response.status} ${response.statusText}`;
+          
+          if (response.status === 503) {
+            errorMessage = 'PDF processing service is temporarily unavailable. This is due to serverless environment limitations.';
+          }
         }
         throw new Error(errorMessage);
       }
@@ -276,6 +286,21 @@ export default function AdminPDFUpload() {
             <CardDescription>
               Select a PDF file and provide metadata to automatically extract questions and answers
             </CardDescription>
+            {/* Temporary Notice */}
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+                <div>
+                  <h4 className="text-sm font-semibold text-yellow-800 dark:text-yellow-200">
+                    PDF Processing Temporarily Limited
+                  </h4>
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                    Due to serverless environment limitations, PDF text extraction is currently unavailable. 
+                    We're working on a fix. For now, please extract text from your PDF manually and use our text-based upload (coming soon).
+                  </p>
+                </div>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
             
