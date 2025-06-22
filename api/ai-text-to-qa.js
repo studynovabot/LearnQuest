@@ -1,11 +1,9 @@
 // 🤖 AI TEXT-TO-QA CONVERSION SERVICE
 // Converts extracted text to Q&A pairs using Groq AI
 
-import { handleCors } from '../utils/cors.js';
-import { initializeGroq } from '../utils/groq.js';
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   console.log('🤖 AI Text-to-QA service called:', {
     method: req.method,
     hasAuth: !!req.headers.authorization,
@@ -13,7 +11,10 @@ export default async function handler(req, res) {
   });
 
   // Handle CORS
-  handleCors(req, res);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -73,13 +74,13 @@ export default async function handler(req, res) {
     console.log(`📚 Processing text for ${metadata.subject} (Class ${metadata.class})`);
     console.log(`📊 Text length: ${text.length} characters`);
 
-    // Initialize Groq AI
-    const groq = initializeGroq();
-    if (!groq) {
+    // Check Groq API key
+    const groqApiKey = process.env.GROQ_API_KEY;
+    if (!groqApiKey) {
       return res.status(500).json({
         success: false,
-        message: 'AI service initialization failed',
-        error: 'GROQ_INIT_FAILED'
+        message: 'AI service not configured',
+        error: 'GROQ_API_KEY_MISSING'
       });
     }
 
@@ -117,19 +118,33 @@ ${text.slice(0, 8000)}`; // Limit text to avoid token limits
     const startTime = Date.now();
 
     try {
-      // Call Groq AI
-      const completion = await groq.chat.completions.create({
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        model: "llama-3.1-70b-versatile",
-        temperature: 0.3,
-        max_tokens: 4000,
-        top_p: 0.9,
+      // Call Groq API directly
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          model: "llama-3.1-70b-versatile",
+          temperature: 0.3,
+          max_tokens: 4000,
+          top_p: 0.9,
+        }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Groq API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+      }
+
+      const completion = await response.json();
       const aiResponse = completion.choices[0]?.message?.content;
+      
       if (!aiResponse) {
         throw new Error('No response from AI service');
       }
