@@ -4,11 +4,12 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = async function handler(req, res) {
-  console.log('🤖 AI Text-to-QA service called:', {
-    method: req.method,
-    hasAuth: !!req.headers.authorization,
-    contentLength: req.headers['content-length']
-  });
+  try {
+    console.log('🤖 AI Text-to-QA service called:', {
+      method: req.method,
+      hasAuth: !!req.headers.authorization,
+      contentLength: req.headers['content-length']
+    });
 
   // Handle CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -233,11 +234,13 @@ ${text.slice(0, 8000)}`; // Limit text to avoid token limits
 
   } catch (error) {
     console.error('❌ AI Text-to-QA service error:', error);
+    console.error('❌ Error stack:', error.stack);
     
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
       error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
       timestamp: new Date().toISOString()
     });
   }
