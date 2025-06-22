@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 NCERT PDF Processor - Test Your Fixed API</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-section h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button.secondary {
+            background: #2196F3;
+        }
+        button.secondary:hover {
+            background: #1976D2;
+        }
+        button.danger {
+            background: #f44336;
+        }
+        button.danger:hover {
+            background: #d32f2f;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .results {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .guide {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .guide h4 {
+            margin-top: 0;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 NCERT PDF Processor</h1>
+        <p class="subtitle">Test your fixed PDF processing API with NCERT Chapter 1: Chemical Reactions and Equations</p>
+        
+        <!-- API Status Section -->
+        <div class="test-section">
+            <h3>📊 API Status Check</h3>
+            <p>First, let's check if your fixed API is working:</p>
+            <button onclick="checkAPIStatus()">🔍 Check API Status</button>
+            <div id="status-result" class="results" style="display: none;"></div>
+        </div>
+        
+        <!-- Sample Test Section -->
+        <div class="test-section">
+            <h3>📝 Test with Sample NCERT Data</h3>
+            <p>Test the API with pre-loaded NCERT chemical reactions questions:</p>
+            <button onclick="testSampleData()">🚀 Test Sample Data</button>
+            <div id="sample-result" class="results" style="display: none;"></div>
+        </div>
+        
+        <!-- Custom Text Test Section -->
+        <div class="test-section">
+            <h3>📄 Test with Your Own Text</h3>
+            <p>Copy text from your NCERT PDF and paste it here to test:</p>
+            <textarea id="custom-text" placeholder="Paste your NCERT text here...
+
+Example format:
+Q1. Why should a magnesium ribbon be cleaned before burning in air?
+Magnesium ribbon should be cleaned before burning in air because...
+
+Q2. Write the balanced equation for the following chemical reactions.
+(i) Hydrogen + Chlorine → Hydrogen chloride
+..."></textarea>
+            <br>
+            <button onclick="testCustomText()">🧪 Process My Text</button>
+            <button class="secondary" onclick="loadSampleText()">📝 Load Sample Text</button>
+            <div id="custom-result" class="results" style="display: none;"></div>
+        </div>
+        
+        <!-- Instructions Section -->
+        <div class="test-section">
+            <h3>📖 How to Extract Text from Your PDF</h3>
+            <div class="guide">
+                <h4>Method 1: Manual Copy-Paste</h4>
+                <ol>
+                    <li>Open your NCERT PDF: <code>"NCERT Solutions for Class 10 Science Chapter 1 Chemical Reactions And Equations - Free PDF Download.pdf"</code></li>
+                    <li>Select all text (Ctrl+A)</li>
+                    <li>Copy (Ctrl+C)</li>
+                    <li>Paste into the text area above</li>
+                </ol>
+                
+                <h4>Method 2: Online PDF to Text Converter</h4>
+                <ol>
+                    <li>Go to <a href="https://www.ilovepdf.com/pdf_to_text" target="_blank">iLovePDF Text Converter</a></li>
+                    <li>Upload your NCERT PDF file</li>
+                    <li>Download the converted text file</li>
+                    <li>Copy the text and paste above</li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Download Section -->
+        <div id="download-section" style="display: none;">
+            <div class="test-section">
+                <h3>💾 Download Results</h3>
+                <p>Your Q&A pairs have been processed successfully!</p>
+                <div id="download-info"></div>
+                <button id="download-btn" onclick="downloadJSONL()">📥 Download JSONL File</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            baseUrl: 'https://studynovaai.vercel.app',
+            authToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFkbWluXzE3NTA1OTg5NDE4NTAiLCJlbWFpbCI6InRoYWt1cnJhbnZlZXJzaW5naDUwNUBnbWFpbC5jb20iLCJzdWJzY3JpcHRpb25QbGFuIjoiZ29hdCIsInRpZXIiOiJnb2F0Iiwicm9sZSI6ImFkbWluIiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNzUwNTk4OTQxLCJleHAiOjE3NTMxOTA5NDF9.EwvwjO3Lrd3x_knaQKR6h-EHYt6TFbUuEvK247JnDQ8'
+        };
+        
+        // Sample NCERT text data
+        const SAMPLE_NCERT_TEXT = `Q1. Why should a magnesium ribbon be cleaned before burning in air?
+Magnesium ribbon should be cleaned before burning in air because magnesium metal reacts with oxygen present in air to form a layer of magnesium oxide (MgO) on its surface. This layer of magnesium oxide prevents the burning of magnesium ribbon. Therefore, it should be cleaned by sand paper to remove the layer of MgO so that the underlying metal can be exposed to air.
+
+Q2. Write the balanced equation for the following chemical reactions.
+(i) Hydrogen + Chlorine → Hydrogen chloride
+(ii) Barium chloride + Aluminium sulphate → Barium sulphate + Aluminium chloride
+(iii) Sodium + Water → Sodium hydroxide + Hydrogen
+
+(i) H2 + Cl2 → 2HCl
+(ii) 3BaCl2 + Al2(SO4)3 → 3BaSO4 + 2AlCl3
+(iii) 2Na + 2H2O → 2NaOH + H2
+
+Q3. Write a balanced chemical equation with state symbols for the following reactions.
+(i) Solutions of barium chloride and sodium sulphate in water react to give insoluble barium sulphate and the solution of sodium chloride.
+(ii) Sodium hydroxide solution (in water) reacts with hydrochloric acid solution (in water) to produce sodium chloride solution and water.
+
+(i) BaCl2(aq) + Na2SO4(aq) → BaSO4(s) + 2NaCl(aq)
+(ii) NaOH(aq) + HCl(aq) → NaCl(aq) + H2O(l)
+
+Q4. A solution of a substance 'X' is used for whitewashing.
+(i) Name the substance 'X' and write its formula.
+(ii) Write the reaction of the substance 'X' named in (i) above with water.
+
+(i) The substance 'X' is calcium oxide (quicklime). Its formula is CaO.
+(ii) CaO(s) + H2O(l) → Ca(OH)2(aq) + Heat
+
+Q5. Why is the amount of gas collected in one of the test tubes in Activity 1.7 double of the amount collected in the other? Name this gas.
+In Activity 1.7, water is electrolyzed to produce hydrogen and oxygen gases. The amount of hydrogen gas collected is double the amount of oxygen gas collected because water molecule contains two atoms of hydrogen and one atom of oxygen. According to the balanced equation: 2H2O(l) → 2H2(g) + O2(g), two molecules of hydrogen gas are produced for every one molecule of oxygen gas. The gas collected in double amount is hydrogen gas.`;
+        
+        let lastProcessedData = null;
+        
+        // Utility functions
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = message;
+            element.className = `results status ${type}`;
+            element.style.display = 'block';
+        }
+        
+        function showResults(elementId, data) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            element.className = 'results';
+            element.style.display = 'block';
+        }
+        
+        // API Status Check
+        async function checkAPIStatus() {
+            showStatus('status-result', '🔄 Checking API status...', 'info');
+            
+            try {
+                const response = await fetch(`${CONFIG.baseUrl}/api/admin-pdf-upload-fixed`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${CONFIG.authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showStatus('status-result', `✅ API Status: ${data.message}`, 'success');
+                    showResults('status-result', data);
+                } else {
+                    showStatus('status-result', `❌ API Error: ${data.message}`, 'error');
+                    showResults('status-result', data);
+                }
+                
+            } catch (error) {
+                showStatus('status-result', `❌ Network Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test Sample Data
+        async function testSampleData() {
+            showStatus('sample-result', '🔄 Processing sample NCERT data...', 'info');
+            
+            try {
+                const response = await fetch(`${CONFIG.baseUrl}/api/admin-pdf-upload-fixed?endpoint=test-text`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${CONFIG.authToken}`
+                    },
+                    body: JSON.stringify({
+                        textContent: SAMPLE_NCERT_TEXT,
+                        metadata: {
+                            board: 'cbse',
+                            class: 10,
+                            subject: 'science',
+                            chapter: 'chemical-reactions-and-equations'
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus('sample-result', `✅ Success! Extracted ${data.data.summary.totalQuestions} Q&A pairs`, 'success');
+                    showResults('sample-result', data);
+                    
+                    // Store data for download
+                    lastProcessedData = data.data.qaPairs;
+                    showDownloadSection(data.data.summary.totalQuestions, 'sample-ncert-qa');
+                } else {
+                    showStatus('sample-result', `❌ Processing Failed: ${data.message}`, 'error');
+                    showResults('sample-result', data);
+                }
+                
+            } catch (error) {
+                showStatus('sample-result', `❌ Network Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test Custom Text
+        async function testCustomText() {
+            const customText = document.getElementById('custom-text').value.trim();
+            
+            if (!customText) {
+                showStatus('custom-result', '❌ Please paste your NCERT text first', 'error');
+                return;
+            }
+            
+            showStatus('custom-result', '🔄 Processing your NCERT text...', 'info');
+            
+            try {
+                const response = await fetch(`${CONFIG.baseUrl}/api/admin-pdf-upload-fixed?endpoint=test-text`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${CONFIG.authToken}`
+                    },
+                    body: JSON.stringify({
+                        textContent: customText,
+                        metadata: {
+                            board: 'cbse',
+                            class: 10,
+                            subject: 'science',
+                            chapter: 'chemical-reactions-and-equations'
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus('custom-result', `✅ Success! Extracted ${data.data.summary.totalQuestions} Q&A pairs from your text`, 'success');
+                    showResults('custom-result', data);
+                    
+                    // Store data for download
+                    lastProcessedData = data.data.qaPairs;
+                    showDownloadSection(data.data.summary.totalQuestions, 'custom-ncert-qa');
+                } else {
+                    showStatus('custom-result', `❌ Processing Failed: ${data.message}`, 'error');
+                    showResults('custom-result', data);
+                }
+                
+            } catch (error) {
+                showStatus('custom-result', `❌ Network Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Load Sample Text
+        function loadSampleText() {
+            document.getElementById('custom-text').value = SAMPLE_NCERT_TEXT;
+            showStatus('custom-result', '📝 Sample NCERT text loaded! Click "Process My Text" to test.', 'info');
+        }
+        
+        // Show Download Section
+        function showDownloadSection(questionCount, filename) {
+            const section = document.getElementById('download-section');
+            const info = document.getElementById('download-info');
+            
+            info.innerHTML = `
+                <div class="status success">
+                    <strong>📊 Processing Complete!</strong><br>
+                    • Extracted: ${questionCount} Q&A pairs<br>
+                    • Format: JSONL (JSON Lines)<br>
+                    • Filename: ${filename}.jsonl<br>
+                    • Ready for download!
+                </div>
+            `;
+            
+            section.style.display = 'block';
+            
+            // Scroll to download section
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Download JSONL
+        function downloadJSONL() {
+            if (!lastProcessedData) {
+                alert('No data to download. Please process some text first.');
+                return;
+            }
+            
+            // Create JSONL content
+            const jsonlLines = lastProcessedData.map(qa => {
+                return JSON.stringify({
+                    question: qa.question,
+                    answer: qa.answer,
+                    metadata: {
+                        questionNumber: qa.questionNumber,
+                        board: qa.board,
+                        class: qa.class,
+                        subject: qa.subject,
+                        chapter: qa.chapter,
+                        extractedAt: qa.extractedAt
+                    }
+                });
+            });
+            
+            const jsonlContent = jsonlLines.join('\\n');
+            
+            // Create and download file
+            const blob = new Blob([jsonlContent], { type: 'application/jsonl' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ncert-chemical-reactions-qa-pairs.jsonl';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            // Show success message
+            document.getElementById('download-info').innerHTML += `
+                <div class="status success" style="margin-top: 15px;">
+                    <strong>✅ Download Started!</strong><br>
+                    File: ncert-chemical-reactions-qa-pairs.jsonl<br>
+                    Check your Downloads folder.
+                </div>
+            `;
+        }
+        
+        // Auto-check API status on page load
+        window.addEventListener('load', () => {
+            console.log('🎉 NCERT PDF Processor loaded!');
+            console.log('Click "Check API Status" to get started.');
+        });
+    </script>
+</body>
+</html>

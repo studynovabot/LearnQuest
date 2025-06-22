@@ -113,8 +113,16 @@ export default function AdminPDFUpload() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Upload failed: ${response.statusText}`);
+        let errorMessage = `Upload failed: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          // If response is not JSON (like HTML error page), use the status text
+          console.error('Failed to parse error response as JSON:', jsonError);
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
@@ -190,8 +198,15 @@ export default function AdminPDFUpload() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Upload to Firebase failed');
+        let errorMessage = `Upload to Firebase failed: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          console.error('Failed to parse error response as JSON:', jsonError);
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();

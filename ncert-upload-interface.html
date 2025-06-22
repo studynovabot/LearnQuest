@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 NCERT Solutions Upload Interface</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .step {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .step.active {
+            border-color: #4CAF50;
+            background: #f8fff8;
+        }
+        .step h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 300px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        button.secondary {
+            background: #2196F3;
+        }
+        button.secondary:hover {
+            background: #1976D2;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .progress {
+            background: #f0f0f0;
+            border-radius: 5px;
+            padding: 3px;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background: #4CAF50;
+            height: 20px;
+            border-radius: 3px;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        .upload-log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 NCERT Solutions Upload Interface</h1>
+        <p style="text-align: center; color: #666;">Upload your processed JSONL files to the web app database</p>
+        
+        <!-- Step 1: Current Database Stats -->
+        <div class="step active" id="step1">
+            <h3>📊 Step 1: Current Database Status</h3>
+            <button onclick="checkDatabaseStatus()">🔍 Check Database Status</button>
+            <div id="database-status" class="status info" style="display: none;">
+                Checking database...
+            </div>
+            <div id="stats-display" class="stats-grid" style="display: none;">
+                <!-- Stats will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Step 2: Chapter Information -->
+        <div class="step" id="step2">
+            <h3>📚 Step 2: Chapter Information</h3>
+            <div class="form-group">
+                <label for="class-select">Class:</label>
+                <select id="class-select">
+                    <option value="6">Class 6</option>
+                    <option value="7">Class 7</option>
+                    <option value="8">Class 8</option>
+                    <option value="9">Class 9</option>
+                    <option value="10" selected>Class 10</option>
+                    <option value="11">Class 11</option>
+                    <option value="12">Class 12</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject-select">Subject:</label>
+                <select id="subject-select">
+                    <option value="science" selected>Science</option>
+                    <option value="mathematics">Mathematics</option>
+                    <option value="english">English</option>
+                    <option value="hindi">Hindi</option>
+                    <option value="social-science">Social Science</option>
+                    <option value="physics">Physics</option>
+                    <option value="chemistry">Chemistry</option>
+                    <option value="biology">Biology</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="chapter-input">Chapter (URL-friendly name):</label>
+                <input type="text" id="chapter-input" placeholder="e.g., chemical-reactions-and-equations" value="chemical-reactions-and-equations">
+            </div>
+            
+            <div class="form-group">
+                <label for="chapter-title">Chapter Title:</label>
+                <input type="text" id="chapter-title" placeholder="e.g., Chemical Reactions and Equations" value="Chemical Reactions and Equations">
+            </div>
+            
+            <div class="form-group">
+                <label for="exercise-input">Exercise/Section:</label>
+                <input type="text" id="exercise-input" placeholder="e.g., Exercise 1.1, General Questions" value="General Questions">
+            </div>
+        </div>
+        
+        <!-- Step 3: JSONL Content -->
+        <div class="step" id="step3">
+            <h3>📄 Step 3: JSONL Content</h3>
+            <div class="form-group">
+                <label for="jsonl-content">Paste your JSONL content here:</label>
+                <textarea id="jsonl-content" placeholder="Paste your JSONL content here...
+Each line should be a valid JSON object with 'question', 'answer', and optional 'metadata'
+
+Example:
+{&quot;question&quot;:&quot;What is photosynthesis?&quot;,&quot;answer&quot;:&quot;Photosynthesis is...&quot;,&quot;metadata&quot;:{&quot;questionNumber&quot;:1}}
+{&quot;question&quot;:&quot;What is respiration?&quot;,&quot;answer&quot;:&quot;Respiration is...&quot;,&quot;metadata&quot;:{&quot;questionNumber&quot;:2}}"></textarea>
+            </div>
+            
+            <button class="secondary" onclick="loadSampleJSONL()">📝 Load Sample NCERT Data</button>
+            <button onclick="validateJSONL()">✅ Validate JSONL Format</button>
+            
+            <div id="validation-result" class="status" style="display: none;"></div>
+        </div>
+        
+        <!-- Step 4: Upload Process -->
+        <div class="step" id="step4">
+            <h3>📤 Step 4: Upload to Database</h3>
+            
+            <div id="upload-summary" style="display: none;">
+                <h4>Upload Summary:</h4>
+                <ul id="summary-list"></ul>
+            </div>
+            
+            <button id="upload-btn" onclick="startUpload()" disabled>🚀 Start Upload</button>
+            <button onclick="resetForm()">🔄 Reset Form</button>
+            
+            <div id="upload-progress" style="display: none;">
+                <div class="progress">
+                    <div class="progress-bar" id="progress-bar" style="width: 0%">0%</div>
+                </div>
+                <div id="upload-status" class="status info">Starting upload...</div>
+            </div>
+            
+            <div id="upload-log" class="upload-log" style="display: none;"></div>
+        </div>
+        
+        <!-- Step 5: Results -->
+        <div class="step" id="step5" style="display: none;">
+            <h3>🎉 Step 5: Upload Results</h3>
+            <div id="final-results"></div>
+            <button onclick="checkDatabaseStatus()">🔍 Refresh Database Stats</button>
+            <button onclick="viewSolutions()">👀 View Uploaded Solutions</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            baseUrl: 'https://studynovaai.vercel.app',
+            authToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFkbWluXzE3NTA1OTg5NDE4NTAiLCJlbWFpbCI6InRoYWt1cnJhbnZlZXJzaW5naDUwNUBnbWFpbC5jb20iLCJzdWJzY3JpcHRpb25QbGFuIjoiZ29hdCIsInRpZXIiOiJnb2F0Iiwicm9sZSI6ImFkbWluIiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNzUwNTk4OTQxLCJleHAiOjE3NTMxOTA5NDF9.EwvwjO3Lrd3x_knaQKR6h-EHYt6TFbUuEvK247JnDQ8'
+        };
+        
+        let currentStats = null;
+        let uploadProgress = {
+            total: 0,
+            completed: 0,
+            failed: 0
+        };
+        
+        // Sample JSONL data for testing
+        const SAMPLE_JSONL = `{"question":"Why should a magnesium ribbon be cleaned before burning in air?","answer":"Magnesium ribbon should be cleaned before burning in air because magnesium metal reacts with oxygen present in air to form a layer of magnesium oxide (MgO) on its surface. This layer of magnesium oxide prevents the burning of magnesium ribbon. Therefore, it should be cleaned by sand paper to remove the layer of MgO so that the underlying metal can be exposed to air.","metadata":{"questionNumber":1,"board":"cbse","class":10,"subject":"science","chapter":"chemical-reactions-and-equations"}}
+{"question":"Write the balanced equation for the following chemical reactions. (i) Hydrogen + Chlorine → Hydrogen chloride (ii) Barium chloride + Aluminium sulphate → Barium sulphate + Aluminium chloride (iii) Sodium + Water → Sodium hydroxide + Hydrogen","answer":"(i) H2 + Cl2 → 2HCl (ii) 3BaCl2 + Al2(SO4)3 → 3BaSO4 + 2AlCl3 (iii) 2Na + 2H2O → 2NaOH + H2","metadata":{"questionNumber":2,"board":"cbse","class":10,"subject":"science","chapter":"chemical-reactions-and-equations"}}
+{"question":"Write a balanced chemical equation with state symbols for the following reactions. (i) Solutions of barium chloride and sodium sulphate in water react to give insoluble barium sulphate and the solution of sodium chloride. (ii) Sodium hydroxide solution (in water) reacts with hydrochloric acid solution (in water) to produce sodium chloride solution and water.","answer":"(i) BaCl2(aq) + Na2SO4(aq) → BaSO4(s) + 2NaCl(aq) (ii) NaOH(aq) + HCl(aq) → NaCl(aq) + H2O(l)","metadata":{"questionNumber":3,"board":"cbse","class":10,"subject":"science","chapter":"chemical-reactions-and-equations"}}`;
+        
+        // Utility functions
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('upload-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            
+            if (logElement) {
+                logElement.textContent += logEntry;
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+            
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.className = `status ${type}`;
+                element.style.display = 'block';
+            }
+        }
+        
+        function updateProgress(completed, total) {
+            const percentage = Math.round((completed / total) * 100);
+            const progressBar = document.getElementById('progress-bar');
+            
+            if (progressBar) {
+                progressBar.style.width = `${percentage}%`;
+                progressBar.textContent = `${percentage}% (${completed}/${total})`;
+            }
+        }
+        
+        // Step 1: Check Database Status
+        async function checkDatabaseStatus() {
+            showStatus('database-status', '🔄 Checking database status...', 'info');
+            
+            try {
+                // Try to get current solutions
+                const response = await fetch(`${CONFIG.baseUrl}/api/ncert-management?action=solutions&limit=10`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${CONFIG.authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentStats = data;
+                    
+                    showStatus('database-status', '✅ Database connection successful', 'success');
+                    
+                    // Display stats
+                    const statsDisplay = document.getElementById('stats-display');
+                    statsDisplay.innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-number">${data.totalCount || 0}</div>
+                            <div class="stat-label">Total Solutions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${data.solutions ? data.solutions.length : 0}</div>
+                            <div class="stat-label">Recent Solutions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${new Set(data.solutions?.map(s => s.subject) || []).size}</div>
+                            <div class="stat-label">Subjects</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${new Set(data.solutions?.map(s => s.class) || []).size}</div>
+                            <div class="stat-label">Classes</div>
+                        </div>
+                    `;
+                    statsDisplay.style.display = 'grid';
+                    
+                } else {
+                    throw new Error(`API returned ${response.status}`);
+                }
+                
+            } catch (error) {
+                showStatus('database-status', `❌ Database check failed: ${error.message}`, 'error');
+                console.error('Database check failed:', error);
+            }
+        }
+        
+        // Step 3: Load Sample JSONL
+        function loadSampleJSONL() {
+            document.getElementById('jsonl-content').value = SAMPLE_JSONL;
+            showStatus('validation-result', '📝 Sample NCERT data loaded. Click "Validate JSONL Format" to verify.', 'info');
+        }
+        
+        // Step 3: Validate JSONL Format
+        function validateJSONL() {
+            const jsonlContent = document.getElementById('jsonl-content').value.trim();
+            
+            if (!jsonlContent) {
+                showStatus('validation-result', '❌ Please paste JSONL content first', 'error');
+                return false;
+            }
+            
+            try {
+                const lines = jsonlContent.split('\n').filter(line => line.trim());
+                const validLines = [];
+                const errors = [];
+                
+                for (let i = 0; i < lines.length; i++) {
+                    try {
+                        const parsed = JSON.parse(lines[i]);
+                        if (!parsed.question || !parsed.answer) {
+                            errors.push(`Line ${i + 1}: Missing 'question' or 'answer' field`);
+                        } else {
+                            validLines.push(parsed);
+                        }
+                    } catch (parseError) {
+                        errors.push(`Line ${i + 1}: Invalid JSON format`);
+                    }
+                }
+                
+                if (errors.length > 0) {
+                    showStatus('validation-result', `❌ Validation failed:\n${errors.slice(0, 3).join('\n')}`, 'error');
+                    return false;
+                }
+                
+                showStatus('validation-result', `✅ Validation successful! Found ${validLines.length} valid Q&A pairs`, 'success');
+                
+                // Update upload summary
+                const summaryList = document.getElementById('summary-list');
+                summaryList.innerHTML = `
+                    <li><strong>Valid Q&A Pairs:</strong> ${validLines.length}</li>
+                    <li><strong>Class:</strong> ${document.getElementById('class-select').value}</li>
+                    <li><strong>Subject:</strong> ${document.getElementById('subject-select').value}</li>
+                    <li><strong>Chapter:</strong> ${document.getElementById('chapter-input').value}</li>
+                    <li><strong>Exercise:</strong> ${document.getElementById('exercise-input').value}</li>
+                `;
+                
+                document.getElementById('upload-summary').style.display = 'block';
+                document.getElementById('upload-btn').disabled = false;
+                
+                return true;
+                
+            } catch (error) {
+                showStatus('validation-result', `❌ Validation error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Step 4: Start Upload Process
+        async function startUpload() {
+            if (!validateJSONL()) {
+                return;
+            }
+            
+            const jsonlContent = document.getElementById('jsonl-content').value.trim();
+            const chapterInfo = {
+                class: parseInt(document.getElementById('class-select').value),
+                subject: document.getElementById('subject-select').value,
+                chapter: document.getElementById('chapter-input').value,
+                chapterTitle: document.getElementById('chapter-title').value,
+                exercise: document.getElementById('exercise-input').value
+            };
+            
+            // Parse JSONL
+            const lines = jsonlContent.split('\n').filter(line => line.trim());
+            const qaPairs = lines.map(line => JSON.parse(line));
+            
+            // Initialize upload progress
+            uploadProgress = {
+                total: qaPairs.length,
+                completed: 0,
+                failed: 0
+            };
+            
+            // Show progress UI
+            document.getElementById('upload-progress').style.display = 'block';
+            document.getElementById('upload-log').style.display = 'block';
+            document.getElementById('upload-btn').disabled = true;
+            
+            log('🚀 Starting upload process...');
+            log(`📊 Total Q&A pairs to upload: ${qaPairs.length}`);
+            log(`📚 Chapter: ${chapterInfo.chapterTitle} (Class ${chapterInfo.class} ${chapterInfo.subject})`);
+            
+            // Upload each Q&A pair
+            for (let i = 0; i < qaPairs.length; i++) {
+                const qa = qaPairs[i];
+                
+                try {
+                    log(`📤 Uploading Q&A ${i + 1}/${qaPairs.length}...`);
+                    
+                    const uploadData = {
+                        class: chapterInfo.class,
+                        subject: chapterInfo.subject,
+                        chapter: chapterInfo.chapter,
+                        exercise: chapterInfo.exercise,
+                        questionNumber: qa.metadata?.questionNumber || i + 1,
+                        question: qa.question,
+                        solution: qa.answer,
+                        difficulty: qa.metadata?.difficulty || 'medium',
+                        tags: [chapterInfo.subject, chapterInfo.chapter]
+                    };
+                    
+                    const response = await fetch(`${CONFIG.baseUrl}/api/ncert-management?action=upload`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${CONFIG.authToken}`,
+                            'x-user-id': 'admin'
+                        },
+                        body: JSON.stringify(uploadData)
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        log(`✅ Q&A ${i + 1} uploaded successfully: ${result.solutionId}`);
+                        uploadProgress.completed++;
+                    } else {
+                        const error = await response.json();
+                        log(`❌ Q&A ${i + 1} upload failed: ${error.message}`, 'error');
+                        uploadProgress.failed++;
+                    }
+                    
+                } catch (error) {
+                    log(`❌ Q&A ${i + 1} upload error: ${error.message}`, 'error');
+                    uploadProgress.failed++;
+                }
+                
+                // Update progress
+                updateProgress(uploadProgress.completed + uploadProgress.failed, uploadProgress.total);
+                showStatus('upload-status', `Uploaded ${uploadProgress.completed} of ${uploadProgress.total} (${uploadProgress.failed} failed)`, 'info');
+                
+                // Small delay to avoid overwhelming the API
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            // Upload completed
+            const successRate = ((uploadProgress.completed / uploadProgress.total) * 100).toFixed(1);
+            
+            log(`🎉 Upload process completed!`);
+            log(`✅ Successfully uploaded: ${uploadProgress.completed} Q&A pairs`);
+            log(`❌ Failed uploads: ${uploadProgress.failed} Q&A pairs`);
+            log(`📊 Success rate: ${successRate}%`);
+            
+            if (uploadProgress.completed > 0) {
+                showStatus('upload-status', `✅ Upload completed! ${uploadProgress.completed} solutions uploaded successfully`, 'success');
+                showResults();
+            } else {
+                showStatus('upload-status', `❌ Upload failed! No solutions were uploaded`, 'error');
+            }
+            
+            document.getElementById('upload-btn').disabled = false;
+        }
+        
+        // Step 5: Show Results
+        function showResults() {
+            const step5 = document.getElementById('step5');
+            const resultsDiv = document.getElementById('final-results');
+            
+            const successRate = ((uploadProgress.completed / uploadProgress.total) * 100).toFixed(1);
+            
+            resultsDiv.innerHTML = `
+                <div class="status success">
+                    <strong>🎉 Upload Completed Successfully!</strong><br>
+                    <br>
+                    📊 <strong>Upload Statistics:</strong><br>
+                    • Total Q&A pairs processed: ${uploadProgress.total}<br>
+                    • Successfully uploaded: ${uploadProgress.completed}<br>
+                    • Failed uploads: ${uploadProgress.failed}<br>
+                    • Success rate: ${successRate}%<br>
+                    <br>
+                    🌐 Your NCERT solutions are now live on your web app!<br>
+                    View them at: <a href="${CONFIG.baseUrl}/ncert-solutions" target="_blank">${CONFIG.baseUrl}/ncert-solutions</a>
+                </div>
+            `;
+            
+            step5.style.display = 'block';
+            step5.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // View Solutions
+        function viewSolutions() {
+            const className = document.getElementById('class-select').value;
+            const subject = document.getElementById('subject-select').value;
+            const url = `${CONFIG.baseUrl}/ncert-solutions?class=${className}&subject=${subject}`;
+            window.open(url, '_blank');
+        }
+        
+        // Reset Form
+        function resetForm() {
+            document.getElementById('jsonl-content').value = '';
+            document.getElementById('validation-result').style.display = 'none';
+            document.getElementById('upload-summary').style.display = 'none';
+            document.getElementById('upload-progress').style.display = 'none';
+            document.getElementById('upload-log').style.display = 'none';
+            document.getElementById('step5').style.display = 'none';
+            document.getElementById('upload-btn').disabled = true;
+            
+            uploadProgress = { total: 0, completed: 0, failed: 0 };
+        }
+        
+        // Auto-check database status on page load
+        window.addEventListener('load', () => {
+            console.log('📚 NCERT Upload Interface loaded!');
+            setTimeout(checkDatabaseStatus, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test PDF Upload Functionality</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .test-section { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        #fileInput { margin: 10px 0; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; max-height: 200px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 PDF Upload Functionality Test</h1>
+    
+    <div class="test-section">
+        <h3>Step 1: Authentication Test</h3>
+        <button onclick="testAuth()">Test Authentication</button>
+        <div id="authResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Step 2: API Endpoint Test</h3>
+        <button onclick="testEndpoints()">Test API Endpoints</button>
+        <div id="endpointResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Step 3: PDF Upload Test (No File)</h3>
+        <button onclick="testUploadNoFile()">Test Upload Structure</button>
+        <div id="uploadNoFileResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Step 4: PDF Upload Test (With File)</h3>
+        <input type="file" id="fileInput" accept=".pdf" />
+        <button onclick="testUploadWithFile()">Test PDF Upload</button>
+        <div id="uploadWithFileResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Instructions:</h3>
+        <ol>
+            <li>First, login to your app at <a href="https://studynovaai.vercel.app" target="_blank">https://studynovaai.vercel.app</a></li>
+            <li>Come back to this page and run the tests in order</li>
+            <li>For the file test, select a PDF file with Q&A content</li>
+            <li>Check the results to see if PDF upload and JSONL conversion is working</li>
+        </ol>
+    </div>
+
+    <script>
+        const API_BASE = 'https://studynovaai.vercel.app/api';
+        
+        function log(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            container.appendChild(div);
+        }
+        
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+        
+        async function testAuth() {
+            clearResults('authResult');
+            log('authResult', '🔍 Testing Authentication...', 'info');
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                log('authResult', '❌ No auth token found. Please login first at the main app.', 'error');
+                return false;
+            }
+            
+            try {
+                // Test with user profile endpoint
+                const response = await fetch(`${API_BASE}/user-management?action=profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('authResult', `✅ Authentication working. User: ${data.user?.email || 'Unknown'}`, 'success');
+                    return true;
+                } else {
+                    log('authResult', `❌ Authentication failed: ${response.status}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                log('authResult', `❌ Auth test error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        async function testEndpoints() {
+            clearResults('endpointResult');
+            log('endpointResult', '🔍 Testing API Endpoints...', 'info');
+            
+            const endpoints = [
+                { name: 'Health Check', url: '/health-check', method: 'GET' },
+                { name: 'Admin PDF Upload', url: '/admin-pdf-upload', method: 'POST' }
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`${API_BASE}${endpoint.url}`, {
+                        method: endpoint.method,
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.status === 200 || response.status === 405 || response.status === 401) {
+                        log('endpointResult', `✅ ${endpoint.name}: Endpoint accessible (${response.status})`, 'success');
+                    } else {
+                        log('endpointResult', `⚠️ ${endpoint.name}: Status ${response.status}`, 'warning');
+                    }
+                } catch (error) {
+                    log('endpointResult', `❌ ${endpoint.name}: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function testUploadNoFile() {
+            clearResults('uploadNoFileResult');
+            log('uploadNoFileResult', '🔍 Testing Upload Structure (No File)...', 'info');
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                log('uploadNoFileResult', '❌ Please run authentication test first.', 'error');
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('board', 'cbse');
+                formData.append('class', '10');
+                formData.append('subject', 'science');
+                formData.append('chapter', 'test-chapter');
+                
+                const response = await fetch(`${API_BASE}/admin-pdf-upload?endpoint=upload-pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: formData
+                });
+                
+                log('uploadNoFileResult', `Response Status: ${response.status}`, 'info');
+                
+                const responseText = await response.text();
+                log('uploadNoFileResult', `Response Type: ${response.headers.get('Content-Type')}`, 'info');
+                
+                if (response.status === 400) {
+                    try {
+                        const jsonData = JSON.parse(responseText);
+                        if (jsonData.message && jsonData.message.includes('No PDF file')) {
+                            log('uploadNoFileResult', '✅ Upload endpoint working correctly - expecting PDF file', 'success');
+                        } else {
+                            log('uploadNoFileResult', `✅ Upload endpoint responding with JSON: ${JSON.stringify(jsonData)}`, 'success');
+                        }
+                    } catch (parseError) {
+                        log('uploadNoFileResult', '❌ Response is not JSON - server might be returning HTML error', 'error');
+                        log('uploadNoFileResult', `<pre>${responseText.substring(0, 500)}...</pre>`, 'error');
+                    }
+                } else if (response.ok) {
+                    log('uploadNoFileResult', '✅ Upload endpoint accessible', 'success');
+                } else {
+                    log('uploadNoFileResult', `❌ Upload endpoint error: ${response.status}`, 'error');
+                    log('uploadNoFileResult', `<pre>${responseText.substring(0, 500)}...</pre>`, 'error');
+                }
+                
+            } catch (error) {
+                log('uploadNoFileResult', `❌ Upload test error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testUploadWithFile() {
+            clearResults('uploadWithFileResult');
+            log('uploadWithFileResult', '🔍 Testing PDF Upload with File...', 'info');
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                log('uploadWithFileResult', '❌ Please run authentication test first.', 'error');
+                return;
+            }
+            
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                log('uploadWithFileResult', '❌ Please select a PDF file first.', 'error');
+                return;
+            }
+            
+            if (file.type !== 'application/pdf') {
+                log('uploadWithFileResult', '❌ Please select a PDF file.', 'error');
+                return;
+            }
+            
+            try {
+                log('uploadWithFileResult', `📄 Uploading file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`, 'info');
+                
+                const formData = new FormData();
+                formData.append('pdf', file);
+                formData.append('board', 'cbse');
+                formData.append('class', '10');
+                formData.append('subject', 'science');
+                formData.append('chapter', 'test-chapter');
+                
+                const response = await fetch(`${API_BASE}/admin-pdf-upload?endpoint=upload-pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: formData
+                });
+                
+                log('uploadWithFileResult', `Response Status: ${response.status}`, 'info');
+                
+                const responseText = await response.text();
+                
+                try {
+                    const jsonData = JSON.parse(responseText);
+                    
+                    if (response.ok) {
+                        log('uploadWithFileResult', '✅ PDF Upload Successful!', 'success');
+                        log('uploadWithFileResult', `<pre>${JSON.stringify(jsonData, null, 2)}</pre>`, 'success');
+                        
+                        if (jsonData.totalQuestions) {
+                            log('uploadWithFileResult', `🎉 Successfully extracted ${jsonData.totalQuestions} Q&A pairs!`, 'success');
+                        }
+                    } else {
+                        log('uploadWithFileResult', `❌ Upload failed: ${jsonData.message || 'Unknown error'}`, 'error');
+                        log('uploadWithFileResult', `<pre>${JSON.stringify(jsonData, null, 2)}</pre>`, 'error');
+                    }
+                } catch (parseError) {
+                    log('uploadWithFileResult', '❌ Server returned non-JSON response', 'error');
+                    log('uploadWithFileResult', `<pre>${responseText.substring(0, 1000)}...</pre>`, 'error');
+                }
+                
+            } catch (error) {
+                log('uploadWithFileResult', `❌ Upload error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

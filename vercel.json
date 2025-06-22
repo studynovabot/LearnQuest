@@ -13,6 +13,7 @@
       "src": "/api/test-simple",
       "dest": "/api/test-simple.js"
     },
+
     {
       "src": "/api/health-check",
       "dest": "/api/health-check.js"
@@ -56,6 +57,10 @@
     {
       "src": "/api/admin-pdf-upload",
       "dest": "/api/admin-pdf-upload.js"
+    },
+    {
+      "src": "/api/admin-pdf-upload-fixed",
+      "dest": "/api/admin-pdf-upload-fixed.js"
     },
     {
       "src": "/api/image-analysis",

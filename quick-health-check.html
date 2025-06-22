@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Health Check</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; }
+        pre { background-color: #f8f9fa; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>LearnQuest API Health Check</h1>
+    
+    <button onclick="runHealthCheck()">Run Health Check</button>
+    <button onclick="testUploadEndpoints()">Test Upload Endpoints</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'https://studynovaai.vercel.app/api';
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function runHealthCheck() {
+            clearResults();
+            log('🔍 Starting API Health Check...', 'info');
+            
+            // Test basic endpoints
+            const endpoints = [
+                { name: 'Health Check', url: '/health-check' },
+                { name: 'Test Simple', url: '/test-simple' },
+                { name: 'Test Upload', url: '/test-upload', method: 'POST' }
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    log(`Testing ${endpoint.name}...`, 'info');
+                    
+                    const options = {
+                        method: endpoint.method || 'GET',
+                        headers: { 'Content-Type': 'application/json' }
+                    };
+                    
+                    if (endpoint.method === 'POST') {
+                        const formData = new FormData();
+                        formData.append('test', 'value');
+                        options.body = formData;
+                        delete options.headers['Content-Type'];
+                    }
+                    
+                    const response = await fetch(`${API_BASE}${endpoint.url}`, options);
+                    
+                    if (response.ok) {
+                        const data = await response.text();
+                        log(`✅ ${endpoint.name}: ${response.status} - ${data.substring(0, 100)}...`, 'success');
+                    } else {
+                        const error = await response.text();
+                        log(`❌ ${endpoint.name}: ${response.status} - ${error.substring(0, 100)}...`, 'error');
+                    }
+                } catch (error) {
+                    log(`❌ ${endpoint.name}: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function testUploadEndpoints() {
+            log('🧪 Testing Upload Functionality...', 'info');
+            
+            // First get a mock token (you'll need to login first)
+            const token = localStorage.getItem('token') || 'mock-token';
+            
+            if (token === 'mock-token') {
+                log('⚠️ No auth token found in localStorage. Please login first.', 'error');
+                return;
+            }
+            
+            // Test upload-pdf endpoint
+            try {
+                const formData = new FormData();
+                formData.append('board', 'cbse');
+                formData.append('class', '10');
+                formData.append('subject', 'science');
+                formData.append('chapter', 'test-chapter');
+                
+                const response = await fetch(`${API_BASE}/upload-pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                const responseText = await response.text();
+                
+                if (response.status === 400) {
+                    log('✅ Upload PDF endpoint responding correctly (400 expected without file)', 'success');
+                    log(`Response: ${responseText}`, 'info');
+                } else if (response.ok) {
+                    log('✅ Upload PDF endpoint working', 'success');
+                    log(`Response: ${responseText}`, 'info');
+                } else {
+                    log(`❌ Upload PDF endpoint error: ${response.status}`, 'error');
+                    log(`Response: ${responseText}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Upload test error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

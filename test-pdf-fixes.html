@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Upload Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; border: none; border-radius: 3px; }
+        .btn-success { background: #28a745; color: white; border: none; border-radius: 3px; }
+        .btn-warning { background: #ffc107; color: black; border: none; border-radius: 3px; }
+        .results { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 PDF Upload Fix Verification</h1>
+    <p>Testing the fixed PDF upload endpoints after deployment...</p>
+
+    <div class="test-section">
+        <h2>🔧 Configuration</h2>
+        <label>Base URL: </label>
+        <input type="text" id="baseUrl" value="https://studynovaai.vercel.app" style="width: 300px;">
+        <br><br>
+        <label>Auth Token: </label>
+        <input type="text" id="authToken" value="eyJhbGciOiJIUzI1NiIs..." style="width: 400px;">
+        <br><br>
+        <button class="btn-primary" onclick="updateConfig()">Update Config</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Quick Tests</h2>
+        <button class="btn-primary" onclick="testHealthCheck()">Health Check</button>
+        <button class="btn-success" onclick="testGetEndpoint()">Test GET /admin-pdf-upload</button>
+        <button class="btn-success" onclick="testNewEndpoint()">Test New Upload Endpoint</button>
+        <button class="btn-warning" onclick="runAllTests()">Run All Tests</button>
+        <div id="quickResults" class="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📤 Mock PDF Upload Test</h2>
+        <p>This tests the PDF upload functionality with a mock PDF file.</p>
+        <button class="btn-success" onclick="testMockPDFUpload()">Test Mock PDF Upload</button>
+        <div id="mockUploadResults" class="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📁 Real File Upload Test</h2>
+        <p>Upload a real PDF file to test the complete workflow.</p>
+        <input type="file" id="pdfFile" accept=".pdf">
+        <br><br>
+        <label>Board: </label>
+        <select id="board">
+            <option value="cbse">CBSE</option>
+            <option value="ncert">NCERT</option>
+        </select>
+        
+        <label>Class: </label>
+        <select id="class">
+            <option value="10">Class 10</option>
+            <option value="11">Class 11</option>
+            <option value="12">Class 12</option>
+        </select>
+        
+        <label>Subject: </label>
+        <input type="text" id="subject" value="science" style="width: 150px;">
+        
+        <label>Chapter: </label>
+        <input type="text" id="chapter" value="test-chapter" style="width: 150px;">
+        <br><br>
+        <button class="btn-success" onclick="testRealPDFUpload()">Upload Real PDF</button>
+        <div id="realUploadResults" class="results"></div>
+    </div>
+
+    <script>
+        let baseUrl = 'https://studynovaai.vercel.app';
+        let authToken = 'eyJhbGciOiJIUzI1NiIs...';
+
+        function updateConfig() {
+            baseUrl = document.getElementById('baseUrl').value;
+            authToken = document.getElementById('authToken').value;
+            alert('Configuration updated!');
+        }
+
+        function logResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning';
+            element.innerHTML += `<div class="${className}"><strong>[${timestamp}]</strong> ${message}</div>`;
+        }
+
+        async function testHealthCheck() {
+            try {
+                const response = await fetch(`${baseUrl}/api/health-check`);
+                const data = await response.json();
+                logResult('quickResults', `✅ Health Check: ${response.status} - ${JSON.stringify(data)}`, 'success');
+            } catch (error) {
+                logResult('quickResults', `❌ Health Check Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetEndpoint() {
+            try {
+                const response = await fetch(`${baseUrl}/api/admin-pdf-upload`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                const data = await response.json();
+                logResult('quickResults', `✅ GET /admin-pdf-upload: ${response.status} - ${JSON.stringify(data)}`, 'success');
+            } catch (error) {
+                logResult('quickResults', `❌ GET Endpoint Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testNewEndpoint() {
+            try {
+                const response = await fetch(`${baseUrl}/api/admin-pdf-upload?endpoint=upload-pdf`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                const data = await response.json();
+                logResult('quickResults', `✅ New Endpoint: ${response.status} - ${JSON.stringify(data)}`, 'success');
+            } catch (error) {
+                logResult('quickResults', `❌ New Endpoint Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testMockPDFUpload() {
+            try {
+                // Create a mock PDF content
+                const mockPDFContent = `
+Q1. What is photosynthesis?
+Photosynthesis is the process by which plants make their own food using sunlight, carbon dioxide, and water.
+
+Q2. What are the products of photosynthesis?
+The products of photosynthesis are glucose (sugar) and oxygen.
+
+Q3. Where does photosynthesis take place?
+Photosynthesis takes place in the chloroplasts of plant cells, specifically in the leaves.
+                `;
+
+                const formData = new FormData();
+                
+                // Create a mock PDF file
+                const blob = new Blob([mockPDFContent], { type: 'application/pdf' });
+                formData.append('pdf', blob, 'test-science-questions.pdf');
+                formData.append('board', 'cbse');
+                formData.append('class', '10');
+                formData.append('subject', 'science');
+                formData.append('chapter', 'photosynthesis');
+
+                logResult('mockUploadResults', '📤 Uploading mock PDF...', 'info');
+
+                const response = await fetch(`${baseUrl}/api/admin-pdf-upload?endpoint=upload-pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    logResult('mockUploadResults', `✅ Mock PDF Upload Success: ${data.message}`, 'success');
+                    logResult('mockUploadResults', `📊 Extracted ${data.data?.totalQuestions || 0} questions`, 'success');
+                } else {
+                    logResult('mockUploadResults', `⚠️ Mock PDF Upload Response: ${response.status} - ${JSON.stringify(data)}`, 'warning');
+                }
+            } catch (error) {
+                logResult('mockUploadResults', `❌ Mock PDF Upload Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testRealPDFUpload() {
+            const fileInput = document.getElementById('pdfFile');
+            if (!fileInput.files[0]) {
+                alert('Please select a PDF file first!');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('pdf', fileInput.files[0]);
+                formData.append('board', document.getElementById('board').value);
+                formData.append('class', document.getElementById('class').value);
+                formData.append('subject', document.getElementById('subject').value);
+                formData.append('chapter', document.getElementById('chapter').value);
+
+                logResult('realUploadResults', '📤 Uploading real PDF file...', 'info');
+
+                const response = await fetch(`${baseUrl}/api/admin-pdf-upload?endpoint=upload-pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    logResult('realUploadResults', `✅ Real PDF Upload Success: ${data.message}`, 'success');
+                    logResult('realUploadResults', `📊 Extracted ${data.data?.totalQuestions || 0} questions from ${fileInput.files[0].name}`, 'success');
+                    
+                    if (data.data?.qaPairs) {
+                        logResult('realUploadResults', `📝 Sample Questions: <pre>${JSON.stringify(data.data.qaPairs.slice(0, 2), null, 2)}</pre>`, 'success');
+                    }
+                } else {
+                    logResult('realUploadResults', `⚠️ Real PDF Upload Response: ${response.status} - ${JSON.stringify(data)}`, 'warning');
+                }
+            } catch (error) {
+                logResult('realUploadResults', `❌ Real PDF Upload Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function runAllTests() {
+            document.getElementById('quickResults').innerHTML = '<h3>🧪 Running All Tests...</h3>';
+            
+            await testHealthCheck();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testGetEndpoint();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testNewEndpoint();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            logResult('quickResults', '🎯 All basic tests completed!', 'success');
+        }
+
+        // Auto-run basic tests on load
+        window.onload = () => {
+            setTimeout(runAllTests, 1000);
+        };
+    </script>
+</body>
+</html>
