@@ -6,9 +6,10 @@ import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Progress } from '../components/ui/progress';
 import { useToast } from '../hooks/use-toast';
-import { Upload, FileText, Brain, Sparkles, CheckCircle, AlertCircle, Eye, Edit } from 'lucide-react';
+import { Upload, FileText, Brain, Sparkles, CheckCircle, AlertCircle, Eye, Edit, Cpu } from 'lucide-react';
 import { config } from '../config';
 import { useAuth } from '../hooks/useAuth';
+import { ClientPDFProcessor } from '../utils/pdfProcessor';
 
 interface UploadStatus {
   processingId: string;
@@ -19,6 +20,14 @@ interface UploadStatus {
   metadata: any;
   totalQuestions?: number;
   sessionId?: string;
+  step?: 'extraction' | 'cleaning' | 'ai-processing' | 'formatting' | 'error';
+  stepProgress?: number;
+}
+
+interface ProcessingStep {
+  step: string;
+  progress: number;
+  message: string;
 }
 
 export default function AdminPDFUpload() {
@@ -92,92 +101,106 @@ export default function AdminPDFUpload() {
     }
 
     setIsUploading(true);
-    setUploadStatus(null);
+    setUploadStatus({
+      processingId: `upload_${Date.now()}`,
+      status: 'processing',
+      progress: 0,
+      message: 'Starting client-side PDF processing...',
+      filename: selectedFile.name,
+      metadata: uploadData,
+      step: 'extraction',
+      stepProgress: 0
+    });
     setExtractedQA([]);
 
     try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('board', uploadData.board);
-      formData.append('class', uploadData.class);
-      formData.append('subject', uploadData.subject);
-      formData.append('chapter', uploadData.chapter);
+      // Progress callback for real-time updates
+      const onProgress = (progressData: ProcessingStep) => {
+        setUploadStatus(prev => ({
+          ...prev!,
+          step: progressData.step as any,
+          stepProgress: progressData.progress,
+          message: progressData.message,
+          progress: getOverallProgress(progressData.step, progressData.progress)
+        }));
+      };
 
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${config.apiUrl}/upload-pdf`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      // Use client-side PDF processor
+      const result = await ClientPDFProcessor.processPDFComplete(
+        selectedFile,
+        uploadData,
+        config.apiUrl,
+        onProgress
+      );
 
-      if (!response.ok) {
-        let errorMessage = `Upload failed: ${response.statusText}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-          
-          // Handle specific serverless PDF processing issues
-          if (response.status === 503 && errorMessage.includes('PDF processing service temporarily unavailable')) {
-            errorMessage = 'PDF processing is temporarily unavailable in our serverless environment. Please try extracting the text from your PDF manually and use the text-based upload option (coming soon).';
-          }
-          
-        } catch (jsonError) {
-          // If response is not JSON (like HTML error page), use the status text
-          console.error('Failed to parse error response as JSON:', jsonError);
-          errorMessage = `Server error: ${response.status} ${response.statusText}`;
-          
-          if (response.status === 503) {
-            errorMessage = 'PDF processing service is temporarily unavailable. This is due to serverless environment limitations.';
-          }
-        }
-        throw new Error(errorMessage);
-      }
-
-      const result = await response.json();
-      
       if (result.success) {
         setUploadStatus({
-          processingId: result.sessionId,
+          processingId: `processed_${Date.now()}`,
           status: 'completed',
           progress: 100,
-          message: `Successfully extracted ${result.totalQuestions} Q&A pairs. Ready for review.`,
+          message: `Successfully extracted ${result.stats.totalQuestions} Q&A pairs from ${result.stats.pageCount} pages!`,
           filename: selectedFile.name,
-          metadata: result.metadata,
-          totalQuestions: result.totalQuestions,
-          sessionId: result.sessionId
+          metadata: uploadData,
+          totalQuestions: result.stats.totalQuestions,
+          step: 'formatting',
+          stepProgress: 100,
+          sessionId: `client_${Date.now()}`
         });
 
         setExtractedQA(result.qaPairs);
 
         toast({
-          title: "Upload Successful!",
-          description: `Extracted ${result.totalQuestions} Q&A pairs. Please review before uploading to Firebase.`,
+          title: "Processing Successful! 🎉",
+          description: `Extracted ${result.stats.totalQuestions} Q&A pairs from ${result.stats.pageCount} pages. Review and upload to Firebase.`,
         });
       } else {
-        throw new Error(result.message || 'Upload failed');
+        throw new Error(result.error || 'PDF processing failed');
       }
 
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error('PDF processing error:', error);
       setUploadStatus({
         processingId: '',
         status: 'failed',
         progress: 0,
-        message: error instanceof Error ? error.message : 'Upload failed',
+        message: error instanceof Error ? error.message : 'PDF processing failed',
         filename: selectedFile?.name || 'Unknown',
-        metadata: uploadData
+        metadata: uploadData,
+        step: 'error'
       });
       
       toast({
-        title: "Upload Failed",
-        description: error instanceof Error ? error.message : 'Upload failed',
+        title: "Processing Failed",
+        description: error instanceof Error ? error.message : 'PDF processing failed',
         variant: "destructive",
       });
     } finally {
       setIsUploading(false);
     }
+  };
+
+  // Helper function to calculate overall progress based on step
+  const getOverallProgress = (step: string, stepProgress: number): number => {
+    const stepWeights = {
+      'extraction': 30,
+      'cleaning': 10,
+      'ai-processing': 50,
+      'formatting': 10
+    };
+    
+    const completedSteps = ['extraction', 'cleaning', 'ai-processing', 'formatting'];
+    const currentStepIndex = completedSteps.indexOf(step);
+    
+    let totalProgress = 0;
+    for (let i = 0; i < currentStepIndex; i++) {
+      totalProgress += stepWeights[completedSteps[i] as keyof typeof stepWeights] || 0;
+    }
+    
+    if (currentStepIndex >= 0) {
+      totalProgress += (stepProgress / 100) * (stepWeights[step as keyof typeof stepWeights] || 0);
+    }
+    
+    return Math.min(totalProgress, 100);
   };
 
   const handleReviewAndUpload = async () => {
@@ -284,19 +307,18 @@ export default function AdminPDFUpload() {
               <span>Upload Educational PDF</span>
             </CardTitle>
             <CardDescription>
-              Select a PDF file and provide metadata to automatically extract questions and answers
+              Upload PDF files for automatic text extraction and Q&A generation using client-side processing
             </CardDescription>
-            {/* Temporary Notice */}
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+            {/* New Features Notice */}
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
               <div className="flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+                <Cpu className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-semibold text-yellow-800 dark:text-yellow-200">
-                    PDF Processing Temporarily Limited
+                  <h4 className="text-sm font-semibold text-green-800 dark:text-green-200">
+                    Client-Side Processing Now Available! 🚀
                   </h4>
-                  <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                    Due to serverless environment limitations, PDF text extraction is currently unavailable. 
-                    We're working on a fix. For now, please extract text from your PDF manually and use our text-based upload (coming soon).
+                  <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                    PDF processing now happens in your browser - no server limitations! Fast, secure, and handles any PDF size.
                   </p>
                 </div>
               </div>
@@ -426,6 +448,46 @@ export default function AdminPDFUpload() {
                   <span>{uploadStatus.progress}%</span>
                 </div>
                 <Progress value={uploadStatus.progress} className="w-full" />
+                
+                {/* Step-by-step progress indicator */}
+                {uploadStatus.status === 'processing' && uploadStatus.step && (
+                  <div className="mt-4 space-y-2">
+                    <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">Processing Steps:</div>
+                    <div className="grid grid-cols-4 gap-2 text-xs">
+                      {[
+                        { step: 'extraction', label: 'PDF Extraction', icon: FileText },
+                        { step: 'cleaning', label: 'Text Cleaning', icon: Edit },
+                        { step: 'ai-processing', label: 'AI Generation', icon: Brain },
+                        { step: 'formatting', label: 'Formatting', icon: Sparkles }
+                      ].map(({ step, label, icon: Icon }) => {
+                        const isActive = uploadStatus.step === step;
+                        const isCompleted = ['extraction', 'cleaning', 'ai-processing', 'formatting']
+                          .indexOf(uploadStatus.step!) > ['extraction', 'cleaning', 'ai-processing', 'formatting'].indexOf(step);
+                        
+                        return (
+                          <div
+                            key={step}
+                            className={`flex flex-col items-center p-2 rounded ${
+                              isActive
+                                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                                : isCompleted
+                                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                                : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                            }`}
+                          >
+                            <Icon className="h-4 w-4 mb-1" />
+                            <span className="text-center leading-tight">{label}</span>
+                            {isActive && (
+                              <div className="text-xs mt-1 font-medium">
+                                {uploadStatus.stepProgress || 0}%
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
               
               <div className="grid grid-cols-2 gap-4 text-sm">

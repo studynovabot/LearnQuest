@@ -46,22 +46,7 @@
       "src": "/api/enhanced-ncert-solutions",
       "dest": "/api/ncert-solutions.js?enhanced=true"
     },
-    {
-      "src": "/api/upload-pdf",
-      "dest": "/api/admin-pdf-upload-simple.js"
-    },
-    {
-      "src": "/api/admin-review",
-      "dest": "/api/admin-pdf-upload-fixed.js?endpoint=admin-review"
-    },
-    {
-      "src": "/api/admin-pdf-upload",
-      "dest": "/api/admin-pdf-upload-fixed.js"
-    },
-    {
-      "src": "/api/admin-pdf-upload-fixed",
-      "dest": "/api/admin-pdf-upload-fixed.js"
-    },
+
     {
       "src": "/api/image-analysis",
       "dest": "/api/media-services.js?service=image-analysis"
@@ -89,6 +74,10 @@
     {
       "src": "/api/user-profile",
       "dest": "/api/user-management.js?action=profile"
+    },
+    {
+      "src": "/api/ai-text-to-qa",
+      "dest": "/api/ai-text-to-qa.js"
     },
     {
       "src": "/api/(.*)",
