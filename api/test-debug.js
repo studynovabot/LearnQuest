@@ -1,4 +1,4 @@
-// 🔍 ULTRA-MINIMAL TEST - Find the crash point
+// 🔍 PURE COMMONJS TEST - Should work now
 module.exports = function handler(req, res) {
   try {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,9 +12,10 @@ module.exports = function handler(req, res) {
     // Test 1: Basic response
     return res.status(200).json({
       success: true,
-      message: 'Basic function execution works',
+      message: '🎉 COMMONJS WORKS! ES modules were the problem',
       nodeVersion: process.version,
       environment: process.env.NODE_ENV,
+      hasGroqKey: !!process.env.GROQ_API_KEY,
       timestamp: new Date().toISOString()
     });
 

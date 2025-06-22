@@ -1,5 +1,5 @@
 // Simple health check API endpoint
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   try {
     const timestamp = new Date().toISOString();
     

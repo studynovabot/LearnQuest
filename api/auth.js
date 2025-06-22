@@ -5,7 +5,7 @@ import { storage } from '../utils/storage.js';
 import { generateToken } from '../utils/jwt-auth.js';
 import bcrypt from 'bcryptjs';
 
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   return handleCors(req, res, async (req, res) => {
     if (req.method !== 'POST') {
       return res.status(405).json({ message: 'Method not allowed' });
