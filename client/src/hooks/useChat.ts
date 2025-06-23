@@ -444,11 +444,15 @@ export function useChat() {
               messageContent = assistantMessage.content;
             } else if (typeof assistantMessage.response === 'string' && assistantMessage.response.trim() !== '') {
               messageContent = assistantMessage.response;
+            } else if (assistantMessage.data && typeof assistantMessage.data.message === 'string' && assistantMessage.data.message.trim() !== '') {
+              // Handle API response format: { success: true, data: { message: "..." } }
+              messageContent = assistantMessage.data.message;
             } else if (typeof assistantMessage === 'string' && assistantMessage.trim() !== '') {
               // Handle case where the entire response is a string
               messageContent = assistantMessage;
             } else {
               // Default fallback message
+              console.warn('Could not extract message content from response:', assistantMessage);
               messageContent = "I'm sorry, I couldn't generate a response this time. Please try asking something else.";
             }
 
