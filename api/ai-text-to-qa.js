@@ -79,12 +79,27 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // Simplified AI prompt
-    const systemPrompt = `You are an educational content creator. Generate 10 question-answer pairs from the given text about ${metadata.subject} for Class ${metadata.class}.
+    // Improved AI prompt with specific JSON format
+    const systemPrompt = `You are an educational content creator. Generate 5-10 high-quality question-answer pairs from the given text about ${metadata.subject} for Class ${metadata.class}.
 
-Format as JSON array with objects containing: question, answer, difficulty, type.`;
+IMPORTANT: Return ONLY a valid JSON array. No additional text or explanations.
 
-    const userPrompt = `Subject: ${metadata.subject}\nText: ${text.slice(0, 4000)}`;
+Format: [
+  {
+    "question": "Clear, specific question",
+    "answer": "Detailed, educational answer", 
+    "difficulty": "easy|medium|hard",
+    "type": "concept|definition|process|example"
+  }
+]`;
+
+    const userPrompt = `Subject: ${metadata.subject} (Class ${metadata.class})
+Board: ${metadata.board || 'CBSE'}
+
+Text to analyze:
+${text.slice(0, 6000)}
+
+Generate educational Q&A pairs as JSON array:`;
 
     console.log('🤖 Calling Groq API...');
 
@@ -105,7 +120,7 @@ Format as JSON array with objects containing: question, answer, difficulty, type
         ],
         model: "llama-3.3-70b-versatile",
         temperature: 0.3,
-        max_tokens: 1000,
+        max_tokens: 2000,
       }),
       signal: controller.signal
     });
@@ -136,20 +151,39 @@ Format as JSON array with objects containing: question, answer, difficulty, type
     }
 
     console.log('✅ AI response received, parsing...');
+    console.log('🔍 Raw AI response:', aiResponse.substring(0, 1000));
 
-    // Simple parsing
+    // Improved parsing logic
     let qaPairs = [];
     try {
-      const cleanResponse = aiResponse
-        .replace(/```json\n?/g, '')
-        .replace(/```\n?/g, '')
+      // More robust cleaning of AI response
+      let cleanResponse = aiResponse
+        .replace(/```json\n?/gi, '')
+        .replace(/```\n?/gi, '')
+        .replace(/^[^[{]*/, '') // Remove any text before JSON starts
+        .replace(/[^}\]]*$/, '') // Remove any text after JSON ends
         .trim();
+      
+      // Try to find JSON array in the response
+      const jsonMatch = cleanResponse.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        cleanResponse = jsonMatch[0];
+      }
+      
+      console.log('🧹 Cleaned response:', cleanResponse.substring(0, 500));
       
       qaPairs = JSON.parse(cleanResponse);
       
       if (!Array.isArray(qaPairs)) {
-        throw new Error('AI response is not an array');
+        console.log('⚠️ Response is not an array, trying to wrap it');
+        if (typeof qaPairs === 'object' && qaPairs.question && qaPairs.answer) {
+          qaPairs = [qaPairs];
+        } else {
+          throw new Error('AI response is not an array or valid object');
+        }
       }
+      
+      console.log(`✅ Successfully parsed ${qaPairs.length} Q&A pairs`);
 
       // Ensure format
       qaPairs = qaPairs

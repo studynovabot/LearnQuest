@@ -1,9 +1,9 @@
 {
-    "checksum": "07d3062d52382d6ee99f1ee0defb1861d74d50a232400055112baf84c342c829",
+    "checksum": "e124bc0906424ed1d89f044e0053fbb1323deecb3d46599e12db4682bf8280be",
     "data": {
     "id": "7994d28e-c44b-450d-874e-0f2d6a2e74b2",
     "createdAt": 1750660020044,
-    "updatedAt": 1750660589743,
+    "updatedAt": 1750660967260,
     "title": "Tutor API Interaction Debugging",
     "messages": [
         {
@@ -982,9 +982,58 @@
                 {
                     "type": "toolCall",
                     "toolCallId": "toolu_01KwuWAWZjLFwd9DmX4Reb1S",
-                    "statusText": "Viewing file",
-                    "status": "IN_PROGRESS",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/lib/queryClient.ts",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\lib\\queryClient.ts"
+                            }
+                        ]
+                    },
                     "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "Now let me check the config file to see what API URL is being used:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01FYpPHqzX9F5GQpkfTwtnTh",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/config.ts",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\config.ts"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "Perfect! Now I understand the issue. The frontend is configured to use `http://localhost:5000/api` for development, which is exactly where our dev server is running. Let me check if there's a frontend development server running and test the full flow.\n\nLet me start the frontend development server:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01Ripikwpt3AXrJ7UJenmeu7",
+                    "status": "IN_PROGRESS",
+                    "isHidden": true,
+                    "localResult": "{\"status\":\"ERROR\",\"exitCode\":124,\"output\":\"\"}"
+                },
+                {
+                    "type": "shellCommand",
+                    "command": "cd client; npm run dev",
+                    "id": "3659571e-fe0b-4ea8-aef7-f20f9d6b8330",
+                    "status": "ERROR",
+                    "toolCallId": "toolu_01Ripikwpt3AXrJ7UJenmeu7",
+                    "commandsRequiringConfirmation": [],
+                    "exitCode": 124,
+                    "output": "",
+                    "outputPath": ".zencoder/Zencoder-0aeb778b-6ad7-4497-89b5-d0857af5f3ea.log"
                 }
             ],
             "context": {
@@ -992,6 +1041,487 @@
                 "operationId": "565b8e66-b61e-4e7d-ae71-b101f990371c"
             },
             "createdAt": 1750660580966,
+            "isInternal": false
+        },
+        {
+            "id": "6b14c83f-52ea-4900-934d-4e67c6436762",
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "i want that if the  ai tutors are properly answering the inputs from cli they should also answer it in the web app"
+                }
+            ],
+            "context": {
+                "codebaseEnabled": true
+            },
+            "createdAt": 1750660766311,
+            "isInternal": false,
+            "rawContent": {
+                "type": "doc",
+                "content": [
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "i want that if the  ai tutors are properly answering the inputs from cli they should also answer it in the web app "
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "8ed5e1ff-5f2a-47c2-b3ea-4db890f00d47",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "I understand the issue now! The CLI tests show that the AI tutors are working perfectly and giving proper responses, but the web app is showing hardcoded fallback messages instead of the actual AI responses.\n\nLet me investigate why the frontend isn't receiving the real AI responses. First, let me check if the frontend development server is running and test the API connection from the web app's perspective."
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_017dVNAeyRAwttJUhDtTgYGz",
+                    "status": "IN_PROGRESS",
+                    "isHidden": true
+                },
+                {
+                    "type": "shellCommand",
+                    "command": "Get-Process | Where-Object {$_.ProcessName -like \"*node*\" -or $_.ProcessName -like \"*npm*\"}",
+                    "id": "b0a6809e-df85-4c33-aefc-83ffb2801d42",
+                    "status": "CONFIRMATION",
+                    "toolCallId": "toolu_017dVNAeyRAwttJUhDtTgYGz",
+                    "commandsRequiringConfirmation": [
+                        {
+                            "name": "get-process",
+                            "arguments": []
+                        },
+                        {
+                            "name": "where-object",
+                            "arguments": [
+                                "-like",
+                                "-or",
+                                "-like"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "751f8c42-11f8-4b08-899c-4a74a1ab9212"
+            },
+            "createdAt": 1750660768698,
+            "isInternal": false
+        },
+        {
+            "id": "e3d12bbc-3f95-41a3-a61c-2331c3ed2f06",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Let me start the frontend development server in a different way:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01KkzGP5vmvQBVe4pjeSz2Eh",
+                    "status": "IN_PROGRESS",
+                    "isHidden": true,
+                    "localResult": "{\"status\":\"SUCCESS\",\"exitCode\":0,\"output\":\"\\u001b[?9001h\\u001b[?1004h\\u001b[?25l\\u001b[2J\\u001b[m\\u001b[H\\r\\n\\r\\n\\u001b[H\\u001b]0;C:\\\\WINDOWS\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\\u0007\\u001b[?25h\"}"
+                },
+                {
+                    "type": "shellCommand",
+                    "command": "cd E:/LearnQuest/LearnQuest/client; Start-Process powershell -ArgumentList \"-Command\", \"npm run dev\" -WindowStyle Minimized",
+                    "id": "f877b9b1-850e-4d83-8c3b-5ae4332f052b",
+                    "status": "SUCCESS",
+                    "toolCallId": "toolu_01KkzGP5vmvQBVe4pjeSz2Eh",
+                    "commandsRequiringConfirmation": [
+                        {
+                            "name": "start-process",
+                            "arguments": [
+                                "powershell",
+                                "-ArgumentList",
+                                "-WindowStyle",
+                                "Minimized"
+                            ]
+                        }
+                    ],
+                    "exitCode": 0,
+                    "output": "\u001b[?9001h\u001b[?1004h\u001b[?25l\u001b[2J\u001b[m\u001b[H\r\n\r\n\u001b[H\u001b]0;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007\u001b[?25h",
+                    "outputPath": ".zencoder/Zencoder-01f80258-0ecb-4d0a-8089-585c766f56a0.log"
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "4ac33e3a-04f6-45a1-8692-ad8b59798809"
+            },
+            "createdAt": 1750660784213,
+            "isInternal": false
+        },
+        {
+            "id": "27fc7cbe-911d-4f7c-a9c2-a0504925914f",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Now let me test the API from the frontend's perspective by making a request to the exact URL the frontend would use:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01KoP4pA4zUcqDDhXoizheh5",
+                    "status": "IN_PROGRESS",
+                    "isHidden": true,
+                    "localResult": "{\"status\":\"SUCCESS\",\"exitCode\":0,\"output\":\"\\u001b[?9001h\\u001b[?1004h\\u001b[?25l\\u001b[2J\\u001b[m\\u001b[H\\r\\n\\r\\n\\u001b[H\\u001b]0;C:\\\\WINDOWS\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\\u0007\\u001b[?25h\\u001b[38;5;9mInvoke-RestMethod : Unable to connect to the remote server\\r\\nAt line:1 char:193\\r\\n+ ... $response = Invoke-RestMethod -Uri \\\"http://localhost:5000/api/chat\\\" - ...\\u001b[m\\r\\n\\u001b[38;5;9m+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\u001b[m\\r\\n\\u001b[38;5;9m    + CategoryInfo          : NotSpecified: (:) [Invoke-RestMethod], WebException\\u001b[m\\r\\n\\u001b[38;5;9m    + FullyQualifiedErrorId : System.Net.WebException,Microsoft.PowerShell.Commands.InvokeRestMethodCommand\\u001b[m\\r\\n\\u001b[38;5;9m\\u001b[1C\\u001b[m\\r\\nFrontend API Test Response:\\r\\n\"}"
+                },
+                {
+                    "type": "shellCommand",
+                    "command": "$headers = @{'Content-Type' = 'application/json'; 'Accept' = 'application/json'; 'X-User-ID' = 'guest'}; $body = '{\"content\": \"what is light\", \"agentId\": \"1\", \"userId\": \"guest\"}'; $response = Invoke-RestMethod -Uri \"http://localhost:5000/api/chat\" -Method POST -Body $body -Headers $headers; Write-Host \"Frontend API Test Response:\"; $response | ConvertTo-Json -Depth 5",
+                    "id": "a7f46f38-8359-43fc-a97a-1bc14853c44c",
+                    "status": "SUCCESS",
+                    "toolCallId": "toolu_01KoP4pA4zUcqDDhXoizheh5",
+                    "commandsRequiringConfirmation": [
+                        {
+                            "name": "'accept'",
+                            "arguments": [
+                                "="
+                            ]
+                        },
+                        {
+                            "name": "'x-user-id'",
+                            "arguments": [
+                                "="
+                            ]
+                        },
+                        {
+                            "name": "convertto-json",
+                            "arguments": [
+                                "-Depth"
+                            ]
+                        }
+                    ],
+                    "exitCode": 0,
+                    "output": "\u001b[?9001h\u001b[?1004h\u001b[?25l\u001b[2J\u001b[m\u001b[H\r\n\r\n\u001b[H\u001b]0;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007\u001b[?25h\u001b[38;5;9mInvoke-RestMethod : Unable to connect to the remote server\r\nAt line:1 char:193\r\n+ ... $response = Invoke-RestMethod -Uri \"http://localhost:5000/api/chat\" - ...\u001b[m\r\n\u001b[38;5;9m+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\u001b[m\r\n\u001b[38;5;9m    + CategoryInfo          : NotSpecified: (:) [Invoke-RestMethod], WebException\u001b[m\r\n\u001b[38;5;9m    + FullyQualifiedErrorId : System.Net.WebException,Microsoft.PowerShell.Commands.InvokeRestMethodCommand\u001b[m\r\n\u001b[38;5;9m\u001b[1C\u001b[m\r\nFrontend API Test Response:\r\n",
+                    "outputPath": ".zencoder/Zencoder-14e56bc2-e076-4771-829c-7a1c614b8ff8.log"
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "21c99270-6b94-4601-82f0-d69a814a41cb"
+            },
+            "createdAt": 1750660833081,
+            "isInternal": false
+        },
+        {
+            "id": "fa0cc5a9-70a0-4d8b-90aa-2113e865cf58",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "It seems the dev server might have stopped. Let me check if it's still running and restart it:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01XDgvfCWP6ZFXmqJ2vTQZm5",
+                    "status": "IN_PROGRESS",
+                    "isHidden": true,
+                    "localResult": "{\"status\":\"SUCCESS\",\"exitCode\":0,\"output\":\"\\u001b[?9001h\\u001b[?1004h\\u001b[?25l\\u001b[2J\\u001b[m\\u001b[H\\r\\n\\r\\n\\u001b[H\\u001b]0;C:\\\\WINDOWS\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\\u0007\\u001b[?25h  UDP    0.0.0.0:50001          *:*                                    4516\\r\\n\"}"
+                },
+                {
+                    "type": "shellCommand",
+                    "command": "netstat -ano | findstr :5000",
+                    "id": "eda76272-9f7a-48d6-accf-b8662c3c56f0",
+                    "status": "SUCCESS",
+                    "toolCallId": "toolu_01XDgvfCWP6ZFXmqJ2vTQZm5",
+                    "commandsRequiringConfirmation": [
+                        {
+                            "name": "findstr",
+                            "arguments": [
+                                ":5000"
+                            ]
+                        }
+                    ],
+                    "exitCode": 0,
+                    "output": "\u001b[?9001h\u001b[?1004h\u001b[?25l\u001b[2J\u001b[m\u001b[H\r\n\r\n\u001b[H\u001b]0;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007\u001b[?25h  UDP    0.0.0.0:50001          *:*                                    4516\r\n",
+                    "outputPath": ".zencoder/Zencoder-4f006f90-07ec-409d-a480-3065cfcdc51d.log"
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "245e7bfc-a473-4f3c-94ec-04cad2afd0e2"
+            },
+            "createdAt": 1750660867987,
+            "isInternal": false
+        },
+        {
+            "id": "2113ce77-57cc-4fb3-9eb1-ed56a0de0f75",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "The dev server isn't running on port 5000. Let me restart it:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01ELeiKZmPThwFg9iFkHmA33",
+                    "status": "IN_PROGRESS",
+                    "isHidden": true,
+                    "localResult": "{\"status\":\"IN_PROGRESS\",\"exitCode\":null,\"output\":null}"
+                },
+                {
+                    "type": "shellCommand",
+                    "command": "node E:/LearnQuest/LearnQuest/dev-server.js",
+                    "id": "abcdcb24-7350-4b85-9203-8e0520e69a60",
+                    "status": "IN_PROGRESS",
+                    "toolCallId": "toolu_01ELeiKZmPThwFg9iFkHmA33",
+                    "commandsRequiringConfirmation": [],
+                    "terminalName": "Zencoder-4a80e436-f443-4c87-8f0a-300b04f38bfa"
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "9d40dd70-1713-4a52-a1cc-d4badeb61f66"
+            },
+            "createdAt": 1750660886345,
+            "isInternal": false
+        },
+        {
+            "id": "c0298da8-0d7c-4144-826c-2ddad31c5456",
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "de E:/LearnQuest/LearnQuest/dev-server.js\""
+                },
+                {
+                    "type": "text",
+                    "text": "Console output is saving to: E:\\LearnQuest\\LearnQuest\\.zencoder\\Zencoder-4a80e436-f443-4c87-8f0a-300b04f38bfa.log"
+                },
+                {
+                    "type": "text",
+                    "text": "🚀 Development server running on http://localhost:5000"
+                },
+                {
+                    "type": "text",
+                    "text": "📡 API endpoints available at http://localhost:5000/api/*"
+                },
+                {
+                    "type": "text",
+                    "text": "🔧 CORS enabled for frontend development"
+                },
+                {
+                    "type": "text",
+                    "text": "🔑 Environment variables loaded: GROQ_API_KEY=Set"
+                }
+            ],
+            "context": {
+                "codebaseEnabled": true
+            },
+            "createdAt": 1750660902553,
+            "isInternal": false,
+            "rawContent": {
+                "type": "doc",
+                "content": [
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "de E:/LearnQuest/LearnQuest/dev-server.js\""
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Console output is saving to: E:\\LearnQuest\\LearnQuest\\.zencoder\\Zencoder-4a80e436-f443-4c87-8f0a-300b04f38bfa.log"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "🚀 Development server running on http://localhost:5000"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "📡 API endpoints available at http://localhost:5000/api/*"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "🔧 CORS enabled for frontend development"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "🔑 Environment variables loaded: GROQ_API_KEY=Set"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "paragraph"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "b6a6ca45-38a0-464b-b9a5-10ec458983ea",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Great! The dev server is running again. Now let me test the API to confirm it's working:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01LV8JtyJRBhSvzDv8F4EcdT",
+                    "status": "IN_PROGRESS",
+                    "isHidden": true,
+                    "localResult": "{\"status\":\"SUCCESS\",\"exitCode\":0,\"output\":\"\\u001b[?9001h\\u001b[?1004h\\u001b[?25l\\u001b[2J\\u001b[m\\u001b[H\\r\\n\\r\\n\\u001b[H\\u001b]0;C:\\\\WINDOWS\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\\u0007\\u001b[?25hAPI Response Message:\\r\\nLight 🌟 is a form of electromagnetic radiation that travels through space, visible to the human eye as different colors, with wavelengths between 400-700 nanometers.\\r\\n\"}"
+                },
+                {
+                    "type": "shellCommand",
+                    "command": "$headers = @{'Content-Type' = 'application/json'; 'Accept' = 'application/json'; 'X-User-ID' = 'guest'}; $body = '{\"content\": \"what is light\", \"agentId\": \"1\", \"userId\": \"guest\"}'; $response = Invoke-RestMethod -Uri \"http://localhost:5000/api/chat\" -Method POST -Body $body -Headers $headers; Write-Host \"API Response Message:\"; $response.data.message",
+                    "id": "27ed1f2e-7c8e-407f-8b85-e1ca31ea12e1",
+                    "status": "SUCCESS",
+                    "toolCallId": "toolu_01LV8JtyJRBhSvzDv8F4EcdT",
+                    "commandsRequiringConfirmation": [
+                        {
+                            "name": "'x-user-id'",
+                            "arguments": [
+                                "="
+                            ]
+                        },
+                        {
+                            "name": "$response.data.message",
+                            "arguments": []
+                        }
+                    ],
+                    "exitCode": 0,
+                    "output": "\u001b[?9001h\u001b[?1004h\u001b[?25l\u001b[2J\u001b[m\u001b[H\r\n\r\n\u001b[H\u001b]0;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007\u001b[?25hAPI Response Message:\r\nLight 🌟 is a form of electromagnetic radiation that travels through space, visible to the human eye as different colors, with wavelengths between 400-700 nanometers.\r\n",
+                    "outputPath": ".zencoder/Zencoder-b8465206-d1f9-428f-bea1-3b58d1b0c57d.log"
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "abf59abd-d041-4696-9b6d-68e4040ef943"
+            },
+            "createdAt": 1750660905036,
+            "isInternal": false
+        },
+        {
+            "id": "fe78b753-e088-481e-9167-abd016187324",
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Perfect! The API is working correctly and returning proper AI responses. Now let me check what might be causing the issue in the web app. The problem is likely in how the frontend is handling the API response.\n\nLet me examine the useChat hook more carefully to see how it processes the API response. Let me search for the actual chat handling code:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_016wz83WhNyYP6UVTgvCWaaa",
+                    "title": "Fulltext search",
+                    "statusText": "Done",
+                    "status": "SUCCESS",
+                    "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "Let me check if there are any other chat-related files:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01Lute6jBqFRmWgZYZGmsWRE",
+                    "title": "File search",
+                    "statusText": "Done",
+                    "status": "SUCCESS",
+                    "isHidden": false
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01NnWCKCVsoP5eYLWwZ97Mth",
+                    "statusText": "Viewed file",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/hooks/useAiChat.ts",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\hooks\\useAiChat.ts"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "This is a different AI chat hook. Let me look for the main chat component that's being used in the web app:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01URpqKMVj9y6WdbgbQ7oM8R",
+                    "title": "File search",
+                    "statusText": "Done",
+                    "status": "SUCCESS",
+                    "isHidden": false
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01XSJvNXG11PZLFGbcRcAGuR",
+                    "statusText": "Viewed file (lines 1:400)",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/ChatAgents.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\ChatAgents.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                },
+                {
+                    "type": "text",
+                    "text": "Now I can see the issue! The ChatAgents component is using the `useChat` hook, and I need to see how the messages are being displayed. Let me look at the chat message rendering part:"
+                },
+                {
+                    "type": "toolCall",
+                    "toolCallId": "toolu_01WxXquDNwronuZLRk2UU9cp",
+                    "statusText": "Viewed file (lines 350:456)",
+                    "status": "SUCCESS",
+                    "context": {
+                        "files": [
+                            {
+                                "path": "client/src/pages/ChatAgents.tsx",
+                                "fsPath": "E:\\LearnQuest\\LearnQuest\\client\\src\\pages\\ChatAgents.tsx"
+                            }
+                        ]
+                    },
+                    "isHidden": false
+                }
+            ],
+            "context": {
+                "author": "Coding Agent",
+                "operationId": "b5d1d337-ce16-4599-9288-db1fd97be14f"
+            },
+            "createdAt": 1750660934572,
             "isInternal": false
         }
     ],
