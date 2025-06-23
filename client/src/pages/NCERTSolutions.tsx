@@ -136,23 +136,59 @@ interface PaginationData {
   pages: number;
 }
 
+// New interface for chapter-based navigation
+interface ChapterSummary {
+  id: string;
+  board: string;
+  class: string;
+  subject: string;
+  chapter: string;
+  totalQuestions: number;
+  difficulty: 'easy' | 'medium' | 'hard';
+  questionsBreakdown: {
+    easy: number;
+    medium: number;
+    hard: number;
+  };
+  lastUpdated: string;
+  isAvailable: boolean;
+}
+
+interface QuestionDetail {
+  id: string;
+  questionNumber?: number;
+  question: string;
+  answer: string;
+  type: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  chapter: string;
+  board: string;
+  class: string;
+  subject: string;
+}
+
 const NCERTSolutions: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   
-  // State for solutions data
-  const [solutions, setSolutions] = useState<NCERTSolution[]>([]);
-  const [processedSolutions, setProcessedSolutions] = useState<ProcessedSolution[]>([]);
-  const [selectedProcessedSolution, setSelectedProcessedSolution] = useState<ProcessedSolution | null>(null);
+  // New state structure for funnel approach
+  const [viewMode, setViewMode] = useState<'chapters' | 'questions'>('chapters');
+  const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
+  
+  // State for chapter summaries and questions
+  const [chapterSummaries, setChapterSummaries] = useState<ChapterSummary[]>([]);
+  const [chapterQuestions, setChapterQuestions] = useState<QuestionDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Mock user data - in production get from auth
+  // User data
   const [userData] = useState({
     id: user?.id || 'user123',
     tier: (user?.subscriptionPlan || 'free') as 'free' | 'pro' | 'goat',
     name: user?.displayName || 'User'
   });
+  
+  // Pagination
   const [pagination, setPagination] = useState<PaginationData>({
     total: 0,
     page: 1,
@@ -160,46 +196,37 @@ const NCERTSolutions: React.FC = () => {
     pages: 0
   });
   
-  // State for filters
+  // Filters
   const [search, setSearch] = useState('');
-  const [boardFilter, setBoardFilter] = useState('');
-  const [classFilter, setClassFilter] = useState('');
-  const [subjectFilter, setSubjectFilter] = useState('');
+  const [boardFilter, setBoardFilter] = useState('cbse');
+  const [classFilter, setClassFilter] = useState('10');
+  const [subjectFilter, setSubjectFilter] = useState('science');
   const [difficultyFilter, setDifficultyFilter] = useState('');
-  const [sortBy, setSortBy] = useState('chapterNumber');
-  const [sortOrder, setSortOrder] = useState('asc');
   
-  // State for solution management
-  const [selectedSolution, setSelectedSolution] = useState<NCERTSolution | null>(null);
+  // Solution management
+  const [selectedQuestion, setSelectedQuestion] = useState<QuestionDetail | null>(null);
   const [isSolutionDialogOpen, setIsSolutionDialogOpen] = useState(false);
   const [isActionLoading, setIsActionLoading] = useState(false);
+  const [contentLoading, setContentLoading] = useState(false);
+  const [solutionContent, setSolutionContent] = useState<SolutionContent[]>([]);
 
-  // State for AI help
+  // AI help
   const [isAIHelpOpen, setIsAIHelpOpen] = useState(false);
   const [aiQuery, setAiQuery] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   
-  // State for solution content
-  const [solutionContent, setSolutionContent] = useState<SolutionContent[]>([]);
-  const [contentLoading, setContentLoading] = useState(false);
-  
-  // Fetch solutions data with real API call
-  const fetchSolutions = async () => {
+  // Fetch chapter summaries from API
+  const fetchChapterSummaries = async () => {
     setLoading(true);
     setError(null);
     
     try {
       const params = new URLSearchParams({
-        page: pagination.page.toString(),
-        limit: pagination.limit.toString(),
-        sortBy,
-        sortOrder,
-        ...(search && { search }),
-        ...(boardFilter && boardFilter !== 'all' && { board: boardFilter }),
-        ...(classFilter && classFilter !== 'all' && { class: classFilter }),
-        ...(subjectFilter && subjectFilter !== 'all' && { subject: subjectFilter }),
-        ...(difficultyFilter && difficultyFilter !== 'all' && { difficulty: difficultyFilter }),
+        ...(boardFilter && { board: boardFilter }),
+        ...(classFilter && { class: classFilter }),
+        ...(subjectFilter && { subject: subjectFilter }),
+        limit: '100' // Get all to group by chapters
       });
 
       const response = await fetch(`${config.apiUrl}/ncert-solutions?${params}`, {
@@ -210,40 +237,170 @@ const NCERTSolutions: React.FC = () => {
       });
 
       if (!response.ok) {
-        // Try to get error message from response body if it's JSON
-        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-        try {
-          const contentType = response.headers.get('content-type');
-          if (contentType && contentType.includes('application/json')) {
-            const errorData = await response.json();
-            errorMessage = errorData.message || errorData.error || errorMessage;
-          }
-        } catch (parseError) {
-          // If we can't parse the error as JSON, keep the original message
-          console.warn('Could not parse error response as JSON:', parseError);
-        }
-        throw new Error(errorMessage);
-      }
-
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Server returned invalid response format. Expected JSON but received: ' + (contentType || 'unknown'));
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      setSolutions(data.solutions || []);
+      const questions = data.solutions || [];
+      
+      // Group questions by chapter to create chapter summaries
+      const chapterMap = new Map<string, ChapterSummary>();
+      
+      questions.forEach((q: any) => {
+        const chapterKey = `${q.board}_${q.class}_${q.subject}_${q.chapter}`;
+        
+        if (!chapterMap.has(chapterKey)) {
+          chapterMap.set(chapterKey, {
+            id: chapterKey,
+            board: q.board || 'CBSE',
+            class: q.class || '10',
+            subject: q.subject || 'Science',
+            chapter: q.chapter || 'Unknown Chapter',
+            totalQuestions: 0,
+            difficulty: 'medium',
+            questionsBreakdown: { easy: 0, medium: 0, hard: 0 },
+            lastUpdated: q.createdAt || new Date().toISOString(),
+            isAvailable: true
+          });
+        }
+        
+        const chapter = chapterMap.get(chapterKey)!;
+        chapter.totalQuestions++;
+        
+        // Count difficulty breakdown
+        const difficulty = q.difficulty || 'medium';
+        if (difficulty in chapter.questionsBreakdown) {
+          chapter.questionsBreakdown[difficulty as keyof typeof chapter.questionsBreakdown]++;
+        }
+      });
+      
+      const summaries = Array.from(chapterMap.values());
+      setChapterSummaries(summaries);
       setPagination(prev => ({
         ...prev,
-        total: data.total || 0,
-        pages: data.pages || 0
+        total: summaries.length,
+        pages: Math.ceil(summaries.length / prev.limit)
       }));
       
     } catch (err) {
-      console.error('Error fetching solutions:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch solutions');
-      setSolutions([]);
+      console.error('Error fetching chapter summaries:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch chapters');
+      setChapterSummaries([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch questions for a specific chapter
+  const fetchChapterQuestions = async (chapter: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const params = new URLSearchParams({
+        board: boardFilter,
+        class: classFilter,
+        subject: subjectFilter,
+        limit: '100'
+      });
+
+      const response = await fetch(`${config.apiUrl}/ncert-solutions?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const allQuestions = data.solutions || [];
+      
+      // Filter questions for the selected chapter
+      const chapterQuestions = allQuestions
+        .filter((q: any) => q.chapter === chapter)
+        .map((q: any) => ({
+          id: q.id,
+          questionNumber: q.questionNumber,
+          question: q.question,
+          answer: q.answer,
+          type: q.type || 'concept',
+          difficulty: q.difficulty || 'medium',
+          chapter: q.chapter,
+          board: q.board,
+          class: q.class,
+          subject: q.subject
+        }));
+      
+      setChapterQuestions(chapterQuestions);
+      
+    } catch (err) {
+      console.error('Error fetching chapter questions:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch questions');
+      setChapterQuestions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Navigation handlers
+  const handleChapterClick = (chapterName: string) => {
+    setSelectedChapter(chapterName);
+    setViewMode('questions');
+    fetchChapterQuestions(chapterName);
+  };
+
+  const handleBackToChapters = () => {
+    setViewMode('chapters');
+    setSelectedChapter(null);
+    setChapterQuestions([]);
+  };
+
+  // Action handlers
+  const handleViewSolution = (question: QuestionDetail) => {
+    setSelectedQuestion(question);
+    setIsSolutionDialogOpen(true);
+  };
+
+  const handleAIHelp = async (question: QuestionDetail) => {
+    if (userData.tier === 'free') {
+      toast({
+        title: "Premium Feature",
+        description: "AI Help is available for Pro and Goat tier users only.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSelectedQuestion(question);
+    setAiQuery(`Help me understand this question: ${question.question}`);
+    setIsAIHelpOpen(true);
+    setAiLoading(true);
+
+    // Call AI help API
+    try {
+      const response = await fetch(`${config.apiUrl}/ai-help`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: question.question,
+          context: question.answer,
+          subject: question.subject,
+          class: question.class
+        }),
+      });
+
+      const data = await response.json();
+      setAiResponse(data.response || 'AI help is not available at the moment.');
+    } catch (error) {
+      setAiResponse('Failed to get AI help. Please try again.');
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -253,41 +410,22 @@ const NCERTSolutions: React.FC = () => {
     return userPlan === 'pro' || userPlan === 'goat';
   };
 
-  // Get AI help for solution
-  const handleAIHelp = async (solution: NCERTSolution) => {
-    if (!canAccessAIHelp()) {
-      toast({
-        title: "Upgrade Required",
-        description: "AI Help is available for PRO and GOAT users only. Please upgrade your plan.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setSelectedSolution(solution);
-    setIsAIHelpOpen(true);
-  };
-
+  // Get AI assistance function
   const getAIAssistance = async () => {
-    if (!aiQuery.trim() || !selectedSolution) return;
+    if (!aiQuery.trim() || !selectedQuestion) return;
 
     setAiLoading(true);
     
     try {
-      const response = await fetch(`${config.apiUrl}/ai-services?service=help`, {
+      const response = await fetch(`${config.apiUrl}/chat`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: aiQuery,
-          context: {
-            board: selectedSolution.board,
-            class: selectedSolution.class,
-            subject: selectedSolution.subject,
-            chapter: selectedSolution.chapter,
-            exercise: selectedSolution.exercise
-          }
+          message: `Help me understand this NCERT question: ${aiQuery}\n\nContext: ${selectedQuestion.question}\nAnswer: ${selectedQuestion.answer}`,
+          type: 'help'
         }),
       });
 
@@ -296,19 +434,18 @@ const NCERTSolutions: React.FC = () => {
       }
 
       const data = await response.json();
-      setAiResponse(data.response);
+      setAiResponse(data.response || data.message || 'AI help is not available at the moment.');
 
     } catch (err) {
       console.error('Error getting AI help:', err);
-      toast({
-        title: "Error",
-        description: "Failed to get AI assistance",
-        variant: "destructive",
-      });
+      setAiResponse('Failed to get AI help. Please try again.');
     } finally {
       setAiLoading(false);
     }
   };
+
+
+
 
   // Load solution content
   const loadSolutionContent = async (solution: NCERTSolution) => {
@@ -452,21 +589,29 @@ const NCERTSolutions: React.FC = () => {
   // Initial data fetch
   useEffect(() => {
     if (hasAccess()) {
-      fetchSolutions();
+      fetchChapterSummaries();
     }
   }, []);
   
-  // Fetch when filters or pagination changes
+  // Fetch when filters change
   useEffect(() => {
-    if (!loading) {
-      fetchSolutions();
+    if (!loading && hasAccess()) {
+      if (viewMode === 'chapters') {
+        fetchChapterSummaries();
+      } else if (viewMode === 'questions' && selectedChapter) {
+        fetchChapterQuestions(selectedChapter);
+      }
     }
-  }, [pagination.page, sortBy, sortOrder, boardFilter, classFilter, subjectFilter, difficultyFilter]);
+  }, [boardFilter, classFilter, subjectFilter, difficultyFilter, viewMode]);
   
   // Handle search
   const handleSearch = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
-    fetchSolutions();
+    if (viewMode === 'chapters') {
+      fetchChapterSummaries();
+    } else if (selectedChapter) {
+      fetchChapterQuestions(selectedChapter);
+    }
   };
   
   // Handle page change
@@ -535,12 +680,7 @@ const NCERTSolutions: React.FC = () => {
     );
   };
   
-  // Handle solution view
-  const handleViewSolution = async (solution: NCERTSolution) => {
-    setSelectedSolution(solution);
-    setIsSolutionDialogOpen(true);
-    await loadSolutionContent(solution);
-  };
+
   
   // Render pagination controls
   const renderPagination = () => {
@@ -615,7 +755,11 @@ const NCERTSolutions: React.FC = () => {
           <div className="flex gap-2">
             <Button 
               onClick={() => {
-                fetchSolutions();
+                if (viewMode === 'chapters') {
+                  fetchChapterSummaries();
+                } else if (selectedChapter) {
+                  fetchChapterQuestions(selectedChapter);
+                }
               }}
               variant="outline"
             >
@@ -710,108 +854,227 @@ const NCERTSolutions: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Solutions Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Available Solutions</CardTitle>
-              <CardDescription>
-                {loading ? 'Loading...' : `${pagination.total} solutions found`}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin" />
-                </div>
-              ) : error ? (
-                <div className="text-center py-8">
-                  <p className="text-red-500">{error}</p>
-                  <Button onClick={fetchSolutions} className="mt-2">
-                    Try Again
+          {/* Navigation Breadcrumb */}
+          {viewMode === 'questions' && selectedChapter && (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center space-x-2 text-sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleBackToChapters}
+                    className="p-0 h-auto font-normal text-blue-600 hover:text-blue-800"
+                  >
+                    All Chapters
                   </Button>
+                  <span className="text-muted-foreground">/</span>
+                  <span className="font-medium">{selectedChapter}</span>
                 </div>
-              ) : solutions.length === 0 ? (
-                <div className="text-center py-8">
-                  <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-medium mb-2">No Solutions Found</h3>
-                  <p className="text-muted-foreground">
-                    Try adjusting your search criteria or check back later
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Chapter</TableHead>
-                        <TableHead>Class</TableHead>
-                        <TableHead>Subject</TableHead>
-                        <TableHead>Board</TableHead>
-                        <TableHead>Questions</TableHead>
-                        <TableHead>Difficulty</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {solutions.map((solution) => (
-                        <TableRow key={solution.id}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{solution.chapter}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {solution.exercise}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Chapter View */}
+          {viewMode === 'chapters' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Available Chapters</CardTitle>
+                <CardDescription>
+                  {loading ? 'Loading...' : `${chapterSummaries.length} chapters found`}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  </div>
+                ) : error ? (
+                  <div className="text-center py-8">
+                    <p className="text-red-500">{error}</p>
+                    <Button onClick={fetchChapterSummaries} className="mt-2">
+                      Try Again
+                    </Button>
+                  </div>
+                ) : chapterSummaries.length === 0 ? (
+                  <div className="text-center py-8">
+                    <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-lg font-medium mb-2">No Chapters Found</h3>
+                    <p className="text-muted-foreground">
+                      Try adjusting your search criteria or check back later
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {chapterSummaries.map((chapter) => (
+                      <Card 
+                        key={chapter.id} 
+                        className="cursor-pointer hover:shadow-md transition-shadow"
+                        onClick={() => handleChapterClick(chapter.chapter)}
+                      >
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg">{chapter.chapter}</CardTitle>
+                          <CardDescription>
+                            Class {chapter.class} • {chapter.subject} • {chapter.board}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-muted-foreground">Total Questions</span>
+                              <Badge variant="outline">{chapter.totalQuestions}</Badge>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <div className="text-sm text-muted-foreground">Difficulty Breakdown:</div>
+                              <div className="flex gap-2">
+                                {chapter.questionsBreakdown.easy > 0 && (
+                                  <Badge className="bg-green-600 text-xs">
+                                    Easy: {chapter.questionsBreakdown.easy}
+                                  </Badge>
+                                )}
+                                {chapter.questionsBreakdown.medium > 0 && (
+                                  <Badge className="bg-yellow-600 text-xs">
+                                    Medium: {chapter.questionsBreakdown.medium}
+                                  </Badge>
+                                )}
+                                {chapter.questionsBreakdown.hard > 0 && (
+                                  <Badge className="bg-red-600 text-xs">
+                                    Hard: {chapter.questionsBreakdown.hard}
+                                  </Badge>
+                                )}
                               </div>
                             </div>
-                          </TableCell>
-                          <TableCell>Class {solution.class}</TableCell>
-                          <TableCell>{solution.subject}</TableCell>
-                          <TableCell>{solution.board}</TableCell>
-                          <TableCell>{solution.totalQuestions}</TableCell>
-                          <TableCell>{getDifficultyBadge(solution.difficulty)}</TableCell>
-                          <TableCell>{getAvailabilityBadge(solution.isAvailable)}</TableCell>
-                          <TableCell>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem 
-                                  onClick={() => handleViewSolution(solution)}
-                                  disabled={!solution.isAvailable}
-                                >
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  View Solutions
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => handleAIHelp(solution)}
-                                  disabled={!solution.aiHelpEnabled || !canAccessAIHelp()}
-                                >
-                                  <Brain className="mr-2 h-4 w-4" />
-                                  Get AI Help {!canAccessAIHelp() && '(PRO/GOAT)'}
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                            
+                            <div className="pt-2 border-t">
+                              <Button 
+                                className="w-full" 
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleChapterClick(chapter.chapter);
+                                }}
+                              >
+                                <BookOpen className="h-4 w-4 mr-2" />
+                                View Questions ({chapter.totalQuestions})
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-                  {/* Pagination */}
-                  {!loading && !error && pagination.pages > 1 && (
-                    <div className="flex justify-center mt-6">
-                      {renderPagination()}
-                    </div>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {/* Questions View */}
+          {viewMode === 'questions' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Questions in {selectedChapter}</CardTitle>
+                <CardDescription>
+                  {loading ? 'Loading...' : `${chapterQuestions.length} questions found`}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  </div>
+                ) : error ? (
+                  <div className="text-center py-8">
+                    <p className="text-red-500">{error}</p>
+                    <Button onClick={() => selectedChapter && fetchChapterQuestions(selectedChapter)} className="mt-2">
+                      Try Again
+                    </Button>
+                  </div>
+                ) : chapterQuestions.length === 0 ? (
+                  <div className="text-center py-8">
+                    <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-lg font-medium mb-2">No Questions Found</h3>
+                    <p className="text-muted-foreground">
+                      No questions available for this chapter yet
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-16">Q. No</TableHead>
+                          <TableHead>Question</TableHead>
+                          <TableHead className="w-24">Type</TableHead>
+                          <TableHead className="w-24">Difficulty</TableHead>
+                          <TableHead className="w-32">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {chapterQuestions.map((question, index) => (
+                          <TableRow key={question.id}>
+                            <TableCell className="font-mono text-sm">
+                              {question.questionNumber || index + 1}
+                            </TableCell>
+                            <TableCell>
+                              <div className="max-w-md">
+                                <p className="text-sm leading-relaxed">
+                                  {question.question.length > 150 
+                                    ? `${question.question.substring(0, 150)}...` 
+                                    : question.question
+                                  }
+                                </p>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="text-xs">
+                                {question.type || 'concept'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {getDifficultyBadge(question.difficulty)}
+                            </TableCell>
+                            <TableCell>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem 
+                                    onClick={() => handleViewSolution(question)}
+                                  >
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    View Solution
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => handleAIHelp(question)}
+                                    disabled={!canAccessAIHelp()}
+                                  >
+                                    <Brain className="mr-2 h-4 w-4" />
+                                    Get AI Help {!canAccessAIHelp() && '(PRO/GOAT)'}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+
+                    {/* Pagination */}
+                    {!loading && !error && pagination.pages > 1 && (
+                      <div className="flex justify-center mt-6">
+                        {renderPagination()}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 
@@ -821,83 +1084,77 @@ const NCERTSolutions: React.FC = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              {selectedSolution?.chapter} - {selectedSolution?.exercise}
+              {selectedQuestion?.chapter} - Question {selectedQuestion?.questionNumber || ''}
             </DialogTitle>
             <DialogDescription>
-              Class {selectedSolution?.class} • {selectedSolution?.subject} • {selectedSolution?.board}
+              Class {selectedQuestion?.class} • {selectedQuestion?.subject} • {selectedQuestion?.board}
             </DialogDescription>
           </DialogHeader>
           
-          {selectedSolution && (
+          {selectedQuestion && (
             <div className="space-y-6">
               <div className="bg-muted/50 rounded-lg p-4 border border-border">
-                <h3 className="font-medium mb-2">Exercise Information:</h3>
+                <h3 className="font-medium mb-2">Question Information:</h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-medium">Total Questions:</span> {selectedSolution.totalQuestions}
+                    <span className="font-medium">Question Type:</span> <Badge variant="outline">{selectedQuestion.type}</Badge>
                   </div>
                   <div>
-                    <span className="font-medium">Difficulty:</span> {getDifficultyBadge(selectedSolution.difficulty)}
+                    <span className="font-medium">Difficulty:</span> {getDifficultyBadge(selectedQuestion.difficulty)}
                   </div>
                   <div>
-                    <span className="font-medium">Views:</span> {selectedSolution.viewCount}
+                    <span className="font-medium">Chapter:</span> {selectedQuestion.chapter}
                   </div>
                   <div>
-                    <span className="font-medium">Last Updated:</span> {formatDate(selectedSolution.lastUpdated)}
+                    <span className="font-medium">Subject:</span> {selectedQuestion.subject}
                   </div>
                 </div>
               </div>
               
-              {contentLoading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin" />
+              <div className="space-y-4">
+                <div className="p-4 border rounded-lg bg-blue-50 dark:bg-blue-950/20">
+                  <h3 className="font-medium mb-2 flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4 text-blue-600" />
+                    Question
+                  </h3>
+                  <p className="text-sm leading-relaxed">{selectedQuestion.question}</p>
                 </div>
-              ) : solutionContent.length > 0 ? (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Solutions</h3>
-                  {solutionContent.map((content) => (
-                    <div key={content.id} className="p-4 border rounded-lg">
-                      <h4 className="font-medium mb-2">Question {content.questionNumber}</h4>
-                      <p className="text-sm text-muted-foreground mb-3">{content.question}</p>
-                      <div className="text-sm">
-                        <p className="mb-2">{content.solution}</p>
-                        {content.steps && content.steps.length > 0 && (
-                          <div className="mt-3">
-                            <p className="font-medium text-xs text-muted-foreground mb-1">Steps:</p>
-                            <ol className="list-decimal list-inside space-y-1 text-xs">
-                              {content.steps.map((step, index) => (
-                                <li key={index}>{step}</li>
-                              ))}
-                            </ol>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-medium mb-2">Solution Content</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Detailed step-by-step solutions for all {selectedSolution.totalQuestions} questions
-                  </p>
-                  <div className="flex gap-2 justify-center">
-                    <Button>
-                      <Download className="w-4 h-4 mr-2" />
-                      Download PDF
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => handleAIHelp(selectedSolution)}
-                      disabled={!selectedSolution.aiHelpEnabled || !canAccessAIHelp()}
-                    >
-                      <Brain className="w-4 h-4 mr-2" />
-                      Get AI Help {!canAccessAIHelp() && '(PRO/GOAT)'}
-                    </Button>
+                
+                <div className="p-4 border rounded-lg bg-green-50 dark:bg-green-950/20">
+                  <h3 className="font-medium mb-2 flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    Solution
+                  </h3>
+                  <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {selectedQuestion.answer}
                   </div>
                 </div>
-              )}
+                
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button 
+                    onClick={() => handleAIHelp(selectedQuestion)}
+                    disabled={!canAccessAIHelp()}
+                    className="flex-1"
+                    variant="outline"
+                  >
+                    <Brain className="h-4 w-4 mr-2" />
+                    Get AI Help {!canAccessAIHelp() && '(PRO/GOAT)'}
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(`Q: ${selectedQuestion.question}\n\nA: ${selectedQuestion.answer}`);
+                      toast({
+                        title: "Copied!",
+                        description: "Question and answer copied to clipboard",
+                      });
+                    }}
+                    variant="outline"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Copy Q&A
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
           
@@ -918,7 +1175,7 @@ const NCERTSolutions: React.FC = () => {
               AI Study Assistant
             </DialogTitle>
             <DialogDescription>
-              Get help with {selectedSolution?.chapter} - {selectedSolution?.exercise}
+              Get help with {selectedQuestion?.chapter} question
             </DialogDescription>
           </DialogHeader>
           
