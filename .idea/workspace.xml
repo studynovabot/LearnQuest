@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
+      <change afterPath="$PROJECT_DIR$/test-api-fix.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/tutors.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/tutors.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/user-management.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/user-management.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,6 +127,8 @@
       <workItem from="1750419231303" duration="1660000" />
       <workItem from="1750420933553" duration="331000" />
       <workItem from="1750421304478" duration="62000" />
+      <workItem from="1750651384914" duration="228000" />
+      <workItem from="1750651696567" duration="356000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -712,15 +717,16 @@
       <map>
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750420873561" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750420873561" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750651713716" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750651713716" />
         <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749626800561" />
-        <entry key="$PROJECT_DIR$/api/ai/explain.js" value="1750420732387" />
+        <entry key="$PROJECT_DIR$/api/ai/explain.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
-        <entry key="$PROJECT_DIR$/api/ncert-solutions-real.js" value="1750417927058" />
+        <entry key="$PROJECT_DIR$/api/ncert-solutions-real.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1750420732387" />
-        <entry key="$PROJECT_DIR$/api/smart-pdf-upload.js" value="1750418980800" />
-        <entry key="$PROJECT_DIR$/api/tutors.js" value="1749192394666" />
+        <entry key="$PROJECT_DIR$/api/smart-pdf-upload.js" value="9223372036854775807" />
+        <entry key="$PROJECT_DIR$/api/tutors.js" value="1750652006688" />
+        <entry key="$PROJECT_DIR$/api/user-management.js" value="1750652006688" />
         <entry key="$PROJECT_DIR$/client/package.json" value="1749147224393" />
         <entry key="$PROJECT_DIR$/client/public/images/hero-image.svg" value="1749573895681" />
         <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749110092207" />
@@ -748,6 +754,7 @@
         <entry key="$PROJECT_DIR$/package-lock.json" value="1750418795036" />
         <entry key="$PROJECT_DIR$/package.json" value="1750418795036" />
         <entry key="$PROJECT_DIR$/simple-dev-server.js" value="1749110402774" />
+        <entry key="$PROJECT_DIR$/test-api-fix.js" value="1750652006688" />
         <entry key="$PROJECT_DIR$/utils/analytics.js" value="1749151731558" />
         <entry key="$PROJECT_DIR$/utils/cors.js" value="1749139557739" />
         <entry key="$PROJECT_DIR$/utils/firebase.js" value="1749196133668" />
@@ -755,11 +762,11 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1750417927058" />
       </map>
     </option>
-    <option name="lastCommitHash" value="4b704f4b786ccb07c43f587cdb57fa357f4809f4" />
-    <option name="lastIndexTimestamp" value="1750420873561" />
-    <option name="repoAccumulatedChanges" value="24" />
-    <option name="repoTotalFiles" value="234" />
+    <option name="lastCommitHash" value="3a24c65cf18ea106fd69c7003bce80fef30e7ba4" />
+    <option name="lastIndexTimestamp" value="1750652006688" />
+    <option name="repoAccumulatedChanges" value="6" />
+    <option name="repoTotalFiles" value="368" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
-    <option name="state" value="UPDATING_INDEX" />
+    <option name="state" value="FULLY_INDEXED" />
   </component>
 </project>

@@ -39,7 +39,13 @@ export function handleCors(req, res, handler = null) {
 
   // Always ensure Content-Type is set to application/json
   // But don't override if it's already set
-  if (!res.getHeader('Content-Type')) {
+  // Use try-catch for getHeader as it might not be available in all environments
+  try {
+    if (!res.getHeader || !res.getHeader('Content-Type')) {
+      res.setHeader('Content-Type', 'application/json');
+    }
+  } catch (error) {
+    // If getHeader is not available, just set the header
     res.setHeader('Content-Type', 'application/json');
   }
 

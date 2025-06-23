@@ -1,0 +1,58 @@
+{
+    "checksum": "bb0a06555d30a2c8ee18bb8aacbb64513232d5996018a5c38fa5fdb6978b4e37",
+    "data": {
+    "id": "0f511a0f-d330-4134-bf10-41378e3d0774",
+    "createdAt": 1750651502157,
+    "updatedAt": 1750651503823,
+    "title": "hi",
+    "messages": [
+        {
+            "id": "615f487f-e073-4b67-82fc-d24799c24383",
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "hi"
+                }
+            ],
+            "context": {
+                "codebaseEnabled": true
+            },
+            "createdAt": 1750651502182,
+            "isInternal": false,
+            "rawContent": {
+                "type": "doc",
+                "content": [
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "hi"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "cdbd6fcc-bf31-4151-9be7-e1445f0cef5b",
+            "role": "system",
+            "content": [
+                {
+                    "type": "errorText",
+                    "text": "Rate limit exceeded. You can try again on June 23 at 10:40.",
+                    "allowRegenerate": true
+                }
+            ],
+            "createdAt": 1750651503821,
+            "isInternal": false
+        }
+    ],
+    "isAgent": true,
+    "isCustomAgent": false,
+    "isUnitTestsAgent": false,
+    "isE2EAgent": false,
+    "autoApply": false
+}
+}

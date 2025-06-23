@@ -41,12 +41,7 @@ async function handleUserProfile(req, res) {
   console.log('⚡ Starting user profile request...');
 
   try {
-    // Load utils if not already loaded
-    const utilsLoaded = await loadUtils();
-    if (!utilsLoaded) {
-      console.error('❌ Utils loading failed');
-    }
-
+    // Utils are already loaded in the main handler
     // Simple token validation for demo purposes
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.startsWith('Bearer ') 
@@ -414,26 +409,39 @@ async function handleAdminUsers(req, res) {
 }
 
 // Main handler with routing
-module.exports = function handler(req, res) {
-  return handleCors(req, res, async (req, res) => {
-    const { action } = req.query;
-    
-    try {
-      switch (action) {
-        case 'profile':
-          return await handleUserProfile(req, res);
-        case 'activity':
-          return await handleUserActivity(req, res);
-        case 'analytics':
-          return await handleStudentAnalytics(req, res);
-        case 'admin-users':
-          return await handleAdminUsers(req, res);
-        default:
-          return res.status(400).json({ error: 'Invalid action parameter. Use: profile, activity, analytics, or admin-users' });
-      }
-    } catch (error) {
-      console.error('User Management API Error:', error);
-      return res.status(500).json({ error: 'Internal server error' });
+module.exports = async function handler(req, res) {
+  try {
+    // Load utils first
+    const utilsLoaded = await loadUtils();
+    if (!utilsLoaded) {
+      console.error('❌ Utils loading failed');
+      return res.status(500).json({ error: 'Server initialization failed' });
     }
-  });
+
+    // Now handleCors is available
+    return handleCors(req, res, async (req, res) => {
+      const { action } = req.query;
+      
+      try {
+        switch (action) {
+          case 'profile':
+            return await handleUserProfile(req, res);
+          case 'activity':
+            return await handleUserActivity(req, res);
+          case 'analytics':
+            return await handleStudentAnalytics(req, res);
+          case 'admin-users':
+            return await handleAdminUsers(req, res);
+          default:
+            return res.status(400).json({ error: 'Invalid action parameter. Use: profile, activity, analytics, or admin-users' });
+        }
+      } catch (error) {
+        console.error('User Management API Error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
+    });
+  } catch (error) {
+    console.error('Main handler error:', error);
+    return res.status(500).json({ error: 'Server initialization failed' });
+  }
 }
