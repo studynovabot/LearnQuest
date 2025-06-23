@@ -1,9 +1,18 @@
 // Comprehensive version of the chat API using all available providers
-import dotenv from 'dotenv';
-dotenv.config();
 
-// Vercel serverless function for AI chat
-import { handleCors } from '../utils/cors.js';
+// Dynamic import for ES modules
+let handleCors;
+
+async function loadUtils() {
+  try {
+    const corsModule = await import('../utils/cors.js');
+    handleCors = corsModule.handleCors;
+    return true;
+  } catch (error) {
+    console.error('Failed to load utils:', error);
+    return false;
+  }
+}
 
 // Agent-specific system prompts for all 15 AI tutors - Engaging Study Buddy Style with Concise Responses
 const AGENT_PROMPTS = {
@@ -377,8 +386,15 @@ function checkForGenericResponse(text) {
 }
 
 // Main API handler
-async function handler(req, res) {
+module.exports = async function handler(req, res) {
   try {
+    // Load utils first
+    const utilsLoaded = await loadUtils();
+    if (!utilsLoaded) {
+      console.error('❌ Utils loading failed');
+      return res.status(500).json({ error: 'Server initialization failed' });
+    }
+
     // Use the CORS utility for consistent handling
     const corsResult = handleCors(req, res);
     if (corsResult) return corsResult;
@@ -702,5 +718,3 @@ async function handler(req, res) {
     }
   }
 }
-
-export default handler;

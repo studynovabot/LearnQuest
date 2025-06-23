@@ -1,35 +1,12 @@
 // Helper function to determine the API URL
 function getApiUrl() {
-  // If a VITE_API_URL env variable is set, use it (for flexibility in deployment)
-  if (import.meta.env.VITE_API_URL) {
-    console.log(`Using custom backend: ${import.meta.env.VITE_API_URL}`);
-    return import.meta.env.VITE_API_URL;
-  }
-
-  // In production, use the actual deployed API URL
-  if (import.meta.env.PROD) {
-    // Use the current origin with /api path
-    const origin = window.location.origin;
-    
-    // Check if we're on Vercel deployment
-    if (origin.includes('vercel.app')) {
-      // For Vercel deployments, use the same origin to avoid CORS issues
-      const relativeApi = `${origin}/api`;
-      console.log(`Using Vercel production API path: ${relativeApi}`);
-      return relativeApi;
-    } else {
-      // For other production environments
-      const relativeApi = `${origin}/api`;
-      console.log(`Using production API path: ${relativeApi}`);
-      return relativeApi;
-    }
-  }
-
-  // For development, always use the full URL with http://localhost:5000/api
-  // This ensures we're making requests to the actual dev server
-  const localApi = 'http://localhost:5000/api';
-  console.log(`Using local development API: ${localApi}`);
-  return localApi;
+  // Always use the same origin with /api path for Vercel deployments
+  // This ensures both frontend and backend are served from the same domain
+  const origin = window.location.origin;
+  const apiUrl = `${origin}/api`;
+  
+  console.log(`Using Vercel serverless API: ${apiUrl}`);
+  return apiUrl;
 }
 
 // Helper function to get Supabase URL

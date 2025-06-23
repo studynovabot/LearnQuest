@@ -20,7 +20,7 @@
     },
     {
       "src": "/api/chat",
-      "dest": "/api/ai-services.js?service=chat"
+      "dest": "/api/chat.js"
     },
     {
       "src": "/api/ai/(.*)",
@@ -78,6 +78,10 @@
     {
       "src": "/api/ai-text-to-qa",
       "dest": "/api/ai-text-to-qa.js"
+    },
+    {
+      "src": "/api/admin-review",
+      "dest": "/api/admin-review.js"
     },
     {
       "src": "/api/(.*)",
