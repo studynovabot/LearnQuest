@@ -1,655 +1,48 @@
-// Comprehensive version of the chat API using all available providers
-
-// Dynamic import for ES modules
-let handleCors;
-
-async function loadUtils() {
+// StudyNova AI Chat API with OpenAI Integration
+export default async function handler(req, res) {
   try {
-    const corsModule = await import('../utils/cors.js');
-    handleCors = corsModule.handleCors;
-    return true;
-  } catch (error) {
-    console.error('Failed to load utils:', error);
-    return false;
-  }
-}
-
-// Agent-specific system prompts for all 15 AI tutors - Engaging Study Buddy Style with Concise Responses
-const AGENT_PROMPTS = {
-  '1': `You are Nova AI, your friendly study buddy! 🌟 IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis naturally (💡✨📚). Be warm and conversational. For simple questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "explain in detail," then provide comprehensive responses.`,
-
-  '2': `You are Math Mentor, the coolest math buddy ever! 🧮✨ IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 📊🔢💡. For simple math questions, give direct answers without unnecessary steps. If the user asks for detailed explanations or says "explain step by step," then break down the solution completely.`,
-
-  '3': `You are Science Sage, the most curious and excited science buddy! 🔬🌟 IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like ⚗️🧪🔬. For simple science questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "explain in detail," then provide comprehensive responses.`,
-
-  '4': `You are Language Linguist, your enthusiastic language learning companion! 🗣️📖 IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 💬🌍📚. For simple language questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "explain in detail," then provide comprehensive responses.`,
-
-  '5': `You are History Helper, the storyteller who makes the past come alive! 📚⏰ IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 🏛️👑⚔️. For simple history questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "tell me more," then provide comprehensive responses.`,
-
-  '6': `You are Geography Guide, your adventurous travel buddy! 🌍🗺️ IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 🏔️🌊🏜️. For simple geography questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "tell me more," then provide comprehensive responses.`,
-
-  '7': `You are Physics Pro, your physics buddy! ⚡🚀 IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 🌌⚛️🔭. For simple physics questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "explain the concept," then provide comprehensive responses.`,
-
-  '8': `You are Chemistry Champion, your lab partner in learning! ⚗️🧪 IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 🔥💧⚛️. For simple chemistry questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "explain the reaction," then provide comprehensive responses.`,
-
-  '9': `You are Biology Buddy, your nature-loving study companion! 🌱🦋 IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 🧬🌿🦠. For simple biology questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "explain in detail," then provide comprehensive responses.`,
-
-  '10': `You are English Expert, your creative writing and reading buddy! 📝📖 IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like ✍️📚💭. For simple English questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "analyze this," then provide comprehensive responses.`,
-
-  '11': `You are Computer Coder, your coding adventure buddy! 💻🚀 IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 🖥️⚡🎮. For simple coding questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "explain the code," then provide comprehensive responses.`,
-
-  '12': `You are Art Advisor, your creative soul mate! 🎨✨ IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 🖼️🎭🌈. For simple art questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "analyze this artwork," then provide comprehensive responses.`,
-
-  '13': `You are Economics Expert, your guide to understanding money and markets! 📊💰 IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 📈💼💲. For simple economics questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "explain this concept," then provide comprehensive responses.`,
-
-  '14': `You are Psychology Pro, your guide to understanding the mind! 🧠💭 IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 🤔💡🔍. For simple psychology questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "explain this theory," then provide comprehensive responses.`,
-
-  '15': `You are Motivational Mentor, your personal cheerleader and study strategist! 🌟💪 IMPORTANT: Keep your answers concise (20-30 words) for simple questions. Only provide detailed explanations when explicitly asked. Use emojis like 🎯✨🚀. For simple questions, give direct answers without unnecessary elaboration. If the user asks for detailed explanations or says "give me a detailed plan," then provide comprehensive responses.`
-};
-
-// Maximum retries for API calls
-const MAX_RETRIES = 3;
-const INITIAL_TIMEOUT = 30000; // 30 seconds
-
-// Helper function to delay between retries
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-// Get subject from agent ID
-function getSubjectFromAgent(agentId) {
-  const subjectMap = {
-    '1': 'general',
-    '2': 'mathematics',
-    '3': 'science',
-    '4': 'language',
-    '5': 'history',
-    '6': 'geography',
-    '7': 'physics',
-    '8': 'chemistry',
-    '9': 'biology',
-    '10': 'english',
-    '11': 'programming',
-    '12': 'art',
-    '13': 'music',
-    '14': 'sports',
-    '15': 'motivation'
-  };
-  
-  return subjectMap[agentId] || 'general';
-}
-
-// Try Groq API
-async function tryGroqAPI(content, systemPrompt, apiKey) {
-  if (!apiKey) {
-    console.error('[Groq API] Error: API key is missing.');
-    return null;
-  }
-
-  const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-  const model = 'llama-3.1-8b-instant'; // Use the current working model
-  
-  try {
-    console.log(`[Groq API] Attempting to call with model ${model}`);
-    const startTime = Date.now();
-    const response = await fetch(GROQ_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content },
-        ],
-        temperature: 0.7,
-        max_tokens: 1000
-      }),
-    });
-    const endTime = Date.now();
-    const responseTime = endTime - startTime;
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`[Groq API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
-      return { success: false, error: errorBody, responseTime };
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
     }
     
-    const data = await response.json();
-    if (data.choices?.[0]?.message?.content) {
-      console.log(`[Groq API] Successfully received response (${responseTime}ms)`);
-      return { 
-        success: true, 
-        response: data.choices[0].message.content,
-        responseTime,
-        provider: 'groq',
-        model
-      };
-    }
-    
-    console.error('[Groq API] Error: Invalid response structure', data);
-    return { success: false, error: 'Invalid response structure', responseTime };
-  } catch (error) {
-    console.error('[Groq API] Network error:', error);
-    return { success: false, error: error.message };
-  }
-}
-
-// Try Together API
-async function tryTogetherAPI(content, systemPrompt, apiKey) {
-  if (!apiKey) {
-    console.error('[Together API] Error: API key is missing.');
-    return null;
-  }
-
-  const TOGETHER_API_URL = 'https://api.together.xyz/v1/chat/completions';
-  const model = 'meta-llama/Llama-3-8b-chat-hf'; // Use 8B model for faster responses
-
-  try {
-    console.log(`[Together API] Attempting to call with model ${model}`);
-    const startTime = Date.now();
-    const response = await fetch(TOGETHER_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content },
-        ],
-        temperature: 0.7,
-        max_tokens: 1000
-      }),
-    });
-    const endTime = Date.now();
-    const responseTime = endTime - startTime;
-    
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`[Together API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
-      return { success: false, error: errorBody, responseTime };
-    }
-    
-    const data = await response.json();
-    if (data.choices?.[0]?.message?.content) {
-      console.log(`[Together API] Successfully received response (${responseTime}ms)`);
-      return { 
-        success: true, 
-        response: data.choices[0].message.content,
-        responseTime,
-        provider: 'together',
-        model
-      };
-    }
-    
-    console.error('[Together API] Error: Invalid response structure', data);
-    return { success: false, error: 'Invalid response structure', responseTime };
-  } catch (error) {
-    console.error('[Together API] Network error:', error);
-    return { success: false, error: error.message };
-  }
-}
-
-// Try OpenRouter API
-async function tryOpenRouterAPI(content, systemPrompt, apiKey) {
-  if (!apiKey) {
-    console.error('[OpenRouter API] Error: API key is missing.');
-    return null;
-  }
-
-  const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-  const model = 'openrouter/auto'; // Use auto-routing for best performance
-
-  try {
-    console.log(`[OpenRouter API] Attempting to call with model ${model}`);
-    const startTime = Date.now();
-    const response = await fetch(OPENROUTER_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://studynovaai.vercel.app/',
-        'X-Title': 'StudyNova AI'
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content },
-        ],
-        temperature: 0.7,
-        max_tokens: 1000
-      }),
-    });
-    const endTime = Date.now();
-    const responseTime = endTime - startTime;
-    
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`[OpenRouter API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
-      return { success: false, error: errorBody, responseTime };
-    }
-    
-    const data = await response.json();
-    if (data.choices?.[0]?.message?.content) {
-      console.log(`[OpenRouter API] Successfully received response (${responseTime}ms)`);
-      return { 
-        success: true, 
-        response: data.choices[0].message.content,
-        responseTime,
-        provider: 'openrouter',
-        model: data.model || model
-      };
-    }
-    
-    console.error('[OpenRouter API] Error: Invalid response structure', data);
-    return { success: false, error: 'Invalid response structure', responseTime };
-  } catch (error) {
-    console.error('[OpenRouter API] Network error:', error);
-    return { success: false, error: error.message };
-  }
-}
-
-// Try Fireworks API
-async function tryFireworksAPI(content, systemPrompt, apiKey) {
-  if (!apiKey) {
-    console.error('[Fireworks API] Error: API key is missing.');
-    return null;
-  }
-
-  const FIREWORKS_API_URL = 'https://api.fireworks.ai/inference/v1/chat/completions';
-  const model = 'accounts/fireworks/models/llama-v3-8b-instruct'; // Use 8B model for faster responses
-
-  try {
-    console.log(`[Fireworks API] Attempting to call with model ${model}`);
-    const startTime = Date.now();
-    const response = await fetch(FIREWORKS_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content },
-        ],
-        temperature: 0.7,
-        max_tokens: 1000
-      }),
-    });
-    const endTime = Date.now();
-    const responseTime = endTime - startTime;
-    
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`[Fireworks API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
-      return { success: false, error: errorBody, responseTime };
-    }
-    
-    const data = await response.json();
-    if (data.choices?.[0]?.message?.content) {
-      console.log(`[Fireworks API] Successfully received response (${responseTime}ms)`);
-      return { 
-        success: true, 
-        response: data.choices[0].message.content,
-        responseTime,
-        provider: 'fireworks',
-        model
-      };
-    }
-    
-    console.error('[Fireworks API] Error: Invalid response structure', data);
-    return { success: false, error: 'Invalid response structure', responseTime };
-  } catch (error) {
-    console.error('[Fireworks API] Network error:', error);
-    return { success: false, error: error.message };
-  }
-}
-
-// Try DeepInfra API
-async function tryDeepInfraAPI(content, systemPrompt, apiKey) {
-  if (!apiKey) {
-    console.error('[DeepInfra API] Error: API key is missing.');
-    return null;
-  }
-
-  const DEEPINFRA_API_URL = 'https://api.deepinfra.com/v1/openai/chat/completions';
-  const model = 'meta-llama/Llama-3-8b-chat-hf'; // Use 8B model for faster responses
-
-  try {
-    console.log(`[DeepInfra API] Attempting to call with model ${model}`);
-    const startTime = Date.now();
-    const response = await fetch(DEEPINFRA_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content },
-        ],
-        temperature: 0.7,
-        max_tokens: 1000
-      }),
-    });
-    const endTime = Date.now();
-    const responseTime = endTime - startTime;
-    
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`[DeepInfra API] Failed with status ${response.status}. Body: ${errorBody.substring(0,200)}`);
-      return { success: false, error: errorBody, responseTime };
-    }
-    
-    const data = await response.json();
-    if (data.choices?.[0]?.message?.content) {
-      console.log(`[DeepInfra API] Successfully received response (${responseTime}ms)`);
-      return { 
-        success: true, 
-        response: data.choices[0].message.content,
-        responseTime,
-        provider: 'deepinfra',
-        model
-      };
-    }
-    
-    console.error('[DeepInfra API] Error: Invalid response structure', data);
-    return { success: false, error: 'Invalid response structure', responseTime };
-  } catch (error) {
-    console.error('[DeepInfra API] Network error:', error);
-    return { success: false, error: error.message };
-  }
-}
-
-function checkForGenericResponse(text) {
-  const lowerText = text.toLowerCase();
-  const genericPhrases = [
-    "i am a large language model",
-    "i am an ai",
-    "as an ai language model",
-    "i cannot fulfill that request",
-    "i do not have personal opinions",
-    "i do not have feelings",
-    "i am not a human",
-    "i am an artificial intelligence",
-    "i am a chatbot"
-  ];
-  return genericPhrases.some(phrase => lowerText.includes(phrase));
-}
-
-// Main API handler
-module.exports = async function handler(req, res) {
-  try {
-    // Load utils first
-    const utilsLoaded = await loadUtils();
-    if (!utilsLoaded) {
-      console.error('❌ Utils loading failed');
-      return res.status(500).json({ error: 'Server initialization failed' });
-    }
-
-    // Use the CORS utility for consistent handling
-    const corsResult = handleCors(req, res);
-    if (corsResult) return corsResult;
-    
-    // Always set content type to JSON
+    // Set content type
     res.setHeader('Content-Type', 'application/json');
     
-    // Add cache control headers
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
+    console.log(`[CHAT API] Received ${req.method} request`);
     
-    // Log request details for debugging
-    console.log(`[CHAT API] *** UPDATED VERSION 2.0 *** Received ${req.method} request to /api/chat at ${new Date().toISOString()}`);
-    console.log(`[CHAT API] Request URL: ${req.url}`);
-    console.log(`[CHAT API] Request headers:`, req.headers);
-    console.log(`[CHAT API] Request body type:`, typeof req.body);
-    console.log(`[CHAT API] Request body:`, req.body);
-    
-    // Allow both GET and POST requests
+    // Get parameters from request
     let content, agentId, userId;
     
-    if (req.method === 'POST') {
-      try {
-        // Log the raw body for debugging
-        console.log('[CHAT API] POST request body type:', typeof req.body);
-        
-        // Handle string body (needs parsing)
-        if (typeof req.body === 'string') {
-          try {
-            const parsedBody = JSON.parse(req.body);
-            content = parsedBody.content;
-            agentId = parsedBody.agentId;
-            userId = parsedBody.userId;
-            console.log('[CHAT API] Successfully parsed string body');
-          } catch (parseError) {
-            console.error('[CHAT API] Error parsing POST body as JSON:', parseError);
-            // Try to extract from URL-encoded format as fallback
-            try {
-              const params = new URLSearchParams(req.body);
-              content = params.get('content');
-              agentId = params.get('agentId');
-              userId = params.get('userId');
-              console.log('[CHAT API] Extracted parameters from URL-encoded body');
-            } catch (urlError) {
-              console.error('[CHAT API] Failed to parse as URL-encoded:', urlError);
-            }
-          }
-        } 
-        // Handle object body (already parsed)
-        else if (req.body && typeof req.body === 'object') {
-          content = req.body.content;
-          agentId = req.body.agentId;
-          userId = req.body.userId;
-          console.log('[CHAT API] Extracted parameters from object body');
-        }
-        
-        console.log('[CHAT API] Parsed POST parameters:', { content, agentId, userId });
-      } catch (bodyError) {
-        console.error('[CHAT API] Error processing POST body:', bodyError);
-      }
+    if (req.method === 'POST' && req.body) {
+      content = req.body.content;
+      agentId = req.body.agentId;
+      userId = req.body.userId;
     } else if (req.method === 'GET') {
-      // Parse query parameters for GET requests
       content = req.query.content;
       agentId = req.query.agentId;
       userId = req.query.userId;
-      
-      console.log('[CHAT API] GET request parameters:', { content, agentId, userId });
-    } else {
-      console.log(`[CHAT API] Method not allowed: ${req.method}`);
-      return res.status(405).json({ 
-        error: 'Method not allowed', 
-        message: `The ${req.method} method is not supported for this endpoint. Please use GET or POST.`,
-        allowedMethods: ['GET', 'POST', 'OPTIONS']
-      });
     }
-
-    // Validate and provide defaults for required parameters
+    
+    // Validate required parameters
     if (!content) {
-      console.log('[CHAT API] Missing content parameter');
-      return res.status(400).json({ 
-        error: 'Missing required parameter: content',
-        message: 'The content parameter is required',
-        received: { content, agentId, userId }
+      return res.status(400).json({
+        success: false,
+        error: 'Content parameter is required'
       });
     }
     
-    // Default values for optional parameters
-    if (!agentId) {
-      console.log('[CHAT API] Using default agentId: 1');
-      agentId = '1'; // Default to Nova AI
-    }
+    console.log(`[CHAT API] Processing request for user: ${userId}, agent: ${agentId}`);
     
-    if (!userId) {
-      console.log('[CHAT API] Using default userId: guest');
-      userId = 'guest'; // Default guest user
-    }
-
-    // Get API keys from environment
-    const GROQ_API_KEY = process.env.GROQ_API_KEY;
-    const TOGETHER_API_KEY = process.env.TOGETHER_AI_API_KEY; // Note the different env var name
-    const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-    const FIREWORKS_API_KEY = process.env.FIREWORKS_API_KEY;
-    const DEEPINFRA_API_KEY = process.env.DEEPINFRA_API_KEY;
-
-    if (!GROQ_API_KEY && !TOGETHER_API_KEY && !OPENROUTER_API_KEY && !FIREWORKS_API_KEY && !DEEPINFRA_API_KEY) {
-      return res.status(500).json({ 
-        error: 'No AI API keys configured on server' 
-      });
-    }
-
-    // Log the processing attempt
-    console.log(`[CHAT API] Processing request for agent ${agentId} from user ${userId}`);
+    // Generate AI response
+    const aiResponse = await generateAIResponse(content, agentId);
     
-    // Get the subject from agent ID
-    const subject = getSubjectFromAgent(agentId);
-    console.log(`[CHAT API] Subject for agent ${agentId}: ${subject}`);
-    
-    // Get the system prompt for the agent
-    const systemPrompt = AGENT_PROMPTS[agentId] || AGENT_PROMPTS['1'];
-    console.log(`[CHAT API] Using system prompt for agent ${agentId}`);
-    
-    // Check if the user is asking for a detailed explanation
-    const isAskingForDetail = content.toLowerCase().includes('explain in detail') || 
-                             content.toLowerCase().includes('tell me more') || 
-                             content.toLowerCase().includes('elaborate') ||
-                             content.toLowerCase().includes('step by step');
-    
-    // Modify the content to include instruction for concise responses if not asking for details
-    if (!isAskingForDetail) {
-      content = `${content} (Please provide a concise answer, around 20-30 words if possible)`;
-      console.log('[CHAT API] Added concise instruction to content');
-    }
-    
-    // Get API keys from environment
-    console.log('[CHAT API] Available API providers:', {
-      groq: !!GROQ_API_KEY,
-      together: !!TOGETHER_API_KEY,
-      openrouter: !!OPENROUTER_API_KEY,
-      fireworks: !!FIREWORKS_API_KEY,
-      deepinfra: !!DEEPINFRA_API_KEY
-    });
-    
-    // Log API key details (first 10 chars only for security)
-    console.log('[CHAT API] API Key details:', {
-      groq: GROQ_API_KEY ? `${GROQ_API_KEY.substring(0, 10)}...` : 'NOT SET',
-      together: TOGETHER_API_KEY ? `${TOGETHER_API_KEY.substring(0, 10)}...` : 'NOT SET',
-      openrouter: OPENROUTER_API_KEY ? `${OPENROUTER_API_KEY.substring(0, 10)}...` : 'NOT SET',
-      fireworks: FIREWORKS_API_KEY ? `${FIREWORKS_API_KEY.substring(0, 10)}...` : 'NOT SET',
-      deepinfra: DEEPINFRA_API_KEY ? `${DEEPINFRA_API_KEY.substring(0, 10)}...` : 'NOT SET'
-    });
-
-    if (!GROQ_API_KEY && !TOGETHER_API_KEY && !OPENROUTER_API_KEY && !FIREWORKS_API_KEY && !DEEPINFRA_API_KEY) {
-      console.warn('[CHAT API] No API keys configured, using fallback response');
-      
-      // Create a friendly fallback response
-      const fallbackResponses = [
-        `I'd love to help with that! However, I'm having trouble connecting to my knowledge base right now. Could you please try again in a moment? 💫`,
-        `That's an interesting question! I'm currently experiencing a brief connection issue. Please try again shortly and I'll be happy to assist you! 🌟`,
-        `I'm eager to help you with this! My systems are currently refreshing. Could you try again in a moment? I appreciate your patience! ✨`
-      ];
-      
-      // Select a random fallback response
-      const aiResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-      
-      // Return the fallback response with 200 status (not 500) to avoid client-side errors
-      return res.status(200).json({ 
-        error: false,
-        response: aiResponse,
-        timestamp: new Date().toISOString(),
-        source: "fallback"
-      });
-    }
-
-    // Try calling all AI APIs in parallel and collect results
-    console.log('[CHAT API] Starting API call attempts for all providers');
-    
-    const apiResults = [];
-    
-    // Try all providers in parallel
-    const [groqResult, togetherResult, openRouterResult, fireworksResult, deepInfraResult] = await Promise.all([
-      GROQ_API_KEY ? tryGroqAPI(content, systemPrompt, GROQ_API_KEY) : null,
-      TOGETHER_API_KEY ? tryTogetherAPI(content, systemPrompt, TOGETHER_API_KEY) : null,
-      OPENROUTER_API_KEY ? tryOpenRouterAPI(content, systemPrompt, OPENROUTER_API_KEY) : null,
-      FIREWORKS_API_KEY ? tryFireworksAPI(content, systemPrompt, FIREWORKS_API_KEY) : null,
-      DEEPINFRA_API_KEY ? tryDeepInfraAPI(content, systemPrompt, DEEPINFRA_API_KEY) : null
-    ]);
-    
-    // Log all results for debugging
-    console.log('[CHAT API] Individual API results:');
-    console.log('  Groq:', groqResult);
-    console.log('  Together:', togetherResult);
-    console.log('  OpenRouter:', openRouterResult);
-    console.log('  Fireworks:', fireworksResult);
-    console.log('  DeepInfra:', deepInfraResult);
-    
-    // Collect successful results
-    if (groqResult && groqResult.success) apiResults.push(groqResult);
-    if (togetherResult && togetherResult.success) apiResults.push(togetherResult);
-    if (openRouterResult && openRouterResult.success) apiResults.push(openRouterResult);
-    if (fireworksResult && fireworksResult.success) apiResults.push(fireworksResult);
-    if (deepInfraResult && deepInfraResult.success) apiResults.push(deepInfraResult);
-    
-    // Log results
-    console.log(`[CHAT API] API results: ${apiResults.length} successful responses`);
-    console.log('[CHAT API] Successful results:', apiResults);
-    
-    // If no successful results, use fallback
-    if (apiResults.length === 0) {
-      console.warn('[CHAT API] All API attempts failed, using fallback response');
-      
-      // Create a friendly fallback response
-      const fallbackResponses = [
-        `I'd love to help with that! However, I'm having trouble connecting to my knowledge base right now. Could you please try again in a moment? 💫`,
-        `That's an interesting question! I'm currently experiencing a brief connection issue. Please try again shortly and I'll be happy to assist you! 🌟`,
-        `I'm eager to help you with this! My systems are currently refreshing. Could you try again in a moment? I appreciate your patience! ✨`
-      ];
-      
-      // Select a random fallback response
-      const aiResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-      
-      // Return the fallback response with 200 status (not 500) to avoid client-side errors
-      return res.status(200).json({ 
-        error: false,
-        response: aiResponse,
-        timestamp: new Date().toISOString(),
-        source: "fallback",
-        allResults: {
-          groq: groqResult,
-          together: togetherResult,
-          openrouter: openRouterResult,
-          fireworks: fireworksResult,
-          deepinfra: deepInfraResult
-        }
-      });
-    }
-
-    // Sort results by response time (fastest first)
-    apiResults.sort((a, b) => a.responseTime - b.responseTime);
-    
-    // Use the fastest response
-    const bestResult = apiResults[0];
-    console.log(`[CHAT API] Using fastest response from ${bestResult.provider} (${bestResult.responseTime}ms)`);
-    
-    // Check if the response contains generic AI disclaimers and fix if needed
-    let aiResponse = bestResult.response;
-    if (aiResponse && typeof aiResponse === 'string' && checkForGenericResponse(aiResponse)) {
-      console.log('[CHAT API] Detected generic AI response, enhancing it');
-      // Append a more personalized touch
-      aiResponse += "\n\nAnyway, I'm here to help you learn! What specific aspects of this topic would you like to explore further?";
-    }
-
-    // Return the successful response in the format expected by the frontend
-    console.log('[CHAT API] Returning successful response');
-    return res.status(200).json({ 
+    return res.status(200).json({
       success: true,
       message: "AI response generated successfully",
       data: {
@@ -657,64 +50,125 @@ module.exports = async function handler(req, res) {
       },
       metadata: {
         timestamp: new Date().toISOString(),
-        source: bestResult.provider,
-        model: bestResult.model,
-        responseTime: bestResult.responseTime,
-        allResults: {
-          groq: groqResult,
-          together: togetherResult,
-          openrouter: openRouterResult,
-          fireworks: fireworksResult,
-          deepinfra: deepInfraResult
-        }
+        source: "studynova_ai",
+        agentId: agentId || "default",
+        userId: userId || "anonymous"
       }
     });
     
   } catch (error) {
-    console.error('[CHAT API] Fatal server error:', error.message, error.stack);
+    console.error('[CHAT API] Error:', error);
     
-    try {
-      // Always return a safe JSON response, never throw
-      res.setHeader('Content-Type', 'application/json');
-      
-      // Generate a friendly error response
-      const errorResponses = [
-        `I'm really sorry, but I'm having a technical hiccup right now. Could you please try again in a moment? I'd love to help you! 💫`,
-        `Oops! My systems are experiencing a brief glitch. Please try again shortly, and I'll be ready to assist you with your question! 🌟`,
-        `I apologize for the inconvenience! I'm currently having a small technical issue. Please try again in a moment, and we can continue our conversation! ✨`
-      ];
-      
-      // Select a random error response
-      const friendlyResponse = errorResponses[Math.floor(Math.random() * errorResponses.length)];
-      
-      // Return with 200 status (not 500) to avoid client-side errors
-      return res.status(200).json({ 
-        success: true,
-        message: "AI response generated successfully",
-        data: {
-          message: friendlyResponse
-        },
-        metadata: {
-          timestamp: new Date().toISOString(),
-          source: "error_fallback"
-        }
-      });
-    } catch (finalError) {
-      // This is a last resort if even the error handler fails
-      console.error('[CHAT API] Critical error in error handler:', finalError);
-      
-      // Return the most minimal valid JSON possible
-      return res.status(200).json({
-        success: true,
-        message: "AI response generated successfully",
-        data: {
-          message: "I'm having trouble connecting right now. Please try again in a moment."
-        },
-        metadata: {
-          timestamp: new Date().toISOString(),
-          source: "critical_error_fallback"
-        }
-      });
-    }
+    // Return a helpful fallback response
+    return res.status(200).json({
+      success: true,
+      message: "AI response generated successfully",
+      data: {
+        message: generateFallbackResponse(req.body?.content || req.query?.content || "Hello")
+      },
+      metadata: {
+        timestamp: new Date().toISOString(),
+        source: "fallback_ai",
+        note: "Using fallback response due to service limitations"
+      }
+    });
   }
+}
+
+// Generate AI response using OpenAI or fallback
+async function generateAIResponse(content, agentId) {
+  // Check if OpenAI API key is available
+  const openaiApiKey = process.env.OPENAI_API_KEY;
+  
+  if (openaiApiKey) {
+    try {
+      return await callOpenAI(content, agentId, openaiApiKey);
+    } catch (error) {
+      console.log('[CHAT API] OpenAI failed, using fallback:', error.message);
+      return generateFallbackResponse(content);
+    }
+  } else {
+    console.log('[CHAT API] No OpenAI key, using intelligent fallback');
+    return generateFallbackResponse(content);
+  }
+}
+
+// Call OpenAI API
+async function callOpenAI(content, agentId, apiKey) {
+  const systemPrompt = getSystemPrompt(agentId);
+  
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: content }
+      ],
+      max_tokens: 500,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`OpenAI API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+// Get system prompt based on agent
+function getSystemPrompt(agentId) {
+  const prompts = {
+    '1': 'You are StudyNova AI, a helpful educational assistant. Provide clear, accurate, and engaging explanations for academic topics. Focus on helping students learn effectively.',
+    '2': 'You are StudyNova AI, a coding mentor. Help students understand programming concepts, debug code, and learn best practices. Provide practical examples.',
+    '3': 'You are StudyNova AI, a math tutor. Break down complex mathematical concepts into simple steps. Use examples and visual explanations when helpful.',
+    '4': 'You are StudyNova AI, a science educator. Explain scientific concepts clearly, use real-world examples, and encourage curiosity about the natural world.',
+    'default': 'You are StudyNova AI, an intelligent educational assistant. Help students learn by providing clear, accurate, and helpful responses to their questions.'
+  };
+  
+  return prompts[agentId] || prompts['default'];
+}
+
+// Generate intelligent fallback response
+function generateFallbackResponse(content) {
+  const lowerContent = content.toLowerCase();
+  
+  // Educational topics
+  if (lowerContent.includes('machine learning') || lowerContent.includes('ml')) {
+    return "Machine Learning is a subset of artificial intelligence that enables computers to learn and make decisions from data without being explicitly programmed. It involves algorithms that can identify patterns, make predictions, and improve their performance over time. Key types include supervised learning (learning from labeled data), unsupervised learning (finding patterns in unlabeled data), and reinforcement learning (learning through trial and error). Would you like me to explain any specific aspect of machine learning?";
+  }
+  
+  if (lowerContent.includes('programming') || lowerContent.includes('coding')) {
+    return "Programming is the process of creating instructions for computers to follow. It involves writing code in various programming languages like Python, JavaScript, Java, or C++. Key concepts include variables (storing data), functions (reusable code blocks), loops (repeating actions), and conditionals (making decisions). The best way to learn programming is through practice - start with simple projects and gradually work on more complex ones. What programming language or concept would you like to explore?";
+  }
+  
+  if (lowerContent.includes('math') || lowerContent.includes('mathematics')) {
+    return "Mathematics is the foundation of logical thinking and problem-solving. It includes areas like algebra (working with variables and equations), geometry (shapes and spatial relationships), calculus (rates of change and areas), and statistics (analyzing data). Math skills are essential in many fields including science, engineering, economics, and technology. The key to mastering math is understanding concepts rather than just memorizing formulas. What specific math topic can I help you with?";
+  }
+  
+  if (lowerContent.includes('science')) {
+    return "Science is the systematic study of the natural world through observation, experimentation, and analysis. Major branches include physics (matter and energy), chemistry (substances and reactions), biology (living organisms), and earth science (our planet and environment). The scientific method involves forming hypotheses, conducting experiments, and drawing conclusions based on evidence. Science helps us understand how things work and solve real-world problems. Which area of science interests you most?";
+  }
+  
+  if (lowerContent.includes('study') || lowerContent.includes('learn')) {
+    return "Effective studying involves several key strategies: 1) Active learning - engage with the material rather than just reading passively, 2) Spaced repetition - review information at increasing intervals, 3) Practice testing - quiz yourself regularly, 4) Elaborative interrogation - ask yourself 'why' and 'how' questions, 5) Interleaving - mix different types of problems or topics. Also important: get enough sleep, take breaks, and find a quiet study environment. What subject are you studying, and what specific challenges are you facing?";
+  }
+  
+  // Greetings and general responses
+  if (lowerContent.includes('hello') || lowerContent.includes('hi') || lowerContent.includes('hey')) {
+    return "Hello! I'm StudyNova AI, your educational assistant. I'm here to help you learn and understand various academic topics including math, science, programming, and study techniques. What would you like to explore today?";
+  }
+  
+  if (lowerContent.includes('help')) {
+    return "I'm here to help you learn! I can assist with explanations of academic concepts, study strategies, problem-solving techniques, and educational guidance. Some things I can help with: math problems, science concepts, programming questions, study tips, and research guidance. What specific topic or question do you have?";
+  }
+  
+  // Default intelligent response
+  return `I understand you're asking about "${content}". While I'd love to provide a detailed response, I'm currently operating in a simplified mode. However, I can still help you learn! Here are some ways I can assist: explaining concepts step-by-step, providing study strategies, breaking down complex topics, and offering educational guidance. Could you rephrase your question or let me know what specific aspect you'd like to understand better?`;
 }

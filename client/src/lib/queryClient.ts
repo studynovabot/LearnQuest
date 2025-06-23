@@ -191,6 +191,8 @@ export async function apiRequest(
         }
 
         // If we get here, the request was successful
+        // Check if the response is OK before returning
+        await throwIfResNotOk(res);
         return res;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
