@@ -76,7 +76,7 @@ async function tryGroqAPI(content, systemPrompt, apiKey) {
   }
 
   const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-  const model = 'llama3-8b-8192'; // Use the 8B model for faster responses
+  const model = 'llama-3.1-8b-instant'; // Use the current working model
   
   try {
     console.log(`[Groq API] Attempting to call with model ${model}`);
@@ -392,7 +392,11 @@ async function handler(req, res) {
     res.setHeader('Expires', '0');
     
     // Log request details for debugging
-    console.log(`[CHAT API] Received ${req.method} request to /api/chat at ${new Date().toISOString()}`);
+    console.log(`[CHAT API] *** UPDATED VERSION 2.0 *** Received ${req.method} request to /api/chat at ${new Date().toISOString()}`);
+    console.log(`[CHAT API] Request URL: ${req.url}`);
+    console.log(`[CHAT API] Request headers:`, req.headers);
+    console.log(`[CHAT API] Request body type:`, typeof req.body);
+    console.log(`[CHAT API] Request body:`, req.body);
     
     // Allow both GET and POST requests
     let content, agentId, userId;
@@ -517,6 +521,15 @@ async function handler(req, res) {
       fireworks: !!FIREWORKS_API_KEY,
       deepinfra: !!DEEPINFRA_API_KEY
     });
+    
+    // Log API key details (first 10 chars only for security)
+    console.log('[CHAT API] API Key details:', {
+      groq: GROQ_API_KEY ? `${GROQ_API_KEY.substring(0, 10)}...` : 'NOT SET',
+      together: TOGETHER_API_KEY ? `${TOGETHER_API_KEY.substring(0, 10)}...` : 'NOT SET',
+      openrouter: OPENROUTER_API_KEY ? `${OPENROUTER_API_KEY.substring(0, 10)}...` : 'NOT SET',
+      fireworks: FIREWORKS_API_KEY ? `${FIREWORKS_API_KEY.substring(0, 10)}...` : 'NOT SET',
+      deepinfra: DEEPINFRA_API_KEY ? `${DEEPINFRA_API_KEY.substring(0, 10)}...` : 'NOT SET'
+    });
 
     if (!GROQ_API_KEY && !TOGETHER_API_KEY && !OPENROUTER_API_KEY && !FIREWORKS_API_KEY && !DEEPINFRA_API_KEY) {
       console.warn('[CHAT API] No API keys configured, using fallback response');
@@ -554,6 +567,14 @@ async function handler(req, res) {
       DEEPINFRA_API_KEY ? tryDeepInfraAPI(content, systemPrompt, DEEPINFRA_API_KEY) : null
     ]);
     
+    // Log all results for debugging
+    console.log('[CHAT API] Individual API results:');
+    console.log('  Groq:', groqResult);
+    console.log('  Together:', togetherResult);
+    console.log('  OpenRouter:', openRouterResult);
+    console.log('  Fireworks:', fireworksResult);
+    console.log('  DeepInfra:', deepInfraResult);
+    
     // Collect successful results
     if (groqResult && groqResult.success) apiResults.push(groqResult);
     if (togetherResult && togetherResult.success) apiResults.push(togetherResult);
@@ -563,6 +584,7 @@ async function handler(req, res) {
     
     // Log results
     console.log(`[CHAT API] API results: ${apiResults.length} successful responses`);
+    console.log('[CHAT API] Successful results:', apiResults);
     
     // If no successful results, use fallback
     if (apiResults.length === 0) {

@@ -5,14 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change afterPath="$PROJECT_DIR$/test-all-apis.cjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test-groq-api.cjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test-groq-simple.cjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test-local-chat-api.cjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/chat.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,7 +129,7 @@
       <workItem from="1750420933553" duration="331000" />
       <workItem from="1750421304478" duration="62000" />
       <workItem from="1750651384914" duration="228000" />
-      <workItem from="1750651696567" duration="3606000" />
+      <workItem from="1750651696567" duration="6464000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -718,14 +716,16 @@
   <component name="ai.zencoder.plugin.rag.state">
     <option name="indexedFilesMap">
       <map>
+        <entry key="$PROJECT_DIR$/.env" value="1750656966506" />
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750655196938" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750656404980" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750659878586" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750659878586" />
         <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749626800561" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" value="1750656404980" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" value="1750659878586" />
         <entry key="$PROJECT_DIR$/api/ai/explain.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
+        <entry key="$PROJECT_DIR$/api/chat.js" value="1750658496382" />
         <entry key="$PROJECT_DIR$/api/debug-env.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions-real.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1750420732387" />
@@ -760,10 +760,21 @@
         <entry key="$PROJECT_DIR$/fix-chat-response.cjs" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/fix-chat-response.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/fix-chat-spread.cjs" value="9223372036854775807" />
-        <entry key="$PROJECT_DIR$/package-lock.json" value="1750418795036" />
-        <entry key="$PROJECT_DIR$/package.json" value="1750418795036" />
+        <entry key="$PROJECT_DIR$/package-lock.json" value="1750659397271" />
+        <entry key="$PROJECT_DIR$/package.json" value="1750659099760" />
         <entry key="$PROJECT_DIR$/simple-dev-server.js" value="1749110402774" />
+        <entry key="$PROJECT_DIR$/test-all-apis.cjs" value="1750656701196" />
         <entry key="$PROJECT_DIR$/test-api-fix.js" value="1750652301877" />
+        <entry key="$PROJECT_DIR$/test-groq-api.cjs" value="1750656701196" />
+        <entry key="$PROJECT_DIR$/test-groq-new-model.cjs" value="1750657294388" />
+        <entry key="$PROJECT_DIR$/test-groq-simple.cjs" value="1750656701196" />
+        <entry key="$PROJECT_DIR$/test-latest-deployment.cjs" value="1750659878586" />
+        <entry key="$PROJECT_DIR$/test-local-chat-api.cjs" value="1750656701196" />
+        <entry key="$PROJECT_DIR$/test-new-deployment.cjs" value="1750658794481" />
+        <entry key="$PROJECT_DIR$/test-new-groq-key.cjs" value="1750656966506" />
+        <entry key="$PROJECT_DIR$/test-production-api.cjs" value="1750658197000" />
+        <entry key="$PROJECT_DIR$/test-with-logs.cjs" value="1750659878586" />
+        <entry key="$PROJECT_DIR$/trigger-api-call.cjs" value="1750658496382" />
         <entry key="$PROJECT_DIR$/utils/analytics.js" value="1749151731558" />
         <entry key="$PROJECT_DIR$/utils/cors.js" value="1750652301877" />
         <entry key="$PROJECT_DIR$/utils/firebase.js" value="1749196133668" />
@@ -771,11 +782,11 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1750417927058" />
       </map>
     </option>
-    <option name="lastCommitHash" value="18c81ebbbd695cbebf0b2c3a6c363ffa01ad5f66" />
-    <option name="lastIndexTimestamp" value="1750656404980" />
-    <option name="repoAccumulatedChanges" value="64" />
+    <option name="lastCommitHash" value="114a525dba3a56c1c510ffdf9c246bb1aecaeeec" />
+    <option name="lastIndexTimestamp" value="1750659878586" />
+    <option name="repoAccumulatedChanges" value="109" />
     <option name="repoTotalFiles" value="368" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
-    <option name="state" value="UPDATING_INDEX" />
+    <option name="state" value="FULLY_INDEXED" />
   </component>
 </project>
