@@ -5,11 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change afterPath="$PROJECT_DIR$/debug-production-response.cjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test-production-chat.cjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test-all-apis.cjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test-groq-api.cjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test-groq-simple.cjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test-local-chat-api.cjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/debug-env.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/test-debug.js" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,7 +131,7 @@
       <workItem from="1750420933553" duration="331000" />
       <workItem from="1750421304478" duration="62000" />
       <workItem from="1750651384914" duration="228000" />
-      <workItem from="1750651696567" duration="2659000" />
+      <workItem from="1750651696567" duration="3606000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -718,9 +721,9 @@
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
         <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750655196938" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750655196938" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750656404980" />
         <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749626800561" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" value="1750655794296" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" value="1750656404980" />
         <entry key="$PROJECT_DIR$/api/ai/explain.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/debug-env.js" value="9223372036854775807" />
@@ -768,11 +771,11 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1750417927058" />
       </map>
     </option>
-    <option name="lastCommitHash" value="be2bf1eba40910a4d2f63f8d0db72c9fbaec4cc4" />
-    <option name="lastIndexTimestamp" value="1750655794296" />
-    <option name="repoAccumulatedChanges" value="54" />
+    <option name="lastCommitHash" value="18c81ebbbd695cbebf0b2c3a6c363ffa01ad5f66" />
+    <option name="lastIndexTimestamp" value="1750656404980" />
+    <option name="repoAccumulatedChanges" value="64" />
     <option name="repoTotalFiles" value="368" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
-    <option name="state" value="FULLY_INDEXED" />
+    <option name="state" value="UPDATING_INDEX" />
   </component>
 </project>
