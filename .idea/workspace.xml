@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
+      <change afterPath="$PROJECT_DIR$/test-frontend-api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder/chats/7994d28e-c44b-450d-874e-0f2d6a2e74b2.json" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder/chats/7994d28e-c44b-450d-874e-0f2d6a2e74b2.json" afterDir="false" />
     </list>
@@ -125,7 +126,7 @@
       <workItem from="1750420933553" duration="331000" />
       <workItem from="1750421304478" duration="62000" />
       <workItem from="1750651384914" duration="228000" />
-      <workItem from="1750651696567" duration="7362000" />
+      <workItem from="1750651696567" duration="7661000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -715,10 +716,11 @@
         <entry key="$PROJECT_DIR$/.env" value="1750656966506" />
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750660604186" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750660604186" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750660895840" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750660895840" />
         <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749626800561" />
         <entry key="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" value="1750659878586" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder/chats/7994d28e-c44b-450d-874e-0f2d6a2e74b2.json" value="1750660981709" />
         <entry key="$PROJECT_DIR$/api/ai-text-to-qa.js" value="1750660604186" />
         <entry key="$PROJECT_DIR$/api/ai/explain.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
@@ -779,9 +781,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1750417927058" />
       </map>
     </option>
-    <option name="lastCommitHash" value="98d8d7bbacf07fe3733beaee2bf1c78e8838e8d9" />
-    <option name="lastIndexTimestamp" value="1750660604186" />
-    <option name="repoAccumulatedChanges" value="123" />
+    <option name="lastCommitHash" value="df590dd0f05cd30bf4cf19a64379af8b6ce6d042" />
+    <option name="lastIndexTimestamp" value="1750660981709" />
+    <option name="repoAccumulatedChanges" value="132" />
     <option name="repoTotalFiles" value="368" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />
