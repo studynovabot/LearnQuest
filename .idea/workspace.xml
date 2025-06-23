@@ -5,9 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change afterPath="$PROJECT_DIR$/test-frontend-api.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deploy.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/zencoder/chats/7994d28e-c44b-450d-874e-0f2d6a2e74b2.json" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder/chats/7994d28e-c44b-450d-874e-0f2d6a2e74b2.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/ncert-solutions.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/ncert-solutions.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/.env" beforeDir="false" afterPath="$PROJECT_DIR$/client/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vercel.json" beforeDir="false" afterPath="$PROJECT_DIR$/vercel.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +132,7 @@
       <workItem from="1750420933553" duration="331000" />
       <workItem from="1750421304478" duration="62000" />
       <workItem from="1750651384914" duration="228000" />
-      <workItem from="1750651696567" duration="7661000" />
+      <workItem from="1750651696567" duration="9447000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -716,22 +722,23 @@
         <entry key="$PROJECT_DIR$/.env" value="1750656966506" />
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750660895840" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750660895840" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750672433402" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750672433402" />
         <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749626800561" />
         <entry key="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" value="1750659878586" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder/chats/7994d28e-c44b-450d-874e-0f2d6a2e74b2.json" value="1750660981709" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder/chats/7994d28e-c44b-450d-874e-0f2d6a2e74b2.json" value="1750672433402" />
         <entry key="$PROJECT_DIR$/api/ai-text-to-qa.js" value="1750660604186" />
         <entry key="$PROJECT_DIR$/api/ai/explain.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/chat.js" value="1750658496382" />
         <entry key="$PROJECT_DIR$/api/debug-env.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions-real.js" value="9223372036854775807" />
-        <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1750420732387" />
+        <entry key="$PROJECT_DIR$/api/ncert-solutions.js" value="1750672433402" />
         <entry key="$PROJECT_DIR$/api/smart-pdf-upload.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/test-debug.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/tutors.js" value="1750652006688" />
         <entry key="$PROJECT_DIR$/api/user-management.js" value="1750652006688" />
+        <entry key="$PROJECT_DIR$/client/.env" value="1750662394558" />
         <entry key="$PROJECT_DIR$/client/package.json" value="1749147224393" />
         <entry key="$PROJECT_DIR$/client/public/images/hero-image.svg" value="1749573895681" />
         <entry key="$PROJECT_DIR$/client/public/site.webmanifest" value="1749110092207" />
@@ -739,7 +746,7 @@
         <entry key="$PROJECT_DIR$/client/src/components/ProtectedRoute.tsx" value="1749573895681" />
         <entry key="$PROJECT_DIR$/client/src/components/firebase/FirebaseStatus.tsx" value="1749107092617" />
         <entry key="$PROJECT_DIR$/client/src/components/ui/premium-chat.tsx" value="1749193596216" />
-        <entry key="$PROJECT_DIR$/client/src/config.ts" value="1749146265660" />
+        <entry key="$PROJECT_DIR$/client/src/config.ts" value="1750662394558" />
         <entry key="$PROJECT_DIR$/client/src/config/themes.ts" value="1749205406851" />
         <entry key="$PROJECT_DIR$/client/src/context/UserContext.tsx" value="1749201077415" />
         <entry key="$PROJECT_DIR$/client/src/hooks/useChat.ts" value="1750654895736" />
@@ -754,16 +761,18 @@
         <entry key="$PROJECT_DIR$/client/src/pages/Register.tsx" value="1749573895681" />
         <entry key="$PROJECT_DIR$/client/src/pages/Settings.tsx" value="1749201077415" />
         <entry key="$PROJECT_DIR$/client/src/pages/Terms.tsx" value="1749573895681" />
+        <entry key="$PROJECT_DIR$/deploy.js" value="1750672159554" />
         <entry key="$PROJECT_DIR$/dev-server.js" value="1748942466395" />
         <entry key="$PROJECT_DIR$/firebase-config.js" value="1749195832013" />
         <entry key="$PROJECT_DIR$/fix-chat-response.cjs" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/fix-chat-response.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/fix-chat-spread.cjs" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/package-lock.json" value="1750659397271" />
-        <entry key="$PROJECT_DIR$/package.json" value="1750659099760" />
+        <entry key="$PROJECT_DIR$/package.json" value="1750672159554" />
         <entry key="$PROJECT_DIR$/simple-dev-server.js" value="1749110402774" />
         <entry key="$PROJECT_DIR$/test-all-apis.cjs" value="1750656701196" />
         <entry key="$PROJECT_DIR$/test-api-fix.js" value="1750652301877" />
+        <entry key="$PROJECT_DIR$/test-frontend-api.js" value="1750661194504" />
         <entry key="$PROJECT_DIR$/test-groq-api.cjs" value="1750656701196" />
         <entry key="$PROJECT_DIR$/test-groq-new-model.cjs" value="1750657294388" />
         <entry key="$PROJECT_DIR$/test-groq-simple.cjs" value="1750656701196" />
@@ -778,12 +787,12 @@
         <entry key="$PROJECT_DIR$/utils/cors.js" value="1750652301877" />
         <entry key="$PROJECT_DIR$/utils/firebase.js" value="1749196133668" />
         <entry key="$PROJECT_DIR$/utils/smart-pdf-processor.js" value="1750418980800" />
-        <entry key="$PROJECT_DIR$/vercel.json" value="1750417927058" />
+        <entry key="$PROJECT_DIR$/vercel.json" value="1750662394558" />
       </map>
     </option>
-    <option name="lastCommitHash" value="df590dd0f05cd30bf4cf19a64379af8b6ce6d042" />
-    <option name="lastIndexTimestamp" value="1750660981709" />
-    <option name="repoAccumulatedChanges" value="132" />
+    <option name="lastCommitHash" value="0ba55b221275950f1c6280bbf599f88e1d2e1637" />
+    <option name="lastIndexTimestamp" value="1750672433402" />
+    <option name="repoAccumulatedChanges" value="166" />
     <option name="repoTotalFiles" value="368" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />
