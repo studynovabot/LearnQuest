@@ -103,7 +103,7 @@ Format as JSON array with objects containing: question, answer, difficulty, type
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        model: "llama-3.1-70b-versatile",
+        model: "llama-3.3-70b-versatile",
         temperature: 0.3,
         max_tokens: 1000,
       }),
@@ -115,7 +115,17 @@ Format as JSON array with objects containing: question, answer, difficulty, type
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error('❌ Groq API error:', response.status, errorData);
-      throw new Error(`Groq API error: ${response.status}`);
+      
+      // Provide more specific error messages
+      let errorMessage = `Groq API error: ${response.status}`;
+      if (errorData.error) {
+        errorMessage = errorData.error.message || errorMessage;
+        if (errorData.error.code === 'model_decommissioned') {
+          errorMessage = 'AI model has been decommissioned. Please update to a newer model.';
+        }
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const completion = await response.json();
