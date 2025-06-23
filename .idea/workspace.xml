@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" afterDir="false" />
-    </list>
+    <list default="true" id="fe44b2a2-db0e-4fc0-b2c5-20cdbbba4eb2" name="Changes" comment="u" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -126,7 +122,7 @@
       <workItem from="1750420933553" duration="331000" />
       <workItem from="1750421304478" duration="62000" />
       <workItem from="1750651384914" duration="228000" />
-      <workItem from="1750651696567" duration="1169000" />
+      <workItem from="1750651696567" duration="1334000" />
     </task>
     <task id="LOCAL-00001" summary="u">
       <option name="closed" value="true" />
@@ -715,9 +711,10 @@
       <map>
         <entry key="$PROJECT_DIR$/.env.local" value="1749153531687" />
         <entry key="$PROJECT_DIR$/.idea/AugmentWebviewStateStore.xml" value="1749046848146" />
-        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750652598550" />
-        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750652301877" />
+        <entry key="$PROJECT_DIR$/.idea/workspace.xml" value="1750652913312" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder-chat-index.xml" value="1750652913312" />
         <entry key="$PROJECT_DIR$/.idea/zencoder-chats-dedicated.xml" value="1749626800561" />
+        <entry key="$PROJECT_DIR$/.idea/zencoder/chats/574fe29c-9a27-4940-8df3-f4a7a8969ccc.json" value="1750652913312" />
         <entry key="$PROJECT_DIR$/api/ai/explain.js" value="9223372036854775807" />
         <entry key="$PROJECT_DIR$/api/auth.js" value="1749056522548" />
         <entry key="$PROJECT_DIR$/api/ncert-solutions-real.js" value="9223372036854775807" />
@@ -749,6 +746,7 @@
         <entry key="$PROJECT_DIR$/client/src/pages/Terms.tsx" value="1749573895681" />
         <entry key="$PROJECT_DIR$/dev-server.js" value="1748942466395" />
         <entry key="$PROJECT_DIR$/firebase-config.js" value="1749195832013" />
+        <entry key="$PROJECT_DIR$/fix-chat-response.js" value="1750652913312" />
         <entry key="$PROJECT_DIR$/package-lock.json" value="1750418795036" />
         <entry key="$PROJECT_DIR$/package.json" value="1750418795036" />
         <entry key="$PROJECT_DIR$/simple-dev-server.js" value="1749110402774" />
@@ -760,9 +758,9 @@
         <entry key="$PROJECT_DIR$/vercel.json" value="1750417927058" />
       </map>
     </option>
-    <option name="lastCommitHash" value="ec807393598115c492e74d30132c9c0b6ea58f2a" />
-    <option name="lastIndexTimestamp" value="1750652598550" />
-    <option name="repoAccumulatedChanges" value="20" />
+    <option name="lastCommitHash" value="59eb22b612e7d27a0259bfac5914edbdfe1fdeb9" />
+    <option name="lastIndexTimestamp" value="1750653001235" />
+    <option name="repoAccumulatedChanges" value="30" />
     <option name="repoTotalFiles" value="368" />
     <option name="repositoryId" value="b3499162-8b9b-4669-bf43-f8cc225e6771" />
     <option name="state" value="FULLY_INDEXED" />

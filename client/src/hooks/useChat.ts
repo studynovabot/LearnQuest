@@ -458,8 +458,9 @@ export function useChat() {
 
             // Add the assistant's response to local state
             setLocalMessages((prev) => [...prev, {
-              ...assistantMessage,
+              id: Date.now(),
               content: messageContent, // Use the validated/fallback content
+              role: 'assistant',
               timestamp: assistantMessage.timestamp || Date.now()
             }]);
 
